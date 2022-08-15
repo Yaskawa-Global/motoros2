@@ -194,6 +194,14 @@ logging:
   # DEFAULT: false
   log_to_stdout: false
 
+  # Should debug messages also be published to rosout?
+  #
+  # NOTE: this will only make them show up in tools like ros_console.
+  #       launch_ros will not automatically include these messages in its logs.
+  #
+  # DEFAULT: false
+  log_to_rosout: false
+
 #-----------------------------------------------------------------------------
 update_periods:
   # The delay between checks for incoming activity on the network. A lower
