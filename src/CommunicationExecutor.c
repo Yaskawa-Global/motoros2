@@ -143,7 +143,8 @@ void Ros_Communication_Initialize()
     motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_SUPPORT_INIT);
 
     //construct a faux command line to pass to rcl_parse_arguments(..)
-    char* faux_argv[MAX_REMAP_RULE_NUM];
+    const size_t FAUX_ARGV_LEN = MAX_REMAP_RULE_NUM + 1 + 1 + 1;
+    char* faux_argv[FAUX_ARGV_LEN];
     size_t faux_argc = 0;
 
     //create copy of remap rule cfg item as Ros_ConstructFauxArgv(..) will
@@ -153,9 +154,9 @@ void Ros_Communication_Initialize()
     Ros_Debug_BroadcastMsg("remap_rules str: '%s'", remap_rules_str_);
     Ros_Debug_BroadcastMsg("len(remap_rules str): %d", strlen(remap_rules_str_));
 
-    bzero(faux_argv, MAX_REMAP_RULE_NUM);
+    bzero(faux_argv, FAUX_ARGV_LEN);
     faux_argc = Ros_ConstructFauxArgv(
-        remap_rules_str_, faux_argv, MAX_REMAP_RULE_NUM);
+        remap_rules_str_, faux_argv, FAUX_ARGV_LEN);
 
     rcl_node_options_t node_options = rcl_node_get_default_options();
     if (faux_argc > 0)
@@ -170,6 +171,27 @@ void Ros_Communication_Initialize()
             mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid remap rule format", SUBCODE_CONFIGURATION_FAIL_NODE_INIT_ARG_PARSE);
             node_options = rcl_node_get_default_options();
         }
+    }
+
+    //configure logging to rosout, if enabled
+    if (g_nodeConfigSettings.log_to_rosout)
+    {
+        //first make sure rosout is enabled in the node options (it should be
+        //by default, but let's make sure)
+        node_options.enable_rosout = TRUE;
+
+        //enable multi output handler, which forwards to rosout
+        ret = rcl_logging_configure_with_output_handler(
+            &node_options.arguments, &g_motoros2_Allocator,
+            rcl_logging_multiple_output_handler);
+        Ros_Debug_BroadcastMsg("rcl_logging_configure_with_output_handler = %d", (int)ret);
+
+        motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_NODE_INIT_ROS_LOGGING,
+            "ret: %d", ret);
+    }
+    else
+    {
+        Ros_Debug_BroadcastMsg("logging to rosout disabled");
     }
 
     //init node with the remap rules and other options from the config file

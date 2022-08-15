@@ -36,7 +36,8 @@
 //
 int Ros_ConstructFauxArgv(char* const remap_rules_str, char* out_array[], size_t out_array_len)
 {
-    const size_t MIN_ARGVS = 1 + 1; // ros args begin and end flags
+    // ros args begin and end flags, and disable-stdout-logs arg
+    const size_t MIN_ARGVS = 1 + 1 + 1;
     const size_t MAX_ARGVS = (MAX_REMAP_RULE_NUM * 2) + MIN_ARGVS;
 
     if (out_array_len < MIN_ARGVS)
@@ -87,6 +88,11 @@ int Ros_ConstructFauxArgv(char* const remap_rules_str, char* out_array[], size_t
         mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid remap rule format", SUBCODE_CONFIGURATION_INVALID_REMAP_RULE_FORMAT);
         return -1;
     }
+
+    // disable logging to stdout: it will end up on the console of the
+    // controller which is invisible to users
+    out_array[num_argvs_++] = rcutils_strdup(
+        "--disable-stdout-logs", g_motoros2_Allocator);
 
     // add ROS CLA suffix
     out_array[num_argvs_++] = rcutils_strdup(
