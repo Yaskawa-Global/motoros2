@@ -32,7 +32,7 @@ The following sections document how to download, install, configure, use and tro
 - download the [latest release](#download) and extract onto USB stick
 - edit the [configuration file](#configuration), at least Agent IP and port
 - insert USB stick into pendant
-- *Maintenance* mode: load the `motoros2_yrc.out` or `motoros2_yrcu.out` MotoPlus application [onto controller](#installation)
+- *Maintenance* mode: load the appropriate `motoros2_yrc1000_*.out` or `motoros2_yrc1000u_*.out` MotoPlus application [onto controller](#installation)
 - *Online* mode: load `motoros2_config.yaml` via `USER DEFINED FILES`
 - start an instance of the [micro-ROS Agent](#the-micro-ros-agent) on a PC
 - reboot controller
