@@ -1,0 +1,24 @@
+---
+# SPDX-FileCopyrightText: 2022-2023, Yaskawa America, Inc.
+# SPDX-FileCopyrightText: 2022-2023, Delft University of Technology
+#
+# SPDX-License-Identifier: CC0-1.0
+extends: default
+
+yaml-files:
+  - 'motoros2_config.yaml'
+
+rules:
+  line-length:
+    max: 120
+  quoted-strings:
+    quote-type: double
+    required: only-when-needed
+  new-lines:
+    # while not strictly needed, we standardise on Windows-style newlines
+    # for the configuration file, even when editing the file on Linux or macOS
+    type: dos
+  comments:
+    # disable this as we use comments without starting spaces to visually
+    # separate the lines with commented keys from explanatory comments
+    require-starting-space: false

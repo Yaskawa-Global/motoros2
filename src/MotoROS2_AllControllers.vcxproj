@@ -1,0 +1,293 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="YRC1000u_foxy|Win32">
+      <Configuration>YRC1000u_foxy</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="YRC1000u_galactic|Win32">
+      <Configuration>YRC1000u_galactic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="YRC1000u_humble|Win32">
+      <Configuration>YRC1000u_humble</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="YRC1000_foxy|Win32">
+      <Configuration>YRC1000_foxy</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="YRC1000_galactic|Win32">
+      <Configuration>YRC1000_galactic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="YRC1000_humble|Win32">
+      <Configuration>YRC1000_humble</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{64C31524-A3C4-49D4-AD04-955D44202226}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <NMakeUseOemCodePage>true</NMakeUseOemCodePage>
+    <ProjectName>MotoROS2</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_galactic|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_galactic|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_foxy|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_galactic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_galactic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_foxy|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000_humble" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;$(SolutionDir)libmicroros_yrc1000_humble\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000_humble" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000_humble\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_galactic|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000_galactic" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_galactic\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000_galactic" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000_galactic\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000_foxy" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_foxy\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000_foxy" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000_foxy\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000u_humble" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;$(SolutionDir)libmicroros_yrc1000u_humble\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000u_humble" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_humble\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_galactic|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000u_galactic" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_galactic\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000u_galactic" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_galactic\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_foxy|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000u_foxy" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "motoros2_yrc1000u_foxy" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_galactic|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_galactic|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_foxy|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\doc\build_from_source.md" />
+    <None Include="..\doc\faq.md" />
+    <None Include="..\doc\ros_api.md" />
+    <None Include="..\doc\troubleshooting.md" />
+    <None Include="..\libmicroros_yrc1000u_foxy\libmicroros.yrcmLib_foxy" />
+    <None Include="..\libmicroros_yrc1000u_galactic\libmicroros.yrcmLib_galactic" />
+    <None Include="..\libmicroros_yrc1000u_humble\libmicroros.yrcmLib_humble" />
+    <None Include="..\libmicroros_yrc1000_foxy\libmicroros.yrcLib_foxy" />
+    <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic" />
+    <None Include="..\libmicroros_yrc1000_humble\libmicroros.yrcLib_humble" />
+    <None Include="..\config\motoros2_config.yaml" />
+    <None Include="MotoROS_PlatformLib.yrcLib" />
+    <None Include="MotoROS_PlatformLib.yrcmLib" />
+    <None Include="ParameterExtraction.yrcLib" />
+    <None Include="ParameterExtraction.yrcmLib" />
+    <None Include="..\README.md" />
+    <None Include="..\CHANGELOG.md" />
+    <None Include="..\robot_jobs\sda_dual_arm\INIT_ROS.JBI" />
+    <None Include="..\robot_jobs\sda_dual_arm\IONAME.DAT" />
+    <None Include="..\robot_jobs\single_arm\INIT_ROS.JBI" />
+    <None Include="..\robot_jobs\single_arm\IONAME.DAT" />
+    <None Include="..\robot_jobs\single_arm_with_base_axis\INIT_ROS.JBI" />
+    <None Include="..\robot_jobs\single_arm_with_base_axis\IONAME.DAT" />
+    <None Include="..\robot_jobs\single_arm_with_ext_axis\INIT_ROS.JBI" />
+    <None Include="..\robot_jobs\single_arm_with_ext_axis\IONAME.DAT" />
+    <None Include="..\robot_jobs\two_arms\INIT_ROS.JBI" />
+    <None Include="..\robot_jobs\two_arms\IONAME.DAT" />
+    <None Include="YRC1000u_foxyCompilerArguments.mps" />
+    <None Include="YRC1000u_foxyLinkerArguments.mps" />
+    <None Include="YRC1000u_galacticCompilerArguments.mps" />
+    <None Include="YRC1000u_galacticLinkerArguments.mps" />
+    <None Include="YRC1000u_humbleCompilerArguments.mps" />
+    <None Include="YRC1000u_humbleLinkerArguments.mps" />
+    <None Include="YRC1000_foxyCompilerArguments.mps" />
+    <None Include="YRC1000_foxyLinkerArguments.mps" />
+    <None Include="YRC1000_galacticCompilerArguments.mps" />
+    <None Include="YRC1000_galacticLinkerArguments.mps" />
+    <None Include="YRC1000_humbleCompilerArguments.mps" />
+    <None Include="YRC1000_humbleLinkerArguments.mps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CommunicationExecutor.c" />
+    <ClCompile Include="ConfigFile.c" />
+    <ClCompile Include="ControllerStatusIO.c" />
+    <ClCompile Include="CtrlGroup.c" />
+    <ClCompile Include="Debug.c" />
+    <ClCompile Include="ErrorHandling.c" />
+    <ClCompile Include="FileUtilityFunctions.c" />
+    <ClCompile Include="InformCheckerAndGenerator.c" />
+    <ClCompile Include="MemoryAllocation.c" />
+    <ClCompile Include="ServiceQueueTrajPoint.c" />
+    <ClCompile Include="ServiceReadWriteIO.c" />
+    <ClCompile Include="ServiceStartPointQueueMode.c" />
+    <ClCompile Include="ServiceStopTrajMode.c" />
+    <ClCompile Include="ServiceStartTrajMode.c" />
+    <ClCompile Include="ServiceSelectMotionTool.c" />
+    <ClCompile Include="Tests_CtrlGroup.c" />
+    <ClCompile Include="MotionControl.c" />
+    <ClCompile Include="ActionServer_FJT.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="Quaternion_Conversion.c" />
+    <ClCompile Include="PositionMonitor.c" />
+    <ClCompile Include="ServiceResetError.c" />
+    <ClCompile Include="FauxCommandLineArgs.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConfigFile.h" />
+    <ClInclude Include="ErrorHandling.h" />
+    <ClInclude Include="CommunicationExecutor.h" />
+    <ClInclude Include="ControllerStatusIO.h" />
+    <ClInclude Include="CtrlGroup.h" />
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="FileUtilityFunctions.h" />
+    <ClInclude Include="InformCheckerAndGenerator.h" />
+    <ClInclude Include="MemoryAllocation.h" />
+    <ClInclude Include="MemoryTracing.h" />
+    <ClInclude Include="RosApiNameConstants.h" />
+    <ClInclude Include="MotoPlusExterns.h" />
+    <ClInclude Include="ServiceQueueTrajPoint.h" />
+    <ClInclude Include="ServiceReadWriteIO.h" />
+    <ClInclude Include="ServiceStartPointQueueMode.h" />
+    <ClInclude Include="ServiceStopTrajMode.h" />
+    <ClInclude Include="ServiceStartTrajMode.h" />
+    <ClInclude Include="ServiceSelectMotionTool.h" />
+    <ClInclude Include="Tests_CtrlGroup.h" />
+    <ClInclude Include="TimeConversionUtils.h" />
+    <ClInclude Include="MotionControl.h" />
+    <ClInclude Include="ActionServer_FJT.h" />
+    <ClInclude Include="MotoROS.h" />
+    <ClInclude Include="CmosParameterExtraction.h" />
+    <ClInclude Include="CmosParameterTypes.h" />
+    <ClInclude Include="Quaternion_Conversion.h" />
+    <ClInclude Include="PositionMonitor.h" />
+    <ClInclude Include="ServiceResetError.h" />
+    <ClInclude Include="FauxCommandLineArgs.h" />
+    <ClInclude Include="MathConstants.h" />
+    <ClInclude Include="MotoROS_PlatformLib.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

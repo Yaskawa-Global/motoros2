@@ -1,0 +1,217 @@
+---
+# SPDX-FileCopyrightText: 2022-2023, Yaskawa America, Inc.
+# SPDX-FileCopyrightText: 2022-2023, Delft University of Technology
+#
+# SPDX-License-Identifier: Apache-2.0
+
+
+#-----------------------------------------------------------------------------
+# REQUIRED
+# IP address and UDP port number of the Micro-ROS Agent PC. All communication
+# to/from MotoROS2 will route through the Agent application.
+# (There is no default value for these fields. They must be specified by
+# the user.)
+#agent_ip_address: "192.168.255.50"
+#agent_port_number: 8888
+
+
+# Any settings that are not specified will be set to their DEFAULT value.
+
+
+#-----------------------------------------------------------------------------
+# The (DDS) domain to join
+#
+# Please refer to the ROS 2 documentation on DDS domain IDs for more
+# information. This setting works exactly like its ROS 2 analogue.
+#
+# DEFAULT: 0 (the default ROS 2 domain ID)
+#ros_domain_id: 0
+
+#-----------------------------------------------------------------------------
+# Name under which MotoROS2 should register with the ROS 2 node graph.
+#
+# DEFAULT: "motoman_xx_yy_zz"  (xyz: last three bytes of robot's MAC address)
+#node_name: ""
+
+#-----------------------------------------------------------------------------
+# Namespace to use for the MotoROS2 node and all topics.
+#
+# DEFAULT: ""  (empty string)
+#node_namespace: ""
+
+#-----------------------------------------------------------------------------
+# Remap rules to apply to ROS 2 resource names.
+#
+# This configures the micro-ROS equivalent of the ROS 2 remap functionality.
+#
+# The current implementation expects all remap rules as a single,
+# space-separated string. Whitespace in resource names is not allowed, so
+# this should not pose any issues.
+#
+# Maximum total length of the remap_rules string: 255 chars. Any characters
+# beyond that will be ignored (and likely result in parsing failures).
+#
+# Please refer to the ROS 2 documentation on remapping for more information
+# on syntax and contraints.
+#
+# Example: the following remaps the 'joint_states' topic to 'my_joint_states',
+# and the 'read_single_io' service to 'io/read_single':
+#
+#   "joint_states:=my_joint_states read_single_io:=io/read_single"
+#
+# DEFAULT: ""  (empty string)
+#remap_rules: ""
+
+#-----------------------------------------------------------------------------
+# This will ensure that when timestamps are sampled, they will match the clock
+# of the Agent PC. This is useful if the date/time of the robot controller is
+# not synchronized.
+#
+# DEFAULT: true
+sync_timeclock_with_agent: true
+
+#-----------------------------------------------------------------------------
+# If the Agent PC disconnects from the robot while it is in motion, should the
+# robot come to a stop?
+#
+# DEFAULT: true
+stop_motion_on_disconnect: true
+
+#-----------------------------------------------------------------------------
+# Should MotoROS2 broadcast transforms on '/tf'? This can be disabled if
+# the data will interfere with applications such as robot_state_publisher.
+#
+# DEFAULT: true
+publish_tf: true
+
+#-----------------------------------------------------------------------------
+# Should the 'tf' topic be namespaced if 'node_namespace' is configured with a
+# non-empty string?
+#
+# Setting this to 'false' will make MotoROS2 broadcast transforms on the '/tf'
+# global topic, which cannot be namespaced (due to being an absolute name).
+# Otherwise, it will broadcast on 'tf', which can be namespaced.
+#
+# DEFAULT: true
+namespace_tf: true
+
+#-----------------------------------------------------------------------------
+# Similar to the 'frame_prefix' parameter of the ROS 2 'robot_state_publisher'
+# node. All published TF frames will be prefixed with this string.
+#
+# Example: with this parameter set to "left/", the "r1/tool0" frame would be
+# published as "left/r1/tool0".
+#
+# NOTE: the prefix must include a separator (fi: '/') if one should be included
+#       in the final name of the TF frames. Such a separator is not added
+#       automatically.
+#
+# DEFAULT: ""  (empty string)
+#tf_frame_prefix: ""
+
+#-----------------------------------------------------------------------------
+# Joints in this configuration file must be listed in the order of Robots,
+# Base-axes, Station-axes.
+#
+# Example: R1+B1+R2+S1 system
+#
+# joint_names:
+# - [r1_s_axis, r1_l_axis, r1_u_axis, r1_r_axis, r1_b_axis, r1_t_axis]
+# - [r2_s_axis, r2_l_axis, r2_u_axis, r2_r_axis, r2_b_axis, r2_t_axis, r2_e_axis]
+# - [b1_axis]
+# - [s1_axis_1, s1_axis_2]
+#
+# When using a 7 axis robot arm with an elbow joint (E) in the middle of the
+# arm, the elbow axis should be listed last (SLURBTE).
+#
+# DEFAULT: "group_x/joint_y"
+#joint_names:
+#- [group_1/joint_1, group_1/joint_2, group_1/joint_3, group_1/joint_4, group_1/joint_5, group_1/joint_6]
+
+#-----------------------------------------------------------------------------
+# Logging settings
+logging:
+  # All log messages are broadcast on the network on port UDP 21789.
+  # Additionally, the messages can be printed to the standard output stream of
+  # the robot controller. This would be visible over a telnet connection, or by
+  # attaching a VGA debug monitor to the robot controller.
+  #
+  # NOTE: this WILL slow down the application.
+  #
+  # DEFAULT: false
+  log_to_stdout: false
+
+#-----------------------------------------------------------------------------
+update_periods:
+  # The delay between checks for incoming activity on the network. A lower
+  # number will result in quicker responsiveness to received messages.
+  # Additionally, it determines the rate at which the feedback_publisher timers
+  # are checked.
+  # This value should be <= to action_feedback_publisher_period as executor_sleep_period
+  # is the rate at which the action-feedback timer is checked. If the value for
+  # action_feedback_publisher_period is < executor_sleep_period, it will effectively
+  # be treated as having the same value executor_sleep_period at runtime. 
+  #
+  # DEFAULT: 10 milliseconds
+  executor_sleep_period: 10
+
+  # The delay between each publish of feedback position and status information.
+  # A lower number will publish the feedback data more frequently.
+  # This value should be >= to executor_sleep_period and
+  # controller_status_monitor_period.
+  #
+  # DEFAULT: 20 milliseconds
+  action_feedback_publisher_period: 20
+
+  # The delay between each poll of the robot I/O and controller status data.
+  # This value should be <= to action_feedback_publisher_period.
+  #
+  # DEFAULT: 10 milliseconds
+  controller_status_monitor_period: 10
+
+#-----------------------------------------------------------------------------
+# QoS profile to use for various publishers MotoROS2 creates.
+# The default values here are based on tests and inspection of the source code
+# of typical consumers of messages on these topics.
+#
+# NOTE : RViz2 expects/requires 'tf' to use the 'default' profile (ie: reliable).
+# NOTE2: MoveIt2 expects/requires 'joint_states' to use the 'default' profile.
+publisher_qos:
+  # DEFAULT: sensor_data
+  robot_status: sensor_data
+
+  # DEFAULT: sensor_data
+  joint_states: sensor_data
+
+  # DEFAULT: default
+  tf: default
+
+#-----------------------------------------------------------------------------
+# Name of the INFORM job to be used (and monitored) by MotoROS2.
+#
+# Maximum length: 32 UTF-8 characters. 16 Japanese (Shift-JIS) characters.
+#
+# Set this to a custom value when using a custom INFORM job with a different
+# name.
+#
+# NOTE: do NOT include the file extension here (ie: '.JBI'). Only the name
+#       of the job should be specified.
+#
+# DEFAULT: "INIT_ROS"
+#inform_job_name: "INIT_ROS"
+
+#-----------------------------------------------------------------------------
+# Allow custom INFORM job.
+#
+# If MotoROS2 detects that the specified INFORM job is not formatted properly
+# then an alarm will be raised at startup.
+# This flag indicates that the job is intentionally configured and will
+# suppress the alarm.
+#
+# When this flag is set to 'true', then MotoROS2 will not validate whether the
+# job is compatible. It is the responsibility of the user to make sure the
+# custom job includes the required INFORM statements and in the expected order
+# (refer to the provided INFORM job files for the general structure).
+#
+# DEFAULT: false
+#allow_custom_inform: false

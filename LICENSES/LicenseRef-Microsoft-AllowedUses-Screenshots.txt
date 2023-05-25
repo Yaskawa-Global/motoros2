@@ -1,0 +1,4 @@
+Screenshots of Microsoft Visual Studio used with permission from Microsoft in accordance with [1] and [2].
+
+[1] https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/permissions, online, retrieved 2023-05-11
+[2] https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/permissions#Screen%20Shots, online, retrieved 2023-05-11

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: 2022-2023, Yaskawa America, Inc.
+SPDX-License-Identifier: Apache-2.0
+-->
+<root>
+	<libExtension>
+		<YRC1000_humble>yrcLib_humble;yrcLib</YRC1000_humble>
+		<YRC1000u_humble>yrcmLib_humble;yrcmLib</YRC1000u_humble>
+		<YRC1000_foxy>yrcLib_foxy;yrcLib</YRC1000_foxy>
+		<YRC1000u_foxy>yrcmLib_foxy;yrcmLib</YRC1000u_foxy>
+		<YRC1000_galactic>yrcLib_galactic;yrcLib</YRC1000_galactic>
+		<YRC1000u_galactic>yrcmLib_galactic;yrcmLib</YRC1000u_galactic>
+	</libExtension>
+	
+	<appName>
+		<YRC1000_humble>MOTOPLUS-YRC1000</YRC1000_humble>
+		<YRC1000u_humble>MOTOPLUS-YRC1000micro</YRC1000u_humble>
+		<YRC1000_foxy>MOTOPLUS-YRC1000</YRC1000_foxy>
+		<YRC1000u_foxy>MOTOPLUS-YRC1000micro</YRC1000u_foxy>
+		<YRC1000_galactic>MOTOPLUS-YRC1000</YRC1000_galactic>
+		<YRC1000u_galactic>MOTOPLUS-YRC1000micro</YRC1000u_galactic>
+	</appName>
+	
+	<compilers>
+		<YRC1000_humble>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_humble>
+		<YRC1000u_humble>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_humble>
+		<YRC1000_foxy>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_foxy>
+		<YRC1000u_foxy>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_foxy>
+		<YRC1000_galactic>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_galactic>
+		<YRC1000u_galactic>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_galactic>
+	</compilers>
+</root>

@@ -1,0 +1,384 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{56b3f26b-d550-436a-8fa8-63d91f7a80a9}</UniqueIdentifier>
+      <Extensions>txt;c;cpp</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e3377235-0a69-4f6e-b24b-96aefee3a3ff}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="MotoPlus Libraries">
+      <UniqueIdentifier>{6a88226f-f107-405b-8bee-0120441f5225}</UniqueIdentifier>
+      <Extensions>fsLib;mpLib;dxLib;dnLib;lib</Extensions>
+    </Filter>
+    <Filter Include="Compile Settings">
+      <UniqueIdentifier>{b312e34a-f77e-465f-9a2b-ce6ddcdeee7d}</UniqueIdentifier>
+      <Extensions>mps</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Actions">
+      <UniqueIdentifier>{6572659c-c0d7-4e5f-b7b0-946ea226d5a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Services">
+      <UniqueIdentifier>{5fe4c751-30a2-4f38-b1ab-82fb080089d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utilities">
+      <UniqueIdentifier>{09b3f8ca-56a0-4819-9a4d-351090d9c51b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Executors">
+      <UniqueIdentifier>{4f93cab0-a76a-4279-98ad-f1a6ed83829a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Robot Controller">
+      <UniqueIdentifier>{a18bb086-0eb4-4ace-af7d-db6339dee69c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Config File">
+      <UniqueIdentifier>{80abf9a9-1053-45ca-a586-8629b30baa01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Parameters and Config">
+      <UniqueIdentifier>{7acf1f8c-52eb-4560-ae36-9ad9a7dfae51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Topics and Publishers">
+      <UniqueIdentifier>{90e0a639-44bd-43dd-9e29-f5ffc147ab80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tests">
+      <UniqueIdentifier>{648683bc-5f19-483d-87d0-7f91e04d3931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Actions">
+      <UniqueIdentifier>{1ab852e3-6392-4444-bc87-ba080684be46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Executors">
+      <UniqueIdentifier>{32a18c60-abc8-444c-8441-9930b1d6a360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tests">
+      <UniqueIdentifier>{e1cc6ebc-8480-41e8-a1f2-f1b72ab61c38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Parameters and Config">
+      <UniqueIdentifier>{976582d7-3f93-489f-8b79-0b6ce7ac86f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Robot Controller">
+      <UniqueIdentifier>{2a740d8d-c614-4a41-9f4f-58ccbc2a9b19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Services">
+      <UniqueIdentifier>{54413dbf-e054-4009-ae46-1609cee30cb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Topics and Publishers">
+      <UniqueIdentifier>{cad35615-01d0-45c9-b990-adffa6570c23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utilities">
+      <UniqueIdentifier>{5b550641-a724-4814-a48f-7f4f00becb77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{b048fcf6-499b-4248-afdf-c94648261b78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Robot Jobs">
+      <UniqueIdentifier>{e91706f5-9ea3-4b7d-b0b2-ac1e9f54f5ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Robot Jobs\sda_dual_arm">
+      <UniqueIdentifier>{b51a543a-d667-40d1-9982-c0300347cb0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Robot Jobs\single_arm">
+      <UniqueIdentifier>{b691a612-245a-4b44-98fb-23656cb2245a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Robot Jobs\single_arm_with_base_axis">
+      <UniqueIdentifier>{7fc2074a-d8fc-4f51-8108-88374d18d810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Robot Jobs\single_arm_with_ext_axis">
+      <UniqueIdentifier>{654cd2e1-60d9-4b67-978e-9dd9cb5c2589}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Robot Jobs\two_arms">
+      <UniqueIdentifier>{8ea0b0c5-39aa-42ac-9f2c-2b5f0cec9615}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs\doc">
+      <UniqueIdentifier>{b77530a2-b8de-43df-b294-73587041326f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MotoPlus Libraries\micro-ROS">
+      <UniqueIdentifier>{e6632634-d563-43fc-b395-cd505f5e6715}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="YRC1000_humbleCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_humbleLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="ParameterExtraction.yrcLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="ParameterExtraction.yrcmLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="MotoROS_PlatformLib.yrcLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="MotoROS_PlatformLib.yrcmLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="..\config\motoros2_config.yaml">
+      <Filter>Config File</Filter>
+    </None>
+    <None Include="..\README.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\CHANGELOG.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\robot_jobs\two_arms\INIT_ROS.JBI">
+      <Filter>Robot Jobs\two_arms</Filter>
+    </None>
+    <None Include="..\robot_jobs\two_arms\IONAME.DAT">
+      <Filter>Robot Jobs\two_arms</Filter>
+    </None>
+    <None Include="..\robot_jobs\single_arm_with_ext_axis\INIT_ROS.JBI">
+      <Filter>Robot Jobs\single_arm_with_ext_axis</Filter>
+    </None>
+    <None Include="..\robot_jobs\single_arm_with_ext_axis\IONAME.DAT">
+      <Filter>Robot Jobs\single_arm_with_ext_axis</Filter>
+    </None>
+    <None Include="..\robot_jobs\single_arm_with_base_axis\INIT_ROS.JBI">
+      <Filter>Robot Jobs\single_arm_with_base_axis</Filter>
+    </None>
+    <None Include="..\robot_jobs\single_arm_with_base_axis\IONAME.DAT">
+      <Filter>Robot Jobs\single_arm_with_base_axis</Filter>
+    </None>
+    <None Include="..\robot_jobs\single_arm\INIT_ROS.JBI">
+      <Filter>Robot Jobs\single_arm</Filter>
+    </None>
+    <None Include="..\robot_jobs\single_arm\IONAME.DAT">
+      <Filter>Robot Jobs\single_arm</Filter>
+    </None>
+    <None Include="..\robot_jobs\sda_dual_arm\INIT_ROS.JBI">
+      <Filter>Robot Jobs\sda_dual_arm</Filter>
+    </None>
+    <None Include="..\robot_jobs\sda_dual_arm\IONAME.DAT">
+      <Filter>Robot Jobs\sda_dual_arm</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000_humble\libmicroros.yrcLib_humble">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000u_humble\libmicroros.yrcmLib_humble">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="YRC1000u_humbleCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_humbleLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="..\doc\faq.md">
+      <Filter>Docs\doc</Filter>
+    </None>
+    <None Include="..\doc\ros_api.md">
+      <Filter>Docs\doc</Filter>
+    </None>
+    <None Include="..\doc\troubleshooting.md">
+      <Filter>Docs\doc</Filter>
+    </None>
+    <None Include="..\doc\build_from_source.md">
+      <Filter>Docs\doc</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="YRC1000u_galacticCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_galacticLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_galacticCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_galacticLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000u_galactic\libmicroros.yrcmLib_galactic">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000_foxy\libmicroros.yrcLib_foxy">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000u_foxy\libmicroros.yrcmLib_foxy">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="YRC1000_foxyCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_foxyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_foxyCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_foxyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionServer_FJT.c">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="PositionMonitor.c">
+      <Filter>Source Files\Topics and Publishers</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion_Conversion.c">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryAllocation.c">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.c">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="FauxCommandLineArgs.c">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="CommunicationExecutor.c">
+      <Filter>Source Files\Executors</Filter>
+    </ClCompile>
+    <ClCompile Include="ControllerStatusIO.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="CtrlGroup.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorHandling.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="MotionControl.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceStopTrajMode.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceStartTrajMode.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceSelectMotionTool.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceReadWriteIO.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceResetError.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigFile.c">
+      <Filter>Source Files\Parameters and Config</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests_CtrlGroup.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="InformCheckerAndGenerator.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUtilityFunctions.c">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceQueueTrajPoint.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceStartPointQueueMode.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MotoROS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RosApiNameConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionServer_FJT.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunicationExecutor.h">
+      <Filter>Header Files\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_CtrlGroup.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigFile.h">
+      <Filter>Header Files\Parameters and Config</Filter>
+    </ClInclude>
+    <ClInclude Include="ControllerStatusIO.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="CtrlGroup.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorHandling.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="MotionControl.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceReadWriteIO.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceStopTrajMode.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceStartTrajMode.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceSelectMotionTool.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceResetError.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="PositionMonitor.h">
+      <Filter>Header Files\Topics and Publishers</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryAllocation.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion_Conversion.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryTracing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FauxCommandLineArgs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CmosParameterTypes.h">
+      <Filter>MotoPlus Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="CmosParameterExtraction.h">
+      <Filter>MotoPlus Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="MotoROS_PlatformLib.h">
+      <Filter>MotoPlus Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeConversionUtils.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="MotoPlusExterns.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="InformCheckerAndGenerator.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtilityFunctions.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceQueueTrajPoint.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceStartPointQueueMode.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
