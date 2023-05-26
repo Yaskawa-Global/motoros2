@@ -150,7 +150,7 @@ update_periods:
   # This value should be <= to action_feedback_publisher_period as executor_sleep_period
   # is the rate at which the action-feedback timer is checked. If the value for
   # action_feedback_publisher_period is < executor_sleep_period, it will effectively
-  # be treated as having the same value executor_sleep_period at runtime. 
+  # be treated as having the same value executor_sleep_period at runtime.
   #
   # DEFAULT: 10 milliseconds
   executor_sleep_period: 10
