@@ -20,28 +20,28 @@ The old `motoros2_interfaces-beta1` repository will also be *archived* and will 
 
 Changes:
 
- - Significantly reduced shutdown time: MotoROS2 now takes approximately 4 seconds to shutdown after it detects the micro-ROS Agent has disconnected (after the default timeout, which is set to 10 seconds)
- - Improved publisher performance (`RobotStatus`, `JointState`, TF)
- - Migrated motion-related services to dedicated executor
- - MotoROS2 now publishes all active alarms & errors on `robot_status`, as opposed to only the one raised most recently
- - `reset_error` now also resets MotoROS2 internal errors
- - Extended `FollowJointTrajectory` goal validation. MotoROS2 now requires:
-   - positive and non-zero durations for all segments
-   - monotonically increasing timestamps on all trajectory points
-   - `positions` and `velocities` for all joints
-   - zero velocity and acceleration for the last trajectory point
- - Extended config file loader to verify names are present for all joints in a group when providing custom joint names
- - Fixed incorrect `result_code` returned by `start_traj_mode`/`start_point_queue_mode`: services now return `MotionReadyEnum::READY` (ie: `1`) instead of `0` on success
- - Updated Visual Studio solution to support Foxy builds
- - Updated Visual Studio solution to support Galactic builds
- - Migrated platform-specific functionality to a common library
- - Migrated custom string handling code to corresponding `rcutils` functionality
- - Switched to using M+ `libmicroros` configuration header
- - Corrected capitalization of "micro-ROS" in the application info struct
+- Significantly reduced shutdown time: MotoROS2 now takes approximately 4 seconds to shutdown after it detects the micro-ROS Agent has disconnected (after the default timeout, which is set to 10 seconds)
+- Improved publisher performance (`RobotStatus`, `JointState`, TF)
+- Migrated motion-related services to dedicated executor
+- MotoROS2 now publishes all active alarms & errors on `robot_status`, as opposed to only the one raised most recently
+- `reset_error` now also resets MotoROS2 internal errors
+- Extended `FollowJointTrajectory` goal validation. MotoROS2 now requires:
+  - positive and non-zero durations for all segments
+  - monotonically increasing timestamps on all trajectory points
+  - `positions` and `velocities` for all joints
+  - zero velocity and acceleration for the last trajectory point
+- Extended config file loader to verify names are present for all joints in a group when providing custom joint names
+- Fixed incorrect `result_code` returned by `start_traj_mode`/`start_point_queue_mode`: services now return `MotionReadyEnum::READY` (ie: `1`) instead of `0` on success
+- Updated Visual Studio solution to support Foxy builds
+- Updated Visual Studio solution to support Galactic builds
+- Migrated platform-specific functionality to a common library
+- Migrated custom string handling code to corresponding `rcutils` functionality
+- Switched to using M+ `libmicroros` configuration header
+- Corrected capitalization of "micro-ROS" in the application info struct
 
 Notices:
 
- - Switched MotoROS2 to the `Apache-2.0` open-source license (from `BSD-3-Clause`)
+- Switched MotoROS2 to the `Apache-2.0` open-source license (from `BSD-3-Clause`)
 
 ## 0.0.15 (2022-11-30)
 
