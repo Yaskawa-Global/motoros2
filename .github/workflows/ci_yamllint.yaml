@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2023, Yaskawa America, Inc.
+# SPDX-FileCopyrightText: 2023, Delft University of Technology
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: "CI: lint MotoROS2 config"
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: karancode/yamllint-github-action@v2.1.1
+        with:
+          yamllint_file_or_dir: 'config'
+          yamllint_config_filepath: 'config/.yamllint'
+          yamllint_strict: true
+          yamllint_comment: true
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
