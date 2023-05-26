@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2023, Yaskawa America, Inc.
+# SPDX-FileCopyrightText: 2023, Delft University of Technology
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Default state for all rules
+default: true
+
+# MD013/line-length - Line length
+# we disable this because we use semantic line breaks (one-sentence-per-line,
+# specifically) so we can't put a maximum length on lines.
+MD013: false
