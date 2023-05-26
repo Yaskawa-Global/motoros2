@@ -5,6 +5,8 @@ SPDX-FileCopyrightText: 2023, Delft University of Technology
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
+# Contributing
+
 All contributions made to this repository will be under the `Apache-2.0` License, as dictated by that [license](http://www.apache.org/licenses/LICENSE-2.0.html):
 
 ```text
