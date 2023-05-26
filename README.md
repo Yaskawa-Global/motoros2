@@ -32,7 +32,7 @@ The following sections document how to download, install, configure, use and tro
 - download the [latest release](#download) and extract onto USB stick
 - edit the [configuration file](#configuration), at least Agent IP and port
 - insert USB stick into pendant
-- *Maintenance* mode: load the `motoros2_yrc.out` or `motoros2_yrcu.out` MotoPlus application [onto controller](#installation)
+- *Maintenance* mode: load the appropriate `motoros2_yrc1000_*.out` or `motoros2_yrc1000u_*.out` MotoPlus application [onto controller](#installation)
 - *Online* mode: load `motoros2_config.yaml` via `USER DEFINED FILES`
 - start an instance of the [micro-ROS Agent](#the-micro-ros-agent) on a PC
 - reboot controller
@@ -93,7 +93,7 @@ The following general requirements must be met in order to be able to use MotoRO
   - `YBS2.31.00-00` for YRC1000micro
 - the controller must have a correctly configured network connection (either `LAN2` or `LAN3`)
 - MotoPlus and Motoman-Driver must be enabled on the controller
-- ROS 2 version: Foxy, Galactic, Humble or Rolling (note: Foxy users *must* build the Galactic version of [control_msgs](https://github.com/ros-controls/control_msgs) from source in their workspace).
+- ROS 2 version: Foxy, Galactic, Humble or Rolling.
   ROS 2 Iron Irwini is not yet supported.
 - Docker or a from-source build of the micro-ROS Agent
 - FastDDS as RMW (even when using ROS 2 Galactic)
