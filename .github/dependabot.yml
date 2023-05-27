@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2023, Yaskawa America, Inc.
+# SPDX-FileCopyrightText: 2023, Delft University of Technology
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Update actions in workflows weekly
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
