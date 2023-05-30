@@ -49,7 +49,7 @@
 //
 // The MIT License
 //
-// Copyright © 2010 - 2020 three.js authors
+// Copyright (c) 2010 - 2020 three.js authors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this softwareand associated documentation files(the "Software"), to deal
