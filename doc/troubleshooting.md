@@ -194,10 +194,6 @@ ALARM 8003
 *Solution:*
 Your robot controller requires internal configuration changes to support the MotoROS2 driver.
 
-For DX100: Please contact your local Yaskawa Motoman office to order the MotoROS2 runtime.
-In North/South America, the part number for this configuration is `180014-1`.
-In Europe, the part number for this configuration is `171403`.
-
 For YRC1000 and YRC1000micro: ensure the controller is updated to at least `YAS2.80.00-00` (for YRC1000) and `YBS2.31.00-00` (for YRC1000micro).
 If the system software version is below this, please contact Yaskawa Motoman for assistance with upgrading the controller.
 
@@ -376,22 +372,6 @@ Additionally, the robot controller must meet a minimum version of system softwar
 For YRC1000, the controller must have `YAS2.80.00-00` or higher.
 For YRC1000micro, the controller must have `YBS2.31.00-00` or higher.
 Please contact Yaskawa technical support for assistance in upgrading the controller software.
-
-### Alarm: 8003[10]
-
-*Example:*
-
-```text
-ALARM 8003
- MotoROS2: Reconfigure waist axis
-[10]
-```
-
-*Solution:*
-The DX100 SDA robots must configured as three control groups.
-The waist must be configured as an external station.
-It cannot have a 'shared' base axis.
-Please contact Yaskawa technical support for assistance in reconfiguring your DX100 SDA.
 
 ### Alarm: 8003[11]
 
