@@ -59,6 +59,10 @@
 
 #define DEFAULT_INFORM_JOB_NAME         "INIT_ROS"
 
+#define DEFAULT_ULAN_MON_ENABLED        TRUE
+#define DEFAULT_ULAN_MON_LINK           ROS_USER_LAN1
+#define DEFAULT_ULAN_MON_MAX_DROPS      1
+
 // based on rmw/qos_profiles.h
 typedef enum
 {
@@ -111,6 +115,10 @@ typedef struct
     char inform_job_name[MAX_JOB_NAME_LEN];
 
     BOOL allow_custom_inform_job;
+
+    BOOL userlan_monitor_enabled;
+    int userlan_monitor_port;
+    int userlan_monitor_max_num_drops;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;

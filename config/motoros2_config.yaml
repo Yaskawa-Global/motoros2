@@ -71,6 +71,33 @@
 sync_timeclock_with_agent: true
 
 #-----------------------------------------------------------------------------
+# Should MotoROS2 monitor the link state of the ethernet port used to
+# communicate with the Agent?
+#
+# If enabled, this will cause immediate notification of loss-of-connection
+# when the link goes down, causing MotoROS2 to activate it's shutdown
+# behaviour (ie: stop all motion (if enabled), release resources, wait for
+# link up and attempt reconnection with the Agent).
+#
+# If this is disabled, Agent disconnection detection uses an application
+# layer based timeout mechanism which takes longer to detect disconnects (but
+# might be more robust against intermittent link-layer disconnects which do not
+# cause network disconnections).
+#
+# DEFAULT: true
+#userlan_monitor_enabled: true
+
+#-----------------------------------------------------------------------------
+# Which port should MotoROS2 monitor, if 'userlan_monitor_enabled' is 'true'?
+#
+# NOTE: this setting only applies to YRC1000 and YRC1000u controllers.
+#       DX200 and FS100 controllers have only a single ethernet port, and any
+#       value other than 1 will be ignored.
+#
+# DEFAULT: 1 (ie: 'ROS_USER_LAN1')
+#userlan_monitor_port: 1
+
+#-----------------------------------------------------------------------------
 # If the Agent PC disconnects from the robot while it is in motion, should the
 # robot come to a stop?
 #

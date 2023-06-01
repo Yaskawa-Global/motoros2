@@ -117,6 +117,9 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "stop_motion_on_disconnect", &g_nodeConfigSettings.stop_motion_on_disconnect, Value_Bool },
     { "inform_job_name", &g_nodeConfigSettings.inform_job_name, Value_String },
     { "allow_custom_inform_job", &g_nodeConfigSettings.allow_custom_inform_job, Value_Bool },
+    { "userlan_monitor_enabled", &g_nodeConfigSettings.userlan_monitor_enabled, Value_Bool },
+    { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_Int },
+    { "userlan_monitor_max_num_drops", &g_nodeConfigSettings.userlan_monitor_max_num_drops, Value_Int },
 };
 
 void Ros_ConfigFile_SetAllDefaultValues()
@@ -211,6 +214,11 @@ void Ros_ConfigFile_SetAllDefaultValues()
 
     //allow_custom_inform
     g_nodeConfigSettings.allow_custom_inform_job = DEFAULT_ALLOW_CUSTOM_INFORM;
+
+    //userlan monitoring
+    g_nodeConfigSettings.userlan_monitor_enabled = DEFAULT_ULAN_MON_ENABLED;
+    g_nodeConfigSettings.userlan_monitor_port = DEFAULT_ULAN_MON_LINK;
+    g_nodeConfigSettings.userlan_monitor_max_num_drops = DEFAULT_ULAN_MON_MAX_DROPS;
 }
 
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
@@ -549,6 +557,33 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
         mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid status_monitor_period", SUBCODE_CONFIGURATION_INVALID_IO_PERIOD);
 
         g_nodeConfigSettings.controller_status_monitor_period = DEFAULT_CONTROLLER_IO_PERIOD;
+    }
+
+    //-----------------------------------------------------------------------------
+    if (g_nodeConfigSettings.userlan_monitor_enabled)
+    {
+        if (g_nodeConfigSettings.userlan_monitor_port != ROS_USER_LAN1 &&
+            g_nodeConfigSettings.userlan_monitor_port != ROS_USER_LAN2)
+        {
+            Ros_Debug_BroadcastMsg("userlan_monitor_port value %d is invalid: reverting to default: %d",
+            g_nodeConfigSettings.userlan_monitor_port, DEFAULT_ULAN_MON_LINK);
+
+            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid userlan_monitor_port",
+                SUBCODE_CONFIGURATION_INVALID_USERLAN_MONITOR_PORT);
+
+            g_nodeConfigSettings.userlan_monitor_port = DEFAULT_ULAN_MON_LINK;
+        }
+
+        if (g_nodeConfigSettings.userlan_monitor_max_num_drops <= 0)
+        {
+            Ros_Debug_BroadcastMsg("userlan_monitor_max_num_drops value %d is invalid: reverting to default: %d",
+            g_nodeConfigSettings.userlan_monitor_max_num_drops, DEFAULT_ULAN_MON_MAX_DROPS);
+
+            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid ulan_mon_max_num_drops",
+                SUBCODE_CONFIGURATION_INVALID_USERLAN_MONITOR_MAX_NUM_DROPS);
+
+            g_nodeConfigSettings.userlan_monitor_max_num_drops = DEFAULT_ULAN_MON_MAX_DROPS;
+        }
     }
 }
 
