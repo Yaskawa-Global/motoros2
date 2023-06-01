@@ -207,6 +207,62 @@ void Ros_Communication_PublishActionFeedback(rcl_timer_t* timer, int64_t last_ca
     Ros_ActionServer_FJT_ProcessResult();
 }
 
+void Ros_Communication_MonitorUserLanState(SHORT interface_id)
+{
+    //assume link is currently up (and pretend it was up before this task even
+    //started).
+    //This task is only started once MotoROS2 can reach the Agent (and can
+    //connect to it), so the link MUST be up or otherwise this task could
+    //not have been started.
+    //If we start with the assumption the link is down, we'd see a state change
+    //as soon as we call Ros_UserLan_IsLinkUp(..), which would not lead to any
+    //action (as we only act on up->down edges), but would be unnecessary.
+    BOOL bLinkWasUp = TRUE;
+
+    //we set g_Ros_Communication_AgentIsConnected=FALSE in the body below,
+    //so this exits when a link drop is detected
+    while (g_Ros_Communication_AgentIsConnected)
+    {
+        //TODO(gavanderhoorn): make configurable ?
+        Ros_Sleep(0.5 * 1e3);
+
+        //retrieve current state of monitored link, assume it's down
+        BOOL bLinkIsUp = FALSE;
+        STATUS status = Ros_UserLan_IsLinkUp(interface_id, &bLinkIsUp);
+        if (status != OK)
+        {
+            //TODO(gavanderhoorn): should this be fatal for MotoROS2?
+            Ros_Debug_BroadcastMsg(
+                "Error reading link state (port: %d, error: %d), shutting down monitor",
+                interface_id, status);
+            //also to console, in case link is actually down
+            Ros_Debug_LogToConsole(
+                "Error reading link state (port: %d, error: %d), shutting down monitor",
+                interface_id, status);
+            //yes, goto has its uses
+            goto UserLanMonitorExit;
+        }
+
+        //link was up last time, but no longer is up now -> signal disconnect
+        if (bLinkWasUp && !bLinkIsUp)
+        {
+            //log to console, as network connection is presumable down
+            Ros_Debug_LogToConsole(
+                "Link down (port: %d), flagging Agent as disconnected", interface_id);
+            //this will cause this task to terminate, no need to GOTO out
+            //of this while-loop
+            g_Ros_Communication_AgentIsConnected = FALSE;
+        }
+
+        //remember
+        bLinkWasUp = bLinkIsUp;
+    }
+
+UserLanMonitorExit:
+    Ros_Debug_BroadcastMsg("Terminating UserLan state monitor task");
+    mpDeleteSelf;
+}
+
 void Ros_Communication_RunIoExecutor(rclc_executor_t* executor, SEM_ID semIoExecutorStatus)
 {
     mpSemTake(semIoExecutorStatus, NO_WAIT);
@@ -353,7 +409,19 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     //===========================================================
     //===========================================================
     //===========================================================
-    
+
+    // See if we should start task which monitors user lan port link state
+    // (This task deletes itself when the agent disconnects.)
+    if (g_nodeConfigSettings.userlan_monitor_enabled)
+    {
+        Ros_Debug_BroadcastMsg("Starting UserLan link state monitor task ..");
+        mpCreateTask(MP_PRI_TIME_NORMAL, MP_STACK_SIZE,
+            (FUNCPTR)Ros_Communication_MonitorUserLanState,
+            (int)g_nodeConfigSettings.userlan_monitor_port, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+    else
+        Ros_Debug_BroadcastMsg("NOT starting UserLan link state monitor task (disabled)");
+
     // Start executor that runs the I/O executor
     // (This task deletes itself when the agent disconnects.)
     SEM_ID semIoExecutorStatus = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
