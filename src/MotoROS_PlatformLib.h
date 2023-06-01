@@ -18,7 +18,7 @@
 // -  ZZ: patch version nr
 //
 // Note: no leading zeros, to avoid octal parsing
-#define MOTOROS_PLATFORM_LIB_VERSION 202
+#define MOTOROS_PLATFORM_LIB_VERSION 203
 
 #define MOTOROS_PLATFORM_LIB_MAJOR (MOTOROS_PLATFORM_LIB_VERSION / 100000)
 #define MOTOROS_PLATFORM_LIB_MINOR (MOTOROS_PLATFORM_LIB_VERSION / 100 % 1000)
@@ -54,6 +54,16 @@ extern ULONG tickGet();
 
 #define SO_BROADCAST    0x0020
 extern STATUS Ros_setsockopt(int s, int level, int optname, char* optval, int optlen);
+
+
+// Attempts to determine whether the specific link is UP (ie: cable is connected).
+// IFF return value is 'OK', 'is_up' will reflect link state. In all other cases,
+// 'is_up' may be left uninitialised.
+#define ROS_USERLAN_STATE_INVALID_IF_NO -10
+#define ROS_USERLAN_STATE_NO_SUCH_IF -11
+#define ROS_USERLAN_STATE_GET_STATE_ERROR -12
+#define ROS_USERLAN_STATE_GENERIC_FAILURE -13
+extern STATUS Ros_UserLan_IsLinkUp(USHORT if_no, BOOL* const is_up /*out*/);
 
 
 #endif  // MOTOROS_PLATFORM_LIB_H
