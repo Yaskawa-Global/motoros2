@@ -23,6 +23,7 @@
 #include <rcl_action/rcl_action.h>
 #include <rcl/error_handling.h>
 #include <rcl/publisher.h>
+#include <rcl/logging.h>
 
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
