@@ -85,9 +85,9 @@ BOOL Ros_Controller_Initialize()
         if(groupIndex < g_Ros_Controller.numGroup)
         {
             // Determine if specific group exists and allocate memory for it
-            g_Ros_Controller.ctrlGroups[groupIndex] = Ros_CtrlGroup_Create(groupIndex,								//Zero based index of the group number(0 - 3)
-                                                                (groupIndex==(g_Ros_Controller.numGroup-1)),	//TRUE if this is the final group that is being initialized. FALSE if you plan to call this function again.
-                                                                g_Ros_Controller.interpolPeriod);		//Value of the interpolation period (ms) for the robot controller.
+            g_Ros_Controller.ctrlGroups[groupIndex] = Ros_CtrlGroup_Create(groupIndex,                       //Zero based index of the group number(0 - 3)
+                                                                (groupIndex==(g_Ros_Controller.numGroup-1)), //TRUE if this is the final group that is being initialized. FALSE if you plan to call this function again.
+                                                                g_Ros_Controller.interpolPeriod);            //Value of the interpolation period (ms) for the robot controller.
             if(g_Ros_Controller.ctrlGroups[groupIndex] != NULL)
             {
                 Ros_CtrlGroup_GetPulsePosCmd(g_Ros_Controller.ctrlGroups[groupIndex], g_Ros_Controller.ctrlGroups[groupIndex]->prevPulsePos); // set the current commanded pulse
@@ -267,28 +267,28 @@ BOOL Ros_Controller_IsValidGroupNo(int groupNo)
 //-------------------------------------------------------------------
 void Ros_Controller_StatusInit()
 {
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_MAJOR].ulAddr = 50010;		// Alarm
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_MINOR].ulAddr = 50011;		// Alarm
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_SYSTEM].ulAddr = 50012;		// Alarm
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_USER].ulAddr = 50013;			// Alarm
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ERROR].ulAddr = 50014;				// Error
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PLAY].ulAddr = 50054;				// Play
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_TEACH].ulAddr = 50053;				// Teach
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_REMOTE].ulAddr = 80011; //50056;	// Remote  // Modified E.M. 7/9/2013
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_OPERATING].ulAddr = 50070;			// Operating
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_HOLD].ulAddr = 50071;				// Hold
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_SERVO].ulAddr = 50073;   			// Servo ON
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ESTOP_EX].ulAddr = 80025;   		// External E-Stop
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ESTOP_PP].ulAddr = 80026;   		// Pendant E-Stop
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ESTOP_CTRL].ulAddr = 80027;   		// Controller E-Stop
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_MAJOR].ulAddr = 50010;       // Alarm
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_MINOR].ulAddr = 50011;       // Alarm
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_SYSTEM].ulAddr = 50012;      // Alarm
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ALARM_USER].ulAddr = 50013;        // Alarm
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ERROR].ulAddr = 50014;             // Error
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PLAY].ulAddr = 50054;              // Play
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_TEACH].ulAddr = 50053;             // Teach
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_REMOTE].ulAddr = 80011; //50056;   // Remote  // Modified E.M. 7/9/2013
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_OPERATING].ulAddr = 50070;         // Operating
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_HOLD].ulAddr = 50071;              // Hold
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_SERVO].ulAddr = 50073;             // Servo ON
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ESTOP_EX].ulAddr = 80025;          // External E-Stop
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ESTOP_PP].ulAddr = 80026;          // Pendant E-Stop
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ESTOP_CTRL].ulAddr = 80027;        // Controller E-Stop
     g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_WAITING_ROS].ulAddr = IO_FEEDBACK_WAITING_MP_INCMOVE; // Job input signaling ready for external motion
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_INECOMODE].ulAddr = 50727;			// Energy Saving Mode
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_INECOMODE].ulAddr = 50727;         // Energy Saving Mode
 #if (YRC1000||YRC1000u)
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_STOP].ulAddr = 81702;			// PFL function stopped the motion
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_ESCAPE].ulAddr = 81703;			// PFL function escape from clamping motion
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOIDING].ulAddr = 15120;		// PFL function avoidance operating
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOID_JOINT].ulAddr = 15124;	// PFL function avoidance joint enabled
-    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOID_TRANS].ulAddr = 15125;	// PFL function avoidance translation enabled
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_STOP].ulAddr = 81702;          // PFL function stopped the motion
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_ESCAPE].ulAddr = 81703;        // PFL function escape from clamping motion
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOIDING].ulAddr = 15120;      // PFL function avoidance operating
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOID_JOINT].ulAddr = 15124;   // PFL function avoidance joint enabled
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOID_TRANS].ulAddr = 15125;   // PFL function avoidance translation enabled
 #endif
     g_Ros_Controller.alarmCode = 0;
 

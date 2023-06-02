@@ -358,9 +358,9 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     mpMulFrame(&frameBaseToTcp, &frameTcpToTool0, &frameBaseToTool0);
 
     //Make rotational frames
-    vectorOrg.x = 0;	vectorOrg.y = 0;	vectorOrg.z = 0;
-    vectorX.x = 0;		vectorX.y = 0;		vectorX.z = 1;
-    vectorY.x = 0;		vectorY.y = -1;		vectorY.z = 0;
+    vectorOrg.x = 0;    vectorOrg.y = 0;    vectorOrg.z = 0;
+    vectorX.x = 0;      vectorX.y = 0;      vectorX.z = 1;
+    vectorY.x = 0;      vectorY.y = -1;     vectorY.z = 0;
     mpMakeFrame(&vectorOrg, &vectorX, &vectorY, &frameTool0ToFlange);
     mpInvFrame(&frameTool0ToFlange, &frameFlangeToTool0);
     mpFrameToZYXeuler(&frameFlangeToTool0, &coordFlangeToTool0);

@@ -8,9 +8,9 @@
 #include "MotoROS.h"
 
 
-#define DEBUG_UDP_PORT_NUMBER	21789
+#define DEBUG_UDP_PORT_NUMBER   21789
 
-#define MAX_DEBUG_MESSAGE_SIZE	1024
+#define MAX_DEBUG_MESSAGE_SIZE  1024
 
 int ros_DebugSocket = -1;
 struct sockaddr_in ros_debug_destAddr1;

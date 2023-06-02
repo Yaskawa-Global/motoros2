@@ -11,53 +11,53 @@
 #define CONFIG_FILE_NAME                "motoros2_config.yaml"
 #define FORMAT_CONFIG_FILE_BACKUP       "%s\\%s.%04d%02d%02d_%02d%02d%02d" //Example: "MPUSB0\motoros2_config.yaml.202207029_081011"
 
-#define MAX_YAML_STRING_LEN				128
+#define MAX_YAML_STRING_LEN             128
 
-#define DEFAULT_ROS_DOMAIN_ID			0
-#define MIN_ROS_DOMAIN_ID_LINUX			0
-#define MAX_ROS_DOMAIN_ID_LINUX			101
+#define DEFAULT_ROS_DOMAIN_ID           0
+#define MIN_ROS_DOMAIN_ID_LINUX         0
+#define MAX_ROS_DOMAIN_ID_LINUX         101
 
-#define DEFAULT_NODE_NAME				"motoman" //will be suffixed with MAC ID
+#define DEFAULT_NODE_NAME               "motoman" //will be suffixed with MAC ID
 
-#define DEFAULT_NODE_NAMSPACE			""
+#define DEFAULT_NODE_NAMSPACE           ""
 
-#define DEFAULT_SYNCTIME				TRUE
+#define DEFAULT_SYNCTIME                TRUE
 
-#define DEFAULT_PUBLISH_TF				TRUE
+#define DEFAULT_PUBLISH_TF              TRUE
 
-#define DEFAULT_NAMESPACE_TF			TRUE
+#define DEFAULT_NAMESPACE_TF            TRUE
 
 // NOTE: We do not prefix joints by the "motoman Grp ID" here, but use the generic
 // group & joint names instead to avoid the OEM-specific names.
-#define DEFAULT_JOINT_NAME_FMT			"group_%d/joint_%d"
+#define DEFAULT_JOINT_NAME_FMT          "group_%d/joint_%d"
 
-#define DEFAULT_LOG_TO_STDOUT			FALSE
+#define DEFAULT_LOG_TO_STDOUT           FALSE
 
-#define DEFAULT_EXECUTOR_SLEEP_PERIOD	10 //ms
+#define DEFAULT_EXECUTOR_SLEEP_PERIOD   10 //ms
 #define MIN_EXECUTOR_SLEEP_PERIOD       1
 #define MAX_EXECUTOR_SLEEP_PERIOD       100
 
-#define DEFAULT_FEEDBACK_PUBLISH_PERIOD	20 //ms
+#define DEFAULT_FEEDBACK_PUBLISH_PERIOD 20 //ms
 #define MIN_FEEDBACK_PUBLISH_PERIOD     1
 #define MAX_FEEDBACK_PUBLISH_PERIOD     100
 
-#define DEFAULT_CONTROLLER_IO_PERIOD	10 //ms
+#define DEFAULT_CONTROLLER_IO_PERIOD    10 //ms
 #define MIN_CONTROLLER_IO_PERIOD        1
 #define MAX_CONTROLLER_IO_PERIOD        100
 
-#define DEFAULT_QOS_ROBOT_STATUS		ROS_QOS_PROFILE_SENSOR_DATA
+#define DEFAULT_QOS_ROBOT_STATUS        ROS_QOS_PROFILE_SENSOR_DATA
 
-#define DEFAULT_QOS_JOINT_STATES		ROS_QOS_PROFILE_SENSOR_DATA
+#define DEFAULT_QOS_JOINT_STATES        ROS_QOS_PROFILE_SENSOR_DATA
 
-#define DEFAULT_QOS_TF					ROS_QOS_PROFILE_DEFAULT
+#define DEFAULT_QOS_TF                  ROS_QOS_PROFILE_DEFAULT
 
-#define DEFAULT_TF_FRAME_PREFIX			""
+#define DEFAULT_TF_FRAME_PREFIX         ""
 
 #define DEFAULT_STOP_MOTION_ON_DISCON   TRUE
 
 #define DEFAULT_ALLOW_CUSTOM_INFORM     FALSE
 
-#define DEFAULT_INFORM_JOB_NAME			"INIT_ROS"
+#define DEFAULT_INFORM_JOB_NAME         "INIT_ROS"
 
 // based on rmw/qos_profiles.h
 typedef enum
@@ -70,9 +70,9 @@ typedef enum
     ROS_QOS_PROFILE_SYSTEM_DEFAULT = 6,
 } Ros_QoS_Profile_Setting;
 
-#define DEFAULT_REMAP_RULES				""
-#define MAX_REMAP_RULE_NUM				16
-#define MAX_REMAP_RULE_LEN				256
+#define DEFAULT_REMAP_RULES             ""
+#define MAX_REMAP_RULE_NUM              16
+#define MAX_REMAP_RULE_LEN              256
 
 typedef struct
 {

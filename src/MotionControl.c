@@ -393,11 +393,11 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
                 JointMotionData* startTrajData;
                 JointMotionData* endTrajData;
                 JointMotionData* curTrajData;
-                double interval;					// Time between startTime and the new data time
+                double interval;                    // Time between startTime and the new data time
                 double accCoef1[MP_GRP_AXES_NUM];   // Acceleration coefficient 1
                 double accCoef2[MP_GRP_AXES_NUM];   // Acceleration coefficient 2
-                UINT64 timeInc_ms;					// time increment in millisecond
-                UINT64 calculationTime_ms;			// time in ms at which the interpolation takes place
+                UINT64 timeInc_ms;                  // time increment in millisecond
+                UINT64 calculationTime_ms;          // time in ms at which the interpolation takes place
                 long newPulsePos[MP_GRP_AXES_NUM];
                 Incremental_data incData;
 
@@ -475,15 +475,15 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
                         for (i = 0; i < ctrlGroup->numAxes; i++)
                         {
                             // Add position change for new interpolation time
-                            curTrajData->pos[i] = startTrajData->pos[i] 						// initial position component
-                                + startTrajData->vel[i] * interpolTime  						// initial velocity component
-                                + accCoef1[i] * interpolTime * interpolTime / 2 				// accCoef1 component
-                                + accCoef2[i] * interpolTime * interpolTime * interpolTime / 6;	// accCoef2 component
+                            curTrajData->pos[i] = startTrajData->pos[i]                         // initial position component
+                                + startTrajData->vel[i] * interpolTime                          // initial velocity component
+                                + accCoef1[i] * interpolTime * interpolTime / 2                 // accCoef1 component
+                                + accCoef2[i] * interpolTime * interpolTime * interpolTime / 6; // accCoef2 component
 
                             // Add velocity change for new interpolation time
-                            curTrajData->vel[i] = startTrajData->vel[i]   						// initial velocity component
-                                + accCoef1[i] * interpolTime 									// accCoef1 component
-                                + accCoef2[i] * interpolTime * interpolTime / 2;				// accCoef2 component
+                            curTrajData->vel[i] = startTrajData->vel[i]                         // initial velocity component
+                                + accCoef1[i] * interpolTime                                    // accCoef1 component
+                                + accCoef2[i] * interpolTime * interpolTime / 2;                // accCoef2 component
                         }
 
                         // Reset the timeInc_ms for the next interpolation cycle

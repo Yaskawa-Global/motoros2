@@ -17,11 +17,11 @@
 #define Q_LOCK_TIMEOUT 5000  //YRC1000 tick period is 0.2 ms
 #endif
 
-#define	Q_OFFSET_IDX( a, b, c )	(((a)+(b)) >= (c) ) ? ((a)+(b)-(c)) \
+#define Q_OFFSET_IDX( a, b, c ) (((a)+(b)) >= (c) ) ? ((a)+(b)-(c)) \
                 : ( (((a)+(b)) < 0 ) ? ((a)+(b)+(c)) : ((a)+(b)) )
 
-#define MAX_JOINT_NAME_LENGTH				32
-#define MAX_TF_FRAME_NAME_LENGTH			96
+#define MAX_JOINT_NAME_LENGTH               32
+#define MAX_TF_FRAME_NAME_LENGTH            96
 
 typedef struct
 {
@@ -43,10 +43,10 @@ typedef struct
 // jointMotionData values are in radian and joint order in sequential order
 typedef struct
 {
-    BOOL valid;						// this point has valid data
-    UINT64 time;					// time in millisecond
-    double pos[MP_GRP_AXES_NUM];	// position in radians
-    double vel[MP_GRP_AXES_NUM];	// velocity in radians/s
+    BOOL valid;                     // this point has valid data
+    UINT64 time;                    // time in millisecond
+    double pos[MP_GRP_AXES_NUM];    // position in radians
+    double vel[MP_GRP_AXES_NUM];    // velocity in radians/s
 } JointMotionData;
 
 //---------------------------------------------------------------
@@ -55,36 +55,36 @@ typedef struct
 //---------------------------------------------------------------
 typedef struct
 {
-    int groupNo;								// sequence group number
-    int numAxes;								// number of axis in the control group
-    MP_GRP_ID_TYPE groupId;						// control group ID
-    PULSE_TO_RAD pulseToRad;					// conversion ratio between pulse and radian
-    PULSE_TO_METER pulseToMeter;				// conversion ratio between pulse and meter (linear axis)
-    FB_PULSE_CORRECTION_DATA correctionData;	// compensation for axes coupling
-    MAX_INCREMENT_INFO maxInc;					// maximum increment per interpolation cycle
-    double maxSpeed[MP_GRP_AXES_NUM];			// maximum joint speed in radian/sec (rotational) or meter/sec (linear) (ROS joint-order)
-    int tool;									// selected tool for the motion
+    int groupNo;                                // sequence group number
+    int numAxes;                                // number of axis in the control group
+    MP_GRP_ID_TYPE groupId;                     // control group ID
+    PULSE_TO_RAD pulseToRad;                    // conversion ratio between pulse and radian
+    PULSE_TO_METER pulseToMeter;                // conversion ratio between pulse and meter (linear axis)
+    FB_PULSE_CORRECTION_DATA correctionData;    // compensation for axes coupling
+    MAX_INCREMENT_INFO maxInc;                  // maximum increment per interpolation cycle
+    double maxSpeed[MP_GRP_AXES_NUM];           // maximum joint speed in radian/sec (rotational) or meter/sec (linear) (ROS joint-order)
+    int tool;                                   // selected tool for the motion
 
-    Incremental_q inc_q;						// incremental queue
-    UINT64 q_time;								// time to which the queue has been processed
+    Incremental_q inc_q;                        // incremental queue
+    UINT64 q_time;                              // time to which the queue has been processed
 
-    JointMotionData* trajectoryIterator;		// joint motion command data in radian
-    JointMotionData* prevTrajectoryIterator;	// joint motion command data in radian
-    JointMotionData trajectoryToProcess[MAX_NUMBER_OF_POINTS_PER_TRAJECTORY];	// joint motion command data in radian to process
+    JointMotionData* trajectoryIterator;        // joint motion command data in radian
+    JointMotionData* prevTrajectoryIterator;    // joint motion command data in radian
+    JointMotionData trajectoryToProcess[MAX_NUMBER_OF_POINTS_PER_TRAJECTORY];   // joint motion command data in radian to process
 
-    BOOL hasDataToProcess;						// indicates that there is data to process
-    UINT64 timeLeftover_ms;						// Time left over after reaching the end of a trajectory to complete the interpolation period
-    long prevPulsePos[MAX_PULSE_AXES];			// The commanded pulse position that the trajectory starts at (Ros_MotionServer_StartTrajMode)
-    AXIS_MOTION_TYPE axisType;					// Indicates whether axis is rotary or linear
+    BOOL hasDataToProcess;                      // indicates that there is data to process
+    UINT64 timeLeftover_ms;                     // Time left over after reaching the end of a trajectory to complete the interpolation period
+    long prevPulsePos[MAX_PULSE_AXES];          // The commanded pulse position that the trajectory starts at (Ros_MotionServer_StartTrajMode)
+    AXIS_MOTION_TYPE axisType;                  // Indicates whether axis is rotary or linear
     char jointNames_userDefined[MP_GRP_AXES_NUM][MAX_JOINT_NAME_LENGTH]; //string name for each joint in 'moto' (non-sequential) joint order
 
-    BOOL bIsBaxisSlave;							// Indicates the B axis will automatically move to maintain orientation as other axes are moved
+    BOOL bIsBaxisSlave;                         // Indicates the B axis will automatically move to maintain orientation as other axes are moved
 
-    MP_COORD robotCalibrationToBaseFrame;		// Transform from [BF] > [RF] or [BF] > [base track origin]
+    MP_COORD robotCalibrationToBaseFrame;       // Transform from [BF] > [RF] or [BF] > [base track origin]
 
-    MP_GRP_ID_TYPE baseTrackGroupId;			// ID for the base track associated with this robot (-1 if no base track)
-    int baseTrackGroupIndex;					// Group index for the base track associated with this robot (-1 if no base track)
-    BASE_AXIS_INFO baseTrackInfo;				//
+    MP_GRP_ID_TYPE baseTrackGroupId;            // ID for the base track associated with this robot (-1 if no base track)
+    int baseTrackGroupIndex;                    // Group index for the base track associated with this robot (-1 if no base track)
+    BASE_AXIS_INFO baseTrackInfo;               //
 
     JOINT_FEEDBACK_SPEED_ADDRESSES speedFeedbackRegisterAddress; //CIO address for the registers containing feedback speed
 
@@ -105,9 +105,9 @@ typedef struct
 
 //Initialize specific control group. This should be called for each group connected to the robot
 //controller in numerical order.
-//	int groupNo: Zero based index of the group number (0-3)
-//	BOOL bIsLastGrpToInit: TRUE if this is the final group that is being initialized. FALSE if you plan to call this function again.
-//	float interpolPeriod: Value of the interpolation period (ms) for the robot controller.
+//  int groupNo: Zero based index of the group number (0-3)
+//  BOOL bIsLastGrpToInit: TRUE if this is the final group that is being initialized. FALSE if you plan to call this function again.
+//  float interpolPeriod: Value of the interpolation period (ms) for the robot controller.
 extern CtrlGroup* Ros_CtrlGroup_Create(int groupNo, BOOL bIsLastGrpToInit, float interpolPeriod);
 extern void Ros_CtrlGrp_Cleanup(CtrlGroup* ctrlGroup);
 

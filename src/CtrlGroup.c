@@ -338,7 +338,7 @@ BOOL Ros_CtrlGroup_GetFBPulsePos(CtrlGroup* ctrlGroup, long pulsePos[MAX_PULSE_A
 
     //--------------------------------------------------------------------
     //NOTE: Do NOT apply any B axis compensation here.
-    //		This is actual feedback which is reported to the state server.
+    //      This is actual feedback which is reported to the state server.
     //--------------------------------------------------------------------
 
     return TRUE;

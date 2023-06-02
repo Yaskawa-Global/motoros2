@@ -244,8 +244,8 @@ static const char* const Ros_IoServer_ResultCodeToStr(UINT32 resultCode);
 //* end of controller IO range defs ************************
 #endif
 
-#define QUANTITY_BIT	(1)
-#define QUANTITY_BYTE	(8)
+#define QUANTITY_BIT    (1)
+#define QUANTITY_BYTE   (8)
 
 rcl_service_t g_serviceReadSingleIO;
 rcl_service_t g_serviceReadGroupIO;
