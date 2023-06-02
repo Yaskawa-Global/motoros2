@@ -97,16 +97,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DX200_humbleCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_humbleLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
     <None Include="YRC1000_humbleCompilerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
     <None Include="YRC1000_humbleLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
+    <None Include="ParameterExtraction.dnLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
     <None Include="ParameterExtraction.yrcLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="ParameterExtraction.yrcmLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="MotoROS_PlatformLib.dnLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="MotoROS_PlatformLib.yrcLib">
@@ -177,6 +189,9 @@
     </None>
     <None Include="..\doc\build_from_source.md">
       <Filter>Docs\doc</Filter>
+    </None>
+    <None Include="..\libmicroros_dx200_humble\libmicroros.dnLib_humble">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
     <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
