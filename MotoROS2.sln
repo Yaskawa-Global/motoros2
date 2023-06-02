@@ -7,6 +7,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MotoROS2", "src\MotoROS2_Al
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		DX200_foxy|x86 = DX200_foxy|x86
+		DX200_galactic|x86 = DX200_galactic|x86
+		DX200_humble|x86 = DX200_humble|x86
 		YRC1000_foxy|x86 = YRC1000_foxy|x86
 		YRC1000_galactic|x86 = YRC1000_galactic|x86
 		YRC1000_humble|x86 = YRC1000_humble|x86
@@ -15,6 +18,12 @@ Global
 		YRC1000u_humble|x86 = YRC1000u_humble|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{64C31524-A3C4-49D4-AD04-955D44202226}.DX200_foxy|x86.ActiveCfg = DX200_foxy|Win32
+		{64C31524-A3C4-49D4-AD04-955D44202226}.DX200_foxy|x86.Build.0 = DX200_foxy|Win32
+		{64C31524-A3C4-49D4-AD04-955D44202226}.DX200_galactic|x86.ActiveCfg = DX200_galactic|Win32
+		{64C31524-A3C4-49D4-AD04-955D44202226}.DX200_galactic|x86.Build.0 = DX200_galactic|Win32
+		{64C31524-A3C4-49D4-AD04-955D44202226}.DX200_humble|x86.ActiveCfg = DX200_humble|Win32
+		{64C31524-A3C4-49D4-AD04-955D44202226}.DX200_humble|x86.Build.0 = DX200_humble|Win32
 		{64C31524-A3C4-49D4-AD04-955D44202226}.YRC1000_foxy|x86.ActiveCfg = YRC1000_foxy|Win32
 		{64C31524-A3C4-49D4-AD04-955D44202226}.YRC1000_foxy|x86.Build.0 = YRC1000_foxy|Win32
 		{64C31524-A3C4-49D4-AD04-955D44202226}.YRC1000_galactic|x86.ActiveCfg = YRC1000_galactic|Win32

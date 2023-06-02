@@ -97,16 +97,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DX200_humbleCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_humbleLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
     <None Include="YRC1000_humbleCompilerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
     <None Include="YRC1000_humbleLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
+    <None Include="ParameterExtraction.dnLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
     <None Include="ParameterExtraction.yrcLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="ParameterExtraction.yrcmLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="MotoROS_PlatformLib.dnLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="MotoROS_PlatformLib.yrcLib">
@@ -178,6 +190,9 @@
     <None Include="..\doc\build_from_source.md">
       <Filter>Docs\doc</Filter>
     </None>
+    <None Include="..\libmicroros_dx200_humble\libmicroros.dnLib_humble">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
     <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
@@ -212,6 +227,24 @@
       <Filter>Compile Settings</Filter>
     </None>
     <None Include="YRC1000u_foxyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="..\libmicroros_dx200_foxy\libmicroros.dnLib_foxy">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="DX200_foxyCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_foxyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="..\libmicroros_dx200_galactic\libmicroros.dnLib_galactic">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="DX200_galacticCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_galacticLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
   </ItemGroup>
