@@ -7,8 +7,8 @@
 
 #include "MotoROS.h"
 
-#if !(YRC1000 || YRC1000u)
-#error This must be compiled for a YRC generation controller!
+#if !(YRC1000 || YRC1000u || DX200)
+#error This must be compiled for a YRC or DX2 generation controller!
 #endif
 
 void RosInitTask();
