@@ -75,11 +75,11 @@
 #include "MotoROS.h"
 
 #ifndef max
-#define max(x, y)	(((x) < (y)) ? (y) : (x))
+#define max(x, y)   (((x) < (y)) ? (y) : (x))
 #endif
 
 #ifndef min
-#define min(x, y)	(((x) < (y)) ? (x) : (y))
+#define min(x, y)   (((x) < (y)) ? (x) : (y))
 #endif
 
 double QuatConversion_clamp(double value, double _min, double _max)

@@ -8,8 +8,8 @@
 #ifndef MOTOROS2_ACTION_SERVER_FJT_H
 #define MOTOROS2_ACTION_SERVER_FJT_H
 
-#define MAX_NUMBER_OF_POINTS_PER_TRAJECTORY	200
-#define MIN_NUMBER_OF_POINTS_PER_TRAJECTORY	2	//current position and destination
+#define MAX_NUMBER_OF_POINTS_PER_TRAJECTORY 200
+#define MIN_NUMBER_OF_POINTS_PER_TRAJECTORY 2   //current position and destination
 
 #define DEFAULT_FJT_GOAL_POSITION_TOLERANCE  (0.01) //radians per axis or meters per axis
 #define DEFAULT_FJT_GOAL_TIME_TOLERANCE      (500000000LL) //nanoseconds (0.5 seconds)

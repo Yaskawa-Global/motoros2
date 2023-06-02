@@ -8,18 +8,18 @@
 #ifndef MOTOROS2_MOTION_CONTROL_H
 #define MOTOROS2_MOTION_CONTROL_H
 
-#define START_MAX_PULSE_DEVIATION			30
+#define START_MAX_PULSE_DEVIATION           30
 
-#define MOTION_START_TIMEOUT				5000  // in milliseconds
-#define MOTION_START_CHECK_PERIOD			50  // in millisecond
-#define MOTION_STOP_TIMEOUT					20
+#define MOTION_START_TIMEOUT                5000  // in milliseconds
+#define MOTION_START_CHECK_PERIOD           50  // in millisecond
+#define MOTION_STOP_TIMEOUT                 20
 
 #ifndef E_EXRCS_PFL_FUNC_BUSY
-#define E_EXRCS_PFL_FUNC_BUSY				(-19)
+#define E_EXRCS_PFL_FUNC_BUSY               (-19)
 #endif
 
 #ifndef E_EXRCS_UNDER_ENERGY_SAVING
-#define E_EXRCS_UNDER_ENERGY_SAVING			(-20)
+#define E_EXRCS_UNDER_ENERGY_SAVING         (-20)
 #endif
 
 typedef enum
