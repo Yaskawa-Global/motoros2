@@ -430,7 +430,8 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     else
     {
         //technically we're not starting it, but the message is clear enough
-        Ros_Debug_BroadcastMsg("Starting UserLan link state monitor timer ..");
+        Ros_Debug_BroadcastMsg("Starting UserLan link state monitor (port: %d)",
+            g_nodeConfigSettings.userlan_monitor_port);
     }
 
     // Start executor that runs the I/O executor

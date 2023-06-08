@@ -60,7 +60,7 @@
 #define DEFAULT_INFORM_JOB_NAME         "INIT_ROS"
 
 #define DEFAULT_ULAN_MON_ENABLED        TRUE
-#define DEFAULT_ULAN_MON_LINK           ROS_USER_LAN1
+#define DEFAULT_ULAN_MON_LINK           -1
 
 // based on rmw/qos_profiles.h
 typedef enum
