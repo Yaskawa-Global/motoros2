@@ -83,7 +83,7 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
         // Populate values
         ctrlGroup->groupNo = groupIndex;
         ctrlGroup->numAxes = numAxes;
-        ctrlGroup->groupId = mpCtrlGrpNo2GrpId(groupIndex);
+        ctrlGroup->groupId = Ros_mpCtrlGrpNo2GrpId(groupIndex);
 
         if (Ros_CtrlGroup_IsRobot(ctrlGroup))
         {
