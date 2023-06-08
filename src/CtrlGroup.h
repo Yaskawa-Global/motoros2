@@ -111,6 +111,8 @@ typedef struct
 extern CtrlGroup* Ros_CtrlGroup_Create(int groupNo, BOOL bIsLastGrpToInit, float interpolPeriod);
 extern void Ros_CtrlGrp_Cleanup(CtrlGroup* ctrlGroup);
 
+extern MP_GRP_ID_TYPE Ros_mpCtrlGrpNo2GrpId(int groupNo);
+
 extern BOOL Ros_CtrlGroup_GetPulsePosCmd(CtrlGroup* ctrlGroup, long pulsePos[MAX_PULSE_AXES]);
 extern BOOL Ros_CtrlGroup_GetFBPulsePos(CtrlGroup* ctrlGroup, long pulsePos[MAX_PULSE_AXES]);
 extern BOOL Ros_CtrlGroup_GetFBServoSpeed(CtrlGroup* ctrlGroup, long pulseSpeed[MAX_PULSE_AXES]);
