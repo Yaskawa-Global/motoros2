@@ -227,7 +227,7 @@ static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t la
         g_nodeConfigSettings.userlan_monitor_port, &bLinkIsUp);
     if (status != OK)
     {
-        //TODO(gavanderhoorn): should this be fatal for MotoROS2?
+        //this isn't fatal, but we do want to log it
         Ros_Debug_BroadcastMsg(
             "Error reading link state (port: %d, error: %d), shutting down monitor timer",
             g_nodeConfigSettings.userlan_monitor_port, status);
@@ -235,6 +235,11 @@ static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t la
         Ros_Debug_LogToConsole(
             "Error reading link state (port: %d, error: %d), shutting down monitor timer",
             g_nodeConfigSettings.userlan_monitor_port, status);
+
+        //and log an alarm on the pendant
+        mpSetAlarm(ALARM_CONFIGURATION_FAIL, "LAN monitor fail",
+            SUBCODE_CONFIGURATION_RUNTIME_USERLAN_LINKUP_ERR);
+
         //yes, goto has its uses
         goto UserLanMonitorTimerCallbackExit;
     }
