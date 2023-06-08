@@ -444,6 +444,38 @@ void Ros_ConfigFile_CheckUsbForNewConfigFile()
         Ros_Debug_BroadcastMsg("No new configuration file found on CN102 USB drive.");
 }
 
+STATUS Ros_ConfigFile_HostOnNetworkInterface(char* const host, USHORT if_no, BOOL* const reachable)
+{
+    ULONG nic_ip, nic_subnetmask, nic_gateway;
+    ULONG host_ip;
+    UINT8 dont_care[6];
+    STATUS status = OK;
+    BOOL host_on_network = FALSE;
+
+    Ros_Debug_BroadcastMsg("%s: checking '%s' on iface %d", __func__, host, if_no);
+
+    host_ip = mpInetAddr(host);
+    status = Ros_mpNICData(if_no, &nic_ip, &nic_subnetmask, dont_care, &nic_gateway);
+    if (status != OK)
+        return status;
+
+    host_on_network = ((nic_ip & nic_subnetmask) == (host_ip & nic_subnetmask));
+
+    //check to see if gateway could be used, and assume the Agent is reachable through it
+    if (!host_on_network)
+    {
+        Ros_Debug_BroadcastMsg("%s: not on network, gateway: 0x%08X", __func__, nic_gateway);
+        host_on_network = (nic_gateway != 0)
+            && ((nic_gateway & nic_subnetmask) == (host_ip & nic_subnetmask));
+    }
+
+    Ros_Debug_BroadcastMsg("%s: exit: on network: %s", __func__,
+        host_on_network ? "true" : "false");
+
+    *reachable = host_on_network;
+    return OK;
+}
+
 void Ros_ConfigFile_ValidateCriticalSettings()
 {
     //==============================================================================
@@ -477,23 +509,23 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     //-----------------------------------------
     //Verify agent is on my subnet (or a gateway is specified)
     BOOL bAgentOnMySubnet = FALSE;
-    ULONG ip_be1, subnetmask_be1, gateway_be1;
-    ULONG ip_be2, subnetmask_be2, gateway_be2;
-    UINT8 macId[6];
-    ULONG agent_ip_be;
-
-    agent_ip_be = mpInetAddr(g_nodeConfigSettings.agent_ip_address);
 
     //check first lan port
-    if (Ros_mpNICData(ROS_USER_LAN1, &ip_be1, &subnetmask_be1, macId, &gateway_be1) == OK)
-        bAgentOnMySubnet = ((ip_be1 & subnetmask_be1) == (agent_ip_be & subnetmask_be1));
+    STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
+        g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnMySubnet);
+    motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+        "Host on NIC check 1");
 
-    //check second lan port
-    if (!bAgentOnMySubnet && (Ros_mpNICData(ROS_USER_LAN2, &ip_be2, &subnetmask_be2, macId, &gateway_be2) == OK))
-        bAgentOnMySubnet = ((ip_be2 & subnetmask_be2) == (agent_ip_be & subnetmask_be2));
-
-    if (!bAgentOnMySubnet) //check if gateway is configured
-        bAgentOnMySubnet = (gateway_be1 != 0) || (gateway_be2 != 0);
+#if defined (YRC1000) || defined (YRC1000u)
+    if (!bAgentOnMySubnet)
+    {
+        //check second lan port
+        status = Ros_ConfigFile_HostOnNetworkInterface(
+            g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnMySubnet);
+        motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+            "Host on NIC check 2");
+    }
+#endif
 
     motoRosAssert_withMsg(bAgentOnMySubnet,
         SUBCODE_CONFIGURATION_INVALID_AGENT_SUBNET,
