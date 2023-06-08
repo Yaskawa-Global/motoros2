@@ -13,6 +13,8 @@
 
 extern size_t mpNumBytesFree(void);
 
+#if defined (YRC1000) || defined (YRC1000u)
 extern MP_GRP_ID_TYPE mpCtrlGrpNo2GrpId(int grp_no);
+#endif
 
 #endif // MOTOROS2_MOTOPLUS_EXTERNS_H
