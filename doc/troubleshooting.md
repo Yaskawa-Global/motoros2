@@ -194,6 +194,8 @@ ALARM 8003
 *Solution:*
 Your robot controller requires internal configuration changes to support the MotoROS2 driver.
 
+For DX200: ensure the controller is updated to at least `DN2.44.00-00`.
+
 For YRC1000 and YRC1000micro: ensure the controller is updated to at least `YAS2.80.00-00` (for YRC1000) and `YBS2.31.00-00` (for YRC1000micro).
 If the system software version is below this, please contact Yaskawa Motoman for assistance with upgrading the controller.
 
@@ -612,7 +614,8 @@ ALARM 8013
 
 *Solution:*
 Follow the [setup instructions](../README.md#installation) to load the `motoros2_config.yaml` configuration file.
-Be sure to follow the steps for initializing SRAM and setting the `S2C` parameters.
+Double check the setting of the `S2C` parameters.
+Additionally, on YRC-generation controllers, be sure to follow the steps for initializing SRAM.
 
 ### Alarm: 8013[1]
 
@@ -910,3 +913,36 @@ ALARM 8014
 *Solution:*
 There was a failure when generating the default INFORM job.
 Please obtain the standard job from the Github repository and load it using the teach pendant.
+
+### Alarm: 8015[0]
+
+*Example:*
+
+```text
+ALARM 8015
+ Failed to parse RBCALIB.DAT
+[0]
+```
+
+*Solution:*
+Check the following robot parameters on the teach pendant and make sure they are set to the values shown here:
+
+- S2C1103 = 2
+- S2C1117 = 1
+
+If that does not resolve the issue, please contact Yaskawa technical support for assistance.
+Include a copy of the `ALL.PRM` and `CMOS.BIN` from your robot controller.
+
+### Alarm: 8015[1] - [4]
+
+*Example:*
+
+```text
+ALARM 8015
+ Failed to parse RBCALIB.DAT
+[1]
+```
+
+*Solution:*
+Open a new ticket on the MotoROS2 [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
+Please include a copy of the `RBCALIB.DAT` from your robot controller along with the output from the [Debug log client](#debug-log-client).
