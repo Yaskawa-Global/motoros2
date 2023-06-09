@@ -704,7 +704,10 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_SetAllDefaultValues();
 
+#if !(DX200 || FS100)
+    //config file always resides on USB for DX200/FS100
     Ros_ConfigFile_CheckUsbForNewConfigFile();
+#endif
 
     do
     {
