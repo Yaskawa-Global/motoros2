@@ -612,7 +612,8 @@ ALARM 8013
 
 *Solution:*
 Follow the [setup instructions](../README.md#installation) to load the `motoros2_config.yaml` configuration file.
-Be sure to follow the steps for initializing SRAM and setting the `S2C` parameters.
+Double check the setting of the `S2C` parameters.
+Additionally, on YRC-generation controllers, be sure to follow the steps for initializing SRAM.
 
 ### Alarm: 8013[1]
 
