@@ -114,13 +114,14 @@ sync_timeclock_with_agent: true
 #         auto-detection by configuring 'userlan_monitor_port' below.
 #
 # NOTE 3: the port specified here is NOT checked against 'agent_ip_address'.
-#         In other words: if 'agent_ip_address' is on 'ROS_USER_LAN1', but
-#         'userlan_monitor_port' is set to 'ROS_USER_LAN2', MotoROS2 will
-#         detect link down events on 'ROS_USER_LAN2', whether or not that
-#         port is used to communicate with the Agent.
+#         In other words: if 'agent_ip_address' is on 'USER_LAN1', but
+#         'userlan_monitor_port' is set to 'USER_LAN2', MotoROS2 will detect
+#         link down events on 'USER_LAN2', whether or not that port is used
+#         to communicate with the Agent.
 #
-# DEFAULT: 1 (ie: 'ROS_USER_LAN1')
-#userlan_monitor_port: 1
+# OPTIONS: USER_LAN1, USER_LAN2
+# DEFAULT: USER_LAN1
+#userlan_monitor_port: USER_LAN1
 
 #-----------------------------------------------------------------------------
 # If the Agent PC disconnects from the robot while it is in motion, should the

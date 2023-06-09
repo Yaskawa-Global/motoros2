@@ -84,7 +84,8 @@ typedef enum
     Value_Int,
     Value_Bool,
     Value_JointNameArray,
-    Value_Qos
+    Value_Qos,
+    Value_UserLanPort,
 } Value_Type;
 
 typedef struct
@@ -118,7 +119,7 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "inform_job_name", &g_nodeConfigSettings.inform_job_name, Value_String },
     { "allow_custom_inform_job", &g_nodeConfigSettings.allow_custom_inform_job, Value_Bool },
     { "userlan_monitor_enabled", &g_nodeConfigSettings.userlan_monitor_enabled, Value_Bool },
-    { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_Int },
+    { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_UserLanPort },
 };
 
 void Ros_ConfigFile_SetAllDefaultValues()
@@ -306,6 +307,39 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                     }
 
                     Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey, (char*)event->data.scalar.value);
+                    break;
+
+                case Value_UserLanPort:
+#if defined (DX200) || defined (FS100)
+                    // single port, override whatever was configured
+                    *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
+                    Ros_Debug_BroadcastMsg("DX200 or FS100: override to 'USER_LAN1'");
+
+#elif defined (YRC1000) || defined (YRC1000u)
+                    if (strncmp((char*)event->data.scalar.value, "USER_LAN1", 9) == 0)
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
+                    else if (strncmp((char*)event->data.scalar.value, "USER_LAN2", 9) == 0)
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN2;
+                    else
+                    {
+                        //Note: ideally, we'd disable user lan monitoring here. However, we can't
+                        //guarantee the 'userlan_monitor_enabled' setting won't be parsed after
+                        //this one. If it were to be parsed after 'userlan_monitor_port', we'd
+                        //be disabling it here, only to have it re-enabled later.
+                        //Set the config value to the 'disabled' sentinel value and let the
+                        //validation code below handle the fallout.
+                        Ros_Debug_BroadcastMsg(
+                            "Unrecognised value for '%s': '%s'. Port monitoring will be disabled",
+                            (char*)event->data.scalar.value,
+                            (char*)activeItem->yamlKey);
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN_DISABLED;
+                    }
+#else
+    #error Unsupported platform
+#endif
+                    //Note: this logs whatever was in the .yaml, NOT the verified/parsed value above
+                    Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey,
+                        (char*)event->data.scalar.value);
                     break;
                 }
             }
@@ -594,14 +628,8 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     {
         Ros_Debug_BroadcastMsg("UserLan monitor enabled, checking port setting ..");
 
-#if defined (DX200) || defined (FS100)
-        // single port, override whatever was configured
-        g_nodeConfigSettings.userlan_monitor_port = ROS_USER_LAN1;
-        Ros_Debug_BroadcastMsg("DX200 or FS100: override to ROS_USER_LAN1 (%d)", ROS_USER_LAN1);
-
-#elif defined (YRC1000) || defined (YRC1000u)
         //try to auto-detect if the port was not configured
-        if (g_nodeConfigSettings.userlan_monitor_port < 0)
+        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
         {
             BOOL bAgentOnInterface = FALSE;
             STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
@@ -611,15 +639,16 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
 
             if (bAgentOnInterface)
             {
-                g_nodeConfigSettings.userlan_monitor_port = ROS_USER_LAN1;
+                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN1;
                 Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
                     g_nodeConfigSettings.userlan_monitor_port);
             }
         }
 
+#if defined (YRC1000) || defined (YRC1000u)
         //on these controllers we can try the second interface, if we haven't
         //already determined we should monitor the first
-        if (g_nodeConfigSettings.userlan_monitor_port < 0)
+        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
         {
             BOOL bAgentOnInterface = FALSE;
             STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
@@ -629,20 +658,17 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
 
             if (bAgentOnInterface)
             {
-                g_nodeConfigSettings.userlan_monitor_port = ROS_USER_LAN2;
+                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN2;
                 Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
                     g_nodeConfigSettings.userlan_monitor_port);
             }
         }
-
-#else
-    #error Unsupported platform
 #endif
 
         //if we still haven't determined which port to monitor, we'll raise an
         //alarm and disable monitoring. There is no appropriate default value
         //here, and user intervention is required.
-        if (g_nodeConfigSettings.userlan_monitor_port < 0)
+        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
         {
             mpSetAlarm(ALARM_CONFIGURATION_FAIL, "UserLan port detect failed",
                 SUBCODE_CONFIGURATION_USERLAN_MONITOR_AUTO_DETECT_FAILED);
@@ -656,11 +682,11 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
         else
         {
 #if defined (YRC1000) || defined (YRC1000u)
-            if (g_nodeConfigSettings.userlan_monitor_port != ROS_USER_LAN1 &&
-                g_nodeConfigSettings.userlan_monitor_port != ROS_USER_LAN2)
+            if (g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN1 &&
+                g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN2)
 
 #elif defined (FS100) || defined (DX200)
-            if (g_nodeConfigSettings.userlan_monitor_port != ROS_USER_LAN1)
+            if (g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN1)
 #endif
             {
                 mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid UserLan port in cfg",

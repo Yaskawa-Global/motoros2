@@ -8,6 +8,10 @@
 #ifndef MOTOROS2_CONFIG_FILE_H
 #define MOTOROS2_CONFIG_FILE_H
 
+//For ROS_USER_LAN1 and ROS_USER_LAN2
+#include "MotoROS_PlatformLib.h"
+
+
 #define CONFIG_FILE_NAME                "motoros2_config.yaml"
 #define FORMAT_CONFIG_FILE_BACKUP       "%s\\%s.%04d%02d%02d_%02d%02d%02d" //Example: "MPUSB0\motoros2_config.yaml.202207029_081011"
 
@@ -59,9 +63,6 @@
 
 #define DEFAULT_INFORM_JOB_NAME         "INIT_ROS"
 
-#define DEFAULT_ULAN_MON_ENABLED        TRUE
-#define DEFAULT_ULAN_MON_LINK           -1
-
 // based on rmw/qos_profiles.h
 typedef enum
 {
@@ -76,6 +77,17 @@ typedef enum
 #define DEFAULT_REMAP_RULES             ""
 #define MAX_REMAP_RULE_NUM              16
 #define MAX_REMAP_RULE_LEN              256
+
+typedef enum
+{
+    CFG_ROS_USER_LAN_DISABLED = -2,  //sentinel
+    CFG_ROS_USER_LAN_AUTO = -1,  //sentinel
+    CFG_ROS_USER_LAN1 = ROS_USER_LAN1,
+    CFG_ROS_USER_LAN2 = ROS_USER_LAN2,
+} Ros_UserLan_Port_Setting;
+
+#define DEFAULT_ULAN_MON_ENABLED        TRUE
+#define DEFAULT_ULAN_MON_LINK           CFG_ROS_USER_LAN_AUTO
 
 typedef struct
 {
@@ -116,7 +128,7 @@ typedef struct
     BOOL allow_custom_inform_job;
 
     BOOL userlan_monitor_enabled;
-    int userlan_monitor_port;
+    Ros_UserLan_Port_Setting userlan_monitor_port;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;
