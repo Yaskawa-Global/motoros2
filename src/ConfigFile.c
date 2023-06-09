@@ -704,7 +704,10 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_SetAllDefaultValues();
 
+#if !(DX200 || FS100)
+    //config file always resides on USB for DX200/FS100
     Ros_ConfigFile_CheckUsbForNewConfigFile();
+#endif
 
     do
     {
@@ -717,15 +720,32 @@ void Ros_ConfigFile_Parse()
         //Parse file
         yaml_parser_t parser;
         yaml_event_t event;
-        char sramFilePath[128];
+        const int CHAR_BUFFER_SIZE = 128;
+        char configFilePath[CHAR_BUFFER_SIZE];
+        char storageDrive[CHAR_BUFFER_SIZE];
         int fd;
         struct stat fileStat;
 
-        sprintf(sramFilePath, "%s\\%s", MP_SRAM_DEV_DOS, CONFIG_FILE_NAME);
+#if (DX200 || FS100)
+        snprintf(storageDrive, CHAR_BUFFER_SIZE, "%s", MP_USB0_DEV_DOS);
+#else //(YRC1000 and newer)
+        snprintf(storageDrive, CHAR_BUFFER_SIZE, "%s", MP_SRAM_DEV_DOS);
+#endif
+
+        snprintf(configFilePath, CHAR_BUFFER_SIZE, "%s\\%s", storageDrive, CONFIG_FILE_NAME);
 
         Ros_Debug_BroadcastMsg("Checking configuration file: %s", CONFIG_FILE_NAME);
 
-        fd = mpOpen(sramFilePath, O_RDONLY, 0);
+        fd = mpOpen(configFilePath, O_RDONLY, 0);
+
+#if (DX200)
+        if (fd < 0)
+        {
+            //try again using second USB port
+            snprintf(configFilePath, CHAR_BUFFER_SIZE, "%s\\%s", MP_USB1_DEV_DOS, CONFIG_FILE_NAME);
+            fd = mpOpen(configFilePath, O_RDONLY, 0);
+        }
+#endif
 
         if (fd >= 0)
         {
