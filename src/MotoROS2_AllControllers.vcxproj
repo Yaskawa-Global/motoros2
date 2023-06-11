@@ -390,6 +390,7 @@
     <ClCompile Include="FauxCommandLineArgs.c" />
     <ClCompile Include="Ros_mpGetRobotCalibrationData.c" />
     <ClCompile Include="RosMotoPlusConversionUtils.c" />
+    <ClCompile Include="Ros_mpGetCalendar.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigFile.h" />
@@ -428,6 +429,7 @@
     <ClInclude Include="MotoROS_PlatformLib.h" />
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h" />
     <ClInclude Include="RosMotoPlusConversionUtils.h" />
+    <ClInclude Include="Ros_mpGetCalendar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
