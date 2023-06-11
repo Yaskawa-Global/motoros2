@@ -7,8 +7,8 @@
 
 #include "MotoROS.h"
 
-#if !(defined (DX200) || defined (YRC1000) || defined (YRC1000u))
-#error MotoROS2 is only supported on DX2 and YRC1 generation controllers
+#if !(defined (FS100) || defined (DX200) || defined (YRC1000) || defined (YRC1000u))
+#error MotoROS2 is only supported on FS, DX2 and YRC1 generation controllers
 #endif
 
 void RosInitTask();
