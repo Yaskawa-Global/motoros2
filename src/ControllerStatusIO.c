@@ -801,8 +801,15 @@ static BOOL Ros_Controller_LoadGroupCalibrationData(Controller* const controller
             //at all on a multigroup system is considered a good thing to do.
             bOneCalibFileLoaded = TRUE;
 
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
             if (calibData.s_rb.grp_no <= MP_R8_GID && //the slave is a robot
                 calibData.m_rb.grp_no <= MP_R8_GID) //the master is another robot's RF
+#elif defined(FS100)
+            if (calibData.s_rb.grp_no <= MP_R4_GID && //the slave is a robot
+                calibData.m_rb.grp_no <= MP_R4_GID) //the master is another robot's RF
+#else
+#error "Ros_Controller_Initialize: unsupported platform"
+#endif
             {
                 int groupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)calibData.s_rb.grp_no);
                 MP_COORD* coord = &controller->ctrlGroups[groupIndex]->robotCalibrationToBaseFrame;

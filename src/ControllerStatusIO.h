@@ -28,12 +28,20 @@
 
 #define INVALID_TASK                        -1
 
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
 #define MAX_CONTROLLABLE_GROUPS             8
+#elif defined (FS100)
+#define MAX_CONTROLLABLE_GROUPS             4
+#endif
 
 #define MASK_ISALARM_ACTIVEALARM            0x02
 #define MASK_ISALARM_ACTIVEERROR            0x01
 
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
 #define MAX_ROBOT_CALIBRATION_FILES         32
+#elif defined (FS100)
+#define MAX_ROBOT_CALIBRATION_FILES         4
+#endif
 
 #define MIN_VALID_TOOL_INDEX                0
 #define MAX_VALID_TOOL_INDEX                63
