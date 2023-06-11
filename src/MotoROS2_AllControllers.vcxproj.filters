@@ -348,6 +348,9 @@
     <ClCompile Include="RosMotoPlusConversionUtils.c">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Ros_mpGetCalendar.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
@@ -456,6 +459,9 @@
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="Ros_mpGetCalendar.h">
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
   </ItemGroup>

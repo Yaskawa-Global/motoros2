@@ -415,7 +415,7 @@ void Ros_ConfigFile_CheckUsbForNewConfigFile()
         return;
     }
 
-    mpGetCalendar(&calendar);
+    Ros_mpGetCalendar(&calendar);
     ret = snprintf(usbFilePathRename, MAX_PATH_LEN, FORMAT_CONFIG_FILE_BACKUP, MP_USB0_DEV_DOS, CONFIG_FILE_NAME, 
         calendar.usYear, calendar.usMonth, calendar.usDay, calendar.usHour, calendar.usMin, calendar.usSec);
     if (ret < 0 || ret >= MAX_PATH_LEN)
