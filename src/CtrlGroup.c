@@ -66,7 +66,9 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
     STATUS status;
     BOOL bInitOk;
     BOOL slaveAxis;
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     MP_GET_TOOL_NO_RSP_DATA retToolData;
+#endif
 
     // Check if group is defined
     numAxes = GP_getNumberOfAxes(groupIndex);
@@ -87,9 +89,11 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
 
         if (Ros_CtrlGroup_IsRobot(ctrlGroup))
         {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
             mpGetToolNo(ctrlGroup->groupId, &retToolData);
             //TODO: need to update this value when selected tool changes
             ctrlGroup->tool = retToolData.sToolNo;
+#endif
 
             int baseIdOffset = (int)ctrlGroup->groupId - (int)MP_R1_GID;
             ctrlGroup->baseTrackGroupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)baseIdOffset + MP_B1_GID);
