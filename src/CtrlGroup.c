@@ -251,7 +251,7 @@ MP_GRP_ID_TYPE Ros_mpCtrlGrpNo2GrpId(int groupNo)
 #if defined (YRC1000) || defined (YRC1000u)
     return mpCtrlGrpNo2GrpId(groupNo);
 
-#elif defined (FS100) || defined (DX200)
+#elif defined (DX200)
     MP_GRP_ID_TYPE grp_id;
 
     for(grp_id = MP_R1_GID; grp_id < MP_S24_GID; ++grp_id)
@@ -262,9 +262,19 @@ MP_GRP_ID_TYPE Ros_mpCtrlGrpNo2GrpId(int groupNo)
 
     return -1;
 
+#elif defined (FS100)
+    MP_GRP_ID_TYPE grp_id;
+
+    for(grp_id = MP_R1_GID; grp_id < MP_S3_GID; ++grp_id)
+    {
+        if(groupNo == mpCtrlGrpId2GrpNo(grp_id))
+            return grp_id;
+    }
+
+    return -1;
+
 #else
 #error "Ros_mpCtrlGrpNo2GrpId: unsupported platform"
-
 #endif
 }
 
@@ -721,7 +731,13 @@ UCHAR Ros_CtrlGroup_GetAxisConfig(CtrlGroup* ctrlGroup)
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup)
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     return((ctrlGroup->groupId >= MP_R1_GID) && (ctrlGroup->groupId <= MP_R8_GID));
+#elif defined(FS100)
+    return((ctrlGroup->groupId >= MP_R1_GID) && (ctrlGroup->groupId <= MP_R4_GID));
+#else
+    #error Unsupported platform
+#endif
 }
 
 //-------------------------------------------------------------------
@@ -729,7 +745,13 @@ BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup)
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_IsBase(CtrlGroup const* const ctrlGroup)
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     return ((ctrlGroup->groupId >= MP_B1_GID) && (ctrlGroup->groupId <= MP_B8_GID));
+#elif defined(FS100)
+    return ((ctrlGroup->groupId >= MP_B1_GID) && (ctrlGroup->groupId <= MP_B4_GID));
+#else
+    #error Unsupported platform
+#endif
 }
 
 //-------------------------------------------------------------------
@@ -737,7 +759,13 @@ BOOL Ros_CtrlGroup_IsBase(CtrlGroup const* const ctrlGroup)
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_IsStation(CtrlGroup const* const ctrlGroup)
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     return ((ctrlGroup->groupId >= MP_S1_GID) && (ctrlGroup->groupId <= MP_S24_GID));
+#elif defined(FS100)
+    return ((ctrlGroup->groupId >= MP_S1_GID) && (ctrlGroup->groupId <= MP_S3_GID));
+#else
+    #error Unsupported platform
+#endif
 }
 
 //-------------------------------------------------------------------
