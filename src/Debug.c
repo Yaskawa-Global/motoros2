@@ -36,6 +36,7 @@ void Ros_Debug_Init()
 void Ros_Debug_BroadcastMsg(char* fmt, ...)
 {
     char str[MAX_DEBUG_MESSAGE_SIZE];
+    char Formatted_Time[300];
     va_list va;
 
     bzero(str, MAX_DEBUG_MESSAGE_SIZE);
@@ -46,6 +47,35 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
 
     if (ros_DebugSocket == -1)
         Ros_Debug_Init();
+    
+    // Timestamp
+
+    time_t DEBUG_MSG_TIMESTAMP;
+    struct tm ts;
+    struct timeval tv;
+
+
+    time(&DEBUG_MSG_TIMESTAMP);
+
+    ts = *localtime(&DEBUG_MSG_TIMESTAMP);
+
+    strftime(Formatted_Time, sizeof(Formatted_Time), "%a %Y-%m-%d %H:%M:%S", &ts);
+
+    gettimeofday(&tv, NULL);
+    long msec = tv.tv_usec / 1000;
+
+    snprintf(Formatted_Time, sizeof(Formatted_Time), "%s.%03ld", Formatted_Time, msec);
+
+    puts(Formatted_Time);
+
+    size_t Timestamp_Length = strlen(Formatted_Time);
+    size_t Debug_Message_Length = strlen(str);
+   
+    if (Timestamp_Length + Debug_Message_Length + 1 < MAX_DEBUG_MESSAGE_SIZE)
+    {
+        memmove(str + Timestamp_Length, str, Debug_Message_Length + 1);
+        memcpy(str, Formatted_Time, Timestamp_Length);
+    }
 
     mpSendTo(ros_DebugSocket, str, strlen(str), 0, (struct sockaddr*) &ros_debug_destAddr1, sizeof(struct sockaddr_in));
 
