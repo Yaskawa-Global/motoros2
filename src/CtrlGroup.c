@@ -490,6 +490,7 @@ BOOL Ros_CtrlGroup_GetTorque(CtrlGroup* ctrlGroup, double torqueValues[MAX_PULSE
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_GetEncoderTemperature(CtrlGroup const* const ctrlGroup, long encoderTemp[MAX_PULSE_AXES])
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     MP_CTRL_GRP_SEND_DATA sData;
     MP_ENCODER_TEMP_RSP_DATA rData;
     LONG status = 0;
@@ -510,6 +511,10 @@ BOOL Ros_CtrlGroup_GetEncoderTemperature(CtrlGroup const* const ctrlGroup, long 
     memcpy(encoderTemp, rData.lTemp, MAX_PULSE_AXES * sizeof(long));
 
     return TRUE;
+
+#elif defined(FS100)
+    return FALSE;
+#endif
 }
 
 //Convert the Motoman position units (pulses) to ROS position units (radians/meters).
