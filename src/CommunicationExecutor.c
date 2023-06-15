@@ -209,8 +209,6 @@ void Ros_Communication_PublishActionFeedback(rcl_timer_t* timer, int64_t last_ca
 
 static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t last_call_time)
 {
-    rcl_ret_t ret;
-
     //assume link is currently up (and pretend it was up before this timer even
     //started).
     //This timer is only started once MotoROS2 can reach the Agent (and can
@@ -240,8 +238,10 @@ static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t la
         mpSetAlarm(ALARM_CONFIGURATION_FAIL, "LAN monitor fail",
             SUBCODE_CONFIGURATION_RUNTIME_USERLAN_LINKUP_ERR);
 
-        //yes, goto has its uses
-        goto UserLanMonitorTimerCallbackExit;
+        // disable timer and return
+        rcl_ret_t ret = rcl_timer_cancel(timer); RCL_UNUSED(ret);
+        Ros_Debug_BroadcastMsg("Cancelled UserLan state monitor timer");
+        return;
     }
 
     //link was up last time, but no longer is up now -> signal disconnect
@@ -256,12 +256,6 @@ static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t la
 
     //remember
     bLinkWasUp = bLinkIsUp;
-
-    return;
-
-UserLanMonitorTimerCallbackExit:
-    ret = rcl_timer_cancel(timer); RCL_UNUSED(ret);
-    Ros_Debug_BroadcastMsg("Cancelled UserLan state monitor timer");
 }
 
 void Ros_Communication_RunIoExecutor(rclc_executor_t* executor, SEM_ID semIoExecutorStatus)
