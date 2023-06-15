@@ -296,7 +296,8 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_ACTION_FB, "Failed creating rclc timer (%d)", (int)rc);
 
     rc = rclc_timer_init_default(&timerMonitorUserLanState, &g_microRosNodeInfo.support,
-        RCL_MS_TO_NS(500), Ros_Communication_MonitorUserLanState);
+        RCL_MS_TO_NS(PERIOD_COMMUNICATION_USERLAN_LINK_CHECK_MS),
+        Ros_Communication_MonitorUserLanState);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_USERLAN_MONITOR,
         "Failed creating rclc timer (%d)", (int)rc);
 

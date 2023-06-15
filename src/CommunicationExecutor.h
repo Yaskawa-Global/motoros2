@@ -10,6 +10,8 @@
 
 #define PERIOD_COMMUNICATION_PING_AGENT_MS                  5000
 
+#define PERIOD_COMMUNICATION_USERLAN_LINK_CHECK_MS          500
+
 // total number of handles =
 //      timers +                                            2
 //      action_server +                                     1
