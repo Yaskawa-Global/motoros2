@@ -56,4 +56,7 @@ extern ULONG tickGet();
 extern STATUS Ros_setsockopt(int s, int level, int optname, char* optval, int optlen);
 
 
+extern int localtime_r(const time_t* timer, struct tm* timeBuffer);
+
+
 #endif  // MOTOROS_PLATFORM_LIB_H
