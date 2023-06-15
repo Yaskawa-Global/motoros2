@@ -11,7 +11,7 @@
 #define PERIOD_COMMUNICATION_PING_AGENT_MS                  5000
 
 // total number of handles =
-//      timers +                                            3
+//      timers +                                            2
 //      action_server +                                     1
 //      service reset                                       1
 //      service start_traj_mode                             1
@@ -19,11 +19,12 @@
 //      service stop_traj_mode                              1
 //      service queue_traj_point                            1
 //      service select_tool                                 1
-#define QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR             (10)
+#define QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR             (9)
 
 // total number of handles =
+//      timers +                                            1
 //      service read & write I/O +                          6
-#define QUANTITY_OF_HANDLES_FOR_IO_EXECUTOR                 (6)
+#define QUANTITY_OF_HANDLES_FOR_IO_EXECUTOR                 (7)
 
 typedef struct
 {

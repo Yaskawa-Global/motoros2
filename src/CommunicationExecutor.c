@@ -325,7 +325,9 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     rc = rclc_executor_add_timer(&executor_motion_control, &timerPublishActionFeedback);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_ADD_ACTION_FB, "Failed adding timer (%d)", (int)rc);
 
-    rc = rclc_executor_add_timer(&executor_motion_control, &timerMonitorUserLanState);
+    //NOTE: add userlan monitor timer to the io executor, to prevent timerPingAgent
+    //from blocking it in case agent connection is lost (ie: ping needs to time out)
+    rc = rclc_executor_add_timer(&executor_io_control, &timerMonitorUserLanState);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_ADD_USERLAN_MONITOR,
         "Failed adding timer (%d)", (int)rc);
 
