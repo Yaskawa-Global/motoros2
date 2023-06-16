@@ -9,7 +9,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 ![YRC1000: supported](https://img.shields.io/badge/YRC1000-supported-blue.svg)
 ![YRC1000micro: supported](https://img.shields.io/badge/YRC1000micro-supported-blue.svg)
-![DX200: not supported](https://img.shields.io/badge/DX200-not%20supported-inactive.svg)
+![DX200: supported](https://img.shields.io/badge/DX200-supported-blue.svg)
 ![FS100: not supported](https://img.shields.io/badge/FS100-not%20supported-inactive.svg)
 ![DX100: not supported](https://img.shields.io/badge/DX100-not%20supported-inactive.svg)
 
