@@ -194,6 +194,8 @@ ALARM 8003
 *Solution:*
 Your robot controller requires internal configuration changes to support the MotoROS2 driver.
 
+For DX200: ensure the controller is updated to at least `DN2.44.00-00`.
+
 For YRC1000 and YRC1000micro: ensure the controller is updated to at least `YAS2.80.00-00` (for YRC1000) and `YBS2.31.00-00` (for YRC1000micro).
 If the system software version is below this, please contact Yaskawa Motoman for assistance with upgrading the controller.
 
