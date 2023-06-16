@@ -15,44 +15,44 @@ MotoROS2 *development* (ie: building MotoROS2 from source) does require a MotoPl
 
 Development of a ROS 2 application that interfaces with MotoROS2 does **not** require a MotoPlus SDK license.
 
-## Can MotoROS2 be installed on DX100, FS100 or DX200 controllers?
+## Can MotoROS2 be installed on DX100 or FS100 controllers?
 
-MotoROS2 only supports YRC1000 and YRC1000micro controllers.
+MotoROS2 only supports DX200, YRC1000 and YRC1000micro controllers.
 
 ## Does MotoROS2 support all Yaskawa Motoman robots?
 
-MotoROS2 is manipulator agnostic, and as such is expected to be compatible with all Yaskawa Motoman robots which can be used with the controller series supported by MotoROS2 (ie: YRC1000 and YRC1000micro).
+MotoROS2 is manipulator agnostic, and as such is expected to be compatible with all Yaskawa Motoman robots which can be used with the controller series supported by MotoROS2 (ie: DX200, YRC1000 and YRC1000micro).
 
 ## Can MotoROS2 be used with SDA robots?
 
-The current version of MotoROS2 is only compatible with YRC1000 and YRC1000micro controllers.
-This controller is not used with SDA robots (ie: dual-arm robots), and as such, MotoROS2 does not support SDA robots.
+The current version of MotoROS2 is only compatible with DX200, YRC1000 and YRC1000micro controllers.
+These controllers are not used with SDA robots (ie: dual-arm robots), and as such, MotoROS2 does not support SDA robots.
 
 Note: the limitation is not MotoROS2, but the controller.
-Users of SDA robots paired with a YRC1000 (or newer) wishing to use MotoROS2 are encouraged to contact the developers.
+Users of SDA robots paired with a DX200 or YRC1000 (or newer) wishing to use MotoROS2 are encouraged to contact the developers.
 
 ## Can MotoROS2 be used with Scara robots?
 
-The current version of MotoROS2 is compatible with YRC1000 and YRC1000micro controllers.
-Provided the robot is used with a YRC1000 generation controller, it should be supported by MotoROS2.
+The current version of MotoROS2 is compatible with DX200, YRC1000 and YRC1000micro controllers.
+Provided the robot is used with a DX200 or YRC1000 generation controller, it should be supported by MotoROS2.
 
 ## Can MotoROS2 be used with Delta robots?
 
-The current version of MotoROS2 is only compatible with YRC1000 and YRC1000micro controllers.
-This controller is not used with Delta robots, and as such, MotoROS2 does not support Delta robots.
+The current version of MotoROS2 is only compatible with DX200, YRC1000 and YRC1000micro controllers.
+These controllers are not used with Delta robots, and as such, MotoROS2 does not support Delta robots.
 
 Note: the limitation is not MotoROS2, but the controller.
-Users of Delta robots paired with a YRC1000 (or newer) wishing to use MotoROS2 are encouraged to contact the developers.
+Users of Delta robots paired with a DX200 or YRC1000 (or newer) wishing to use MotoROS2 are encouraged to contact the developers.
 
 ## Can MotoROS2 be used with palletizing robots?
 
-The current version of MotoROS2 is compatible with YRC1000 and YRC1000micro controllers.
-Provided the palletizing robot is used with a YRC1000 generation controller, it should be supported by MotoROS2.
+The current version of MotoROS2 is compatible with DX200, YRC1000 and YRC1000micro controllers.
+Provided the palletizing robot is used with a DX200 or YRC1000 generation controller, it should be supported by MotoROS2.
 
 ## Can MotoROS2 be used with welding robots?
 
-The current version of MotoROS2 is compatible with YRC1000 and YRC1000micro controllers.
-Provided the robot is used with a YRC1000 generation controller, the *motion* of the arm can be controlled by MotoROS2.
+The current version of MotoROS2 is compatible with DX200, YRC1000 and YRC1000micro controllers.
+Provided the robot is used with a DX200 or YRC1000 generation controller, the *motion* of the arm can be controlled by MotoROS2.
 
 Note: MotoROS2 does not have any process-controls.
 It cannot be used to control the welding power source.
