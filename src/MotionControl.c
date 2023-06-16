@@ -627,7 +627,6 @@ UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__Q
     //------------------------------------------------------------
     //The trajectory contains information for all groups. Determine which groups are used by looking at the 'joint names'.
     int grpIndex, jointIndexInTraj;
-    CtrlGroup* ctrlGroup;
 
     if (g_Ros_Controller.totalAxesCount != request->joint_names.size)
     {
@@ -644,7 +643,7 @@ UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__Q
     //precheck to ensure all groups are ready to accept a new point
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
-        ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
+        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
 
         if (ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
         {
@@ -726,7 +725,7 @@ UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__Q
 
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
-        ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
+        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
 
         ctrlGroup->trajectoryIterator->valid = TRUE;
     }

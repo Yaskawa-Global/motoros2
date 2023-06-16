@@ -650,8 +650,8 @@ BOOL Ros_Controller_IoStatusUpdate()
                 g_messages_RobotStatus.msgRobotStatus->error_codes.size = num_alarms;
                 // 'msgRobotStatus->error_codes' has been initialised to be of
                 // length 'MAX_ALARM_COUNT + 1' in Ros_Controller_Initialize()
-                for (int i = 0; i < num_alarms; ++i)
-                    g_messages_RobotStatus.msgRobotStatus->error_codes.data[i] = active_alarms[i];
+                for (int alm = 0; alm < num_alarms; ++alm)
+                    g_messages_RobotStatus.msgRobotStatus->error_codes.data[alm] = active_alarms[alm];
             }
         }
 
