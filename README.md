@@ -348,7 +348,7 @@ To extract a copy of your current configuration from the teach pendant:
  1. power down the robot controller and open the cabinet
  1. locate the USB port labelled `CN106` on the robot's CPU board and remove the USB stick
  1. overwrite the `motoros2_config.yaml` file in the root directory of a USB stick with an updated version
- 1. replace the USB stick into `CN106 and close the controller cabinet
+ 1. replace the USB stick into `CN106` and close the controller cabinet
 
 ## The micro-ROS Agent
 
