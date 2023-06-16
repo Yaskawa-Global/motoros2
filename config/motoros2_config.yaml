@@ -71,6 +71,59 @@
 sync_timeclock_with_agent: true
 
 #-----------------------------------------------------------------------------
+# Should MotoROS2 monitor the link state of the ethernet port used to
+# communicate with the Agent?
+#
+# If enabled, this will cause immediate notification of loss-of-connection
+# when the link goes down, causing MotoROS2 to activate it's shutdown
+# behaviour (ie: stop all motion (if enabled), release resources, wait for
+# link up and attempt reconnection with the Agent).
+#
+# If this is disabled, Agent disconnection detection uses an application
+# layer based timeout mechanism which takes longer to detect disconnects (but
+# might be more robust against intermittent link-layer disconnects which do not
+# cause network disconnections).
+#
+# DEFAULT: true
+#userlan_monitor_enabled: true
+
+#-----------------------------------------------------------------------------
+# Which port should MotoROS2 monitor, if 'userlan_monitor_enabled' is 'true'?
+#
+# If not specified, MotoROS2 will attempt to auto-detect the network port
+# that is used to connect to the micro-ROS Agent. It will do this by
+# comparing the 'agent_ip_address' setting against the IP addresses (and
+# netmasks) of all available network interfaces.
+#
+# If the Agent can be reached directly over a particular interface, or via a
+# configured default gateway on the same interface, the associated port will be
+# monitored for link drops.
+#
+# To disable auto-detection, uncomment 'userlan_monitor_port' below and set
+# it to the desired port.
+#
+# NOTE:   this setting only applies to YRC1000 and YRC1000u controllers.
+#         DX200 and FS100 controllers only have a single ethernet port, and any
+#         value other than 1 will be ignored.
+#
+# NOTE 2: auto-detection is not perfect. It can't determine whether the Agent
+#         might be reachable using multiple hops. Nor can it determine whether
+#         any routers have been configured to forward particular types of
+#         traffic or firewalls exist between MotoROS2 and the micro-ROS Agent.
+#         For deployments with complex network configurations, disable
+#         auto-detection by configuring 'userlan_monitor_port' below.
+#
+# NOTE 3: the port specified here is NOT checked against 'agent_ip_address'.
+#         In other words: if 'agent_ip_address' is on 'USER_LAN1', but
+#         'userlan_monitor_port' is set to 'USER_LAN2', MotoROS2 will detect
+#         link down events on 'USER_LAN2', whether or not that port is used
+#         to communicate with the Agent.
+#
+# OPTIONS: USER_LAN1, USER_LAN2
+# DEFAULT: USER_LAN1
+#userlan_monitor_port: USER_LAN1
+
+#-----------------------------------------------------------------------------
 # If the Agent PC disconnects from the robot while it is in motion, should the
 # robot come to a stop?
 #

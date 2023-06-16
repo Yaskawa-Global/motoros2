@@ -207,6 +207,57 @@ void Ros_Communication_PublishActionFeedback(rcl_timer_t* timer, int64_t last_ca
     Ros_ActionServer_FJT_ProcessResult();
 }
 
+static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t last_call_time)
+{
+    //assume link is currently up (and pretend it was up before this timer even
+    //started).
+    //This timer is only started once MotoROS2 can reach the Agent (and can
+    //connect to it), so the link MUST be up or otherwise this timer could
+    //not have been started.
+    //If we start with the assumption the link is down, we'd see a state change
+    //as soon as we call Ros_UserLan_IsLinkUp(..), which would not lead to any
+    //action (as we only act on up->down edges), but would be unnecessary.
+    static BOOL bLinkWasUp = TRUE;
+
+    //retrieve current state of monitored link, assume it's down
+    BOOL bLinkIsUp = FALSE;
+    STATUS status = Ros_UserLan_IsLinkUp(
+        g_nodeConfigSettings.userlan_monitor_port, &bLinkIsUp);
+    if (status != OK)
+    {
+        //this isn't fatal, but we do want to log it
+        Ros_Debug_BroadcastMsg(
+            "Error reading link state (port: %d, error: %d), shutting down monitor timer",
+            g_nodeConfigSettings.userlan_monitor_port, status);
+        //also to console, in case link is actually down
+        Ros_Debug_LogToConsole(
+            "Error reading link state (port: %d, error: %d), shutting down monitor timer",
+            g_nodeConfigSettings.userlan_monitor_port, status);
+
+        //and log an alarm on the pendant
+        mpSetAlarm(ALARM_CONFIGURATION_FAIL, "LAN monitor fail",
+            SUBCODE_CONFIGURATION_RUNTIME_USERLAN_LINKUP_ERR);
+
+        // disable timer and return
+        rcl_ret_t ret = rcl_timer_cancel(timer); RCL_UNUSED(ret);
+        Ros_Debug_BroadcastMsg("Cancelled UserLan state monitor timer");
+        return;
+    }
+
+    //link was up last time, but no longer is up now -> signal disconnect
+    if (bLinkWasUp && !bLinkIsUp)
+    {
+        g_Ros_Communication_AgentIsConnected = FALSE;
+        //log to console, as network connection is presumable down
+        Ros_Debug_LogToConsole(
+            "Link down (port: %d), flagging Agent as disconnected",
+                g_nodeConfigSettings.userlan_monitor_port);
+    }
+
+    //remember
+    bLinkWasUp = bLinkIsUp;
+}
+
 void Ros_Communication_RunIoExecutor(rclc_executor_t* executor, SEM_ID semIoExecutorStatus)
 {
     mpSemTake(semIoExecutorStatus, NO_WAIT);
@@ -232,6 +283,7 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
 
     rcl_timer_t timerPingAgent = rcl_get_zero_initialized_timer();
     rcl_timer_t timerPublishActionFeedback = rcl_get_zero_initialized_timer();
+    rcl_timer_t timerMonitorUserLanState = rcl_get_zero_initialized_timer();
 
     mpSemTake(semCommunicationExecutorStatus, NO_WAIT);
 
@@ -242,6 +294,12 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
 
     rc = rclc_timer_init_default(&timerPublishActionFeedback, &g_microRosNodeInfo.support, RCL_MS_TO_NS(g_nodeConfigSettings.action_feedback_publisher_period), Ros_Communication_PublishActionFeedback);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_ACTION_FB, "Failed creating rclc timer (%d)", (int)rc);
+
+    rc = rclc_timer_init_default(&timerMonitorUserLanState, &g_microRosNodeInfo.support,
+        RCL_MS_TO_NS(PERIOD_COMMUNICATION_USERLAN_LINK_CHECK_MS),
+        Ros_Communication_MonitorUserLanState);
+    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_USERLAN_MONITOR,
+        "Failed creating rclc timer (%d)", (int)rc);
 
     //---------------------------------
     //Create executors
@@ -267,6 +325,12 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
 
     rc = rclc_executor_add_timer(&executor_motion_control, &timerPublishActionFeedback);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_ADD_ACTION_FB, "Failed adding timer (%d)", (int)rc);
+
+    //NOTE: add userlan monitor timer to the io executor, to prevent timerPingAgent
+    //from blocking it in case agent connection is lost (ie: ping needs to time out)
+    rc = rclc_executor_add_timer(&executor_io_control, &timerMonitorUserLanState);
+    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_ADD_USERLAN_MONITOR,
+        "Failed adding timer (%d)", (int)rc);
 
     rc = rclc_executor_add_action_server(&executor_motion_control,
         &g_actionServerFollowJointTrajectory,
@@ -353,7 +417,20 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     //===========================================================
     //===========================================================
     //===========================================================
-    
+
+    // See if we should enable the timer which monitors user lan port link state
+    if (!g_nodeConfigSettings.userlan_monitor_enabled)
+    {
+        rc = rcl_timer_cancel(&timerMonitorUserLanState); RCL_UNUSED(rc);
+        Ros_Debug_BroadcastMsg("NOT starting UserLan link state monitor timer (disabled)");
+    }
+    else
+    {
+        //technically we're not starting it, but the message is clear enough
+        Ros_Debug_BroadcastMsg("Starting UserLan link state monitor (port: %d)",
+            g_nodeConfigSettings.userlan_monitor_port);
+    }
+
     // Start executor that runs the I/O executor
     // (This task deletes itself when the agent disconnects.)
     SEM_ID semIoExecutorStatus = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
@@ -405,6 +482,11 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
 
     Ros_Debug_BroadcastMsg("Cleanup I/O control executor");
     rclc_executor_fini(&executor_io_control);
+
+    Ros_Debug_BroadcastMsg("Cleanup timer for UserLan link state monitor");
+    rc = rcl_timer_fini(&timerMonitorUserLanState);
+    if (rc != RCL_RET_OK)
+        Ros_Debug_BroadcastMsg("Failed cleaning up UserLan link state monitor timer: %d", rc);
 
     Ros_Debug_BroadcastMsg("Cleanup timer for action feedback");
     rc = rcl_timer_fini(&timerPublishActionFeedback);
