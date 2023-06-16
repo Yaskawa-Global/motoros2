@@ -73,7 +73,8 @@ void Ros_InformChecker_CreateJob()
                 if (group->baseTrackGroupId != -1) //this robot has a base
                 {
                     sprintf(tagBuffer, ",BS%d", (group->baseTrackGroupId - MP_B1_GID) + 1);
-                    strncat(lineBuffer, tagBuffer, MAX_JOB_LINE_LENGTH);
+                    strncat(lineBuffer, tagBuffer,
+                        sizeof(lineBuffer) - Ros_strnlen(lineBuffer, MAX_JOB_LINE_LENGTH) - 1);
                 }
 
                 FileUtilityFunctions_WriteLine(fd, lineBuffer);
