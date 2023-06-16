@@ -160,7 +160,7 @@ void Ros_Communication_Initialize()
     motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_NODE_INIT);
 
     //we're done with it
-    ret = rcl_node_options_fini(&node_options);
+    ret = rcl_node_options_fini(&node_options); RCL_UNUSED(ret);
     Ros_CleanupFauxArgv(faux_argv, faux_argc);
 
     MOTOROS2_MEM_TRACE_REPORT(comm_exec_init);

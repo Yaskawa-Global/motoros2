@@ -213,9 +213,9 @@ BOOL Ros_InformChecker_CheckHeaderForGroupCombinations(int fdJob)
     for (int groupIndex = 0; groupIndex < g_Ros_Controller.numGroup; groupIndex += 1)
     {
         CtrlGroup* group = g_Ros_Controller.ctrlGroups[groupIndex];
-        BOOL bGroupFound = FALSE;
         if (group)
         {
+            BOOL bGroupFound = FALSE;
             //iterate over the used groups
             for (int i = 0; i < MAX_GROUP_COMBINATIONS; i += 1)
             {
