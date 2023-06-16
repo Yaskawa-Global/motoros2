@@ -292,6 +292,21 @@ rcl_ret_t Ros_ActionServer_FJT_Goal_Received(rclc_action_goal_handle_t* goal_han
             case INIT_TRAJ_INVALID_TIME:
                 rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, "Invalid time in trajectory.");
                 break;
+            case INIT_TRAJ_BACKWARD_TIME:
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, "Trajectory message contains waypoints that are not strictly increasing in time.");
+                break;
+            case INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS:
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, "Trajectory did not contain position data for all axes.");
+                break;
+            case INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES:
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, "Trajectory did not contain velocity data for all axes.");
+                break;
+            case INIT_TRAJ_INVALID_ENDING_VELOCITY:
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, "The final point in the trajectory must have zero velocity.");
+                break;
+            case INIT_TRAJ_INVALID_ENDING_ACCELERATION:
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, "The final point in the trajectory must have zero acceleration.");
+                break;
             default:
                 rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, "Trajectory initialization failed. Generic failure.");
             }
