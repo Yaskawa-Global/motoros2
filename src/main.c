@@ -135,20 +135,20 @@ void RosInitTask()
                        mpNumBytesFree(), MP_MEM_PART_SIZE - mpNumBytesFree());
 
         //==================================
-        ULONG tickNow = 0, tickBefore = 0, tickDiff;
-        float elapsedMs = 0;
+        ULONG tickBefore = 0;
 
         while(g_Ros_Communication_AgentIsConnected)
         {
             //figure out how long to sleep to achieve the user-configured rate
-            tickNow = tickGet();
-            
+            ULONG tickNow = tickGet();
+
+            ULONG tickDiff = 0;
             if (tickNow > tickBefore)
                 tickDiff = tickNow - tickBefore;
             else //unsigned rollover
                 tickDiff = (UINT_MAX - tickBefore) + tickNow;
 
-            elapsedMs = tickDiff * mpGetRtc(); //time it took to read and publish data
+            float elapsedMs = tickDiff * mpGetRtc(); //time it took to read and publish data
 
             if (elapsedMs < g_nodeConfigSettings.controller_status_monitor_period)
                 Ros_Sleep(g_nodeConfigSettings.controller_status_monitor_period - elapsedMs);

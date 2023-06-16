@@ -221,7 +221,6 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
 
     char* t[] = { "y", "Y", "yes", "Yes", "YES", "true", "True", "TRUE", "on", "On", "ON", "1", NULL };
     char* f[] = { "n", "N", "no", "No", "NO", "false", "False", "FALSE", "off", "Off", "OFF", "0", NULL };
-    BOOL bBoolValueFound;
 
     if (event->type == YAML_SCALAR_EVENT)
     {
@@ -229,6 +228,8 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
         {
             if (event->data.scalar.length > 0)
             {
+                BOOL bBoolValueFound = FALSE;
+
                 switch (activeItem->typeOfValue)
                 {
                 case Value_String:
