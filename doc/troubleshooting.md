@@ -775,6 +775,28 @@ ALARM 8013
 *Solution:*
 This alarm occurs in conjunction with `8011` (subcode `55`), please refer to [Alarm: 8011[55]](#alarm-801155).
 
+### Alarm: 8013[13]
+
+*Example:*
+
+```text
+ALARM 8013
+ Invalid UserLan port in cfg
+[13]
+```
+
+*Solution:*
+The `userlan_monitor_port` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
+LAN port monitoring will be disabled for this session.
+
+On YRC1000 and YRC1000u, this must be set to either `USER_LAN1` or `USER_LAN2`.
+
+No other values are supported.
+
+Example: `userlan_monitor_port: USER_LAN1`.
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
 ### Alarm: 8014[0]
 
 *Example:*
