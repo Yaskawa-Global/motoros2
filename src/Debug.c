@@ -47,36 +47,28 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
 
     if (ros_DebugSocket == -1)
         Ros_Debug_Init();
-    
-   // Timestamp
 
-    time_t DEBUG_MSG_TIMESTAMP;
-    struct tm ts;
-    struct timeval tv;
+    // Timestamp
+    struct tm synced_time;
+    int64_t nanosecs = rmw_uros_epoch_nanos();
+    builtin_interfaces__msg__Time debug_msg_timestamp;
 
-
-    time(&DEBUG_MSG_TIMESTAMP);
-
-    localtime_r(&DEBUG_MSG_TIMESTAMP, &ts);
-
-    strftime(Formatted_Time, sizeof(Formatted_Time), "%a %Y-%m-%d %H:%M:%S", &ts);
-
-    gettimeofday(&tv, NULL);
-    long msec = tv.tv_usec / 1000;
-
-    snprintf(Formatted_Time, sizeof(Formatted_Time), "%s.%03ld", Formatted_Time, msec);
-
-    size_t Timestamp_Length = strlen(Formatted_Time);
-    size_t Debug_Message_Length = strlen(str);
-
-    // Pre-pending the timestamp to the debug message 
-
-    if (Timestamp_Length + Debug_Message_Length + 1 < MAX_DEBUG_MESSAGE_SIZE)
+    Ros_Nanos_To_Time_Msg(nanosecs, &debug_msg_timestamp);
+    time(&debug_msg_timestamp);
+    strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&debug_msg_timestamp.sec, &synced_time));
+    snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d", (int)debug_msg_timestamp.nanosec / 1000000);
+  
+    // Pre - pending the timestamp to the debug message
+    size_t timestamp_length = strnlen(timestamp, FORMATTED_TIME_SIZE);
+    size_t debug_message_length = strnlen(str, MAX_DEBUG_MESSAGE_SIZE);
+    if (timestamp_length + debug_message_length + 1 < MAX_DEBUG_MESSAGE_SIZE)
     {
-        memmove(str + Timestamp_Length, str, Debug_Message_Length + 1); // Move existing contents of str buffer to the end by Timestamp_Length to make space for the timestamp and avoiding overwriting the debug message during the move 
-        memcpy(str, Formatted_Time, Timestamp_Length); // Copy the timestamp stored in Formatted_Timestamp buffer to the beginning of str buffer        
+        // Move existing contents of str buffer to the end by Timestamp_Length to make space 
+        //for the timestamp and avoiding overwriting the debug message during the move 
+        memmove(str + timestamp_length, str, debug_message_length + 1); 
+        // Copy the timestamp stored in Formatted_time buffer to the beginning of str buffer
+        memcpy(str, timestamp, timestamp_length);         
     }
-
 
     mpSendTo(ros_DebugSocket, str, strlen(str), 0, (struct sockaddr*) &ros_debug_destAddr1, sizeof(struct sockaddr_in));
 
