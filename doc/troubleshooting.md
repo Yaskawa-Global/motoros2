@@ -569,7 +569,7 @@ ALARM 8013
 [12]
 ```
 
-With `G` ∈ `[r1, r2, ..., rN]` or `[b1, b2, ..., bN]` or `[s1, s2, ..., sN]` and `M` ∈ ℕ⁺: `[1, 2, 3, 4, ...]`.
+Where `G` could be `r1`, `r2`, etc, or `b1`, `b2`, etc or `s1`, `s2`, etc and `A` indicates the specific axis for which the name is empty.
 
 *Solution:*
 Verify the `joint_names` dictionary in the `motoros2_config.yaml` configuration file contains names for all joints across all motion groups.
