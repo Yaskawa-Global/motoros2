@@ -797,6 +797,34 @@ Example: `userlan_monitor_port: USER_LAN1`.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
+### Alarm: 8013[14]
+
+*Example:*
+
+```text
+ALARM 8013
+ UserLan port detect failed
+[14]
+```
+
+*Solution:*
+Because `userlan_monitor_enabled` was set to `true` but no value was supplied for `userlan_monitor_port`, MotoROS2 attempted to auto-detect the LAN port to monitor.
+This auto-detection failed, and as a result MotoROS2 has disabled LAN port monitoring for this session.
+
+To rule out a transient failure, reboot the controller.
+
+If the alarm is raised again, and if auto-detection is not needed or desired, make sure `userlan_monitor_port` is not commented out (ie: does not have a `#` at the start of the line) and set it to an appropriate value.
+
+On YRC1000 and YRC1000u, set it to either `USER_LAN1` or `USER_LAN2`, depending on which LAN port is used to connect the controller to the PC running the micro-ROS Agent application.
+
+If auto-detection is to be used, verify `agent_ip_address` is set to an IP that can be reached by MotoROS2 over the LAN port which is connected to the PC running the micro-ROS Agent application (either directly, or via a default gateway configured on the controller).
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+If the behavior persists, save a copy of the debug-listener script output and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
 ### Alarm: 8014[0]
 
 *Example:*
