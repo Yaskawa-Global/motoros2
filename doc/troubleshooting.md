@@ -556,6 +556,33 @@ The name must not be blank.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
+### Alarm: 8011[55]
+
+*Example:*
+
+```text
+ALARM 8011
+ Empty custom joint name
+[55]
+ALARM 8013
+ group: G, axis: A
+[12]
+```
+
+Where `G` could be `r1`, `r2`, etc, or `b1`, `b2`, etc or `s1`, `s2`, etc and `A` indicates the specific axis for which the name is empty.
+
+*Solution:*
+Verify the `joint_names` dictionary in the `motoros2_config.yaml` configuration file contains names for all joints across all motion groups.
+
+Joint names must not be blank and there must be an entry for every joint in a motion group.
+
+*Note*: MotoROS2 does not support configuring custom joint names for a subset of joints and/or motion groups.
+If only a subset of joints should be configured with a custom name, specify the default name for all other joints.
+
+Refer to [FAQ: Can names of joints be changed?](faq.md#can-names-of-joints-be-changed) for more information about configuring custom joint names.
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
 ### Alarm: 8012[xx]
 
 *Example:*
@@ -731,6 +758,95 @@ The `motoros2_config.yaml` configuration file contains a remap rule that has bee
 Example format: `remap_rules: "joint_states:=my_joint_states read_single_io:=io/read_single"`
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+### Alarm: 8013[12]
+
+*Example:*
+
+```text
+ALARM 8011
+ Empty custom joint name
+[55]
+ALARM 8013
+ group: G, axis: A
+[12]
+```
+
+*Solution:*
+This alarm occurs in conjunction with `8011` (subcode `55`), please refer to [Alarm: 8011[55]](#alarm-801155).
+
+### Alarm: 8013[13]
+
+*Example:*
+
+```text
+ALARM 8013
+ Invalid UserLan port in cfg
+[13]
+```
+
+*Solution:*
+The `userlan_monitor_port` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
+LAN port monitoring will be disabled for this session.
+
+On YRC1000 and YRC1000u, this must be set to either `USER_LAN1` or `USER_LAN2`.
+
+No other values are supported.
+
+Example: `userlan_monitor_port: USER_LAN1`.
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+### Alarm: 8013[14]
+
+*Example:*
+
+```text
+ALARM 8013
+ UserLan port detect failed
+[14]
+```
+
+*Solution:*
+Because `userlan_monitor_enabled` was set to `true` but no value was supplied for `userlan_monitor_port`, MotoROS2 attempted to auto-detect the LAN port to monitor.
+This auto-detection failed, and as a result MotoROS2 has disabled LAN port monitoring for this session.
+
+To rule out a transient failure, reboot the controller.
+
+If the alarm is raised again, and if auto-detection is not needed or desired, make sure `userlan_monitor_port` is not commented out (ie: does not have a `#` at the start of the line) and set it to an appropriate value.
+
+On YRC1000 and YRC1000u, set it to either `USER_LAN1` or `USER_LAN2`, depending on which LAN port is used to connect the controller to the PC running the micro-ROS Agent application.
+
+If auto-detection is to be used, verify `agent_ip_address` is set to an IP that can be reached by MotoROS2 over the LAN port which is connected to the PC running the micro-ROS Agent application (either directly, or via a default gateway configured on the controller).
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+If the behavior persists, save a copy of the debug-listener script output and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8013[15]
+
+*Example:*
+
+```text
+ALARM 8013
+ LAN monitor fail
+[15]
+```
+
+*Solution:*
+MotoROS2 tried to monitor the LAN port configured in `userlan_monitor_port`, but was unable to retrieve link status and as a result has disabled LAN port monitoring for this session.
+
+To rule out a transient failure, reboot the controller.
+
+If the alarm is raised again, make sure `userlan_monitor_port` is set to the correct value (ie: the LAN port used to connect the controller to the PC running the micro-ROS Agent application) and is not commented out (ie: does not have a `#` at the start of the line).
+
+If the configuration file has to be updated, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+If the behavior persists, save a copy of the debug-listener script output and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
 ### Alarm: 8014[0]
 
