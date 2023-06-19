@@ -662,7 +662,7 @@ ALARM 8013
 ```
 
 *Solution:*
-A the `executor_sleep_period` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
+The `executor_sleep_period` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
 This must be set to an integer value between `1` and `100` milliseconds.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
@@ -678,7 +678,7 @@ ALARM 8013
 ```
 
 *Solution:*
-A the `feedback_publisher_period` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
+The `feedback_publisher_period` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
 This must be set to an integer value between `1` and `100` milliseconds.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
