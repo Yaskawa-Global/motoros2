@@ -825,6 +825,29 @@ If the behavior persists, save a copy of the debug-listener script output and th
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
+### Alarm: 8013[15]
+
+*Example:*
+
+```text
+ALARM 8013
+ LAN monitor fail
+[15]
+```
+
+*Solution:*
+MotoROS2 tried to monitor the LAN port configured in `userlan_monitor_port`, but was unable to retrieve link status and as a result has disabled LAN port monitoring for this session.
+
+To rule out a transient failure, reboot the controller.
+
+If the alarm is raised again, make sure `userlan_monitor_port` is set to the correct value (ie: the LAN port used to connect the controller to the PC running the micro-ROS Agent application) and is not commented out (ie: does not have a `#` at the start of the line).
+
+If the configuration file has to be updated, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+If the behavior persists, save a copy of the debug-listener script output and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
 ### Alarm: 8014[0]
 
 *Example:*
