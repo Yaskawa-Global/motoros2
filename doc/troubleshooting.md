@@ -556,6 +556,33 @@ The name must not be blank.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
+### Alarm: 8011[55]
+
+*Example:*
+
+```text
+ALARM 8011
+ Empty custom joint name
+[55]
+ALARM 8013
+ group: G, axis: A
+[12]
+```
+
+With `G` ∈ `[r1, r2, ..., rN]` or `[b1, b2, ..., bN]` or `[s1, s2, ..., sN]` and `M` ∈ ℕ⁺: `[1, 2, 3, 4, ...]`.
+
+*Solution:*
+Verify the `joint_names` dictionary in the `motoros2_config.yaml` configuration file contains names for all joints across all motion groups.
+
+Joint names must not be blank and there must be an entry for every joint in a motion group.
+
+*Note*: MotoROS2 does not support configuring custom joint names for a subset of joints and/or motion groups.
+If only a subset of joints should be configured with a custom name, specify the default name for all other joints.
+
+Refer to [FAQ: Can names of joints be changed?](faq.md#can-names-of-joints-be-changed) for more information about configuring custom joint names.
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
 ### Alarm: 8012[xx]
 
 *Example:*
@@ -731,6 +758,22 @@ The `motoros2_config.yaml` configuration file contains a remap rule that has bee
 Example format: `remap_rules: "joint_states:=my_joint_states read_single_io:=io/read_single"`
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+### Alarm: 8013[12]
+
+*Example:*
+
+```text
+ALARM 8011
+ Empty custom joint name
+[55]
+ALARM 8013
+ group: G, axis: A
+[12]
+```
+
+*Solution:*
+This alarm occurs in conjunction with `8011` (subcode `55`), please refer to [Alarm: 8011[55]](#alarm-801155).
 
 ### Alarm: 8014[0]
 
