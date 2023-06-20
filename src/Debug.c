@@ -48,15 +48,27 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     if (ros_DebugSocket == -1)
         Ros_Debug_Init();
 
-    // Timestamp
+     // Timestamp
     struct tm synced_time;
+    struct timeval tv;
     int64_t nanosecs = rmw_uros_epoch_nanos();
     builtin_interfaces__msg__Time debug_msg_timestamp;
 
-    Ros_Nanos_To_Time_Msg(nanosecs, &debug_msg_timestamp);
-    time(&debug_msg_timestamp);
-    strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&debug_msg_timestamp.sec, &synced_time));
-    snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d", (int)debug_msg_timestamp.nanosec / 1000000);
+    if (g_Ros_Communication_AgentIsConnected)
+    {
+        //get synchronized time from the agent
+        int64_t nanosecs = rmw_uros_epoch_nanos(); 
+        Ros_Nanos_To_Time_Msg(nanosecs, &debug_msg_timestamp);
+        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&debug_msg_timestamp.sec, &synced_time));
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d", (int)debug_msg_timestamp.nanosec / 1000000);
+    }
+    else
+    {
+        //rmw_uros_epoch_nanos cannot sync with agent because it's not connected
+        gettimeofday(&tv, NULL);
+        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&tv.tv_sec, &synced_time));
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d", tv.tv_usec / 1000);
+    }
   
     // Pre - pending the timestamp to the debug message
     size_t timestamp_length = strnlen(timestamp, FORMATTED_TIME_SIZE);
