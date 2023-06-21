@@ -54,7 +54,6 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     struct timeval tv;
     int64_t nanosecs = rmw_uros_epoch_nanos();
     builtin_interfaces__msg__Time debug_msg_timestamp;
-
     if (g_Ros_Communication_AgentIsConnected)
     {
         //get synchronized time from the agent
@@ -70,7 +69,6 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&tv.tv_sec, &synced_time));
         snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d", tv.tv_usec / 1000);
     }
-  
     // Pre - pending the timestamp to the debug message
     size_t timestamp_length = strnlen(timestamp, FORMATTED_TIME_SIZE);
     size_t debug_message_length = strnlen(str, MAX_DEBUG_MESSAGE_SIZE);
@@ -82,7 +80,6 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         // Copy the timestamp stored in Formatted_time buffer to the beginning of str buffer
         memcpy(str, timestamp, timestamp_length);         
     }
-
     mpSendTo(ros_DebugSocket, str, strlen(str), 0, (struct sockaddr*) &ros_debug_destAddr1, sizeof(struct sockaddr_in));
 
     if (g_nodeConfigSettings.log_to_stdout)
