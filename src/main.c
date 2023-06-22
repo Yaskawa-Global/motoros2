@@ -130,8 +130,10 @@ void RosInitTask()
         Ros_ServiceStartTrajMode_Initialize();
         Ros_ServiceStartPointQueueMode_Initialize();
         Ros_ServiceStopTrajMode_Initialize();
-        Ros_ServiceSelectMotionTool_Initialize();
 
+#if defined (YRC1000) || defined (YRC1000u) || defined (DX200)
+        Ros_ServiceSelectMotionTool_Initialize();
+#endif
         // Start executor that performs all communication
         // (This task deletes itself when the agent disconnects.)
         SEM_ID semCommunicationExecutorStatus = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
@@ -203,7 +205,10 @@ void RosInitTask()
         mpSemTake(semCommunicationExecutorStatus, WAIT_FOREVER);
         mpSemDelete(semCommunicationExecutorStatus);
 
+#if defined (YRC1000) || defined (YRC1000u) || defined (DX200)
         Ros_ServiceSelectMotionTool_Cleanup();
+#endif
+
         Ros_ServiceStopTrajMode_Cleanup();
         Ros_ServiceStartTrajMode_Cleanup();
         Ros_ServiceStartPointQueueMode_Cleanup();

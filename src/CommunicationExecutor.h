@@ -20,8 +20,13 @@
 //      service start_point_queue_mode                      1
 //      service stop_traj_mode                              1
 //      service queue_traj_point                            1
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
 //      service select_tool                                 1
 #define QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR             (9)
+#elif defined (FS100)
+//      select_tool is not supported on FS100 (yet)
+#define QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR             (8)
+#endif
 
 // total number of handles =
 //      timers +                                            1

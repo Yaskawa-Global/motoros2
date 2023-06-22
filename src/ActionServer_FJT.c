@@ -23,7 +23,11 @@ control_msgs__action__FollowJointTrajectory_FeedbackMessage feedback_FollowJoint
 //Static Memory (used for FJT goal storage)
 
 //TODO: shrink this once I have found a good buffer size
+#if defined (DX200) || defined (YRC1000) || defined (YRC1000u)
 #define SIZEOF_BUFFER_FJT_GOAL (2000000)
+#elif defined(FS100)
+#define SIZEOF_BUFFER_FJT_GOAL (1000000)
+#endif
 UINT8 Ros_StaticAllocationBuffer_FJTgoal[SIZEOF_BUFFER_FJT_GOAL];
 
 
