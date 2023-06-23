@@ -760,6 +760,36 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: ignore_missing_calib_data = %d", config->ignore_missing_calib_data);
 }
 
+#if defined (FS100)
+static LONG Ros_mpTell(int fd)
+{
+    //note: 'FIOWHERE' doesn't take any arguments, so set it to '0'
+    return mpIoctl(fd, FIOWHERE, /*arg=*/ 0);
+}
+
+static LONG Ros_ConfigFile_GetFileSize(int fd)
+{
+    LONG currPos = Ros_mpTell(fd);
+    LONG endPos = mpLseek(fd, /*offset=*/ 0L, SEEK_END);
+    if (currPos == ERROR || endPos == ERROR)
+    {
+        Ros_Debug_BroadcastMsg("%s: error: %d; %d", __func__, currPos, endPos);
+        //not much we can do, we also don't have much more information
+        return ERROR;
+    }
+    //restore: leave fd 'as we found it'
+    LONG newCurrPos = mpLseek(fd, currPos, SEEK_SET);
+    if (newCurrPos != currPos)
+    {
+        Ros_Debug_BroadcastMsg("%s: restore error: %d; %d", __func__, currPos, newCurrPos);
+        //not much we can do, we also don't have much more information
+        return ERROR;
+    }
+    //this should be the size of the file in bytes
+    return endPos;
+}
+#endif
+
 void Ros_ConfigFile_Parse()
 {
     BOOL bAlarmOnce = TRUE;
@@ -815,17 +845,42 @@ void Ros_ConfigFile_Parse()
 
         if (fd >= 0)
         {
-            mpFstat(fd, &fileStat);
+            STATUS stat = mpFstat(fd, &fileStat);
+            if (stat != OK)
+            {
+                //TODO(gavanderhoorn): raise alarm?
+                Ros_Debug_BroadcastMsg("%s: mpFstat error: %d", __func__, stat);
+                bOkToInit = FALSE;
+                continue;
+            }
+
+#if defined(FS100)
+            //mpFstat(..) doesn't appear to work reliably on FS100 (at least
+            //not for files on USB sticks and SRAM drive), so 'fix up' the file size
+            //field by overriding its value with the result of a custom function.
+            LONG st_size_override = Ros_ConfigFile_GetFileSize(fd);
+            if (st_size_override < 0)
+            {
+                Ros_Debug_BroadcastMsg("%s: Ros_ConfigFile_GetFileSize error: %d",
+                    __func__, st_size_override);
+                //TODO(gavanderhoorn): raise alarm? Make fatal?
+                bOkToInit = FALSE;
+                continue;
+            }
+            fileStat.st_size = (unsigned long) st_size_override;
+            Ros_Debug_BroadcastMsg(
+                "%s: override st_size: Ros_ConfigFile_GetFileSize: %d",
+                __func__, fileStat.st_size);
+#endif
 
             const size_t st_size_sz = fileStat.st_size + 1;
             char* string = (char*)mpMalloc(st_size_sz);
             bzero(string, st_size_sz);
 
-            mpRead(fd, string, fileStat.st_size);
-
+            int ret = mpRead(fd, string, fileStat.st_size);
             mpClose(fd);
 
-            yaml_parser_initialize(&parser);
+            ret = yaml_parser_initialize(&parser);
             yaml_parser_set_input_string(&parser, (UCHAR*)string, fileStat.st_size);
 
             yaml_event_type_t event_type;
