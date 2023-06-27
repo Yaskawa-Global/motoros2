@@ -77,7 +77,7 @@ void Ros_Communication_ConnectToAgent()
     //Also print to console, for easier debugging (but only if not logging to stdout already)
     if (!g_nodeConfigSettings.log_to_stdout)
     {
-        Ros_Debug_LogToConsole("Attempting to connect to Micro-ROS PC Agent (at udp://%s:%s)",
+        Ros_Debug_LogToConsole("Waiting for Micro-ROS PC Agent (at udp://%s:%s)",
             g_nodeConfigSettings.agent_ip_address, g_nodeConfigSettings.agent_port_number);
     }
 
