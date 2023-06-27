@@ -72,12 +72,12 @@ void Ros_Communication_ConnectToAgent()
     Ros_Debug_BroadcastMsg("Using client key: 0x%08X", client_key);
     rmw_uros_options_set_client_key(client_key, rmw_connectionoptions);
 
-    Ros_Debug_BroadcastMsg("Attempting to connect to Micro-ROS PC Agent (at udp://%s:%s)",
+    Ros_Debug_BroadcastMsg("Attempting to connect to micro-ROS PC Agent (at udp://%s:%s)",
         g_nodeConfigSettings.agent_ip_address, g_nodeConfigSettings.agent_port_number);
     //Also print to console, for easier debugging (but only if not logging to stdout already)
     if (!g_nodeConfigSettings.log_to_stdout)
     {
-        Ros_Debug_LogToConsole("Waiting for Micro-ROS PC Agent (at udp://%s:%s)",
+        Ros_Debug_LogToConsole("Waiting for micro-ROS PC Agent (at udp://%s:%s)",
             g_nodeConfigSettings.agent_ip_address, g_nodeConfigSettings.agent_port_number);
     }
 
@@ -94,7 +94,7 @@ void Ros_Communication_ConnectToAgent()
         retry_count += 1;
         if (retry_count == 10)
         {
-            Ros_Debug_BroadcastMsg("Attempting to connect to Micro-ROS PC Agent (at udp://%s:%s)",
+            Ros_Debug_BroadcastMsg("Attempting to connect to micro-ROS PC Agent (at udp://%s:%s)",
                 g_nodeConfigSettings.agent_ip_address, g_nodeConfigSettings.agent_port_number);
             retry_count = 0;
         }
@@ -107,7 +107,7 @@ void Ros_Communication_ConnectToAgent()
     } while (ret != RCL_RET_OK);
 
     g_Ros_Communication_AgentIsConnected = TRUE;
-    Ros_Debug_BroadcastMsg("Found Micro-ROS PC Agent");
+    Ros_Debug_BroadcastMsg("Found micro-ROS PC Agent");
 }
 
 void Ros_Communication_Initialize()
