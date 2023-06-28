@@ -60,14 +60,14 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         int64_t nanosecs = rmw_uros_epoch_nanos(); 
         Ros_Nanos_To_Time_Msg(nanosecs, &debug_msg_timestamp);
         strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&debug_msg_timestamp.sec, &synced_time));
-        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d", (int)debug_msg_timestamp.nanosec / 1000000);
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", (int)debug_msg_timestamp.nanosec / 1000000);
     }
     else
     {
         //rmw_uros_epoch_nanos cannot sync with agent because it's not connected
         gettimeofday(&tv, NULL);
         strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&tv.tv_sec, &synced_time));
-        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d", tv.tv_usec / 1000);
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", tv.tv_usec / 1000);
     }
     // Pre - pending the timestamp to the debug message
     size_t timestamp_length = strnlen(timestamp, FORMATTED_TIME_SIZE);
