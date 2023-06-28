@@ -12,6 +12,8 @@
 
 #define MAX_DEBUG_MESSAGE_SIZE  1024
 
+#define FORMATTED_TIME_SIZE  1024
+
 int ros_DebugSocket = -1;
 struct sockaddr_in ros_debug_destAddr1;
 
@@ -52,7 +54,6 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     //are set to indicate that the Micro-Ros PC Agent is connected but the first sync of the host time using the micro-ROS agent is yet to occur
     struct tm synced_time;
     struct timeval tv;
-    int64_t nanosecs = rmw_uros_epoch_nanos();
     builtin_interfaces__msg__Time debug_msg_timestamp;
     if (g_Ros_Communication_AgentIsConnected)
     {
@@ -76,7 +77,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     {
         // Move existing contents of str buffer to the end by Timestamp_Length to make space 
         //for the timestamp and avoiding overwriting the debug message during the move 
-        memmove(str + timestamp_length, str, debug_message_length + 1); 
+        memmove(str + timestamp_length, str, debug_message_length); 
         // Copy the timestamp stored in Formatted_time buffer to the beginning of str buffer
         memcpy(str, timestamp, timestamp_length);         
     }
