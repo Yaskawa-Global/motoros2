@@ -38,7 +38,6 @@ void Ros_Debug_Init()
 void Ros_Debug_BroadcastMsg(char* fmt, ...)
 {
     char str[MAX_DEBUG_MESSAGE_SIZE];
-    char Formatted_Time[300];
     va_list va;
 
     bzero(str, MAX_DEBUG_MESSAGE_SIZE);
