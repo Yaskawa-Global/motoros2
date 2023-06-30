@@ -229,6 +229,24 @@
     <None Include="YRC1000u_foxyLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
+    <None Include="..\libmicroros_dx200_foxy\libmicroros.dnLib_foxy">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="DX200_foxyCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_foxyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="..\libmicroros_dx200_galactic\libmicroros.dnLib_galactic">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="DX200_galacticCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_galacticLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
