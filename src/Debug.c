@@ -53,6 +53,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     //are set to indicate that the Micro-Ros PC Agent is connected but the first sync of the host time using the micro-ROS agent is yet to occur
     struct tm synced_time;
     struct timeval tv;
+    char timestamp[FORMATTED_TIME_SIZE];
     builtin_interfaces__msg__Time debug_msg_timestamp;
     if (g_Ros_Communication_AgentIsConnected)
     {
