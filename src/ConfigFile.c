@@ -132,10 +132,29 @@ void Ros_ConfigFile_SetAllDefaultValues()
     //=========
     //node_name
     UCHAR macId[6];
-    motoRosAssert_withMsg(
-        Ros_GetMacAddress(macId) == OK,
-        SUBCODE_FAIL_MP_NICDATA,
-        "Must enable ETHERNET function");
+
+    //TODO(gavanderhoorn): get MAC only from interface which is used for
+    //ROS traffic (https://github.com/Yaskawa-Global/motoros2/issues/57)
+    STATUS status = Ros_GetMacAddress(ROS_USER_LAN1, macId);
+    if (status != OK)
+    {
+        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
+            __func__, ROS_USER_LAN1, status);
+        motoRosAssert_withMsg(FALSE, SUBCODE_FAIL_MP_NICDATA,
+            "Must enable ETHERNET function");
+    }
+
+#if defined (YRC1000) || defined (YRC1000u)
+    //Try second interface if first one didn't succeed
+    if (status != OK && (status = Ros_GetMacAddress(ROS_USER_LAN2, macId)) != OK)
+    {
+        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
+            __func__, ROS_USER_LAN2, status);
+        motoRosAssert_withMsg(FALSE, SUBCODE_FAIL_MP_NICDATA,
+            "Must enable ETHERNET function");
+    }
+#endif
+
     //last three bytes of MAC ID are a unique identifier
     sprintf(g_nodeConfigSettings.node_name, "%s_%2x_%2x_%2x", DEFAULT_NODE_NAME, macId[3], macId[4], macId[5]);
 
