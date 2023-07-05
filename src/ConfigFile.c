@@ -84,7 +84,8 @@ typedef enum
     Value_Int,
     Value_Bool,
     Value_JointNameArray,
-    Value_Qos
+    Value_Qos,
+    Value_UserLanPort,
 } Value_Type;
 
 typedef struct
@@ -117,6 +118,8 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "stop_motion_on_disconnect", &g_nodeConfigSettings.stop_motion_on_disconnect, Value_Bool },
     { "inform_job_name", &g_nodeConfigSettings.inform_job_name, Value_String },
     { "allow_custom_inform_job", &g_nodeConfigSettings.allow_custom_inform_job, Value_Bool },
+    { "userlan_monitor_enabled", &g_nodeConfigSettings.userlan_monitor_enabled, Value_Bool },
+    { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_UserLanPort },
 };
 
 void Ros_ConfigFile_SetAllDefaultValues()
@@ -211,6 +214,10 @@ void Ros_ConfigFile_SetAllDefaultValues()
 
     //allow_custom_inform
     g_nodeConfigSettings.allow_custom_inform_job = DEFAULT_ALLOW_CUSTOM_INFORM;
+
+    //userlan monitoring
+    g_nodeConfigSettings.userlan_monitor_enabled = DEFAULT_ULAN_MON_ENABLED;
+    g_nodeConfigSettings.userlan_monitor_port = DEFAULT_ULAN_MON_LINK;
 }
 
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
@@ -221,7 +228,6 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
 
     char* t[] = { "y", "Y", "yes", "Yes", "YES", "true", "True", "TRUE", "on", "On", "ON", "1", NULL };
     char* f[] = { "n", "N", "no", "No", "NO", "false", "False", "FALSE", "off", "Off", "OFF", "0", NULL };
-    BOOL bBoolValueFound;
 
     if (event->type == YAML_SCALAR_EVENT)
     {
@@ -229,6 +235,8 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
         {
             if (event->data.scalar.length > 0)
             {
+                BOOL bBoolValueFound = FALSE;
+
                 switch (activeItem->typeOfValue)
                 {
                 case Value_String:
@@ -300,6 +308,39 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                     }
 
                     Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey, (char*)event->data.scalar.value);
+                    break;
+
+                case Value_UserLanPort:
+#if defined (DX200) || defined (FS100)
+                    // single port, override whatever was configured
+                    *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
+                    Ros_Debug_BroadcastMsg("DX200 or FS100: override to 'USER_LAN1'");
+
+#elif defined (YRC1000) || defined (YRC1000u)
+                    if (strncmp((char*)event->data.scalar.value, "USER_LAN1", 9) == 0)
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
+                    else if (strncmp((char*)event->data.scalar.value, "USER_LAN2", 9) == 0)
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN2;
+                    else
+                    {
+                        //Note: ideally, we'd disable user lan monitoring here. However, we can't
+                        //guarantee the 'userlan_monitor_enabled' setting won't be parsed after
+                        //this one. If it were to be parsed after 'userlan_monitor_port', we'd
+                        //be disabling it here, only to have it re-enabled later.
+                        //Set the config value to the 'disabled' sentinel value and let the
+                        //validation code below handle the fallout.
+                        Ros_Debug_BroadcastMsg(
+                            "Unrecognised value for '%s': '%s'. Port monitoring will be disabled",
+                            (char*)event->data.scalar.value,
+                            (char*)activeItem->yamlKey);
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN_DISABLED;
+                    }
+#else
+    #error Unsupported platform
+#endif
+                    //Note: this logs whatever was in the .yaml, NOT the verified/parsed value above
+                    Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey,
+                        (char*)event->data.scalar.value);
                     break;
                 }
             }
@@ -438,6 +479,38 @@ void Ros_ConfigFile_CheckUsbForNewConfigFile()
         Ros_Debug_BroadcastMsg("No new configuration file found on CN102 USB drive.");
 }
 
+STATUS Ros_ConfigFile_HostOnNetworkInterface(char* const host, USHORT if_no, BOOL* const reachable)
+{
+    ULONG nic_ip, nic_subnetmask, nic_gateway;
+    ULONG host_ip;
+    UINT8 dont_care[6];
+    STATUS status = OK;
+    BOOL host_on_network = FALSE;
+
+    Ros_Debug_BroadcastMsg("%s: checking '%s' on iface %d", __func__, host, if_no);
+
+    host_ip = mpInetAddr(host);
+    status = Ros_mpNICData(if_no, &nic_ip, &nic_subnetmask, dont_care, &nic_gateway);
+    if (status != OK)
+        return status;
+
+    host_on_network = ((nic_ip & nic_subnetmask) == (host_ip & nic_subnetmask));
+
+    //check to see if gateway could be used, and assume the Agent is reachable through it
+    if (!host_on_network)
+    {
+        Ros_Debug_BroadcastMsg("%s: not on network, gateway: 0x%08X", __func__, nic_gateway);
+        host_on_network = (nic_gateway != 0)
+            && ((nic_gateway & nic_subnetmask) == (host_ip & nic_subnetmask));
+    }
+
+    Ros_Debug_BroadcastMsg("%s: exit: on network: %s", __func__,
+        host_on_network ? "true" : "false");
+
+    *reachable = host_on_network;
+    return OK;
+}
+
 void Ros_ConfigFile_ValidateCriticalSettings()
 {
     //==============================================================================
@@ -471,23 +544,23 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     //-----------------------------------------
     //Verify agent is on my subnet (or a gateway is specified)
     BOOL bAgentOnMySubnet = FALSE;
-    ULONG ip_be1, subnetmask_be1, gateway_be1;
-    ULONG ip_be2, subnetmask_be2, gateway_be2;
-    UINT8 macId[6];
-    ULONG agent_ip_be;
-
-    agent_ip_be = mpInetAddr(g_nodeConfigSettings.agent_ip_address);
 
     //check first lan port
-    if (Ros_mpNICData(ROS_USER_LAN1, &ip_be1, &subnetmask_be1, macId, &gateway_be1) == OK)
-        bAgentOnMySubnet = ((ip_be1 & subnetmask_be1) == (agent_ip_be & subnetmask_be1));
+    STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
+        g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnMySubnet);
+    motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+        "Host on NIC check 1");
 
-    //check second lan port
-    if (!bAgentOnMySubnet && (Ros_mpNICData(ROS_USER_LAN2, &ip_be2, &subnetmask_be2, macId, &gateway_be2) == OK))
-        bAgentOnMySubnet = ((ip_be2 & subnetmask_be2) == (agent_ip_be & subnetmask_be2));
-
-    if (!bAgentOnMySubnet) //check if gateway is configured
-        bAgentOnMySubnet = (gateway_be1 != 0) || (gateway_be2 != 0);
+#if defined (YRC1000) || defined (YRC1000u)
+    if (!bAgentOnMySubnet)
+    {
+        //check second lan port
+        status = Ros_ConfigFile_HostOnNetworkInterface(
+            g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnMySubnet);
+        motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+            "Host on NIC check 2");
+    }
+#endif
 
     motoRosAssert_withMsg(bAgentOnMySubnet,
         SUBCODE_CONFIGURATION_INVALID_AGENT_SUBNET,
@@ -549,6 +622,82 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
         mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid status_monitor_period", SUBCODE_CONFIGURATION_INVALID_IO_PERIOD);
 
         g_nodeConfigSettings.controller_status_monitor_period = DEFAULT_CONTROLLER_IO_PERIOD;
+    }
+
+    //-----------------------------------------------------------------------------
+    if (g_nodeConfigSettings.userlan_monitor_enabled)
+    {
+        Ros_Debug_BroadcastMsg("UserLan monitor enabled, checking port setting ..");
+
+        //try to auto-detect if the port was not configured
+        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
+        {
+            BOOL bAgentOnInterface = FALSE;
+            STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
+                g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnInterface);
+            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+                "Host on NIC check 1 auto-detect");
+
+            if (bAgentOnInterface)
+            {
+                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN1;
+                Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
+                    g_nodeConfigSettings.userlan_monitor_port);
+            }
+        }
+
+#if defined (YRC1000) || defined (YRC1000u)
+        //on these controllers we can try the second interface, if we haven't
+        //already determined we should monitor the first
+        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
+        {
+            BOOL bAgentOnInterface = FALSE;
+            STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
+                g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnInterface);
+            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+                "Host on NIC check 2 auto-detect");
+
+            if (bAgentOnInterface)
+            {
+                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN2;
+                Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
+                    g_nodeConfigSettings.userlan_monitor_port);
+            }
+        }
+#endif
+
+        //if we still haven't determined which port to monitor, we'll raise an
+        //alarm and disable monitoring. There is no appropriate default value
+        //here, and user intervention is required.
+        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
+        {
+            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "UserLan port detect failed",
+                SUBCODE_CONFIGURATION_USERLAN_MONITOR_AUTO_DETECT_FAILED);
+            g_nodeConfigSettings.userlan_monitor_enabled = FALSE;
+            Ros_Debug_BroadcastMsg(
+                "UserLan port auto-detection failed, disabling monitor");
+        }
+
+        //otherwise, either auto-detect worked, or a fixed value was configured.
+        //In both cases, verify it's an acceptable value.
+        else
+        {
+#if defined (YRC1000) || defined (YRC1000u)
+            if (g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN1 &&
+                g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN2)
+
+#elif defined (FS100) || defined (DX200)
+            if (g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN1)
+#endif
+            {
+                mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid UserLan port in cfg",
+                    SUBCODE_CONFIGURATION_INVALID_USERLAN_MONITOR_PORT);
+                g_nodeConfigSettings.userlan_monitor_enabled = FALSE;
+                Ros_Debug_BroadcastMsg(
+                    "userlan_monitor_port value %d is invalid, disabling monitor",
+                    g_nodeConfigSettings.userlan_monitor_port);
+            }
+        }
     }
 }
 

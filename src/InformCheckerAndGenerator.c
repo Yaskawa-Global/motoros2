@@ -73,7 +73,8 @@ void Ros_InformChecker_CreateJob()
                 if (group->baseTrackGroupId != -1) //this robot has a base
                 {
                     sprintf(tagBuffer, ",BS%d", (group->baseTrackGroupId - MP_B1_GID) + 1);
-                    strncat(lineBuffer, tagBuffer, MAX_JOB_LINE_LENGTH);
+                    strncat(lineBuffer, tagBuffer,
+                        sizeof(lineBuffer) - Ros_strnlen(lineBuffer, MAX_JOB_LINE_LENGTH) - 1);
                 }
 
                 FileUtilityFunctions_WriteLine(fd, lineBuffer);
@@ -213,9 +214,9 @@ BOOL Ros_InformChecker_CheckHeaderForGroupCombinations(int fdJob)
     for (int groupIndex = 0; groupIndex < g_Ros_Controller.numGroup; groupIndex += 1)
     {
         CtrlGroup* group = g_Ros_Controller.ctrlGroups[groupIndex];
-        BOOL bGroupFound = FALSE;
         if (group)
         {
+            BOOL bGroupFound = FALSE;
             //iterate over the used groups
             for (int i = 0; i < MAX_GROUP_COMBINATIONS; i += 1)
             {

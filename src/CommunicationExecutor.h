@@ -10,6 +10,8 @@
 
 #define PERIOD_COMMUNICATION_PING_AGENT_MS                  5000
 
+#define PERIOD_COMMUNICATION_USERLAN_LINK_CHECK_MS          500
+
 // total number of handles =
 //      timers +                                            2
 //      action_server +                                     1
@@ -22,8 +24,9 @@
 #define QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR             (9)
 
 // total number of handles =
+//      timers +                                            1
 //      service read & write I/O +                          6
-#define QUANTITY_OF_HANDLES_FOR_IO_EXECUTOR                 (6)
+#define QUANTITY_OF_HANDLES_FOR_IO_EXECUTOR                 (7)
 
 typedef struct
 {
