@@ -12,6 +12,8 @@
 
 #define MAX_DEBUG_MESSAGE_SIZE  1024
 
+#define FORMATTED_TIME_SIZE  1024
+
 int ros_DebugSocket = -1;
 struct sockaddr_in ros_debug_destAddr1;
 
@@ -46,7 +48,39 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
 
     if (ros_DebugSocket == -1)
         Ros_Debug_Init();
-
+    // Timestamp
+    //The timestamp for the message "Found Micro-Ros PC Agent" will be the epoch time (THU 1970-01-01 00:00:00.000) as the global flags 
+    //are set to indicate that the Micro-Ros PC Agent is connected but the first sync of the host time using the micro-ROS agent is yet to occur
+    struct tm synced_time;
+    struct timeval tv;
+    char timestamp[FORMATTED_TIME_SIZE];
+    builtin_interfaces__msg__Time debug_msg_timestamp;
+    if (g_Ros_Communication_AgentIsConnected)
+    {
+        //get synchronized time from the agent
+        int64_t nanosecs = rmw_uros_epoch_nanos(); 
+        Ros_Nanos_To_Time_Msg(nanosecs, &debug_msg_timestamp);
+        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&debug_msg_timestamp.sec, &synced_time));
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", (int)debug_msg_timestamp.nanosec / 1000000);
+    }
+    else
+    {
+        //rmw_uros_epoch_nanos cannot sync with agent because it's not connected
+        gettimeofday(&tv, NULL);
+        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&tv.tv_sec, &synced_time));
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", tv.tv_usec / 1000);
+    }
+    // Pre - pending the timestamp to the debug message
+    size_t timestamp_length = strnlen(timestamp, FORMATTED_TIME_SIZE);
+    size_t debug_message_length = strnlen(str, MAX_DEBUG_MESSAGE_SIZE);
+    if (timestamp_length + debug_message_length + 1 < MAX_DEBUG_MESSAGE_SIZE)
+    {
+        // Move existing contents of str buffer to the end by Timestamp_Length to make space 
+        //for the timestamp and avoiding overwriting the debug message during the move 
+        memmove(str + timestamp_length, str, debug_message_length); 
+        // Copy the timestamp stored in Formatted_time buffer to the beginning of str buffer
+        memcpy(str, timestamp, timestamp_length);         
+    }
     mpSendTo(ros_DebugSocket, str, strlen(str), 0, (struct sockaddr*) &ros_debug_destAddr1, sizeof(struct sockaddr_in));
 
     if (g_nodeConfigSettings.log_to_stdout)

@@ -56,6 +56,15 @@ extern ULONG tickGet();
 extern STATUS Ros_setsockopt(int s, int level, int optname, char* optval, int optlen);
 
 
+#if defined (DX100) || defined (FS100)
+// VxWorks 5.5/6.8
+extern int localtime_r(const time_t* timer, struct tm* timeBuffer);
+#else
+// >= VxWorks 6.9
+struct tm* localtime_r(const time_t* timep, struct tm* result);
+#endif
+
+
 // Attempts to determine whether the specific link is UP (ie: cable is connected).
 // IFF return value is 'OK', 'is_up' will reflect link state. In all other cases,
 // 'is_up' may be left uninitialised.
