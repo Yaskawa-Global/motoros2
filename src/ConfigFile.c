@@ -225,14 +225,11 @@ static int nestedListCounter = 0;
 static int jointIteratorCOuntdownPerGroup = MP_GRP_AXES_NUM;
 BOOL bBoolValueFound;
 
-void Ros_ConfigFile_PrintAllItems(&activeItem, yaml_event_t* event)
+void Ros_ConfigFile_PrintAllItems(activeItem, yaml_event_t* event)
 {
     int numberOfItems = sizeof(Ros_ConfigFile_Items) / sizeof(Configuration_Item);
     for (int i = 0; i < numberOfItems; i += 1)
     {
-        Configuration_Item item = Ros_ConfigFile_Items[i];
-        printf("Config: %s = ", item.yamlKey);
-
         if (event->type == YAML_SCALAR_EVENT)
         {
             if (activeItem) //this is the value for a particular yamlKey
@@ -301,10 +298,6 @@ void Ros_ConfigFile_PrintAllItems(&activeItem, yaml_event_t* event)
 
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
 {
-    static Configuration_Item* activeItem = NULL;
-    static int nestedListCounter = 0;
-    static int jointIteratorCountdownPerGroup = MP_GRP_AXES_NUM;
-
     char* t[] = { "y", "Y", "yes", "Yes", "YES", "true", "True", "TRUE", "on", "On", "ON", "1", NULL };
     char* f[] = { "n", "N", "no", "No", "NO", "false", "False", "FALSE", "off", "Off", "OFF", "0", NULL };
 
