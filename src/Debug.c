@@ -60,7 +60,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         //get synchronized time from the agent
         int64_t nanosecs = rmw_uros_epoch_nanos(); 
         Ros_Nanos_To_Time_Msg(nanosecs, &debug_msg_timestamp);
-        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&debug_msg_timestamp.sec, &synced_time));
+        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r((const time_t*)&debug_msg_timestamp.sec, &synced_time));
         snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", (int)debug_msg_timestamp.nanosec / 1000000);
     }
     else
