@@ -24,8 +24,9 @@ LONG Ros_mpGetRobotCalibrationData(ULONG file_no, MP_RB_CALIB_DATA *rData)
     //This is an array of POINTERS. We'll only allocate a slot if that calibration
     //file is configured.
     static MP_RB_CALIB_DATA* calibrationFiles[MAX_ROBOT_CALIBRATION_FILES];
+    static BOOL fileHasBeenParsed = FALSE;
     
-    if (file_no == 0) //first time in, let's parse the whole file
+    if (!fileHasBeenParsed) //first time in, let's parse the whole file
     {
         int ret;
         int fd;
@@ -142,6 +143,8 @@ LONG Ros_mpGetRobotCalibrationData(ULONG file_no, MP_RB_CALIB_DATA *rData)
 
         mpClose(fd);
         mpRemove(PATH_TO_RBCALIB_DAT); //dont care if this fails
+
+        fileHasBeenParsed = TRUE;
     }
 
     //----------------------------------------------------------------------
