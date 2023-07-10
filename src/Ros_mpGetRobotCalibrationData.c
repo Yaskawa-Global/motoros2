@@ -47,14 +47,18 @@ LONG Ros_mpGetRobotCalibrationData(ULONG file_no, MP_RB_CALIB_DATA *rData)
         ret = mpSaveFile(MP_DRV_ID_DRAM, "", FILENAME_RBCALIB_DAT);
         if (ret != OK)
         {
-#error raise alarm
+            Ros_Debug_BroadcastMsg("Couldn't save " FILENAME_RBCALIB_DAT " to DRAM drive. Error (%d)", ret);
+            Ros_Debug_BroadcastMsg("/tf will be inaccurate for multi-group systems");
+            mpSetAlarm(ALARM_DAT_FILE_PARSE_FAIL, "Failed to parse " FILENAME_RBCALIB_DAT, SUBCODE_DAT_FAIL_CMOS_TO_DRAM);
             return ERROR;
         }
 
         fd = mpOpen(PATH_TO_RBCALIB_DAT, O_RDONLY, 0);
         if (fd < 0)
         {
-#error raise alarm
+            Ros_Debug_BroadcastMsg("Couldn't open " FILENAME_RBCALIB_DAT " from DRAM drive. fd (%d)", fd);
+            Ros_Debug_BroadcastMsg("/tf will be inaccurate for multi-group systems");
+            mpSetAlarm(ALARM_DAT_FILE_PARSE_FAIL, "Failed to parse " FILENAME_RBCALIB_DAT, SUBCODE_DAT_FAIL_OPEN);
             return ERROR;
         }
 

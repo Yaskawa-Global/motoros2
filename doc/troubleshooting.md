@@ -913,3 +913,36 @@ ALARM 8014
 *Solution:*
 There was a failure when generating the default INFORM job.
 Please obtain the standard job from the Github repository and load it using the teach pendant.
+
+### Alarm: 8015[0]
+
+*Example:*
+
+```text
+ALARM 8015
+ Failed to parse RBCALIB.DAT
+[0]
+```
+
+*Solution:*
+Please contact Yaskawa technical support for assistance.
+Include a copy of the `ALL.PRM` and `CMOS.BIN` from your robot controller.
+
+### Alarm: 8015[1]
+
+*Example:*
+
+```text
+ALARM 8015
+ Failed to parse RBCALIB.DAT
+[1]
+```
+
+*Solution:*
+Check the following robot parameters on the teach pendant:
+
+- S2C1103 = 2
+- S2C1117 = 1
+
+If that does not resolve the issue, please contact Yaskawa technical support for assistance.
+Include a copy of the `ALL.PRM` and `CMOS.BIN` from your robot controller.
