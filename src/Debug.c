@@ -71,8 +71,8 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", tv.tv_usec / 1000);
     }
     // Pre - pending the timestamp to the debug message
-    size_t timestamp_length = strnlen(timestamp, FORMATTED_TIME_SIZE);
-    size_t debug_message_length = strnlen(str, MAX_DEBUG_MESSAGE_SIZE);
+    size_t timestamp_length = Ros_strnlen(timestamp, FORMATTED_TIME_SIZE);
+    size_t debug_message_length = Ros_strnlen(str, MAX_DEBUG_MESSAGE_SIZE);
     if (timestamp_length + debug_message_length + 1 < MAX_DEBUG_MESSAGE_SIZE)
     {
         // Move existing contents of str buffer to the end by Timestamp_Length to make space 
