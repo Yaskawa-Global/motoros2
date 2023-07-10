@@ -66,7 +66,7 @@ LONG Ros_mpGetRobotCalibrationData(ULONG file_no, MP_RB_CALIB_DATA *rData)
             {
                 rcutils_split(buffer, ' ', g_motoros2_Allocator, &splitSpace);
 
-                int fileNo = atoi(splitSpace.data[1]);
+                int fileNo = atoi(splitSpace.data[1]) - 1; //fileNo is zero-based, RBCALIB is one-based
                 calibrationFiles[fileNo] = (MP_RB_CALIB_DATA*)mpMalloc(sizeof(MP_RB_CALIB_DATA));
 #error dont forget to free this memory later
 
