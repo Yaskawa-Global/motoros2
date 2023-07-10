@@ -99,6 +99,8 @@ void RosInitTask()
 
         Ros_Allocation_Initialize();
 
+        Ros_mpGetRobotCalibrationData_Initialize(); //must occur before Ros_Controller_Initialize
+
         Ros_Communication_ConnectToAgent();
 
         Ros_Controller_SetIOState(IO_FEEDBACK_AGENTCONNECTED, TRUE);
@@ -203,7 +205,8 @@ void RosInitTask()
         Ros_ActionServer_FJT_Cleanup();
         Ros_PositionMonitor_Cleanup();
         Ros_Controller_Cleanup();
-        Ros_Communication_Cleanup();
+        Ros_Communication_Cleanup(); 
+        Ros_mpGetRobotCalibrationData_Cleanup();
 
         //--------------------------------
         Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE);

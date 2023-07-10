@@ -52,7 +52,8 @@ typedef struct  {
 
 #endif
 
-
+extern void Ros_mpGetRobotCalibrationData_Initialize();
+extern void Ros_mpGetRobotCalibrationData_Cleanup();
 extern LONG Ros_mpGetRobotCalibrationData(ULONG file_no, MP_RB_CALIB_DATA *rData);
 
 
