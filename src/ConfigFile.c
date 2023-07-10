@@ -220,84 +220,12 @@ void Ros_ConfigFile_SetAllDefaultValues()
     g_nodeConfigSettings.userlan_monitor_port = DEFAULT_ULAN_MON_LINK;
 }
 
-static Configuration_Item* activeItem = NULL;
-static int nestedListCounter = 0;
-static int jointIteratorCOuntdownPerGroup = MP_GRP_AXES_NUM;
-BOOL bBoolValueFound;
-
-void Ros_ConfigFile_PrintAllItems(activeItem, yaml_event_t* event)
-{
-    int numberOfItems = sizeof(Ros_ConfigFile_Items) / sizeof(Configuration_Item);
-    for (int i = 0; i < numberOfItems; i += 1)
-    {
-        if (event->type == YAML_SCALAR_EVENT)
-        {
-            if (activeItem) //this is the value for a particular yamlKey
-            {
-                if (event->data.scalar.length > 0)
-                {
-                    switch (activeItem->typeOfValue)
-                    {
-                    case Value_String:
-                        Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey, (char*)activeItem->valueToSet);
-                        break;
-
-                    case Value_Int:
-                        Ros_Debug_BroadcastMsg("Config: %s = %d", (char*)activeItem->yamlKey, *(int*)activeItem->valueToSet);
-                        break;
-
-                    case Value_Bool:
-                        if (!bBoolValueFound)
-                        {
-                            Ros_Debug_BroadcastMsg("Config: %s left at default value", (char*)activeItem->yamlKey);
-                        }
-                        else
-                            Ros_Debug_BroadcastMsg("Config: %s = %d", (char*)activeItem->yamlKey, *(BOOL*)activeItem->valueToSet);
-                        break;
-
-                    case Value_JointNameArray:
-                        Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey, *(char**)activeItem->valueToSet);
-                        break;
-
-                    case Value_Qos:
-                        Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey, (char*)event->data.scalar.value);
-                        break;
-
-                    case Value_UserLanPort:
-                    {
-                        if defined(DX200) || defined(FS100)
-                            Ros_Debug_BroadcastMsg("DX200 or FS100: override to 'USER_LAN1'");
-                        else
-                            Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey,
-                                (char*)event->data.scalar.value);
-                        break;
-                    }
-                    }
-                }
-            }
-        }
-        else if (event->type == YAML_SEQUENCE_END_EVENT && activeItem->typeOfValue == Value_JointNameArray)
-        {
-            if (nestedListCounter == 0)
-                Ros_Debug_BroadcastMsg("List of configured joint names:");
-            for (int i = 0; i < MAX_CONTROLLABLE_GROUPS; i += 1)
-            {
-                Ros_Debug_BroadcastMsg("---");
-                for (int j = 0; j < MP_GRP_AXES_NUM; j += 1)
-                {
-                    if (strlen(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]) > 0)
-                        Ros_Debug_BroadcastMsg(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]);
-                    else
-                        Ros_Debug_BroadcastMsg("x");
-                }
-            }
-            Ros_Debug_BroadcastMsg("---");
-        }
-    }
-}
-
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
 {
+    static Configuration_Item* activeItem = NULL;
+    static int nestedListCounter = 0;
+    static int jointIteratorCountdownPerGroup = MP_GRP_AXES_NUM;
+
     char* t[] = { "y", "Y", "yes", "Yes", "YES", "true", "True", "TRUE", "on", "On", "ON", "1", NULL };
     char* f[] = { "n", "N", "no", "No", "NO", "false", "False", "FALSE", "off", "Off", "OFF", "0", NULL };
 
@@ -307,6 +235,8 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
         {
             if (event->data.scalar.length > 0)
             {
+                BOOL bBoolValueFound = FALSE;
+
                 switch (activeItem->typeOfValue)
                 {
                 case Value_String:
@@ -370,6 +300,39 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                             (char*)event->data.scalar.value);
                     }
                     break;
+
+                case Value_UserLanPort:
+#if defined (DX200) || defined (FS100)
+                    // single port, override whatever was configured
+                    *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
+                    Ros_Debug_BroadcastMsg("DX200 or FS100: override to 'USER_LAN1'");
+
+#elif defined (YRC1000) || defined (YRC1000u)
+                    if (strncmp((char*)event->data.scalar.value, "USER_LAN1", 9) == 0)
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
+                    else if (strncmp((char*)event->data.scalar.value, "USER_LAN2", 9) == 0)
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN2;
+                    else
+                    {
+                        //Note: ideally, we'd disable user lan monitoring here. However, we can't
+                        //guarantee the 'userlan_monitor_enabled' setting won't be parsed after
+                        //this one. If it were to be parsed after 'userlan_monitor_port', we'd
+                        //be disabling it here, only to have it re-enabled later.
+                        //Set the config value to the 'disabled' sentinel value and let the
+                        //validation code below handle the fallout.
+                        Ros_Debug_BroadcastMsg(
+                            "Unrecognised value for '%s': '%s'. Port monitoring will be disabled",
+                            (char*)event->data.scalar.value,
+                            (char*)activeItem->yamlKey);
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN_DISABLED;
+                    }
+#else
+    #error Unsupported platform
+#endif
+                    //Note: this logs whatever was in the .yaml, NOT the verified/parsed value above
+                    Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey,
+                        (char*)event->data.scalar.value);
+                    break;
                 }
             }
 
@@ -404,19 +367,6 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
         if (nestedListCounter == 0) //all sub-lists in [joint_names] have been processed
         {
             activeItem = NULL;
-
-            for (int i = 0; i < MAX_CONTROLLABLE_GROUPS; i += 1)
-            {
-                for (int j = 0; j < MP_GRP_AXES_NUM; j += 1)
-                {
-                    if (strlen(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]) > 0)
-                        Ros_Debug_BroadcastMsg(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]);
-                    else
-                        Ros_Debug_BroadcastMsg("x");
-                }
-            }
-            Ros_Debug_BroadcastMsg("---");
-            Ros_ConfigFile_PrintAllItems();
         }
     }
 }
@@ -807,6 +757,42 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
+
+    Ros_Debug_BroadcastMsg("Config: ros_domain_id = %d", g_nodeConfigSettings.ros_domain_id);
+    Ros_Debug_BroadcastMsg("Config: node_name = %s", g_nodeConfigSettings.node_name);
+    Ros_Debug_BroadcastMsg("Config: node_namespace = %s", g_nodeConfigSettings.node_namespace);
+    Ros_Debug_BroadcastMsg("Config: remap_rules = %s", g_nodeConfigSettings.remap_rules);
+    Ros_Debug_BroadcastMsg("Config: agent_ip_address = %s", g_nodeConfigSettings.agent_ip_address);
+    Ros_Debug_BroadcastMsg("Config: agent_port_number = %s", g_nodeConfigSettings.agent_port_number);
+    Ros_Debug_BroadcastMsg("Config: sync_timeclock_with_agent = %d", g_nodeConfigSettings.sync_timeclock_with_agent);
+    Ros_Debug_BroadcastMsg("Config: namespace_tf = %d", g_nodeConfigSettings.namespace_tf);
+    Ros_Debug_BroadcastMsg("Config: publish_tf = %d", g_nodeConfigSettings.publish_tf);
+    Ros_Debug_BroadcastMsg("List of configured joint names:");
+    for (int i = 0; i < MAX_CONTROLLABLE_GROUPS; i += 1)
+    {
+        Ros_Debug_BroadcastMsg("---");
+        for (int j = 0; j < MP_GRP_AXES_NUM; j += 1)
+        {
+            if (strlen(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]) > 0)
+                Ros_Debug_BroadcastMsg(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]);
+            else
+                Ros_Debug_BroadcastMsg("x");
+        }
+    }
+    Ros_Debug_BroadcastMsg("---");
+    Ros_Debug_BroadcastMsg("Config: log_to_stdout = %d", g_nodeConfigSettings.log_to_stdout);
+    Ros_Debug_BroadcastMsg("Config: executor_sleep_period = %d", g_nodeConfigSettings.executor_sleep_period);
+    Ros_Debug_BroadcastMsg("Config: action_feedback_publisher_period = %d", g_nodeConfigSettings.action_feedback_publisher_period);
+    Ros_Debug_BroadcastMsg("Config: controller_status_monitor_period = %d", g_nodeConfigSettings.controller_status_monitor_period);
+    Ros_Debug_BroadcastMsg("Config: robot_status = %d", g_nodeConfigSettings.qos_robot_status);
+    Ros_Debug_BroadcastMsg("Config: joint_states = %d", g_nodeConfigSettings.qos_joint_states);
+    Ros_Debug_BroadcastMsg("Config: tf = %d", g_nodeConfigSettings.qos_tf);
+    Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = %s", g_nodeConfigSettings.tf_frame_prefix);
+    Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", g_nodeConfigSettings.stop_motion_on_disconnect);
+    Ros_Debug_BroadcastMsg("Config: inform_job_name = %s", g_nodeConfigSettings.inform_job_name);
+    Ros_Debug_BroadcastMsg("Config: allow_custom_inform_job = %d", g_nodeConfigSettings.allow_custom_inform_job);
+    Ros_Debug_BroadcastMsg("Config: userlan_monitor_enabled = %d", g_nodeConfigSettings.userlan_monitor_enabled);
+    Ros_Debug_BroadcastMsg("Config: userlan_monitor_port = %d", g_nodeConfigSettings.userlan_monitor_port);    
 }
 
 rmw_qos_profile_t const* const Ros_ConfigFile_To_Rmw_Qos_Profile(Ros_QoS_Profile_Setting val)
