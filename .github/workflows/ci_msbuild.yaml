@@ -19,10 +19,8 @@ jobs:
       # controllers and for which ROS 2 versions builds fail / succeed)
       fail-fast: false
       matrix:
-        # controller: [yrc1000, yrc1000u]
-        # ros2_codename: [humble, galactic, foxy]
-        controller: [yrc1000]
-        ros2_codename: [humble]
+        controller: [yrc1000, yrc1000u]
+        ros2_codename: [humble, galactic, foxy]
 
     steps:
     - name: Uppercase controller identifier
