@@ -66,7 +66,8 @@ void Ros_Communication_ConnectToAgent()
         Ros_GetMacAddress(macId) == OK,
         SUBCODE_FAIL_MP_NICDATA,
         "Must enable ETHERNET function");
-    uint32_t client_key = *((uint32_t*) &macId[2]);
+    uint32_t client_key = 0;
+    memcpy(&client_key, macId+2, sizeof(client_key));
     //Swap to make NIC bytes LSB
     client_key = mpNtohl(client_key);
     Ros_Debug_BroadcastMsg("Using client key: 0x%08X", client_key);
