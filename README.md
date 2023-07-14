@@ -5,19 +5,18 @@ SPDX-FileCopyrightText: 2022-2023, Delft University of Technology
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
-# MotoROS2
-
-[![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
-
-![Version: 0.1.0](https://img.shields.io/badge/version-0.1.0-informational.svg)
-
-[![support level: consortium / vendor](https://img.shields.io/badge/support%20level-consortium%20/%20vendor-brightgreen.svg)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
+<h1><img src="doc/img/logo.png" alt="MotoROS2 logo" style="width: 70%" /></h1>
 
 ![YRC1000: supported](https://img.shields.io/badge/YRC1000-supported-blue.svg)
 ![YRC1000micro: supported](https://img.shields.io/badge/YRC1000micro-supported-blue.svg)
 ![DX200: not supported](https://img.shields.io/badge/DX200-not%20supported-inactive.svg)
 ![FS100: not supported](https://img.shields.io/badge/FS100-not%20supported-inactive.svg)
 ![DX100: not supported](https://img.shields.io/badge/DX100-not%20supported-inactive.svg)
+
+[![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
+[![support level: consortium / vendor](https://img.shields.io/badge/support%20level-consortium%20/%20vendor-brightgreen.svg)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
+
+![Version: 0.1.0](https://img.shields.io/badge/version-0.1.0-informational.svg)
 
 ## Overview
 
