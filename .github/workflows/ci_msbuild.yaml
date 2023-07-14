@@ -30,7 +30,11 @@ jobs:
   msbuild:
     runs-on: windows-2022
     needs: msbuild_filter
-    if: needs.msbuild_filter.outputs.needs_msbuild == 'true'
+    # only run this job if source files were changed,
+    # AND the PR came from a feature branch on the main repository
+    if: |
+      needs.msbuild_filter.outputs.needs_msbuild == 'true' &&
+        github.event.pull_request.head.repo.full_name == github.repository
 
     strategy:
       # keep jobs running even if one fails (we want to know on which
