@@ -52,7 +52,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     //The timestamp for the message "Found Micro-Ros PC Agent" will be the epoch time (THU 1970-01-01 00:00:00.000) as the global flags 
     //are set to indicate that the Micro-Ros PC Agent is connected but the first sync of the host time using the micro-ROS agent is yet to occur
     struct tm synced_time;
-    struct timeval tv;
+    timespec tp;
     char timestamp[FORMATTED_TIME_SIZE];
     builtin_interfaces__msg__Time debug_msg_timestamp;
     if (g_Ros_Communication_AgentIsConnected)
@@ -66,9 +66,9 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     else
     {
         //rmw_uros_epoch_nanos cannot sync with agent because it's not connected
-        gettimeofday(&tv, NULL);
-        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&tv.tv_sec, &synced_time));
-        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", tv.tv_usec / 1000);
+        clock_gettime(CLOCK_REALTIME, &tp);
+        strftime(timestamp, FORMATTED_TIME_SIZE, "%a %Y-%m-%d %H:%M:%S", localtime_r(&tp.tv_sec, &synced_time));
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%03d ", tp.tv_nsec / 1000000);
     }
     // Pre - pending the timestamp to the debug message
     size_t timestamp_length = Ros_strnlen(timestamp, FORMATTED_TIME_SIZE);
