@@ -10,3 +10,9 @@ default: true
 # we disable this because we use semantic line breaks (one-sentence-per-line,
 # specifically) so we can't put a maximum length on lines.
 MD013: false
+
+# MD033 - Inline HTML
+# as we use an 'img' tag to show the logo at the top of the readme, we
+# explicitly allow it here
+MD033:
+  allowed_elements: ['h1', 'img']

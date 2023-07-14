@@ -5,7 +5,7 @@ SPDX-FileCopyrightText: 2022-2023, Delft University of Technology
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
-# MotoROS2
+<h1><img src="doc/img/logo.png" alt="MotoROS2 logo" style="width: 70%" /></h1>
 
 [![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
