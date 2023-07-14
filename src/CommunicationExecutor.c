@@ -64,6 +64,7 @@ void Ros_Communication_ConnectToAgent()
     //TODO(gavanderhoorn): get MAC only from interface which is used for
     //ROS traffic (https://github.com/Yaskawa-Global/motoros2/issues/57)
     UCHAR macId[6];
+  
     STATUS status = Ros_GetMacAddress(ROS_USER_LAN1, macId);
     if (status != OK)
     {
@@ -83,8 +84,10 @@ void Ros_Communication_ConnectToAgent()
             "Must enable ETHERNET function");
     }
 #endif
-
-    uint32_t client_key = *((uint32_t*) &macId[2]);
+  
+    uint32_t client_key = 0;
+    memcpy(&client_key, macId+2, sizeof(client_key));
+  
     //Swap to make NIC bytes LSB
     client_key = mpNtohl(client_key);
     Ros_Debug_BroadcastMsg("Using client key: 0x%08X", client_key);
