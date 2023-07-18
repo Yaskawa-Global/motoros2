@@ -1,0 +1,130 @@
+# SPDX-FileCopyrightText: 2023, Yaskawa America, Inc.
+# SPDX-FileCopyrightText: 2023, Delft University of Technology
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: "CI: build VS proj"
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  msbuild_filter:
+    runs-on: ubuntu-latest
+    outputs:
+      needs_msbuild: ${{ steps.paths_filter.outputs.vsproj }}
+    steps:
+      - name: Checkout MotoROS2
+        uses: actions/checkout@v3
+      - name: Check VS proj has changed
+        id: paths_filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            vsproj:
+              - 'src/**'
+              - 'MotoROS2.sln'
+
+  msbuild:
+    runs-on: windows-2022
+    needs: msbuild_filter
+    # only run this job if source files were changed,
+    # AND the PR came from a feature branch on the main repository
+    if: |
+      needs.msbuild_filter.outputs.needs_msbuild == 'true' &&
+        github.event.pull_request.head.repo.full_name == github.repository
+
+    strategy:
+      # keep jobs running even if one fails (we want to know on which
+      # controllers and for which ROS 2 versions builds fail / succeed)
+      fail-fast: false
+      matrix:
+        controller: [yrc1000, yrc1000u]
+        ros2_codename: [humble, galactic, foxy]
+
+    steps:
+    - name: Uppercase controller identifier
+      id: uppercaser
+      shell: bash
+      env:
+        TEMP_VAR: "${{ matrix.controller }}"
+      run: |
+        echo "ctrlr=${TEMP_VAR^^}" >> $GITHUB_OUTPUT
+
+    - name: Checkout MotoROS2
+      uses: actions/checkout@v3
+      with:
+        path: 'motoros2'
+
+    - name: Find MSBuild and add to PATH
+      uses: microsoft/setup-msbuild@v1.3
+
+    - name: "Download M+ libmicroros (${{ matrix.ros2_codename }} on ${{ steps.uppercaser.outputs.ctrlr }})"
+      id: download_libmicroros
+      uses: dsaltares/fetch-gh-release-asset@1.1.1
+      with:
+        repo: 'yaskawa-global/motoros2'
+        version: 'latest'
+        regex: true
+        # download the M+ libmicroros distribution for the latest release of
+        # MotoROS2 corresponding to the controller this workflow is run for
+        file: ".*_libmicroros_${{ matrix.ros2_codename }}-.*_${{ matrix.controller }}\\.zip"
+        # work-around for https://github.com/dsaltares/fetch-gh-release-asset/issues/48
+        target: "./"
+
+    - name: Setup MotoROS2 build dir
+      shell: bash
+      run: |
+        mkdir -p /c/build
+        rm -rf /c/build/*
+        # we do this to shorten the path. Windows/M+ SDK sometimes does
+        cp -r "${{ github.workspace }}"/* /c/build/
+        ls -al /c/build
+
+    - name: "Find downloaded M+ libmicroros (${{ matrix.ros2_codename }} on ${{ steps.uppercaser.outputs.ctrlr }})"
+      id: find_libmicroros
+      shell: bash
+      # bit of a kludge, but works for now.
+      # we need to do this as 'fetch-gh-release-asset' will try to rename downloaded
+      # files if we use a regex to match 'unknown' files instead of hard-coding
+      # everything.
+      run: |
+        LIBM_ZIP=$(find /c/build -type f -regextype posix-extended -regex ".*[[:digit:]]+_libmicroros_${{ matrix.ros2_codename }}.*${{ matrix.controller}}\.zip")
+        echo "libmicroros_zip=${LIBM_ZIP}" >> $GITHUB_OUTPUT
+        echo "libmicroros_zip_win=$(cygpath -w ${LIBM_ZIP})" >> $GITHUB_OUTPUT
+        echo "Found libmicroros zip: '${LIBM_ZIP}'"
+    - name: Extract M+ libmicroros distribution
+      shell: bash
+      run: |
+        unzip -q "${{ steps.find_libmicroros.outputs.libmicroros_zip }}" \
+          -d /c/build/motoros2/libmicroros_${{ matrix.controller }}_${{ matrix.ros2_codename }}
+
+    - name: Download and setup M+ SDK (mpBuilder)
+      shell: cmd
+      run: |
+        C:\msys64\usr\bin\wget.exe -q -O C:/build/mpsdk_ci.7z "${{ secrets.MPSDK_DOWNLOAD_URL }}"
+        "C:\Program Files\7-Zip\7z.exe" x C:/build/mpsdk_ci.7z -oC:/build/
+        del /q C:\build\mpsdk_ci.7z
+    - name: Add M+ SDK to PATH
+      shell: bash
+      run: echo "C:/build/mpsdk" >> $GITHUB_PATH
+
+    - name: Register mpBuilder problem matcher
+      run: echo "::add-matcher::motoros2/.github/matchers/mpbuilder.json"
+
+    - name: "Build MotoROS2 (config: ${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.ros2_codename }})"
+      shell: cmd
+      env:
+        MP_VS_Install: "C:/build/mpsdk/"
+        WIND_BASE: "C:/"
+        WIND_HOST_TYPE: "x86-win32"
+        WIND_USR: "C:/"
+      run: |
+        msbuild ^
+          C:\build\motoros2\MotoROS2.sln ^
+          -t:Build ^
+          -nologo ^
+          -v:minimal ^
+          -p:Configuration=${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.ros2_codename }}

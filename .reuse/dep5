@@ -37,3 +37,12 @@ License: CC0-1.0
 Files: doc/img/add_library.png doc/img/configuration_manager.png doc/img/intellisense_search_path.png doc/img/properties_configuration.png doc/img/vc_directories.png
 Copyright: 2023 Microsoft
 License: LicenseRef-Microsoft-AllowedUses-Screenshots
+
+Files: .github/matchers/mpbuilder.json
+Copyright: 2023 Yaskawa America, Inc.
+  2023, Delft University of Technology
+License: CC0-1.0
+
+Files: doc/img/logo.png
+Copyright: 2023 Yaskawa America, Inc.
+License: CC-BY-NC-ND-4.0

@@ -61,12 +61,33 @@ void Ros_Communication_ConnectToAgent()
 
     //Construct the RMW Micro-XRCE-DDS client key to use
     //Use MAC last 4 bytes as client key (1 byte from the OUI, 3 bytes from NIC)
+    //TODO(gavanderhoorn): get MAC only from interface which is used for
+    //ROS traffic (https://github.com/Yaskawa-Global/motoros2/issues/57)
     UCHAR macId[6];
-    motoRosAssert_withMsg(
-        Ros_GetMacAddress(macId) == OK,
-        SUBCODE_FAIL_MP_NICDATA,
-        "Must enable ETHERNET function");
-    uint32_t client_key = *((uint32_t*) &macId[2]);
+  
+    STATUS status = Ros_GetMacAddress(ROS_USER_LAN1, macId);
+    if (status != OK)
+    {
+        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
+            __func__, ROS_USER_LAN1, status);
+        motoRosAssert_withMsg(FALSE, SUBCODE_FAIL_MP_NICDATA_INIT0,
+            "Must enable ETHERNET function");
+    }
+
+#if defined (YRC1000) || defined (YRC1000u)
+    //Try second interface if first one didn't succeed
+    if (status != OK && (status = Ros_GetMacAddress(ROS_USER_LAN2, macId)) != OK)
+    {
+        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
+            __func__, ROS_USER_LAN2, status);
+        motoRosAssert_withMsg(FALSE, SUBCODE_FAIL_MP_NICDATA_INIT1,
+            "Must enable ETHERNET function");
+    }
+#endif
+  
+    uint32_t client_key = 0;
+    memcpy(&client_key, macId+2, sizeof(client_key));
+  
     //Swap to make NIC bytes LSB
     client_key = mpNtohl(client_key);
     Ros_Debug_BroadcastMsg("Using client key: 0x%08X", client_key);
