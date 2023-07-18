@@ -812,7 +812,7 @@ void Ros_ConfigFile_Parse()
         }
 
     } while (!bOkToInit);
-    
+
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
     Ros_ConfigFile_PrintActiveConfiguration();
