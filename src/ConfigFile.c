@@ -122,6 +122,27 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_UserLanPort },
 };
 
+const char* Ros_QosProfiledescription(Ros_QoS_Profile_Setting profile)
+{
+    switch (profile) 
+    {
+    case ROS_QOS_PROFILE_SENSOR_DATA:
+        return "ROS_QOS_PROFILE_SENSOR_DATA";
+    case ROS_QOS_PROFILE_PARAMETERS:
+        return "ROS_QOS_PROFILE_PARAMETERS";
+    case ROS_QOS_PROFILE_DEFAULT:
+        return "ROS_QOS_PROFILE_DEFAULT";
+    case ROS_QOS_PROFILE_SERVICES:
+        return "ROS_QOS_PROFILE_SERVICES";
+    case ROS_QOS_PROFILE_PARAMETER_EVENTS:
+        return "ROS_QOS_PROFILE_PARAMETER_EVENTS";
+    case ROS_QOS_PROFILE_SYSTEM_DEFAULT:
+        return "ROS_QOS_PROFILE_SYSTEM_DEFAULT";
+    default:
+        return "Unknown";
+    }
+}
+
 void Ros_ConfigFile_SetAllDefaultValues()
 {
     //=========
@@ -725,9 +746,9 @@ void Ros_ConfigFile_PrintActiveConfiguration()
     Ros_Debug_BroadcastMsg("Config: update_periods.executor_sleep_period = %d", g_nodeConfigSettings.executor_sleep_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.action_feedback_publisher_period = %d", g_nodeConfigSettings.action_feedback_publisher_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.controller_status_monitor_period = %d", g_nodeConfigSettings.controller_status_monitor_period);
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = %d", g_nodeConfigSettings.qos_robot_status);
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = %d", g_nodeConfigSettings.qos_joint_states);
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = %d", g_nodeConfigSettings.qos_tf);
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = %s", Ros_QosProfiledescription(g_nodeConfigSettings.qos_robot_status));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = %s", Ros_QosProfiledescription(g_nodeConfigSettings.qos_joint_states));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = %s", Ros_QosProfiledescription(g_nodeConfigSettings.qos_tf));
     Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = '%s'", g_nodeConfigSettings.tf_frame_prefix);
     Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", g_nodeConfigSettings.stop_motion_on_disconnect);
     Ros_Debug_BroadcastMsg("Config: inform_job_name = '%s'", g_nodeConfigSettings.inform_job_name);
