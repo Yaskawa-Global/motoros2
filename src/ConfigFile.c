@@ -95,6 +95,12 @@ typedef struct
     Value_Type typeOfValue;
 } Configuration_Item;
 
+typedef struct  
+{
+    const char* QosString;
+    Ros_QoS_Profile_Setting QosValue;
+} QoSMapping;
+
 Configuration_Item Ros_ConfigFile_Items[] =
 {
     { "ros_domain_id", &g_nodeConfigSettings.ros_domain_id, Value_Int },
@@ -122,22 +128,32 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_UserLanPort },
 };
 
-const char* Ros_QosProfiledescription(Ros_QoS_Profile_Setting profile)
+const QoSMapping QosMappings[] =
 {
-    switch (profile) 
+    { "sensor_data", ROS_QOS_PROFILE_SENSOR_DATA },
+    { "parameters", ROS_QOS_PROFILE_PARAMETERS },
+    { "default", ROS_QOS_PROFILE_DEFAULT },
+    { "services", ROS_QOS_PROFILE_SERVICES},
+    { "parameter events", ROS_QOS_PROFILE_PARAMETER_EVENTS},
+    { "system Default", ROS_QOS_PROFILE_SYSTEM_DEFAULT},
+};
+
+const char* QosString(Ros_QoS_Profile_Setting profile)
+{
+    switch (profile)
     {
     case ROS_QOS_PROFILE_SENSOR_DATA:
-        return "ROS_QOS_PROFILE_SENSOR_DATA";
+        return "sensor_data";
     case ROS_QOS_PROFILE_PARAMETERS:
-        return "ROS_QOS_PROFILE_PARAMETERS";
+        return "parameters";
     case ROS_QOS_PROFILE_DEFAULT:
-        return "ROS_QOS_PROFILE_DEFAULT";
+        return "default";
     case ROS_QOS_PROFILE_SERVICES:
-        return "ROS_QOS_PROFILE_SERVICES";
+        return "services";
     case ROS_QOS_PROFILE_PARAMETER_EVENTS:
-        return "ROS_QOS_PROFILE_PARAMETER_EVENTS";
+        return "parameter events";
     case ROS_QOS_PROFILE_SYSTEM_DEFAULT:
-        return "ROS_QOS_PROFILE_SYSTEM_DEFAULT";
+        return "system Default";
     default:
         return "Unknown";
     }
@@ -324,22 +340,35 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                     break;
 
                 case Value_Qos:
-                    if (strcmp((char*)event->data.scalar.value, "sensor_data") == 0)
-                        *(Ros_QoS_Profile_Setting*)activeItem->valueToSet = ROS_QOS_PROFILE_SENSOR_DATA;
-                    else if (strcmp((char*)event->data.scalar.value, "default") == 0)
-                        *(Ros_QoS_Profile_Setting*)activeItem->valueToSet = ROS_QOS_PROFILE_DEFAULT;
-                    else
+                {
+                    const char* QosProfileValue = (char*)event->data.scalar.value;
+                    Ros_QoS_Profile_Setting enumValue = ROS_QOS_PROFILE_SENSOR_DATA;
+                    bool valueFound = false;
+
+                    // Finds enum value in the lookup table
+                    for (size_t i = 0; i < sizeof(QosMappings) / sizeof(QosMappings[0]); i++)
+                    {
+                        if (strcmp(QosMappings[i].QosString, QosProfileValue) == 0)
+                        {
+                            enumValue = QosMappings[i].QosValue;
+                            valueFound = true;
+                            break;
+                        }
+                    }
+
+                    // In case the value is not found in the lookup table or is invalid
+                    if (!valueFound)
                     {
                         mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid QOS in motoros2_config", SUBCODE_CONFIGURATION_INVALID_QOS_VALUE);
-
-                        *(Ros_QoS_Profile_Setting*)activeItem->valueToSet = ROS_QOS_PROFILE_DEFAULT;
+                        enumValue = ROS_QOS_PROFILE_DEFAULT;
+                        *(Ros_QoS_Profile_Setting*)activeItem->valueToSet = enumValue;
                         Ros_Debug_BroadcastMsg(
-                            "Falling back to '%s' profile for '%s': unrecognised profile: '%s'",
-                            "default",
+                            "Falling back to 'default' profile for '%s': unrecognised profile: '%s'",
                             (char*)activeItem->yamlKey,
-                            (char*)event->data.scalar.value);
+                            QosProfileValue);
                     }
                     break;
+                }
 
                 case Value_UserLanPort:
 #if defined (DX200) || defined (FS100)
@@ -746,9 +775,9 @@ void Ros_ConfigFile_PrintActiveConfiguration()
     Ros_Debug_BroadcastMsg("Config: update_periods.executor_sleep_period = %d", g_nodeConfigSettings.executor_sleep_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.action_feedback_publisher_period = %d", g_nodeConfigSettings.action_feedback_publisher_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.controller_status_monitor_period = %d", g_nodeConfigSettings.controller_status_monitor_period);
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = %s", Ros_QosProfiledescription(g_nodeConfigSettings.qos_robot_status));
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = %s", Ros_QosProfiledescription(g_nodeConfigSettings.qos_joint_states));
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = %s", Ros_QosProfiledescription(g_nodeConfigSettings.qos_tf));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = %s", QosString(g_nodeConfigSettings.qos_robot_status));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = %s", QosString(g_nodeConfigSettings.qos_joint_states));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = %s", QosString(g_nodeConfigSettings.qos_tf));
     Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = '%s'", g_nodeConfigSettings.tf_frame_prefix);
     Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", g_nodeConfigSettings.stop_motion_on_disconnect);
     Ros_Debug_BroadcastMsg("Config: inform_job_name = '%s'", g_nodeConfigSettings.inform_job_name);
