@@ -128,7 +128,7 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_UserLanPort },
 };
 
-const QoSMapping QosMappings[] =
+const QoSMapping Ros_QosMappings[] =
 {
     { "sensor_data", ROS_QOS_PROFILE_SENSOR_DATA },
     { "parameters", ROS_QOS_PROFILE_PARAMETERS },
@@ -138,7 +138,7 @@ const QoSMapping QosMappings[] =
     { "system Default", ROS_QOS_PROFILE_SYSTEM_DEFAULT},
 };
 
-const char* QosString(Ros_QoS_Profile_Setting profile)
+const char* Ros_QosString(Ros_QoS_Profile_Setting profile)
 {
     switch (profile)
     {
@@ -154,8 +154,6 @@ const char* QosString(Ros_QoS_Profile_Setting profile)
         return "parameter events";
     case ROS_QOS_PROFILE_SYSTEM_DEFAULT:
         return "system Default";
-    default:
-        return "Unknown";
     }
 }
 
@@ -346,11 +344,11 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                     bool valueFound = false;
 
                     // Finds enum value in the lookup table
-                    for (size_t i = 0; i < sizeof(QosMappings) / sizeof(QosMappings[0]); i++)
+                    for (size_t i = 0; i < sizeof(Ros_QosMappings) / sizeof(Ros_QosMappings[0]); i++)
                     {
-                        if (strcmp(QosMappings[i].QosString, QosProfileValue) == 0)
+                        if (strncmp(Ros_QosMappings[i].Ros_QosString, QosProfileValue, strnlen(QosProfileValue)) == 0)
                         {
-                            enumValue = QosMappings[i].QosValue;
+                            enumValue = Ros_QosMappings[i].QosValue;
                             valueFound = true;
                             break;
                         }
@@ -775,9 +773,9 @@ void Ros_ConfigFile_PrintActiveConfiguration()
     Ros_Debug_BroadcastMsg("Config: update_periods.executor_sleep_period = %d", g_nodeConfigSettings.executor_sleep_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.action_feedback_publisher_period = %d", g_nodeConfigSettings.action_feedback_publisher_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.controller_status_monitor_period = %d", g_nodeConfigSettings.controller_status_monitor_period);
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = %s", QosString(g_nodeConfigSettings.qos_robot_status));
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = %s", QosString(g_nodeConfigSettings.qos_joint_states));
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = %s", QosString(g_nodeConfigSettings.qos_tf));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = '%s'", Ros_QosString(g_nodeConfigSettings.qos_robot_status));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = '%s'", Ros_QosString(g_nodeConfigSettings.qos_joint_states));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = '%s'", Ros_QosString(g_nodeConfigSettings.qos_tf));
     Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = '%s'", g_nodeConfigSettings.tf_frame_prefix);
     Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", g_nodeConfigSettings.stop_motion_on_disconnect);
     Ros_Debug_BroadcastMsg("Config: inform_job_name = '%s'", g_nodeConfigSettings.inform_job_name);
