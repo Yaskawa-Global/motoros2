@@ -140,7 +140,7 @@ extern void Ros_Controller_SetIOState(ULONG signal, BOOL status);
 extern int Ros_Controller_GetAlarmCode();
 
 //retrieve all active alarms (and a possible error) and store them in 'active_alarms'
-extern int Ros_Controller_GetActiveAlarmCodes(USHORT active_alarms[MAX_ALARM_COUNT + 1]);
+extern int Ros_Controller_GetActiveAlarmCodes(USHORT active_alarms[MAX_ALARM_COUNT + MAX_ERROR_COUNT]);
 
 
 //#define DUMMY_SERVO_MODE 1    // Dummy servo mode is used for testing with Yaskawa debug controllers
