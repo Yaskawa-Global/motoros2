@@ -725,7 +725,7 @@ int Ros_Controller_GetAlarmCode()
     return -1;
 }
 
-int Ros_Controller_GetActiveAlarmCodes(USHORT active_alarms[MAX_ALARM_COUNT + 1])
+int Ros_Controller_GetActiveAlarmCodes(USHORT active_alarms[MAX_ALARM_COUNT + MAX_ERROR_COUNT])
 {
     MP_ALARM_CODE_RSP_DATA alarmData;
     bzero(&alarmData, sizeof(alarmData));
@@ -736,7 +736,7 @@ int Ros_Controller_GetActiveAlarmCodes(USHORT active_alarms[MAX_ALARM_COUNT + 1]
 
     // if the output array is too small, we can't do anything either. This
     // should not happen, but best check for it.
-    if (alarmData.usAlarmNum + alarmData.usErrorNo > MAX_ALARM_COUNT + 1)
+    if (alarmData.usAlarmNum + MAX_ERROR_COUNT > MAX_ALARM_COUNT + MAX_ERROR_COUNT)
         return -2;
 
     // add all alarms to the output array

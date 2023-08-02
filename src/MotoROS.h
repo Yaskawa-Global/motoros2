@@ -73,6 +73,7 @@
 //============================================
 // MotoROS
 //============================================
+#include "MotoPlusExterns.h"
 #include "Debug.h"
 #include "FileUtilityFunctions.h"
 #include "CommunicationExecutor.h"
@@ -95,7 +96,6 @@
 #include "MotionControl.h"
 #include "ConfigFile.h"
 #include "RosApiNameConstants.h"
-#include "MotoPlusExterns.h"
 #include "TimeConversionUtils.h"
 #include "Tests_CtrlGroup.h"
 #include "FauxCommandLineArgs.h"

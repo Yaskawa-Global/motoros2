@@ -15,4 +15,11 @@ extern size_t mpNumBytesFree(void);
 
 extern MP_GRP_ID_TYPE mpCtrlGrpNo2GrpId(int grp_no);
 
+//M+ only defines MAX_ALARM_COUNT, but we'd like to avoid magic nrs
+//as much as possible, so we define our own here for errors.
+//But only if something hasn't been defined already.
+#ifndef MAX_ERROR_COUNT
+#define MAX_ERROR_COUNT 1
+#endif
+
 #endif // MOTOROS2_MOTOPLUS_EXTERNS_H
