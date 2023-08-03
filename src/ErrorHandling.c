@@ -15,6 +15,8 @@ const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo)
 {
     switch (errNo)
     {
+    //Note: returning literals here as 'const char*' is OK, as they are stored
+    //in an anonymous array with static storage.
     case 0x2010: return "Robot is in operation";
     case 0x2030: return "In HOLD status (PP)";
     case 0x2040: return "In HOLD status (External)";
