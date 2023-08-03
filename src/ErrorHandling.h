@@ -206,7 +206,6 @@ extern void motoRosAssert(BOOL mustBeTrue, ASSERTION_SUBCODE subCodeIfFalse);
 extern void motoRosAssert_withMsg(BOOL mustBeTrue, ASSERTION_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
 
 extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
-extern const char* const Ros_ErrorHandling_Only_ErrNo_ToString(int errNo);
 extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
 
 #endif  // MOTOROS2_ERROR_HANDLING_H

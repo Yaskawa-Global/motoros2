@@ -32,41 +32,6 @@ const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo)
     }
 }
 
-const char* const Ros_ErrorHandling_Only_ErrNo_ToString(int errNo)
-{
-    switch (errNo)
-    {
-    case 0x2010:
-        return "Robot is in operation";
-    case 0x2030:
-        return "In HOLD status (PP)";
-    case 0x2040:
-        return "In HOLD status (External)";
-    case 0x2050:
-        return "In HOLD status (Command)";
-    case 0x2060:
-        return "In ERROR/ALARM status";
-    case 0x2070:
-        return "In SERVO OFF status";
-    case 0x2080:
-        return "Wrong operation mode";
-    case 0x3040:
-        return "The home position is not registered";
-    case 0x3050:
-        return "Out of range (ABSO data)";
-    case 0x3400:
-        return "Cannot operate MASTER JOB";
-    case 0x3410:
-        return "The JOB name is already registered in another task";
-    case 0x4040:
-        return "Specified JOB not found";
-    case 0x5200:
-        return "Over data range";
-    default:
-        return "Unspecified reason";
-    }
-}
-
 const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code)
 {
     //messages defined in motoros2_interfaces/msg/MotionReadyEnum.msg
