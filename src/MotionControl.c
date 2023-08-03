@@ -1252,7 +1252,9 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         {
             //TODO(gavanderhoorn): should this be reported to user, or are causes
             //covered by errors in MotionNotReadyCode?
-            Ros_Debug_BroadcastMsg("Can't turn on servo because: 0x%04X", rData.err_no);
+            Ros_Debug_BroadcastMsg(
+                "Can't turn on servo because: '%s' (0x%04X)",
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
             goto updateStatus;
         }
     }
@@ -1287,7 +1289,8 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     {
         //TODO(gavanderhoorn): special check for "job is not loaded"
         Ros_Debug_BroadcastMsg(
-            "Can't start '%s' because: 0x%04X", g_nodeConfigSettings.inform_job_name, rData.err_no);
+            "Can't start '%s' because: '%s' (0x%04X)", g_nodeConfigSettings.inform_job_name,
+            Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
         goto updateStatus;
     }
 
