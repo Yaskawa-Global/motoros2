@@ -321,7 +321,7 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                     break;
 
                 case Value_UserLanPort:
-#if defined (DX200) || defined (FS100)
+#if defined (FS100) || defined (DX200)
                     // single port, override whatever was configured
                     *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
                     Ros_Debug_BroadcastMsg("DX200 or FS100: override to 'USER_LAN1'");
@@ -704,8 +704,9 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_SetAllDefaultValues();
 
-#if !(DX200 || FS100)
-    //config file always resides on USB for DX200/FS100
+#if defined (YRC1000) || defined (YRC1000u)
+    //config file always resides on USB for DX200/FS100, so only check
+    //on YRC1000 and micro
     Ros_ConfigFile_CheckUsbForNewConfigFile();
 #endif
 
@@ -726,10 +727,12 @@ void Ros_ConfigFile_Parse()
         int fd;
         struct stat fileStat;
 
-#if (DX200 || FS100)
+#if defined (FS100) || defined (DX200)
         snprintf(storageDrive, CHAR_BUFFER_SIZE, "%s", MP_USB0_DEV_DOS);
-#else //(YRC1000 and newer)
+#elif defined (YRC1000) || defined (YRC1000u)
         snprintf(storageDrive, CHAR_BUFFER_SIZE, "%s", MP_SRAM_DEV_DOS);
+#else
+#error Ros_ConfigFile_Parse: unsupported platform
 #endif
 
         snprintf(configFilePath, CHAR_BUFFER_SIZE, "%s\\%s", storageDrive, CONFIG_FILE_NAME);
@@ -738,7 +741,7 @@ void Ros_ConfigFile_Parse()
 
         fd = mpOpen(configFilePath, O_RDONLY, 0);
 
-#if (DX200)
+#if defined (DX200)
         if (fd < 0)
         {
             //try again using second USB port

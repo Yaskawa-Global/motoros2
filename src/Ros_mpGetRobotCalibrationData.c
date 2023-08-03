@@ -10,7 +10,7 @@
 #define FILENAME_RBCALIB_DAT    "RBCALIB.DAT"
 #define PATH_TO_RBCALIB_DAT     "MPRAM1:0\\RBCALIB.DAT"
 
-#if defined (DX200) || defined (FS100)
+#if defined (FS100) || defined (DX200)
 //The download and parsing of the DAT file is expensive. I only want to
 //perform it once. So let's cache the data in an array.
 //
@@ -21,7 +21,7 @@ MP_RB_CALIB_DATA* Ros_CalibrationFiles[MAX_ROBOT_CALIBRATION_FILES];
 
 void Ros_mpGetRobotCalibrationData_Initialize()
 {
-#if defined (DX200) || defined (FS100)
+#if defined (FS100) || defined (DX200)
     int ret;
     int fd;
     BOOL bRet;
@@ -186,7 +186,7 @@ void Ros_mpGetRobotCalibrationData_Initialize()
 
 void Ros_mpGetRobotCalibrationData_Cleanup()
 {
-#if defined (DX200) || defined (FS100)
+#if defined (FS100) || defined (DX200)
     for (int i = 0; i < MAX_ROBOT_CALIBRATION_FILES; i += 1)
     {
         if (Ros_CalibrationFiles[i])
@@ -201,8 +201,7 @@ LONG Ros_mpGetRobotCalibrationData(ULONG file_no, MP_RB_CALIB_DATA *rData)
     // on these controllers we can forward to mpGetRobotCalibrationData(..)
     return mpGetRobotCalibrationData(file_no, rData);
 
-#elif defined (DX200) || defined (FS100)
-
+#elif defined (FS100) || defined (DX200)
     if (Ros_CalibrationFiles[file_no] != NULL) //if this calibration file exists
     {
         memcpy(rData, Ros_CalibrationFiles[file_no], sizeof(MP_RB_CALIB_DATA));

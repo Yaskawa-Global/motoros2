@@ -12,7 +12,7 @@
 #include "motoPlus.h"
 
 
-#if defined (DX200) || defined (FS100)
+#if defined (FS100) || defined (DX200)
 
 // from mpSysCtrl.h
 
