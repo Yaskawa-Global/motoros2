@@ -31,7 +31,7 @@ The following sections document how to download, install, configure, use and tro
 - download the [latest release](#download) and extract onto USB stick
 - edit the [configuration file](#configuration), at least Agent IP and port
 - insert USB stick into pendant
-- *Maintenance* mode: load the appropriate `motoros2_yrc1000_*.out` or `motoros2_yrc1000u_*.out` MotoPlus application [onto controller](#installation)
+- *Maintenance* mode: load the appropriate `mr2_yrc1_*.out` or `mr2_yrc1m_*.out` MotoPlus application [onto controller](#installation)
 - *Online* mode: load `motoros2_config.yaml` via `USER DEFINED FILES`
 - start an instance of the [micro-ROS Agent](#the-micro-ros-agent) on a PC
 - reboot controller
@@ -142,21 +142,21 @@ To calculate the MD5 hash on Debian/Ubuntu for the main MotoROS2 binary, run the
 
 ```shell
 $ cd /path/to/where/the/binary/was/saved
-$ md5sum -b motoros2_yrc1000_humble.out
-c5d0f2cce281ed1cb8194badaaffc511  motoros2_yrc1000_humble.out
+$ md5sum -b mr2_yrc1_h.out
+c5d0f2cce281ed1cb8194badaaffc511  mr2_yrc1_h.out
 ```
 
 Compare the output of `md5sum` when run against the binary downloaded in the previous section ([Downloading the files](#downloading-the-files)) with the values listed in the following table.
 The values must match *exactly*.
 
-|**Controller** |**ROS 2 Version** | **File**                         |**Version** | **MD5 hash**                       |
-|---------------|------------------|----------------------------------|------------|------------------------------------|
-| YRC1000       | Foxy             | `motoros2_yrc1000_foxy.out`      | `v0.1.0`   | `eb3c028d0989b6cce2eb4d50a9f45001` |
-| YRC1000       | Galactic         | `motoros2_yrc1000_galactic.out`  | `v0.1.0`   | `78abcead2e2504109a49287648a9bc04` |
-| YRC1000       | Humble           | `motoros2_yrc1000_humble.out`    | `v0.1.0`   | `c5d0f2cce281ed1cb8194badaaffc511` |
-| YRC1000micro  | Foxy             | `motoros2_yrc1000u_foxy.out`     | `v0.1.0`   | `fe17a90ca6e4a86447e9206a273486f2` |
-| YRC1000micro  | Galactic         | `motoros2_yrc1000u_galactic.out` | `v0.1.0`   | `080957841a010aee9b479d36b5f6c1b8` |
-| YRC1000micro  | Humble           | `motoros2_yrc1000u_humble.out`   | `v0.1.0`   | `6b5df5c2764924466903111d0f61502a` |
+|**Controller** |**ROS 2 Version** | **File**          |**Version** | **MD5 hash**                       |
+|---------------|------------------|-------------------|------------|------------------------------------|
+| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `v0.1.0`   | `eb3c028d0989b6cce2eb4d50a9f45001` |
+| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `v0.1.0`   | `78abcead2e2504109a49287648a9bc04` |
+| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `v0.1.0`   | `c5d0f2cce281ed1cb8194badaaffc511` |
+| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `v0.1.0`   | `fe17a90ca6e4a86447e9206a273486f2` |
+| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `v0.1.0`   | `080957841a010aee9b479d36b5f6c1b8` |
+| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `v0.1.0`   | `6b5df5c2764924466903111d0f61502a` |
 
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
@@ -241,7 +241,7 @@ In *Maintenance* mode:
 
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
  1. touch `[MotoPlus APL]`→`[Device]` to select either SD or USB memory type
- 1. touch `[MotoPlus APL]`→`[Load (User App)]` to select and load `motoros2_XXX.out`
+ 1. touch `[MotoPlus APL]`→`[Load (User App)]` to select and load the `mr2_yrc1_*.out` (or `mr2_yrc1m_*.out`) file
  1. touch `[MotoPlus APL]`→`[File List]` and verify that MotoROS2 was properly installed and no other MotoPlus applications are currently loaded on the controller
  1. touch `[File]`→`[Initialize]` and select `USER DEFINED FILES`
  1. select `SRAM RAM DRIVE` and initialize it
