@@ -18,7 +18,7 @@ It is only required when you want to change the included functionality.
 - **Microsoft Windows**
 - **Microsoft Visual Studio 2017 or higher** (the *Community Edition* is also known to work).
 The MotoPlus SDK is not compatible with Visual Studio Code.
-- **MotoPlus SDK for Visual Stdio v1.5.1 or higher**.
+- **MotoPlus SDK for Visual Studio v1.5.1 or higher**.
 This is not the same as MotoPlus IDE. Users in Asian regions will need to purchase this software from [Yaskawa America directly](https://www.motoman.com/en-us/products/robots/sales-quote).
 If you already have a license for an older version of the MotoPlus SDK, please contact `techsupport@motoman.com` or `ccs@yaskawa.eu` for assistance obtaining a newer edition.
 - **libmicroros library and headers** that corresponds to your target edition of ROS 2 (Foxy, Humble, etc) and the Yaskawa controller series you are building MotoROS2 for
