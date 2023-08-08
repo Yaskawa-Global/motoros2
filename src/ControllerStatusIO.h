@@ -44,7 +44,11 @@
 #endif
 
 #define MIN_VALID_TOOL_INDEX                0
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
 #define MAX_VALID_TOOL_INDEX                63
+#elif defined (FS100)
+#define MAX_VALID_TOOL_INDEX                15
+#endif
 
 typedef enum
 {
