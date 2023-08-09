@@ -358,6 +358,7 @@ libmicroros_dx200_galactic/
 libmicroros_yrc1000_foxy/
 libmicroros_yrc1000u_foxy/
 libmicroros_dx200_foxy/
+libmicroros_fs100_humble/
 
 # M+ build output
 *.out
