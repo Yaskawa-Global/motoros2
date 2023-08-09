@@ -103,6 +103,12 @@
     <None Include="DX200_humbleLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
+    <None Include="FS100_humbleCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="FS100_humbleLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
     <None Include="YRC1000_humbleCompilerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
@@ -112,6 +118,9 @@
     <None Include="ParameterExtraction.dnLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
+    <None Include="ParameterExtraction.fsLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
     <None Include="ParameterExtraction.yrcLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
@@ -119,6 +128,9 @@
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="MotoROS_PlatformLib.dnLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="MotoROS_PlatformLib.fsLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="MotoROS_PlatformLib.yrcLib">
@@ -194,6 +206,9 @@
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
     <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_fs100_humble\libmicroros.fsLib_humble">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
     <None Include="YRC1000u_galacticCompilerArguments.mps">
