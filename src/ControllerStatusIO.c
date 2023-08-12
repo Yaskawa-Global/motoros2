@@ -117,7 +117,7 @@ BOOL Ros_Controller_Initialize()
     for (i = 0; i < MAX_ROBOT_CALIBRATION_FILES; i += 1)
     {
         MP_RB_CALIB_DATA calibData;
-        if (mpGetRobotCalibrationData(i, &calibData) == OK)
+        if (Ros_mpGetRobotCalibrationData(i, &calibData) == OK)
         {
             if (calibData.s_rb.grp_no <= MP_R8_GID && //the slave is a robot
                 calibData.m_rb.grp_no <= MP_R8_GID) //the master is another robot's RF

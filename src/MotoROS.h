@@ -102,6 +102,7 @@
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"
 #include "MotoROS_PlatformLib.h"
+#include "Ros_mpGetRobotCalibrationData.h"
 
 extern void Ros_Sleep(float milliseconds);
 
