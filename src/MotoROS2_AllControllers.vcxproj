@@ -351,6 +351,7 @@
     <ClCompile Include="PositionMonitor.c" />
     <ClCompile Include="ServiceResetError.c" />
     <ClCompile Include="FauxCommandLineArgs.c" />
+    <ClCompile Include="Ros_mpGetRobotCalibrationData.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigFile.h" />
@@ -384,6 +385,7 @@
     <ClInclude Include="FauxCommandLineArgs.h" />
     <ClInclude Include="MathConstants.h" />
     <ClInclude Include="MotoROS_PlatformLib.h" />
+    <ClInclude Include="Ros_mpGetRobotCalibrationData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
