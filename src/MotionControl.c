@@ -1177,6 +1177,12 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     }
 #endif
 
+    if (Ros_Controller_IsAnyFaultActive())
+    {
+        Ros_Debug_BroadcastMsg("Controller is in a fault state. Please call /reset_error");
+        return FALSE;
+    }
+
     // Check if currently in operation, we don't want to interrupt current operation
     if (Ros_Controller_IsOperating())
     {
