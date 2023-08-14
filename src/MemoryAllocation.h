@@ -11,7 +11,7 @@
 //------------------------------------
 //Dynamic Memory
 //------------------------------------
-extern void Ros_Allocation_Initialize();
+extern void Ros_Allocation_Initialize(rcl_allocator_t* const allocator);
 
 extern rcl_allocator_t g_motoros2_Allocator;
 

@@ -68,15 +68,15 @@ void* __motoplus_zero_allocate(size_t number_of_elements, size_t size_of_element
     return newPtr;
 }
 
-void Ros_Allocation_Initialize()
+void Ros_Allocation_Initialize(rcl_allocator_t* const allocator)
 {
     //initialize memory allocation for microros
-    g_motoros2_Allocator.allocate = __motoplus_allocate;
-    g_motoros2_Allocator.deallocate = __motoplus_deallocate;
-    g_motoros2_Allocator.reallocate = __motoplus_reallocate;
-    g_motoros2_Allocator.zero_allocate = __motoplus_zero_allocate;
-    g_motoros2_Allocator.state = NULL;
+    allocator->allocate = __motoplus_allocate;
+    allocator->deallocate = __motoplus_deallocate;
+    allocator->reallocate = __motoplus_reallocate;
+    allocator->zero_allocate = __motoplus_zero_allocate;
+    allocator->state = NULL;
 
     //configure Micro-ROS to use our allocator. Errors are fatal.
-    motoRosAssert(rcutils_set_default_allocator(&g_motoros2_Allocator), SUBCODE_FAIL_MEM_ALLOC_CFG);
+    motoRosAssert(rcutils_set_default_allocator(allocator), SUBCODE_FAIL_MEM_ALLOC_CFG);
 }
