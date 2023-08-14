@@ -7,8 +7,8 @@
 
 #include "MotoROS.h"
 
-#if !(YRC1000 || YRC1000u)
-#error This must be compiled for a YRC generation controller!
+#if !(defined (DX200) || defined (YRC1000) || defined (YRC1000u))
+#error MotoROS2 is only supported on DX2 and YRC1 generation controllers
 #endif
 
 void RosInitTask();
@@ -98,6 +98,8 @@ void RosInitTask()
         Ros_Controller_StatusInit();
 
         Ros_Allocation_Initialize(&g_motoros2_Allocator);
+
+        Ros_mpGetRobotCalibrationData_Initialize(); //must occur before Ros_Controller_Initialize
 
         Ros_Communication_ConnectToAgent();
 
@@ -203,7 +205,8 @@ void RosInitTask()
         Ros_ActionServer_FJT_Cleanup();
         Ros_PositionMonitor_Cleanup();
         Ros_Controller_Cleanup();
-        Ros_Communication_Cleanup();
+        Ros_Communication_Cleanup(); 
+        Ros_mpGetRobotCalibrationData_Cleanup();
 
         //--------------------------------
         Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE);

@@ -9,7 +9,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 ![YRC1000: supported](https://img.shields.io/badge/YRC1000-supported-blue.svg)
 ![YRC1000micro: supported](https://img.shields.io/badge/YRC1000micro-supported-blue.svg)
-![DX200: not supported](https://img.shields.io/badge/DX200-not%20supported-inactive.svg)
+![DX200: supported](https://img.shields.io/badge/DX200-supported-blue.svg)
 ![FS100: not supported](https://img.shields.io/badge/FS100-not%20supported-inactive.svg)
 ![DX100: not supported](https://img.shields.io/badge/DX100-not%20supported-inactive.svg)
 
@@ -31,8 +31,13 @@ The following sections document how to download, install, configure, use and tro
 - download the [latest release](#download) and extract onto USB stick
 - edit the [configuration file](#configuration), at least Agent IP and port
 - insert USB stick into pendant
-- *Maintenance* mode: load the appropriate `mr2_yrc1_*.out` or `mr2_yrc1m_*.out` MotoPlus application [onto controller](#installation)
-- *Online* mode: load `motoros2_config.yaml` via `USER DEFINED FILES`
+- *Maintenance* mode: load the MotoPlus application [onto the controller](#installation):
+  - DX200: `mr2_dx2_*.out`
+  - YRC1000: `mr2_yrc1_*.out`
+  - YRC1000micro: `mr2_yrc1m_*.out`
+- *Online* mode:
+  - DX200: insert USB stick with `motoros2_config.yaml` into `CN106` in the controller cabinet
+  - YC1000[micro]: load `motoros2_config.yaml` via `USER DEFINED FILES`
 - start an instance of the [micro-ROS Agent](#the-micro-ros-agent) on a PC
 - reboot controller
 - verify [MotoROS2 is running](#verifying-successful-installation)
@@ -53,7 +58,7 @@ The following sections document how to download, install, configure, use and tro
   - [Verifying YAML correctness](#verifying-yaml-correctness)
 - [Example INFORM jobs](#example-inform-jobs)
 - [Installation](#installation)
-  - [YRC1000 and YRC1000micro](#yrc1000-and-yrc1000micro)
+  - [DX200, YRC1000 and YRC1000micro](#dx200-yrc1000-and-yrc1000micro)
 - [Building from source](#building-from-source)
 - [Updating the configuration](#updating-the-configuration)
 - [The micro-ROS Agent](#the-micro-ros-agent)
@@ -86,11 +91,15 @@ The following sections document how to download, install, configure, use and tro
 
 The following general requirements must be met in order to be able to use MotoROS2 with a Yaskawa Motoman robot controller:
 
-- controller series: YRC1000 or YRC1000micro
+- controller series: DX200, YRC1000, or YRC1000micro
 - minimum versions of system software:
+  - `DN2.44.00-00` for DX200
   - `YAS2.80.00-00` for YRC1000
   - `YBS2.31.00-00` for YRC1000micro
-- the controller must have a correctly configured network connection (either `LAN2` or `LAN3`)
+- the controller must have a correctly configured network connection:
+  - DX200: `LAN`
+  - YRC1000: either `LAN2` or `LAN3`
+  - YRC1000micro: either `LAN2` or `LAN3`
 - MotoPlus and Motoman-Driver must be enabled on the controller
 - ROS 2 version: Foxy, Galactic, Humble or Rolling.
   ROS 2 Iron Irwini is not yet supported.
@@ -151,6 +160,9 @@ The values must match *exactly*.
 
 |**Controller** |**ROS 2 Version** | **File**          |**Version** | **MD5 hash**                       |
 |---------------|------------------|-------------------|------------|------------------------------------|
+| DX200         | Foxy             | `mr2_dx2_f.out`   | `TODO`     | `TODO`                             |
+| DX200         | Galactic         | `mr2_dx2_g.out`   | `TODO`     | `TODO`                             |
+| DX200         | Humble           | `mr2_dx2_h.out`   | `TODO`     | `TODO`                             |
 | YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `v0.1.0`   | `eb3c028d0989b6cce2eb4d50a9f45001` |
 | YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `v0.1.0`   | `78abcead2e2504109a49287648a9bc04` |
 | YRC1000       | Humble           | `mr2_yrc1_h.out`  | `v0.1.0`   | `c5d0f2cce281ed1cb8194badaaffc511` |
@@ -213,13 +225,13 @@ All MotoROS2 release `.zip`s contain a copy of the default INFORM jobs (`.jbi` a
 
 The following variants are shipped with MotoROS2 in the `robot_jobs` sub directory:
 
-| **Directory**               | **Description**      | **Supported controller(s)** |
-|:----------------------------|:---------------------|:----------------------------|
-| `single_arm`                | Single robot group   | YRC1000, YRC1000micro       |
-| `single_arm_with_ext_axis`  | Robot + station axis | YRC1000, YRC1000micro       |
-| `single_arm_with_base_axis` | Robot + base axis    | YRC1000, YRC1000micro       |
-| `two_arms`                  | Two robot groups     | YRC1000, YRC1000micro       |
-| `sda_dual_arm`              | SDA robots *only*    | -                           |
+| **Directory**               | **Description**      | **Supported controller(s)**  |
+|:----------------------------|:---------------------|:-----------------------------|
+| `single_arm`                | Single robot group   | DX200, YRC1000, YRC1000micro |
+| `single_arm_with_ext_axis`  | Robot + station axis | DX200, YRC1000, YRC1000micro |
+| `single_arm_with_base_axis` | Robot + base axis    | DX200, YRC1000, YRC1000micro |
+| `two_arms`                  | Two robot groups     | DX200, YRC1000, YRC1000micro |
+| `sda_dual_arm`              | SDA robots *only*    | -                            |
 
 **These jobs are not required.**
 The INFORM job will be automatically generated at startup.
@@ -229,10 +241,10 @@ If needed, open a new issue on the [Issue tracker](https://github.com/yaskawa-gl
 
 ## Installation
 
-Place the `.out` (main binary), `.yaml` (configuration), and `.dat` (I/O names) files on an external storage device: both Secure Digital (SD) and USB sticks can be used.
+Place the `.out` (main binary), `.yaml` (configuration), and `.dat` (I/O names) files on an external storage device: Compact Flash (CF), Secure Digital (SD), and USB sticks can be used depending on the controller model.
 Insert the storage device into the robot's programming pendant and refer to the following section.
 
-### YRC1000 and YRC1000micro
+### DX200, YRC1000, and YRC1000micro
 
 Turn on the robot controller while holding the `{Main Menu}` key on the keypad to enter *Maintenance* mode.
 You may release the key when you see the Yaskawa logo appear on the screen.
@@ -240,11 +252,11 @@ You may release the key when you see the Yaskawa logo appear on the screen.
 In *Maintenance* mode:
 
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
- 1. touch `[MotoPlus APL]`→`[Device]` to select either SD or USB memory type
- 1. touch `[MotoPlus APL]`→`[Load (User App)]` to select and load the `mr2_yrc1_*.out` (or `mr2_yrc1m_*.out`) file
+ 1. touch `[MotoPlus APL]`→`[Device]` to select CF, SD, or USB memory type
+ 1. touch `[MotoPlus APL]`→`[Load (User App)]` to select and load the `mr2_*_*.out` file
  1. touch `[MotoPlus APL]`→`[File List]` and verify that MotoROS2 was properly installed and no other MotoPlus applications are currently loaded on the controller
- 1. touch `[File]`→`[Initialize]` and select `USER DEFINED FILES`
- 1. select `SRAM RAM DRIVE` and initialize it
+ 1. (YRC1000[micro] only): touch `[File]`→`[Initialize]` and select `USER DEFINED FILES`
+ 1. (YRC1000[micro] only): select `SRAM RAM DRIVE` and initialize it
  1. rotate the pendant key-switch (upper left of pendant) fully counter-clockwise into `TEACH` mode
  1. reboot the robot controller into regular mode
 
@@ -254,13 +266,13 @@ In *Normal Operation* mode:
  touch `[RESET]` to clear the alarm
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
  1. touch `[PARAMETER]`→`[S2C]` and set the following parameters:
+     1. `S2C541 = 0`
+     1. `S2C542 = 0`
      1. `S2C1102 = 2`
      1. `S2C1104 = 2`
+     1. `S2C1117 = 1` (DX200 only)
      1. `S2C1250 = 1`
      1. `S2C1402 = 3`
- 1. touch `[EX MEMORY]`→`[Load]`
- 1. cursor to `USER DEFINED FILES` and press `[SELECT]`
- 1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
 
  If a custom INFORM job will be used:
 
@@ -268,7 +280,27 @@ In *Normal Operation* mode:
  1. cursor to `JOB` and press `[SELECT]`
  1. cursor to your job file and press `[SELECT]` then `[ENTER]`
 
-Within 30 seconds of loading the configuration file, you should get alarm `8001[10] Speed FB enabled, reboot now`. Reboot again and there should be no alarms.
+#### YRC1000 and YRC1000 micro
+
+ 1. touch `[EX MEMORY]`→`[Load]`
+ 1. cursor to `USER DEFINED FILES` and press `[SELECT]`
+ 1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
+
+#### DX200
+
+ 1. power down the DX200 controller
+ 1. copy the `motoros2_config.yaml` file to a USB storage drive
+ 1. insert the USB drive into the `CN106` USB port inside the controller cabinet
+ 1. leave the drive in place and close the controller cabinet
+ 1. power up the DX200 controller
+
+Note: on DX200, the USB stick used to store `motoros2_config.yaml` can't be removed, it *must* remain inserted into the USB port labelled `CN106`, or at least as long as MotoROS2 is installed on the controller.
+Without the USB stick in `CN106`, MotoROS2 would not be able to load its configuration and alarms will be raised on each controller (re)boot.
+
+### All supported controllers
+
+Within 30 seconds of loading the configuration file, you should get alarm `8001[10] Speed FB enabled, reboot now`.
+Reboot again and there should be no alarms.
 
 If you receive any errors or alarms after rebooting, please refer to the [Troubleshooting](#troubleshooting) section for information on how to remedy the issue.
 
@@ -280,7 +312,9 @@ Please refer to [doc/Building from source](doc/build_from_source.md).
 
 It may be necessary to update MotoROS2 configuration during or after initial deployment.
 
-### Controller software YAS4.70 or YBS3.02 or later
+### YRC1000 and YRC1000micro
+
+#### Controller software YAS4.70 or YBS3.02 or later
 
 In *Normal Operation* mode:
 
@@ -293,7 +327,7 @@ In *Normal Operation* mode:
  1. touch `[YES]` to overwrite
  1. reboot the robot controller
 
-### Older controller software
+#### Older controller software
 
 Due to the way the controller treats files, `motoros2_config.yaml` cannot be directly overwritten using the `[EX MEMORY]` menu.
 Instead, MotoROS2 has a built-in mechanism which updates the controller's copy of the `.yaml` file with a new version placed on a USB stick.
@@ -328,6 +362,15 @@ To extract a copy of your current configuration from the teach pendant:
 1. touch `[EX MEMORY]`→`[SAVE]`
 1. cursor to `USER DEFINED FILES` and press `[SELECT]`
 1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
+
+### DX200 only
+
+ 1. power down the robot controller and open the cabinet
+ 1. locate the USB port labelled `CN106` on the robot's CPU board and remove the USB stick
+ 1. overwrite the `motoros2_config.yaml` file in the root directory of a USB stick with an updated version
+ 1. replace the USB stick into `CN106` and close the controller cabinet
+ 1. power on the controller and wait for it to fully boot (ie: you see the regular UI on the teach pendant)
+ 1. verify MotoROS2 has started
 
 ## The micro-ROS Agent
 
@@ -739,7 +782,7 @@ As such, no statements are made about priorities or development schedule for any
 
 The following items are on the MotoROS2 roadmap, and are listed here in no particular order:
 
-- support DX200/FS100 controllers
+- support FS100 controllers
 - read/write of controller variables
 - CRUD of INFORM job files (ie: create, retrieve, update, delete)
 - starting/stopping INFORM jobs (other than `INIT_ROS`)

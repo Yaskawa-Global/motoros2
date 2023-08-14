@@ -83,7 +83,7 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
         // Populate values
         ctrlGroup->groupNo = groupIndex;
         ctrlGroup->numAxes = numAxes;
-        ctrlGroup->groupId = mpCtrlGrpNo2GrpId(groupIndex);
+        ctrlGroup->groupId = Ros_mpCtrlGrpNo2GrpId(groupIndex);
 
         if (Ros_CtrlGroup_IsRobot(ctrlGroup))
         {
@@ -240,6 +240,34 @@ void Ros_CtrlGrp_Cleanup(CtrlGroup* ctrlGroup)
 
     mpSemDelete(ctrlGroup->inc_q.q_lock);
 }
+
+
+//-------------------------------------------------------------------
+// Search through the control group to find the GroupId that matches
+// the group number
+//-------------------------------------------------------------------
+MP_GRP_ID_TYPE Ros_mpCtrlGrpNo2GrpId(int groupNo)
+{
+#if defined (YRC1000) || defined (YRC1000u)
+    return mpCtrlGrpNo2GrpId(groupNo);
+
+#elif defined (FS100) || defined (DX200)
+    MP_GRP_ID_TYPE grp_id;
+
+    for(grp_id = MP_R1_GID; grp_id < MP_S24_GID; ++grp_id)
+    {
+        if(groupNo == mpCtrlGrpId2GrpNo(grp_id))
+            return grp_id;
+    }
+
+    return -1;
+
+#else
+#error "Ros_mpCtrlGrpNo2GrpId: unsupported platform"
+
+#endif
+}
+
 
 //-------------------------------------------------------------------
 // Get the commanded pulse position in pulse (in motoman joint order)

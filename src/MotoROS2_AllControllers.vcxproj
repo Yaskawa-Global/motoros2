@@ -1,6 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DX200_foxy|Win32">
+      <Configuration>DX200_foxy</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DX200_galactic|Win32">
+      <Configuration>DX200_galactic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DX200_humble|Win32">
+      <Configuration>DX200_humble</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="YRC1000u_foxy|Win32">
       <Configuration>YRC1000u_foxy</Configuration>
       <Platform>Win32</Platform>
@@ -34,6 +46,21 @@
     <ProjectName>MotoROS2</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_galactic|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_foxy|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -67,6 +94,15 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DX200_galactic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DX200_foxy|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -86,6 +122,42 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_humble\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_dx200_humble\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_galactic|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_galactic\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_dx200_galactic\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_foxy|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_foxy\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\libmicroros_dx200_foxy\include;</IncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
@@ -158,6 +230,21 @@
     <IntDir />
     <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;</IncludePath>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX200_galactic|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX200_foxy|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
     <BuildLog>
       <Path>_buildLog\MotoROS2$(Configuration).log</Path>
@@ -193,6 +280,9 @@
     <None Include="..\doc\faq.md" />
     <None Include="..\doc\ros_api.md" />
     <None Include="..\doc\troubleshooting.md" />
+    <None Include="..\libmicroros_dx200_foxy\libmicroros.dnLib_foxy" />
+    <None Include="..\libmicroros_dx200_galactic\libmicroros.dnLib_galactic" />
+    <None Include="..\libmicroros_dx200_humble\libmicroros.dnLib_humble" />
     <None Include="..\libmicroros_yrc1000u_foxy\libmicroros.yrcmLib_foxy" />
     <None Include="..\libmicroros_yrc1000u_galactic\libmicroros.yrcmLib_galactic" />
     <None Include="..\libmicroros_yrc1000u_humble\libmicroros.yrcmLib_humble" />
@@ -200,8 +290,14 @@
     <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic" />
     <None Include="..\libmicroros_yrc1000_humble\libmicroros.yrcLib_humble" />
     <None Include="..\config\motoros2_config.yaml" />
+    <None Include="DX200_foxyCompilerArguments.mps" />
+    <None Include="DX200_foxyLinkerArguments.mps" />
+    <None Include="DX200_galacticCompilerArguments.mps" />
+    <None Include="DX200_galacticLinkerArguments.mps" />
+    <None Include="MotoROS_PlatformLib.dnLib" />
     <None Include="MotoROS_PlatformLib.yrcLib" />
     <None Include="MotoROS_PlatformLib.yrcmLib" />
+    <None Include="ParameterExtraction.dnLib" />
     <None Include="ParameterExtraction.yrcLib" />
     <None Include="ParameterExtraction.yrcmLib" />
     <None Include="..\README.md" />
@@ -216,6 +312,8 @@
     <None Include="..\robot_jobs\single_arm_with_ext_axis\IONAME.DAT" />
     <None Include="..\robot_jobs\two_arms\INIT_ROS.JBI" />
     <None Include="..\robot_jobs\two_arms\IONAME.DAT" />
+    <None Include="DX200_humbleCompilerArguments.mps" />
+    <None Include="DX200_humbleLinkerArguments.mps" />
     <None Include="YRC1000u_foxyCompilerArguments.mps" />
     <None Include="YRC1000u_foxyLinkerArguments.mps" />
     <None Include="YRC1000u_galacticCompilerArguments.mps" />
@@ -253,6 +351,7 @@
     <ClCompile Include="PositionMonitor.c" />
     <ClCompile Include="ServiceResetError.c" />
     <ClCompile Include="FauxCommandLineArgs.c" />
+    <ClCompile Include="Ros_mpGetRobotCalibrationData.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigFile.h" />
@@ -286,6 +385,7 @@
     <ClInclude Include="FauxCommandLineArgs.h" />
     <ClInclude Include="MathConstants.h" />
     <ClInclude Include="MotoROS_PlatformLib.h" />
+    <ClInclude Include="Ros_mpGetRobotCalibrationData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -351,10 +351,13 @@ healthchecksdb
 # M+ libmicroros distribution directories
 libmicroros_yrc1000_humble/
 libmicroros_yrc1000u_humble/
+libmicroros_dx200_humble/
 libmicroros_yrc1000_galactic/
 libmicroros_yrc1000u_galactic/
+libmicroros_dx200_galactic/
 libmicroros_yrc1000_foxy/
 libmicroros_yrc1000u_foxy/
+libmicroros_dx200_foxy/
 
 # M+ build output
 *.out

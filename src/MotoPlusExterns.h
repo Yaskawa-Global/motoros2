@@ -13,7 +13,9 @@
 
 extern size_t mpNumBytesFree(void);
 
+#if defined (YRC1000) || defined (YRC1000u)
 extern MP_GRP_ID_TYPE mpCtrlGrpNo2GrpId(int grp_no);
+#endif
 
 //M+ only defines MAX_ALARM_COUNT, but we'd like to avoid magic nrs
 //as much as possible, so we define our own here for errors.
