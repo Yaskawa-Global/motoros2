@@ -97,7 +97,7 @@ void RosInitTask()
     {
         Ros_Controller_StatusInit();
 
-        Ros_Allocation_Initialize();
+        Ros_Allocation_Initialize(&g_motoros2_Allocator);
 
         Ros_Communication_ConnectToAgent();
 
