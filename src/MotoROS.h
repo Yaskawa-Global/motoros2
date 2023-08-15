@@ -106,7 +106,4 @@
 
 extern void Ros_Sleep(float milliseconds);
 
-#define max(x, y)   (((x) < (y)) ? (y) : (x))
-#define min(x, y)   (((x) < (y)) ? (x) : (y))
-
 #endif  // MOTOROS2_MOTOROS_H
