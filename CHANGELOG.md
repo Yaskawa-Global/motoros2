@@ -7,6 +7,28 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
+## Forthcoming
+
+First release with official support for DX200 controllers.
+
+New functionality:
+
+- Added link-state monitor: LAN cable disconnects now cause immediate MotoROS2 shutdown ([#27](https://github.com/Yaskawa-Global/motoros2/pull/27))
+- Added full DX200 support ([#49](https://github.com/Yaskawa-Global/motoros2/pull/49))
+- Debug messages are now stamped with the time they are logged at ([#61](https://github.com/Yaskawa-Global/motoros2/pull/61))
+- Debug log now includes full configuration, including defaults, instead of only parsed keys ([#81](https://github.com/Yaskawa-Global/motoros2/pull/81))
+- `PANELBOX.LOG` and the M+ application list show the supported ROS 2 version ([#126](https://github.com/Yaskawa-Global/motoros2/pull/126))
+
+Changes:
+
+- Improved error messages returned by trajectory processing code (`FollowJointTrajectory` action server) ([#63](https://github.com/Yaskawa-Global/motoros2/pull/63))
+- Added missing alarm description for `8011[55]` ([#70](https://github.com/Yaskawa-Global/motoros2/pull/70))
+- `MotoROS_PlatformLib` updated to `0.2.11` ([#90](https://github.com/Yaskawa-Global/motoros2/pull/90))
+- An active error no longer causes excessive debug logger traffic ([#105](https://github.com/Yaskawa-Global/motoros2/pull/105))
+- `/start_traj_mode`: now returns improved error messages in case `INIT_ROS` could not be started ([#106](https://github.com/Yaskawa-Global/motoros2/pull/106))
+- `/start_traj_mode`: don't attempt to enable servos and/or start `INIT_ROS` if there are active errors and/or alarms ([#115](https://github.com/Yaskawa-Global/motoros2/pull/115))
+- Clarified installation procedure and troubleshooting with active FSU ([#130](https://github.com/Yaskawa-Global/motoros2/pull/130))
+
 ## 0.1.0 (2023-05-23)
 
 First public release.
