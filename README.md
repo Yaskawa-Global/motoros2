@@ -101,7 +101,7 @@ The following general requirements must be met in order to be able to use MotoRO
   - YRC1000: either `LAN2` or `LAN3`
   - YRC1000micro: either `LAN2` or `LAN3`
 - MotoPlus and Motoman-Driver must be enabled on the controller
-- ROS 2 version: Foxy, Galactic, Humble or Rolling.
+- ROS 2 version: Foxy, Galactic or Humble.
   ROS 2 Iron Irwini is not yet supported.
 - Docker or a from-source build of the micro-ROS Agent
 - FastDDS as RMW (even when using ROS 2 Galactic)
@@ -505,7 +505,7 @@ After the final reboot of the controller, and after [starting the micro-ROS Agen
 
 Note: if you are using ROS 2 Galactic, please first read [Only FastDDS is supported](#only-fastdds-is-supported).
 
-On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS), Humble or Rolling):
+On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS) or Humble):
 
 1. open a new terminal
 1. `source` the ROS 2 installation
