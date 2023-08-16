@@ -717,11 +717,11 @@ const char* const Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(Ros_QoS_Profile
 void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* const config)
 {
     Ros_Debug_BroadcastMsg("Config: ros_domain_id = %d", config->ros_domain_id);
-    Ros_Debug_BroadcastMsg("Config: node_name = %s", config->node_name);
-    Ros_Debug_BroadcastMsg("Config: node_namespace = %s", config->node_namespace);
-    Ros_Debug_BroadcastMsg("Config: remap_rules = %s", config->remap_rules);
-    Ros_Debug_BroadcastMsg("Config: agent_ip_address = %s", config->agent_ip_address);
-    Ros_Debug_BroadcastMsg("Config: agent_port_number = %s", config->agent_port_number);
+    Ros_Debug_BroadcastMsg("Config: node_name = '%s'", config->node_name);
+    Ros_Debug_BroadcastMsg("Config: node_namespace = '%s'", config->node_namespace);
+    Ros_Debug_BroadcastMsg("Config: remap_rules = '%s'", config->remap_rules);
+    Ros_Debug_BroadcastMsg("Config: agent_ip_address = '%s'", config->agent_ip_address);
+    Ros_Debug_BroadcastMsg("Config: agent_port_number = '%s'", config->agent_port_number);
     Ros_Debug_BroadcastMsg("Config: sync_timeclock_with_agent = %d", config->sync_timeclock_with_agent);
     Ros_Debug_BroadcastMsg("Config: namespace_tf = %d", config->namespace_tf);
     Ros_Debug_BroadcastMsg("Config: publish_tf = %d", config->publish_tf);
@@ -733,7 +733,7 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
         for (int j = 0; j < MP_GRP_AXES_NUM; j += 1)
         {
             if (strlen(config->joint_names[(i * MP_GRP_AXES_NUM) + j]) > 0)
-                Ros_Debug_BroadcastMsg("%s", config->joint_names[(i * MP_GRP_AXES_NUM) + j]);
+                Ros_Debug_BroadcastMsg("'%s'", config->joint_names[(i * MP_GRP_AXES_NUM) + j]);
             else
                 Ros_Debug_BroadcastMsg("x");
         }
@@ -744,12 +744,12 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: update_periods.executor_sleep_period = %d", config->executor_sleep_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.action_feedback_publisher_period = %d", config->action_feedback_publisher_period);
     Ros_Debug_BroadcastMsg("Config: update_periods.controller_status_monitor_period = %d", config->controller_status_monitor_period);
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_robot_status));
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_joint_states));
-    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_tf));
-    Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = %s", config->tf_frame_prefix);
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = '%s'", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_robot_status));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = '%s'", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_joint_states));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = '%s'", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_tf));
+    Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = '%s'", config->tf_frame_prefix);
     Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", config->stop_motion_on_disconnect);
-    Ros_Debug_BroadcastMsg("Config: inform_job_name = %s", config->inform_job_name);
+    Ros_Debug_BroadcastMsg("Config: inform_job_name = '%s'", config->inform_job_name);
     Ros_Debug_BroadcastMsg("Config: allow_custom_inform_job = %d", config->allow_custom_inform_job);
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_enabled = %d", config->userlan_monitor_enabled);
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_port = %d", config->userlan_monitor_port);
