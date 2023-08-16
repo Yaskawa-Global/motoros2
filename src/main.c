@@ -40,10 +40,10 @@ void Ros_ReportVersionInfoToController()
     MP_APPINFO_SEND_DATA appInfoSendData;
     MP_STD_RSP_DATA stdResponseData;
 
-    sprintf(appInfoSendData.AppName, APPLICATION_NAME);
-
+    sprintf(appInfoSendData.AppName, "%s (%s)",
+        APPLICATION_NAME, MOTOPLUS_LIBMICROROS_ROS2_CODENAME);
     sprintf(appInfoSendData.Version, "%s", APPLICATION_VERSION);
-    sprintf(appInfoSendData.Comment, "micro-ROS based ROS 2 interface");
+    sprintf(appInfoSendData.Comment, "%s", "micro-ROS based ROS 2 interface");
 
     mpApplicationInfoNotify(&appInfoSendData, &stdResponseData); //don't care about return value
 }
