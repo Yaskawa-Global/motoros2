@@ -697,6 +697,47 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     }
 }
 
+void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* const config)
+{
+    Ros_Debug_BroadcastMsg("Config: ros_domain_id = %d", config->ros_domain_id);
+    Ros_Debug_BroadcastMsg("Config: node_name = %s", config->node_name);
+    Ros_Debug_BroadcastMsg("Config: node_namespace = %s", config->node_namespace);
+    Ros_Debug_BroadcastMsg("Config: remap_rules = %s", config->remap_rules);
+    Ros_Debug_BroadcastMsg("Config: agent_ip_address = %s", config->agent_ip_address);
+    Ros_Debug_BroadcastMsg("Config: agent_port_number = %s", config->agent_port_number);
+    Ros_Debug_BroadcastMsg("Config: sync_timeclock_with_agent = %d", config->sync_timeclock_with_agent);
+    Ros_Debug_BroadcastMsg("Config: namespace_tf = %d", config->namespace_tf);
+    Ros_Debug_BroadcastMsg("Config: publish_tf = %d", config->publish_tf);
+    Ros_Debug_BroadcastMsg("List of configured joint names:");
+
+    for (int i = 0; i < MAX_CONTROLLABLE_GROUPS; i += 1)
+    {
+        Ros_Debug_BroadcastMsg("---");
+        for (int j = 0; j < MP_GRP_AXES_NUM; j += 1)
+        {
+            if (strlen(config->joint_names[(i * MP_GRP_AXES_NUM) + j]) > 0)
+                Ros_Debug_BroadcastMsg(config->joint_names[(i * MP_GRP_AXES_NUM) + j]);
+            else
+                Ros_Debug_BroadcastMsg("x");
+        }
+    }
+    Ros_Debug_BroadcastMsg("---");
+
+    Ros_Debug_BroadcastMsg("Config: log_to_stdout = %d", config->log_to_stdout);
+    Ros_Debug_BroadcastMsg("Config: executor_sleep_period = %d", config->executor_sleep_period);
+    Ros_Debug_BroadcastMsg("Config: action_feedback_publisher_period = %d", config->action_feedback_publisher_period);
+    Ros_Debug_BroadcastMsg("Config: controller_status_monitor_period = %d", config->controller_status_monitor_period);
+    Ros_Debug_BroadcastMsg("Config: robot_status = %d", config->qos_robot_status);
+    Ros_Debug_BroadcastMsg("Config: joint_states = %d", config->qos_joint_states);
+    Ros_Debug_BroadcastMsg("Config: tf = %d", config->qos_tf);
+    Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = %s", config->tf_frame_prefix);
+    Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", config->stop_motion_on_disconnect);
+    Ros_Debug_BroadcastMsg("Config: inform_job_name = %s", config->inform_job_name);
+    Ros_Debug_BroadcastMsg("Config: allow_custom_inform_job = %d", config->allow_custom_inform_job);
+    Ros_Debug_BroadcastMsg("Config: userlan_monitor_enabled = %d", config->userlan_monitor_enabled);
+    Ros_Debug_BroadcastMsg("Config: userlan_monitor_port = %d", config->userlan_monitor_port);
+}
+
 void Ros_ConfigFile_Parse()
 {
     BOOL bAlarmOnce = TRUE;
@@ -799,42 +840,7 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
-
-    Ros_Debug_BroadcastMsg("Config: ros_domain_id = %d", g_nodeConfigSettings.ros_domain_id);
-    Ros_Debug_BroadcastMsg("Config: node_name = %s", g_nodeConfigSettings.node_name);
-    Ros_Debug_BroadcastMsg("Config: node_namespace = %s", g_nodeConfigSettings.node_namespace);
-    Ros_Debug_BroadcastMsg("Config: remap_rules = %s", g_nodeConfigSettings.remap_rules);
-    Ros_Debug_BroadcastMsg("Config: agent_ip_address = %s", g_nodeConfigSettings.agent_ip_address);
-    Ros_Debug_BroadcastMsg("Config: agent_port_number = %s", g_nodeConfigSettings.agent_port_number);
-    Ros_Debug_BroadcastMsg("Config: sync_timeclock_with_agent = %d", g_nodeConfigSettings.sync_timeclock_with_agent);
-    Ros_Debug_BroadcastMsg("Config: namespace_tf = %d", g_nodeConfigSettings.namespace_tf);
-    Ros_Debug_BroadcastMsg("Config: publish_tf = %d", g_nodeConfigSettings.publish_tf);
-    Ros_Debug_BroadcastMsg("List of configured joint names:");
-    for (int i = 0; i < MAX_CONTROLLABLE_GROUPS; i += 1)
-    {
-        Ros_Debug_BroadcastMsg("---");
-        for (int j = 0; j < MP_GRP_AXES_NUM; j += 1)
-        {
-            if (strlen(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]) > 0)
-                Ros_Debug_BroadcastMsg(g_nodeConfigSettings.joint_names[(i * MP_GRP_AXES_NUM) + j]);
-            else
-                Ros_Debug_BroadcastMsg("x");
-        }
-    }
-    Ros_Debug_BroadcastMsg("---");
-    Ros_Debug_BroadcastMsg("Config: log_to_stdout = %d", g_nodeConfigSettings.log_to_stdout);
-    Ros_Debug_BroadcastMsg("Config: executor_sleep_period = %d", g_nodeConfigSettings.executor_sleep_period);
-    Ros_Debug_BroadcastMsg("Config: action_feedback_publisher_period = %d", g_nodeConfigSettings.action_feedback_publisher_period);
-    Ros_Debug_BroadcastMsg("Config: controller_status_monitor_period = %d", g_nodeConfigSettings.controller_status_monitor_period);
-    Ros_Debug_BroadcastMsg("Config: robot_status = %d", g_nodeConfigSettings.qos_robot_status);
-    Ros_Debug_BroadcastMsg("Config: joint_states = %d", g_nodeConfigSettings.qos_joint_states);
-    Ros_Debug_BroadcastMsg("Config: tf = %d", g_nodeConfigSettings.qos_tf);
-    Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = %s", g_nodeConfigSettings.tf_frame_prefix);
-    Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", g_nodeConfigSettings.stop_motion_on_disconnect);
-    Ros_Debug_BroadcastMsg("Config: inform_job_name = %s", g_nodeConfigSettings.inform_job_name);
-    Ros_Debug_BroadcastMsg("Config: allow_custom_inform_job = %d", g_nodeConfigSettings.allow_custom_inform_job);
-    Ros_Debug_BroadcastMsg("Config: userlan_monitor_enabled = %d", g_nodeConfigSettings.userlan_monitor_enabled);
-    Ros_Debug_BroadcastMsg("Config: userlan_monitor_port = %d", g_nodeConfigSettings.userlan_monitor_port);    
+    Ros_ConfigFile_PrintActiveConfiguration(&g_nodeConfigSettings);
 }
 
 rmw_qos_profile_t const* const Ros_ConfigFile_To_Rmw_Qos_Profile(Ros_QoS_Profile_Setting val)
