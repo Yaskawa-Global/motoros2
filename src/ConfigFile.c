@@ -303,9 +303,9 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                     break;
 
                 case Value_Qos:
-                    if (strcmp((char*)event->data.scalar.value, "sensor_data") == 0)
+                    if (strcmp((char*)event->data.scalar.value, ROS_QOS_PROFILE_SENSOR_DATA_NAME) == 0)
                         *(Ros_QoS_Profile_Setting*)activeItem->valueToSet = ROS_QOS_PROFILE_SENSOR_DATA;
-                    else if (strcmp((char*)event->data.scalar.value, "default") == 0)
+                    else if (strcmp((char*)event->data.scalar.value, ROS_QOS_PROFILE_DEFAULT_NAME) == 0)
                         *(Ros_QoS_Profile_Setting*)activeItem->valueToSet = ROS_QOS_PROFILE_DEFAULT;
                     else
                     {
@@ -314,7 +314,7 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                         *(Ros_QoS_Profile_Setting*)activeItem->valueToSet = ROS_QOS_PROFILE_DEFAULT;
                         Ros_Debug_BroadcastMsg(
                             "Falling back to '%s' profile for '%s': unrecognised profile: '%s'",
-                            "default",
+                            ROS_QOS_PROFILE_DEFAULT_NAME,
                             (char*)activeItem->yamlKey,
                             (char*)event->data.scalar.value);
                     }
@@ -697,6 +697,23 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     }
 }
 
+const char* const Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(Ros_QoS_Profile_Setting val)
+{
+    if (val == ROS_QOS_PROFILE_SENSOR_DATA)
+        return ROS_QOS_PROFILE_SENSOR_DATA_NAME;
+    if (val == ROS_QOS_PROFILE_PARAMETERS)
+        return ROS_QOS_PROFILE_PARAMETERS_NAME;
+    if (val == ROS_QOS_PROFILE_DEFAULT)
+        return ROS_QOS_PROFILE_DEFAULT_NAME;
+    if (val == ROS_QOS_PROFILE_SERVICES)
+        return ROS_QOS_PROFILE_SERVICES_NAME;
+    if (val == ROS_QOS_PROFILE_PARAMETER_EVENTS)
+        return ROS_QOS_PROFILE_PARAMETER_EVENTS_NAME;
+    if (val == ROS_QOS_PROFILE_SYSTEM_DEFAULT)
+        return ROS_QOS_PROFILE_SYSTEM_DEFAULT_NAME;
+    return ROS_QOS_PROFILE_UNKNOWN_NAME;
+}
+
 void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* const config)
 {
     Ros_Debug_BroadcastMsg("Config: ros_domain_id = %d", config->ros_domain_id);
@@ -727,9 +744,9 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: executor_sleep_period = %d", config->executor_sleep_period);
     Ros_Debug_BroadcastMsg("Config: action_feedback_publisher_period = %d", config->action_feedback_publisher_period);
     Ros_Debug_BroadcastMsg("Config: controller_status_monitor_period = %d", config->controller_status_monitor_period);
-    Ros_Debug_BroadcastMsg("Config: robot_status = %d", config->qos_robot_status);
-    Ros_Debug_BroadcastMsg("Config: joint_states = %d", config->qos_joint_states);
-    Ros_Debug_BroadcastMsg("Config: tf = %d", config->qos_tf);
+    Ros_Debug_BroadcastMsg("Config: robot_status = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_robot_status));
+    Ros_Debug_BroadcastMsg("Config: joint_states = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_joint_states));
+    Ros_Debug_BroadcastMsg("Config: tf = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_tf));
     Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = %s", config->tf_frame_prefix);
     Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", config->stop_motion_on_disconnect);
     Ros_Debug_BroadcastMsg("Config: inform_job_name = %s", config->inform_job_name);

@@ -74,6 +74,14 @@ typedef enum
     ROS_QOS_PROFILE_SYSTEM_DEFAULT = 6,
 } Ros_QoS_Profile_Setting;
 
+#define ROS_QOS_PROFILE_SENSOR_DATA_NAME "sensor_data"
+#define ROS_QOS_PROFILE_PARAMETERS_NAME "parameters"
+#define ROS_QOS_PROFILE_DEFAULT_NAME "default"
+#define ROS_QOS_PROFILE_SERVICES_NAME "services"
+#define ROS_QOS_PROFILE_PARAMETER_EVENTS_NAME "parameter_events"
+#define ROS_QOS_PROFILE_SYSTEM_DEFAULT_NAME "system_default"
+#define ROS_QOS_PROFILE_UNKNOWN_NAME "unknown"
+
 #define DEFAULT_REMAP_RULES             ""
 #define MAX_REMAP_RULE_NUM              16
 #define MAX_REMAP_RULE_LEN              256
