@@ -740,13 +740,13 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     }
     Ros_Debug_BroadcastMsg("---");
 
-    Ros_Debug_BroadcastMsg("Config: log_to_stdout = %d", config->log_to_stdout);
-    Ros_Debug_BroadcastMsg("Config: executor_sleep_period = %d", config->executor_sleep_period);
-    Ros_Debug_BroadcastMsg("Config: action_feedback_publisher_period = %d", config->action_feedback_publisher_period);
-    Ros_Debug_BroadcastMsg("Config: controller_status_monitor_period = %d", config->controller_status_monitor_period);
-    Ros_Debug_BroadcastMsg("Config: robot_status = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_robot_status));
-    Ros_Debug_BroadcastMsg("Config: joint_states = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_joint_states));
-    Ros_Debug_BroadcastMsg("Config: tf = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_tf));
+    Ros_Debug_BroadcastMsg("Config: logging.log_to_stdout = %d", config->log_to_stdout);
+    Ros_Debug_BroadcastMsg("Config: update_periods.executor_sleep_period = %d", config->executor_sleep_period);
+    Ros_Debug_BroadcastMsg("Config: update_periods.action_feedback_publisher_period = %d", config->action_feedback_publisher_period);
+    Ros_Debug_BroadcastMsg("Config: update_periods.controller_status_monitor_period = %d", config->controller_status_monitor_period);
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.robot_status = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_robot_status));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.joint_states = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_joint_states));
+    Ros_Debug_BroadcastMsg("Config: publisher_qos.tf = %s", Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(config->qos_tf));
     Ros_Debug_BroadcastMsg("Config: tf_frame_prefix = %s", config->tf_frame_prefix);
     Ros_Debug_BroadcastMsg("Config: stop_motion_on_disconnect = %d", config->stop_motion_on_disconnect);
     Ros_Debug_BroadcastMsg("Config: inform_job_name = %s", config->inform_job_name);
