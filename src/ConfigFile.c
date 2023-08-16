@@ -716,7 +716,7 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
         for (int j = 0; j < MP_GRP_AXES_NUM; j += 1)
         {
             if (strlen(config->joint_names[(i * MP_GRP_AXES_NUM) + j]) > 0)
-                Ros_Debug_BroadcastMsg(config->joint_names[(i * MP_GRP_AXES_NUM) + j]);
+                Ros_Debug_BroadcastMsg("%s", config->joint_names[(i * MP_GRP_AXES_NUM) + j]);
             else
                 Ros_Debug_BroadcastMsg("x");
         }
