@@ -153,13 +153,22 @@ This alarm occurs if the FSU is enabled when installing MotoROS2.
 The MotoROS2 driver attempts to enable the *Speed Feedback* parameters, but is unable to change the required parameters due to FSU settings.
 You must temporarily disable the CRC check for the *Speed Feedback* update to complete.
 
-Touch `[RESET]` to clear the active alarm.
+Boot the controller into *Maintenance* mode by holding `{Main Menu}` on the keypad.
+Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
+Then touch `[MotoPlus Apl]`→`[Delete]`.
+Select the MotoROS2 `.out` file and press `{Enter}` to confirm removal of the MotoROS2 driver.
+
+Boot the controller into *Normal Operation* mode
 Switch the pendant to TEACH mode.
 Then, from the main menu, touch `[System]`→`[Security]` and upgrade to *SAFETY* security level (the default password is all `5`s).
 Then touch `[Setup]`→`[Function Enable]`.
 Navigate to *SAVE DATA CRC CHECK FUNC (FSU)*.
-Set this feature to *INVALID* and reboot the controller in normal mode.
+Set this feature to *INVALID*.
 
+Boot the controller into *Maintenance* mode by holding `{Main Menu}` on the keypad.
+Now reinstall the MotoROS2 `.out` file according to the installation procedure. 
+
+Boot the controller into *Normal Operation* mode
 After rebooting, you should receive `Alarm 8001 [10]` ("Speed FB enabled, reboot now").
 Now *Speed Feedback* has been permanently enabled.
 
