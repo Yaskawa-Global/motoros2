@@ -153,10 +153,11 @@ This alarm occurs if the FSU is enabled when installing MotoROS2.
 The MotoROS2 driver attempts to enable the *Speed Feedback* parameters, but is unable to change the required parameters due to FSU settings.
 You must temporarily disable the CRC check for the *Speed Feedback* update to complete.
 
-Boot the controller into *Maintenance* mode by holding `{Main Menu}` on the keypad.
+Boot the controller into *Maintenance* mode by powering on the controller while holding `{Main Menu}` on the keypad.
 Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
 Then touch `[MotoPlus Apl]`→`[Delete]`.
 Select the MotoROS2 `.out` file and press `{Enter}` to confirm removal of the MotoROS2 driver.
+Turn off the robot controller.
 
 Boot the controller into *Normal Operation* mode
 Switch the pendant to TEACH mode.
@@ -164,8 +165,9 @@ Then, from the main menu, touch `[System]`→`[Security]` and upgrade to *SAFETY
 Then touch `[Setup]`→`[Function Enable]`.
 Navigate to *SAVE DATA CRC CHECK FUNC (FSU)*.
 Set this feature to *INVALID*.
+Turn off the robot controller.
 
-Boot the controller into *Maintenance* mode by holding `{Main Menu}` on the keypad.
+Boot the controller into *Maintenance* mode by powering on the controller while holding `{Main Menu}` on the keypad.
 Now reinstall the MotoROS2 `.out` file according to the installation procedure.
 
 Boot the controller into *Normal Operation* mode

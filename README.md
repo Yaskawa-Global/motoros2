@@ -248,6 +248,8 @@ Insert the storage device into the robot's programming pendant and refer to the 
 
 If the controller is configured with the Functional Safety Unit (FSU), then `SAVE DATA CRC CHECK FUNC (FSU)` must be temporarily disabled during the installation procedure.
 
+Turn on the robot controller to enter *Normal Operation* mode.
+
 In *Normal Operation* mode:
 
  1. upgrade to *SAFETY* security level by touching `[System Info]`→`[Security]` (default password is all `5`'s)
