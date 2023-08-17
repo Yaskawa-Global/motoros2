@@ -104,9 +104,9 @@ class DebugBroadcastProtocol(asyncio.DatagramProtocol):
         sent_stamp = msg[:STAMP_STR_LEN]
         msg = msg[STAMP_STR_LEN+1:]
         source_addr = (addr[0], addr[1])
-        self._write_to_syncs(msg=msg, stamp=sent_stamp, source_addr=source_addr)
+        self._write_to_sinks(msg=msg, stamp=sent_stamp, source_addr=source_addr)
 
-    def _write_to_syncs(self, msg, stamp, source_addr):
+    def _write_to_sinks(self, msg, stamp, source_addr):
         for cb in self._sink_cbs:
             cb(msg=msg, stamp=stamp, source_addr=source_addr)
 
