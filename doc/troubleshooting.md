@@ -166,7 +166,7 @@ Navigate to *SAVE DATA CRC CHECK FUNC (FSU)*.
 Set this feature to *INVALID*.
 
 Boot the controller into *Maintenance* mode by holding `{Main Menu}` on the keypad.
-Now reinstall the MotoROS2 `.out` file according to the installation procedure. 
+Now reinstall the MotoROS2 `.out` file according to the installation procedure.
 
 Boot the controller into *Normal Operation* mode
 After rebooting, you should receive `Alarm 8001 [10]` ("Speed FB enabled, reboot now").
