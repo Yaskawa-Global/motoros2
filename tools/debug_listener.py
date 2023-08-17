@@ -17,6 +17,9 @@ from typing import Tuple, Union, Text
 
 Address = Tuple[str, int]
 
+# length of the stamp in a log msg: 'YYYY-MM-DD HH:MM:SS.nnnnnn'
+# (where 'nnnnnn' is the microsecond part)
+STAMP_STR_LEN=26
 
 def main():
     default_bcast_port=21789
@@ -73,19 +76,13 @@ def main():
         os.remove(path=fname)
 
 
-def to_human_readable_stamp(stamp) -> str:
-    return datetime.datetime.fromtimestamp(stamp).strftime('%Y-%m-%d %H:%M:%S.%f')
-
-
-def file_sink(f, msg, recv_time, source_addr):
-    stamp = to_human_readable_stamp(recv_time)
+def file_sink(f, msg, stamp, source_addr):
     ip, port = source_addr
     print(f'[{stamp}] [{ip}:{port}]: {msg}', file=f)
     f.flush()
 
 
-def console_sink_cb(msg, recv_time, source_addr):
-    stamp = to_human_readable_stamp(recv_time)
+def console_sink_cb(msg, stamp, source_addr):
     ip, port = source_addr
     print(f'[{stamp}] [{ip}:{port}]: {msg}')
 
@@ -104,14 +101,14 @@ class DebugBroadcastProtocol(asyncio.DatagramProtocol):
     def datagram_received(self, data: Union[bytes, Text], addr: Address):
         # note: we assume all sinks appreciate strings instead of raw data
         msg = data.decode('ascii')
-        stamp_recvd = time.time()
+        sent_stamp = msg[:STAMP_STR_LEN]
+        msg = msg[STAMP_STR_LEN+1:]
         source_addr = (addr[0], addr[1])
-        self._write_to_syncs(
-            msg=msg, recv_time=stamp_recvd, source_addr=source_addr)
+        self._write_to_sinks(msg=msg, stamp=sent_stamp, source_addr=source_addr)
 
-    def _write_to_syncs(self, msg, recv_time, source_addr):
+    def _write_to_sinks(self, msg, stamp, source_addr):
         for cb in self._sink_cbs:
-            cb(msg=msg, recv_time=recv_time, source_addr=source_addr)
+            cb(msg=msg, stamp=stamp, source_addr=source_addr)
 
 
 if __name__ == '__main__':
