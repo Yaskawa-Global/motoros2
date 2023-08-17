@@ -153,28 +153,41 @@ This alarm occurs if the FSU is enabled when installing MotoROS2.
 The MotoROS2 driver attempts to enable the *Speed Feedback* parameters, but is unable to change the required parameters due to FSU settings.
 You must temporarily disable the CRC check for the *Speed Feedback* update to complete.
 
-Boot the controller into *Maintenance* mode by powering on the controller while holding `{Main Menu}` on the keypad.
-Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
-Then touch `[MotoPlus Apl]`→`[Delete]`.
-Select the MotoROS2 `.out` file and press `{Enter}` to confirm removal of the MotoROS2 driver.
-Turn off the robot controller.
+First, remove MotoROS2 from the controller:
 
-Boot the controller into *Normal Operation* mode
-Switch the pendant to TEACH mode.
-Then, from the main menu, touch `[System]`→`[Security]` and upgrade to *SAFETY* security level (the default password is all `5`s).
-Then touch `[Setup]`→`[Function Enable]`.
-Navigate to *SAVE DATA CRC CHECK FUNC (FSU)*.
-Set this feature to *INVALID*.
-Turn off the robot controller.
+- Boot the controller into *Maintenance* mode by powering on the controller while holding `{Main Menu}` on the keypad.
+- Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
+- Touch `[MotoPlus Apl]`→`[Delete]`.
+- Select the MotoROS2 `.out` file and press `{Enter}` to confirm removal of the MotoROS2 driver.
+- Turn off the robot controller.
 
-Boot the controller into *Maintenance* mode by powering on the controller while holding `{Main Menu}` on the keypad.
-Now reinstall the MotoROS2 `.out` file according to the installation procedure.
+Disable the CRC check:
 
-Boot the controller into *Normal Operation* mode
-After rebooting, you should receive `Alarm 8001 [10]` ("Speed FB enabled, reboot now").
-Now *Speed Feedback* has been permanently enabled.
+- Turn on the robot controller and let it boot into *Normal Operation* mode (do not hold any keys).
+- Switch the pendant to TEACH mode.
+- From the main menu, touch `[System]`→`[Security]` and upgrade to *SAFETY* security level (the default password is all `5`s).
+- Touch `[Setup]`→`[Function Enable]`.
+- Navigate to *SAVE DATA CRC CHECK FUNC (FSU)*.
+- Set this feature to *INVALID*.
+- Turn off the robot controller.
 
-Reboot once more and follow the steps above to re-enable the *SAVE DATA CRC CHECK FUNC (FSU)*.
+Reinstall MotoROS2:
+
+- Boot the controller into *Maintenance* mode by powering on the controller while holding `{Main Menu}` on the keypad.
+- Reinstall the MotoROS2 `.out` file following the [regular installation procedure](https://github.com/Yaskawa-Global/motoros2#installation).
+- Reboot the robot controller and let it boot into *Normal Operation* mode (do not hold any keys).
+- After rebooting, you should see the alarm: `Alarm 8001 [10]` ("Speed FB enabled, reboot now").
+- *Speed Feedback* has now permanently been enabled.
+
+Re-enable the CRC check:
+
+- Reboot once more and follow the steps in the *Disable the CRC check* section above to re-enable the *SAVE DATA CRC CHECK FUNC (FSU)* (be sure to set it to *VALID*).
+
+No more alarms should be raised and MotoROS2 should now be installed.
+
+If the alarm is raised again, save a copy of the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach the `PANELBOX.LOG` to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
 ### Alarm: 8001[10]
 
