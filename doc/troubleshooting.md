@@ -185,8 +185,8 @@ Re-enable the CRC check:
 
 No more alarms should be raised and MotoROS2 should now be installed.
 
-If the alarm is raised again, save a copy of the `PANELBOX.LOG` from the robot's teach pendant.
-Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach the `PANELBOX.LOG` to the issue.
+If the alarm is raised again, save a copy of the `ALL.PRM` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach the `ALL.PRM` to the issue (alternatively: send it to the MotoROS2 developers in a private email).
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
 ### Alarm: 8001[10]
