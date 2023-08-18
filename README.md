@@ -246,6 +246,18 @@ Insert the storage device into the robot's programming pendant and refer to the 
 
 ### DX200, YRC1000, and YRC1000micro
 
+If the controller is configured with the Functional Safety Unit (FSU), then `SAVE DATA CRC CHECK FUNC (FSU)` must be temporarily disabled during the installation procedure.
+
+Turn on the robot controller to enter *Normal Operation* mode.
+
+In *Normal Operation* mode:
+
+ 1. upgrade to *SAFETY* security level by touching `[System Info]`→`[Security]` (default password is all `5`'s)
+ 1. touch `[Setup]`→`[Function Enable]`
+ 1. navigate to `SAVE DATA CRC CHECK FUNC (FSU)`
+ 1. set this feature to `INVALID`
+ 1. turn off the robot controller
+
 Turn on the robot controller while holding the `{Main Menu}` key on the keypad to enter *Maintenance* mode.
 You may release the key when you see the Yaskawa logo appear on the screen.
 
@@ -303,6 +315,13 @@ Within 30 seconds of loading the configuration file, you should get alarm `8001[
 Reboot again and there should be no alarms.
 
 If you receive any errors or alarms after rebooting, please refer to the [Troubleshooting](#troubleshooting) section for information on how to remedy the issue.
+
+If `SAVE DATA CRC CHECK FUNC (FSU)` was disabled at the start of this procedure, then it can now be reenabled.
+
+ 1. upgrade to *SAFETY* security level by touching `[System Info]`→`[Security]` (default password is all `5`'s)
+ 1. touch `[Setup]`→`[Function Enable]`
+ 1. navigate to `SAVE DATA CRC CHECK FUNC (FSU)`
+ 1. set this feature to `VALID`
 
 ## Building from source
 
