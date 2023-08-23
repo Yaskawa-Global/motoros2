@@ -7,7 +7,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
-## Forthcoming
+## 0.1.1 (2023-08-23)
 
 First release with official support for DX200 controllers.
 
