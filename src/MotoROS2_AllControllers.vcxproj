@@ -128,7 +128,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_humble\include;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -140,7 +140,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_galactic\include;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_g" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -152,7 +152,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_foxy\include;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_f" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -164,7 +164,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;$(SolutionDir)libmicroros_yrc1000_humble\include;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -176,7 +176,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_galactic\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_g" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -188,7 +188,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_foxy\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_f" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -200,7 +200,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;$(SolutionDir)libmicroros_yrc1000u_humble\include;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_h" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -212,7 +212,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_galactic\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_g" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
@@ -224,7 +224,7 @@
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "$(ProjectName)" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_f" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
