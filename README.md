@@ -163,12 +163,12 @@ The values must match *exactly*.
 | DX200         | Foxy             | `mr2_dx2_f.out`   | `TODO`     | `TODO`                             |
 | DX200         | Galactic         | `mr2_dx2_g.out`   | `TODO`     | `TODO`                             |
 | DX200         | Humble           | `mr2_dx2_h.out`   | `TODO`     | `TODO`                             |
-| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `v0.1.0`   | `eb3c028d0989b6cce2eb4d50a9f45001` |
-| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `v0.1.0`   | `78abcead2e2504109a49287648a9bc04` |
-| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `v0.1.0`   | `c5d0f2cce281ed1cb8194badaaffc511` |
-| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `v0.1.0`   | `fe17a90ca6e4a86447e9206a273486f2` |
-| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `v0.1.0`   | `080957841a010aee9b479d36b5f6c1b8` |
-| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `v0.1.0`   | `6b5df5c2764924466903111d0f61502a` |
+| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.0`    | `eb3c028d0989b6cce2eb4d50a9f45001` |
+| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.0`    | `78abcead2e2504109a49287648a9bc04` |
+| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.0`    | `c5d0f2cce281ed1cb8194badaaffc511` |
+| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.0`    | `fe17a90ca6e4a86447e9206a273486f2` |
+| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.0`    | `080957841a010aee9b479d36b5f6c1b8` |
+| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.0`    | `6b5df5c2764924466903111d0f61502a` |
 
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
