@@ -26,6 +26,7 @@ Changes:
 - `MotoROS_PlatformLib` updated to `0.2.11` ([#90](https://github.com/Yaskawa-Global/motoros2/pull/90))
 - An active error no longer causes excessive debug logger traffic ([#105](https://github.com/Yaskawa-Global/motoros2/pull/105))
 - `/start_traj_mode`: now returns improved error messages in case `INIT_ROS` could not be started ([#106](https://github.com/Yaskawa-Global/motoros2/pull/106))
+- MotoROS2 binary names have been shortened ([#109](https://github.com/Yaskawa-Global/motoros2/pull/109), [#132](https://github.com/Yaskawa-Global/motoros2/pull/132))
 - `/start_traj_mode`: don't attempt to enable servos and/or start `INIT_ROS` if there are active errors and/or alarms ([#115](https://github.com/Yaskawa-Global/motoros2/pull/115))
 - Clarified installation procedure and troubleshooting with active FSU ([#130](https://github.com/Yaskawa-Global/motoros2/pull/130))
 
