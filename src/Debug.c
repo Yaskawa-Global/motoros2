@@ -59,16 +59,16 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         //get synchronized time from the agent
         int64_t nanosecs = rmw_uros_epoch_nanos();
         Ros_Nanos_To_Timespec(nanosecs, &tp);
-        strftime(timestamp, FORMATTED_TIME_SIZE, "%Y-%m-%d %H:%M:%S", localtime_r(&tp.tv_sec, &synced_time));
-        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%06d ", (int)tp.tv_nsec / 1000);
     }
     else
     {
         //rmw_uros_epoch_nanos cannot sync with agent because it's not connected
         clock_gettime(CLOCK_REALTIME, &tp);
-        strftime(timestamp, FORMATTED_TIME_SIZE, "%Y-%m-%d %H:%M:%S", localtime_r(&tp.tv_sec, &synced_time));
-        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%06d ", tp.tv_nsec / 1000);
     }
+    localtime_r(&tp.tv_sec, &synced_time);
+    strftime(timestamp, FORMATTED_TIME_SIZE, "%Y-%m-%d %H:%M:%S", &synced_time);
+    snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%06d ", (int)tp.tv_nsec / 1000);
+
     // Pre - pending the timestamp to the debug message
     size_t timestamp_length = Ros_strnlen(timestamp, FORMATTED_TIME_SIZE);
     size_t debug_message_length = Ros_strnlen(str, MAX_DEBUG_MESSAGE_SIZE);
