@@ -48,6 +48,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
 
     if (ros_DebugSocket == -1)
         Ros_Debug_Init();
+
     // Timestamp
     //The timestamp for the message "Found Micro-Ros PC Agent" will be the epoch time (THU 1970-01-01 00:00:00.000) as the global flags 
     //are set to indicate that the Micro-Ros PC Agent is connected but the first sync of the host time using the micro-ROS agent is yet to occur
@@ -80,6 +81,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         // Copy the timestamp stored in Formatted_time buffer to the beginning of str buffer
         memcpy(str, timestamp, timestamp_length);         
     }
+
     mpSendTo(ros_DebugSocket, str, strlen(str), 0, (struct sockaddr*) &ros_debug_destAddr1, sizeof(struct sockaddr_in));
 
     if (g_nodeConfigSettings.log_to_stdout)
