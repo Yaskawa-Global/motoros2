@@ -52,7 +52,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     //The timestamp for the message "Found Micro-Ros PC Agent" will be the epoch time (THU 1970-01-01 00:00:00.000) as the global flags 
     //are set to indicate that the Micro-Ros PC Agent is connected but the first sync of the host time using the micro-ROS agent is yet to occur
     struct tm synced_time;
-    timespec tp;
+    struct timespec tp;
     char timestamp[FORMATTED_TIME_SIZE];
     builtin_interfaces__msg__Time debug_msg_timestamp;
     if (g_Ros_Communication_AgentIsConnected)
