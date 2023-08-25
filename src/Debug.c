@@ -54,14 +54,13 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     struct tm synced_time;
     struct timespec tp;
     char timestamp[FORMATTED_TIME_SIZE];
-    builtin_interfaces__msg__Time debug_msg_timestamp;
     if (g_Ros_Communication_AgentIsConnected)
     {
         //get synchronized time from the agent
-        int64_t nanosecs = rmw_uros_epoch_nanos(); 
-        Ros_Nanos_To_Time_Msg(nanosecs, &debug_msg_timestamp);
-        strftime(timestamp, FORMATTED_TIME_SIZE, "%Y-%m-%d %H:%M:%S", localtime_r((const time_t*)&debug_msg_timestamp.sec, &synced_time));
-        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%06d ", (int)debug_msg_timestamp.nanosec / 1000);
+        int64_t nanosecs = rmw_uros_epoch_nanos();
+        Ros_Nanos_To_Timespec(nanosecs, &tp);
+        strftime(timestamp, FORMATTED_TIME_SIZE, "%Y-%m-%d %H:%M:%S", localtime_r(&tp.tv_sec, &synced_time));
+        snprintf(timestamp + strlen(timestamp), FORMATTED_TIME_SIZE - strlen(timestamp), ".%06d ", (int)tp.tv_nsec / 1000);
     }
     else
     {
