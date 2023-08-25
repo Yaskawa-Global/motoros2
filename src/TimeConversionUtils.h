@@ -40,5 +40,11 @@ static inline void Ros_Nanos_To_Time_Msg(INT64 x, builtin_interfaces__msg__Time*
     y->nanosec = (x % 1000000000LL);
 }
 
+static inline void Ros_Nanos_To_Timespec(INT64 x, struct timespec* const y)
+{
+    y->tv_sec = x / 1000000000LL;
+    y->tv_nsec = (x % 1000000000LL);
+}
+
 
 #endif // MOTOROS2_TIME_CONVERSION_UTILS_H
