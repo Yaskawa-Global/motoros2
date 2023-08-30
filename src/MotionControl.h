@@ -14,14 +14,6 @@
 #define MOTION_START_CHECK_PERIOD           50  // in millisecond
 #define MOTION_STOP_TIMEOUT                 20
 
-#ifndef E_EXRCS_PFL_FUNC_BUSY
-#define E_EXRCS_PFL_FUNC_BUSY               (-19)
-#endif
-
-#ifndef E_EXRCS_UNDER_ENERGY_SAVING
-#define E_EXRCS_UNDER_ENERGY_SAVING         (-20)
-#endif
-
 typedef enum
 {
     MOTION_MODE_INACTIVE,

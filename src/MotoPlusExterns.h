@@ -24,4 +24,12 @@ extern MP_GRP_ID_TYPE mpCtrlGrpNo2GrpId(int grp_no);
 #define MAX_ERROR_COUNT 1
 #endif
 
+#ifndef E_EXRCS_PFL_FUNC_BUSY
+#define E_EXRCS_PFL_FUNC_BUSY               (-19)
+#endif
+
+#ifndef E_EXRCS_UNDER_ENERGY_SAVING
+#define E_EXRCS_UNDER_ENERGY_SAVING         (-20)
+#endif
+
 #endif // MOTOROS2_MOTOPLUS_EXTERNS_H
