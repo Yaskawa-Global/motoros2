@@ -159,7 +159,7 @@ Compare the output of `md5sum` when run against the binary downloaded in the pre
 The values must match *exactly*.
 
 |**Controller** |**ROS 2 Version** | **File**          |**Version** | **MD5 hash**                       |
-|---------------|------------------|-------------------|------------|------------------------------------|
+|:--------------|:-----------------|:------------------|:-----------|:-----------------------------------|
 | DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.1`    | `010b61367c7a90b4315533710aec7716` |
 | DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.1`    | `44c316f860d46fc35326a1c227c28e57` |
 | DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.1`    | `b402e63d03a86cdc8f9d5aecbbc4ab52` |
