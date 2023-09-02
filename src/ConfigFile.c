@@ -156,7 +156,7 @@ void Ros_ConfigFile_SetAllDefaultValues()
 #endif
 
     //last three bytes of MAC ID are a unique identifier
-    sprintf(g_nodeConfigSettings.node_name, "%s_%2x_%2x_%2x", DEFAULT_NODE_NAME, macId[3], macId[4], macId[5]);
+    sprintf(g_nodeConfigSettings.node_name, "%s_%02x_%02x_%02x", DEFAULT_NODE_NAME, macId[3], macId[4], macId[5]);
 
     //=========
     //node_namespace
