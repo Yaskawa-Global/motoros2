@@ -17,7 +17,7 @@ jobs:
       needs_msbuild: ${{ steps.paths_filter.outputs.vsproj }}
     steps:
       - name: Checkout MotoROS2
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Check VS proj has changed
         id: paths_filter
         uses: dorny/paths-filter@v2
@@ -54,7 +54,7 @@ jobs:
         echo "ctrlr=${TEMP_VAR^^}" >> $GITHUB_OUTPUT
 
     - name: Checkout MotoROS2
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'motoros2'
 
