@@ -18,7 +18,7 @@
 // -  ZZ: patch version nr
 //
 // Note: no leading zeros, to avoid octal parsing
-#define MOTOROS_PLATFORM_LIB_VERSION 211
+#define MOTOROS_PLATFORM_LIB_VERSION 212
 
 #define MOTOROS_PLATFORM_LIB_MAJOR (MOTOROS_PLATFORM_LIB_VERSION / 100000)
 #define MOTOROS_PLATFORM_LIB_MINOR (MOTOROS_PLATFORM_LIB_VERSION / 100 % 1000)
@@ -79,17 +79,17 @@ struct tm* localtime_r(const time_t* timep, struct tm* result);
 
 #if defined (YRC1000) || defined (YRC1000u) || defined (DX200) || defined (FS100) || defined (DX100)
 // from clockLib
-typedef struct _timespec
+struct timespec
 {
     time_t tv_sec;  /* seconds */
     long   tv_nsec; /* nanoseconds (0 -1,000,000,000) */
-} timespec;
+};
 #ifndef CLOCK_REALTIME
 #define CLOCK_REALTIME 0
 #endif
 typedef int clockid_t;
 extern int clock_gettime(clockid_t clock_id, /* clock ID (always CLOCK_REALTIME) */
-                         timespec* tp /* where to store current time */);
+                         struct timespec* tp /* where to store current time */);
 #else
 #error clock_gettime: unsupported platform
 #endif
