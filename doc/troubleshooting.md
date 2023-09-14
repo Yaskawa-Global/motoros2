@@ -600,14 +600,13 @@ If the behavior persists, save a copy of the [debug-listener script](#debug-log-
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
 Describe the problem and include the following items:
 
- - `PANELBOX.LOG`
- - output from debug listener script (complete and unedited)
- - version of MotoROS2
- - version of micro-ROS Agent
- - version of ROS2 on client PC
- - copy of the MotoROS2 yaml configuration file
- - verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
-
+- `PANELBOX.LOG`
+- output from debug listener script (complete and unedited)
+- version of MotoROS2
+- version of micro-ROS Agent
+- version of ROS2 on client PC
+- copy of the MotoROS2 yaml configuration file
+- verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
 ### Alarm: 8011[55]
 
@@ -654,13 +653,13 @@ If the behavior persists, save a copy of the [debug-listener script](#debug-log-
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
 Describe the problem and include the following items:
 
- - `PANELBOX.LOG`
- - output from debug listener script (complete and unedited)
- - version of MotoROS2
- - version of micro-ROS Agent
- - version of ROS2 on client PC
- - copy of the MotoROS2 yaml configuration file
- - verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+- `PANELBOX.LOG`
+- output from debug listener script (complete and unedited)
+- version of MotoROS2
+- version of micro-ROS Agent
+- version of ROS2 on client PC
+- copy of the MotoROS2 yaml configuration file
+- verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
 ### Alarm: 8011[60 - 62]
 
