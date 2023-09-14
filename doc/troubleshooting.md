@@ -582,6 +582,33 @@ The name must not be blank.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
+### Alarm: 8011[23 - 54]
+
+*Example:*
+
+```text
+ALARM 8011
+ Failed creating/adding/init *something*
+[23] - [54]
+```
+
+*Solution:*
+Ensure that the ROS2 version (Galactic, Humble, etc) is the same for MotoROS2, the micro-ROS Agent and the client PC.
+Additionally, ensure that the ROS2 version is one that is [officially supported](https://github.com/Yaskawa-Global/motoros2#general-requirements) by MotoROS2.
+
+If the behavior persists, save a copy of the [debug-listener script](#debug-log-client) output and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
+Describe the problem and include the following items:
+
+ - `PANELBOX.LOG`
+ - output from debug listener script (complete and unedited)
+ - version of MotoROS2
+ - version of micro-ROS Agent
+ - version of ROS2 on client PC
+ - copy of the MotoROS2 yaml configuration file
+ - verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+
 ### Alarm: 8011[55]
 
 *Example:*
@@ -608,6 +635,58 @@ If only a subset of joints should be configured with a custom name, specify the 
 Refer to [FAQ: Can names of joints be changed?](faq.md#can-names-of-joints-be-changed) for more information about configuring custom joint names.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+### Alarm: 8011[56 - 58]
+
+*Example:*
+
+```text
+ALARM 8011
+ Failed creating/adding/init *something*
+[56] - [58]
+```
+
+*Solution:*
+Ensure that the ROS2 version (Galactic, Humble, etc) is the same for MotoROS2, the micro-ROS Agent and the client PC.
+Additionally, ensure that the ROS2 version is one that is [officially supported](https://github.com/Yaskawa-Global/motoros2#general-requirements) by MotoROS2.
+
+If the behavior persists, save a copy of the [debug-listener script](#debug-log-client) output and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
+Describe the problem and include the following items:
+
+ - `PANELBOX.LOG`
+ - output from debug listener script (complete and unedited)
+ - version of MotoROS2
+ - version of micro-ROS Agent
+ - version of ROS2 on client PC
+ - copy of the MotoROS2 yaml configuration file
+ - verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8011[60 - 62]
+
+*Example:*
+
+```text
+ALARM 8011
+ Must enable ETHERNET function
+[60 - 61]
+```
+
+*Solution:*
+The ETHERNET function must be enabled for one (or both) LAN interface in the robot controller.
+Please contact your local Yaskawa representative to request this function.
+
+### Alarm: 8011[59]
+
+*Example:*
+
+```text
+ALARM 8011
+ Host on NIC check x
+[59]
+```
+
+*Solution:*
 
 ### Alarm: 8012[xx]
 
