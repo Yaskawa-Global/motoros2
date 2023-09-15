@@ -13,7 +13,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 ![FS100: not supported](https://img.shields.io/badge/FS100-not%20supported-inactive.svg)
 ![DX100: not supported](https://img.shields.io/badge/DX100-not%20supported-inactive.svg)
 
-[![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
+[![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg "MotoROS2 itself is licensed under the Apache-2.0 license. Please see the LICENSES directory for additional license files")](https://opensource.org/licenses/Apache-2.0)
 [![support level: consortium / vendor](https://img.shields.io/badge/support%20level-consortium%20/%20vendor-brightgreen.svg)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
 
 ![Version: 0.1.1](https://img.shields.io/badge/version-0.1.1-informational.svg)
