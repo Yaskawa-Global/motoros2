@@ -459,7 +459,7 @@ ALARM 8011
 *Solution:*
 Check the [setup instructions](../README.md#installation) to ensure that the robot controller is configured properly.
 
-If the behavior persists, save a copy of the [debug-listener script](#debug-log-client) output and the `PANELBOX.LOG` from the robot's teach pendant.
+If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
@@ -621,7 +621,7 @@ Ensure only compatible versions are used.
 As an example: the *Humble* version of MotoROS2 should only be used with ROS 2 *Humble* on the client PC and with the *Humble* version of the micro-ROS Agent.
 Please also verify the client PC uses a version of ROS 2 that is [supported by MotoROS2](https://github.com/Yaskawa-Global/motoros2#general-requirements).
 
-If the behavior persists, save a copy of the [debug-listener script](#debug-log-client) output and the `PANELBOX.LOG` from the robot's teach pendant.
+If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
 Describe the problem and include the following items:
 
@@ -714,7 +714,7 @@ ALARM 8012
 *Solution:*
 Verify there are no other MotoPlus applications (`.out` file) installed on the robot controller.
 
-If the behavior persists, save a copy of the [debug-listener script](#debug-log-client) output and the `PANELBOX.LOG` from the robot's teach pendant.
+If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
@@ -940,7 +940,7 @@ If auto-detection is to be used, verify `agent_ip_address` is set to an IP that 
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
-If the behavior persists, save a copy of the [debug-listener script](#debug-log-client) output and the `PANELBOX.LOG` from the robot's teach pendant.
+If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
@@ -963,7 +963,7 @@ If the alarm is raised again, make sure `userlan_monitor_port` is set to the cor
 
 If the configuration file has to be updated, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
-If the behavior persists, save a copy of the [debug-listener script](#debug-log-client) output and the `PANELBOX.LOG` from the robot's teach pendant.
+If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
