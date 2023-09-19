@@ -590,7 +590,23 @@ After correcting the configuration, the [changes will need to be propagated to t
 ALARM 8011
  MotoROS2: Fatal Error
  Failed adding ...
+[23] - [54]
+```
+
+or:
+
+```text
+ALARM 8011
+ MotoROS2: Fatal Error
  Failed to init ...
+[23] - [54]
+```
+
+or:
+
+```text
+ALARM 8011
+ MotoROS2: Fatal Error
  Failed creating ...
 [23] - [54]
 ```
@@ -650,7 +666,23 @@ After correcting the configuration, the [changes will need to be propagated to t
 ALARM 8011
  MotoROS2: Fatal Error
  Failed adding ...
+[56] - [58]
+```
+
+or:
+
+```text
+ALARM 8011
+ MotoROS2: Fatal Error
  Failed to init ...
+[56] - [58]
+```
+
+or:
+
+```text
+ALARM 8011
+ MotoROS2: Fatal Error
  Failed creating ...
 [56] - [58]
 ```
