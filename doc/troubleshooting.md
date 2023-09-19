@@ -590,7 +590,7 @@ After correcting the configuration, the [changes will need to be propagated to t
 ALARM 8011
  MotoROS2: Fatal Error
  Failed adding ...
-[23] - [54]
+[xx]
 ```
 
 or:
@@ -599,7 +599,7 @@ or:
 ALARM 8011
  MotoROS2: Fatal Error
  Failed to init ...
-[23] - [54]
+[xx]
 ```
 
 or:
@@ -608,8 +608,10 @@ or:
 ALARM 8011
  MotoROS2: Fatal Error
  Failed creating ...
-[23] - [54]
+[xx]
 ```
+
+Where `[xx]` is a subcode in the ranges `[23 - 54]` or `[56 - 58]`.
 
 *Solution:*
 These alarms are often caused by version incompatibilities between ROS 2 (on the client PC), micro-ROS (as part of MotoROS2) and/or the micro-ROS Agent.
