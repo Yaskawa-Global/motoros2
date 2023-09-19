@@ -694,7 +694,7 @@ Refer to the relevant Yaskawa Motoman documentation for information on how to ch
 ```text
 ALARM 8011
  Must enable ETHERNET function
-[60 - 61]
+[60 - 62]
 ```
 
 *Solution:*
