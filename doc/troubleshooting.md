@@ -674,9 +674,10 @@ ALARM 8011
 [59]
 ```
 
-*Solution:*
+Where `x` is either `1` or `2`.
 
-The `agent_ip_address` key in the `motoros2_config.yaml` configuration file is an address that is not reachable by the robot controller.
+*Solution:*
+This problem is often caused by the `agent_ip_address` key in the `motoros2_config.yaml` configuration file set to an address that is not reachable by the robot controller.
 
 Options:
 
