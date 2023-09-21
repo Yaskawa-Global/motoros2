@@ -747,6 +747,36 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     UINT64 q_time;
     int axis;
 
+    MP_CTRL_GRP_SEND_DATA ctrlGrpData;
+    MP_PULSE_POS_RSP_DATA pulsePosData;
+
+    LONG newPulseInc[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];		// Pulse increments that we just retrieved from the incQueue
+    LONG toProcessPulses[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];	// Total pulses that still need to be sent to the command
+    LONG processedPulses[MP_GRP_AXES_NUM];							// Amount of pulses from the last command that were actually processed (accepted) 
+    LONG prevMaxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
+    LONG prevMaxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
+    LONG maxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
+    LONG maxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
+    BOOL skipReadingQ[MAX_CONTROLLABLE_GROUPS];
+    BOOL queueRead[MAX_CONTROLLABLE_GROUPS];
+    BOOL isMissingPulse;
+    BOOL hasUnprocessedData;
+
+    ctrlGrpData.sCtrlGrp = 0;
+
+    memset(newPulseInc, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    memset(toProcessPulses, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    memset(processedPulses, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM);
+    memset(prevMaxSpeed, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    memset(prevMaxSpeedRemain, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    memset(maxSpeed, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    memset(maxSpeedRemain, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    memset(skipReadingQ, 0x00, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
+    memset(queueRead, 0x00, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
+
+    isMissingPulse = FALSE;
+    hasUnprocessedData = FALSE;
+
     Ros_Debug_BroadcastMsg("IncMoveTask Started");
 
     bzero(&moveData, sizeof(moveData));
@@ -762,81 +792,216 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
         mpClkAnnounce(MP_INTERPOLATION_CLK);
 
         if (Ros_Controller_IsMotionReady()
-            && Ros_MotionControl_HasDataInQueue()
+            && (Ros_MotionControl_HasDataInQueue() || hasUnprocessedData)
             && !g_Ros_Controller.bStopMotion)
         {
             for (i = 0; i < g_Ros_Controller.numGroup; i++)
             {
-                q = &g_Ros_Controller.ctrlGroups[i]->inc_q;
-
-                // Lock the q before manipulating it
-                if (mpSemTake(q->q_lock, Q_LOCK_TIMEOUT) == OK)
+                queueRead[i] = FALSE;
+                if (skipReadingQ[i])
                 {
-                    if (q->cnt > 0)
-                    {
-                        inc_data_time = q->data[q->idx].time;
-                        q_time = g_Ros_Controller.ctrlGroups[i]->q_time;
-                        moveData.grp_pos_info[i].pos_tag.data[2] = q->data[q->idx].tool;
-                        moveData.grp_pos_info[i].pos_tag.data[3] = q->data[q->idx].frame;
-                        moveData.grp_pos_info[i].pos_tag.data[4] = q->data[q->idx].user;
-
-                        memcpy(&moveData.grp_pos_info[i].pos, &q->data[q->idx].inc, sizeof(LONG) * MP_GRP_AXES_NUM);
-
-                        // increment index in the queue and decrease the count
-                        q->idx = Q_OFFSET_IDX(q->idx, 1, Q_SIZE);
-                        q->cnt--;
-
-                        // Check if complete interpolation period covered
-                        while (q->cnt > 0)
-                        {
-                            if ((q_time <= q->data[q->idx].time)
-                                && (q->data[q->idx].time - q_time <= g_Ros_Controller.interpolPeriod))
-                            {
-                                // next incMove is part of same interpolation period
-
-                                // check that information is in the same format
-                                if ((moveData.grp_pos_info[i].pos_tag.data[2] != q->data[q->idx].tool)
-                                    || (moveData.grp_pos_info[i].pos_tag.data[3] != q->data[q->idx].frame)
-                                    || (moveData.grp_pos_info[i].pos_tag.data[4] != q->data[q->idx].user))
-                                {
-                                    // Different format can't combine information
-                                    break;
-                                }
-
-                                // add next incMove to current incMove
-                                for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                                    moveData.grp_pos_info[i].pos[axis] += q->data[q->idx].inc[axis];
-                                inc_data_time = q->data[q->idx].time;
-
-                                // increment index in the queue and decrease the count
-                                q->idx = Q_OFFSET_IDX(q->idx, 1, Q_SIZE);
-                                q->cnt--;
-                            }
-                            else
-                            {
-                                // interpolation period complete
-                                break;
-                            }
-                        }
-
-                        g_Ros_Controller.ctrlGroups[i]->q_time = inc_data_time;
-                    }
-                    else
-                    {
-                        moveData.grp_pos_info[i].pos_tag.data[2] = 0;
-                        moveData.grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
-                        moveData.grp_pos_info[i].pos_tag.data[4] = 0;
-                        bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
-                    }
-
-                    // Unlock the q
-                    mpSemGive(q->q_lock);
+                    skipReadingQ[i] = FALSE;
+                    bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
                 }
                 else
                 {
-                    Ros_Debug_BroadcastMsg("ERROR: Can't get data from queue. Queue is locked up (Group #%d)", g_Ros_Controller.ctrlGroups[i]->groupNo);
-                    bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
-                    continue;
+                    q = &g_Ros_Controller.ctrlGroups[i]->inc_q;
+
+                    // Lock the q before manipulating it
+                    if (mpSemTake(q->q_lock, Q_LOCK_TIMEOUT) == OK)
+                    {
+                        if (q->cnt > 0)
+                        {
+                            inc_data_time = q->data[q->idx].time;
+                            q_time = g_Ros_Controller.ctrlGroups[i]->q_time;
+                            moveData.grp_pos_info[i].pos_tag.data[2] = q->data[q->idx].tool;
+                            moveData.grp_pos_info[i].pos_tag.data[3] = q->data[q->idx].frame;
+                            moveData.grp_pos_info[i].pos_tag.data[4] = q->data[q->idx].user;
+
+                            memcpy(&moveData.grp_pos_info[i].pos, &q->data[q->idx].inc, sizeof(LONG) * MP_GRP_AXES_NUM);
+                            queueRead[i] = TRUE;
+
+                            // increment index in the queue and decrease the count
+                            q->idx = Q_OFFSET_IDX(q->idx, 1, Q_SIZE);
+                            q->cnt--;
+
+                            // Check if complete interpolation period covered
+                            while (q->cnt > 0)
+                            {
+                                if ((q_time <= q->data[q->idx].time)
+                                    && (q->data[q->idx].time - q_time <= g_Ros_Controller.interpolPeriod))
+                                {
+                                    // next incMove is part of same interpolation period
+
+                                    // check that information is in the same format
+                                    if ((moveData.grp_pos_info[i].pos_tag.data[2] != q->data[q->idx].tool)
+                                        || (moveData.grp_pos_info[i].pos_tag.data[3] != q->data[q->idx].frame)
+                                        || (moveData.grp_pos_info[i].pos_tag.data[4] != q->data[q->idx].user))
+                                    {
+                                        // Different format can't combine information
+                                        break;
+                                    }
+
+                                    // add next incMove to current incMove
+                                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
+                                        moveData.grp_pos_info[i].pos[axis] += q->data[q->idx].inc[axis];
+                                    inc_data_time = q->data[q->idx].time;
+
+                                    // increment index in the queue and decrease the count
+                                    q->idx = Q_OFFSET_IDX(q->idx, 1, Q_SIZE);
+                                    q->cnt--;
+                                }
+                                else
+                                {
+                                    // interpolation period complete
+                                    break;
+                                }
+                            }
+
+                            g_Ros_Controller.ctrlGroups[i]->q_time = inc_data_time;
+                        }
+                        else
+                        {
+                            moveData.grp_pos_info[i].pos_tag.data[2] = 0;
+                            moveData.grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
+                            moveData.grp_pos_info[i].pos_tag.data[4] = 0;
+                            bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
+                        }
+
+                        // Unlock the q
+                        mpSemGive(q->q_lock);
+                    }
+                    else
+                    {
+                        Ros_Debug_BroadcastMsg("ERROR: Can't get data from queue. Queue is locked up (Group #%d)", g_Ros_Controller.ctrlGroups[i]->groupNo);
+                        bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
+                        continue;
+                    }
+                }
+            }
+
+            for (i = 0; i < g_Ros_Controller.numGroup; i++)
+            {
+                memcpy(newPulseInc[i], moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
+
+                // record the speed associate with the next amount of pulses
+                if (queueRead[i])
+                {
+                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
+                    {
+                        maxSpeed[i][axis] = abs(newPulseInc[i][axis]);
+                        maxSpeedRemain[i][axis] = abs(newPulseInc[i][axis]);
+                    }
+                }
+
+                // Check if pulses are missing from last increment
+                mpGetPulsePos(&ctrlGrpData, &pulsePosData);
+                isMissingPulse = FALSE;
+                for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
+                {
+                    // Check how many pulses we processed from last increment
+                    processedPulses[axis] = pulsePosData.lPos[axis] - g_Ros_Controller.ctrlGroups[i]->prevPulsePosData[axis];
+                    g_Ros_Controller.ctrlGroups[i]->prevPulsePosData[axis] = pulsePosData.lPos[axis];
+
+                    // Remove those pulses from the amount to process.  
+                    // If everything was processed, then there should by 0 pulses left. Otherwise FSU Speed limit prevented processing
+                    toProcessPulses[i][axis] -= processedPulses[axis];
+                    if (toProcessPulses[i][axis] != 0)
+                        isMissingPulse = TRUE;
+
+                    // Add the new pulses to be processed for this iteration 
+                    toProcessPulses[i][axis] += newPulseInc[i][axis];
+
+                    if (toProcessPulses[i][axis] != 0)
+                        hasUnprocessedData = TRUE;
+                }
+
+                if (isMissingPulse)
+                {
+                    UINT64 max_inc;
+
+                    // Prevent going faster than original requested speed once speed limit turns off
+                    // Check if the speed (inc) of previous interation should be considered by checking 
+                    // if the unprocessed pulses from that speed setting still remains.
+                    // If all the pulses of previous increment were processed, then transfer the current 
+                    // speed and process the next increment from the increment queue.
+                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
+                    {
+                        // Check if has pulses to process
+                        if (toProcessPulses[i][axis] == 0)
+                            prevMaxSpeedRemain[i][axis] = 0;
+                        else
+                            prevMaxSpeedRemain[i][axis] = abs(prevMaxSpeedRemain[i][axis]) - abs(processedPulses[axis]);
+                    }
+
+                    // Check if still have data to process from previous iteration
+                    skipReadingQ[i] = FALSE;
+                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
+                    {
+                        if (prevMaxSpeedRemain[i][axis] > 0)
+                            skipReadingQ[i] = TRUE;
+                    }
+
+                    if (!skipReadingQ[i]) {
+                        for (axis = 0; axis < MP_GRP_AXES_NUM; axis++) {
+                            // Transfer the current speed as the new prevSpeed
+                            prevMaxSpeed[i][axis] = maxSpeed[i][axis];
+                            prevMaxSpeedRemain[i][axis] += maxSpeedRemain[i][axis];
+                        }
+                    }
+
+                    // Set the number of pulse that can be sent without exceeding speed
+                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
+                    {
+                        // Check if has pulses to process
+                        if (toProcessPulses[i][axis] == 0)
+                            continue;
+
+                        // Maximum inc that should be send ()
+                        if (prevMaxSpeed[i][axis] > 0)
+                            // if previous speed is defined use it
+                            max_inc = prevMaxSpeed[i][axis];
+                        else
+                        {
+                            if (maxSpeed[i][axis] > 0)
+                                // else fallback on current speed if defined
+                                max_inc = maxSpeed[i][axis];
+                            else if (newPulseInc[i][axis] != 0)
+                                // use the current speed if none zero.
+                                max_inc = abs(newPulseInc[i][axis]);
+                            else
+                                // otherwise use the axis max speed
+                                max_inc = g_Ros_Controller.ctrlGroups[i]->maxInc.maxIncrement[axis];
+
+                            if(max_inc > 1)
+                                Ros_Debug_BroadcastMsg("Warning undefined speed: Axis %d Defaulting Max Inc: %d (prevSpeed: %d curSpeed %d)\r\n",
+                                axis, max_inc, prevMaxSpeed[i][axis], maxSpeed[i][axis]);
+
+                        }
+
+                        // Set new increment and recalculate unsent pulses
+                        if (abs(toProcessPulses[i][axis]) <= max_inc)
+                        {
+                            // Pulses to send is small than max, so send everything
+                            moveData.grp_pos_info[i].pos[axis] = toProcessPulses[i][axis];
+                        }
+                        else {
+                            // Pulses to send is too high, so send the amount matching the maximum speed
+                            if (toProcessPulses[i][axis] >= 0)
+                                moveData.grp_pos_info[i].pos[axis] = max_inc;
+                            else
+                                moveData.grp_pos_info[i].pos[axis] = -max_inc;
+                        }
+                    }
+                }
+                else
+                {
+                    // No PFL Speed Limit detected
+                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
+                    {
+                        prevMaxSpeed[i][axis] = abs(moveData.grp_pos_info[i].pos[axis]);
+                        prevMaxSpeedRemain[i][axis] = abs(moveData.grp_pos_info[i].pos[axis]);
+                    }
                 }
             }
 
