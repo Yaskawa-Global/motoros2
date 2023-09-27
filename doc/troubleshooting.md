@@ -1050,7 +1050,7 @@ Check the following robot parameters on the teach pendant and make sure they are
 If that does not resolve the issue, please contact Yaskawa technical support for assistance.
 Include a copy of the `ALL.PRM` and `CMOS.BIN` from your robot controller.
 
-### Alarm: 8015[1] - [4]
+### Alarm: 8015[1 - 4]
 
 *Example:*
 

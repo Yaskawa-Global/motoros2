@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2023, Yaskawa America, Inc.
+# SPDX-FileCopyrightText: 2023, Delft University of Technology
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: "CI: lint alarm subcode docs"
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python (3.8)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install mistletoe==1.2.1 pycparser==2.21
+      - name: Register GCC problem matcher
+        run: echo "::add-matcher::.github/matchers/gcc.json"
+      - name: Check alarm subcode documentation
+        run: |
+          python \
+            .ci/alarm_subcode_doc_linter.py \
+              --check-all \
+              --ignore-enum Failed_Trajectory_Status \
+              --ignore-enum Init_Trajectory_Status \
+              --ignore-enum MotionNotReadyCode \
+              src/ErrorHandling.h \
+              doc/troubleshooting.md
