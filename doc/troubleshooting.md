@@ -846,7 +846,7 @@ This must be set to an integer value between `1` and `100` milliseconds.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
-### Alarm: 8013[8] or [9]
+### Alarm: 8013[8] - [9]
 
 *Example:*
 
@@ -862,7 +862,7 @@ A maximum of 16 rules may be specified.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
-### Alarm: 8013[10] or [11]
+### Alarm: 8013[10] - [11]
 
 *Example:*
 
