@@ -320,6 +320,10 @@ rcl_ret_t Ros_ActionServer_FJT_Goal_Received(rclc_action_goal_handle_t* goal_han
                 rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
                     "The final point in the trajectory must have zero acceleration.");
                 break;
+            case INIT_TRAJ_DUPLICATE_JOINT_NAME:
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
+                    "The trajectory contains duplicate joint names.");
+                break;
             default:
                 rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
                     "Trajectory initialization failed. Generic failure.");

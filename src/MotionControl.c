@@ -31,7 +31,7 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
 {
     long pulsePos[MAX_PULSE_AXES];
     long curPos[MAX_PULSE_AXES];
-    int grpIndex, jointIndexInTraj, pointIndex;
+    int grpIndex, jointIndexInTraj, pointIndex, checkForDupIndex;
 
     //Verify we're not already running a trajectory
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
@@ -94,6 +94,17 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
         int  jointIndexInCtrlGroup;
         CtrlGroup* ctrlGroup;
 
+        //check to ensure there are no duplicate joint names in the list
+        for (checkForDupIndex = jointIndexInTraj; checkForDupIndex < sequenceGoalJointNames->size; checkForDupIndex += 1)
+        {
+            if (strncmp(sequenceGoalJointNames->data[jointIndexInTraj].data,
+                sequenceGoalJointNames->data[checkForDupIndex].data,
+                MAX_JOINT_NAME_LENGTH) == 0)
+            {
+                Ros_Debug_BroadcastMsg("Joint name [%s] is used for multiple joints in the trajectory.", sequenceGoalJointNames->data[jointIndexInTraj].data);
+                return INIT_TRAJ_DUPLICATE_JOINT_NAME;
+            }
+        }
 
         //find the ctrlgroup for this joint
         BOOL bFound = FALSE;
