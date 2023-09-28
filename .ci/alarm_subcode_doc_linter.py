@@ -243,7 +243,7 @@ def collapse_heading_children(headings):
     return [c["children"][0]["content"] for c in headings]
 
 
-alm_re = re.compile(r"\b(?:(\d{4})\[(?:(\d+)|(xx)|(\d+) \- (\d+))\])")
+alm_re = re.compile(r"\b(?:(\d{4})(?:\[(\d+)\]|\[(xx)\]|\[(\d+) \- (\d+)\]))$")
 
 
 def parse_alarm_code_with_subcode(subcode_spec) -> AlarmWithSubcodeRange:
