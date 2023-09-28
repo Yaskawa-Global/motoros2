@@ -74,12 +74,12 @@ const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCo
     }
 }
 
-void motoRosAssert(BOOL mustBeTrue, ASSERTION_SUBCODE subCodeIfFalse)
+void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
 {
     motoRosAssert_withMsg(mustBeTrue, subCodeIfFalse, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRosAssert_withMsg(BOOL mustBeTrue, ASSERTION_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
+void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
 {
     const int MAX_MSG_LEN = 32;
     char msg[MAX_MSG_LEN];
