@@ -251,8 +251,13 @@ def parse_alarm_code_with_subcode(subcode_spec) -> AlarmWithSubcodeRange:
     turns "8010[1]", "8010[xx]" or "8010[1 - 2]"
     into
     (8010, 1, 1), (8010, 0, 65535) or (8010, 1, 2)
+
+    "8010[1] or [2]" and "8010[1 or 2]" will fail to parse and cause this method to return None.
     """
     groups = alm_re.findall(subcode_spec)
+    if not groups:
+        return None
+
     code, subcode_n, subcode_a, sc_range_s, sc_range_e = groups[0]
 
     def to_subcode_range(code, r_s, r_e):
@@ -264,7 +269,6 @@ def parse_alarm_code_with_subcode(subcode_spec) -> AlarmWithSubcodeRange:
         return to_subcode_range(code, SC_RANGE_MIN, SC_RANGE_MAX)
     if code and subcode_n:
         return to_subcode_range(code, subcode_n, subcode_n)
-    raise ValueError(f"Failed to parse range spec: '{subcode_spec}'")
 
 
 def find_subcode_doc(
