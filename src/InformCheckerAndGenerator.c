@@ -262,6 +262,9 @@ BOOL Ros_InformChecker_CheckInformLines(int fdJob)
         //instruction line doesn't match
         if (strncmp(lineBuffer, rosInitJobLines[lineIndex], MAX_JOB_LINE_LENGTH) != 0)
         {
+            //note: job lines are 0-indexed
+            Ros_Debug_BroadcastMsg("%s: mismatch: line %d, expected: '%s', got: '%s'",
+                __func__, lineIndex, rosInitJobLines[lineIndex], lineBuffer);
             bJobOk = FALSE;
             break;
         }
