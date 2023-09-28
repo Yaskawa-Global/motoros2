@@ -101,7 +101,7 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
                 sequenceGoalJointNames->data[checkForDupIndex].data,
                 MAX_JOINT_NAME_LENGTH) == 0)
             {
-                Ros_Debug_BroadcastMsg("Joint name [%s] is used for multiple joints in the trajectory.", sequenceGoalJointNames->data[jointIndexInTraj].data);
+                Ros_Debug_BroadcastMsg("Joint name [%s] is used for multiple joints in the trajectory (indices: %d and %d).", sequenceGoalJointNames->data[jointIndexInTraj].data, jointIndexInTraj, checkForDupIndex);
                 return INIT_TRAJ_DUPLICATE_JOINT_NAME;
             }
         }
