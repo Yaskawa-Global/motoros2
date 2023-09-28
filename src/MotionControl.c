@@ -95,7 +95,7 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
         CtrlGroup* ctrlGroup;
 
         //check to ensure there are no duplicate joint names in the list
-        for (checkForDupIndex = jointIndexInTraj; checkForDupIndex < sequenceGoalJointNames->size; checkForDupIndex += 1)
+        for (checkForDupIndex = (jointIndexInTraj + 1); checkForDupIndex < sequenceGoalJointNames->size; checkForDupIndex += 1)
         {
             if (strncmp(sequenceGoalJointNames->data[jointIndexInTraj].data,
                 sequenceGoalJointNames->data[checkForDupIndex].data,
