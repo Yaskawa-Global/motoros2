@@ -114,9 +114,13 @@ def main():
     )
 
     # retrieve subcode documentation from Markdown document
-    alarm_docs: list[AlarmWithSubcodeRange] = get_alarm_docs(
+    alarm_docs, failed_to_parse = get_alarm_docs(
         md_file=args.md_file, no_catch_alls=args.no_catch_alls
     )
+
+    for line_nr, h in failed_to_parse:
+        # NOTE: +1 as line_nr is 0-based, but we need to report 1-based
+        print(f"{args.md_file}:{line_nr+1}:0: error: failed to parse '{h}'")
 
     # for each subcode enum member, check there's a troubleshooting section documenting it
     ret = 0
@@ -217,9 +221,20 @@ def ast_enum_to_list(node: c_ast.Enum, alarm_name: str, alarm_code: int) -> list
 def get_alarm_docs(md_file: str, no_catch_alls: bool) -> list[AlarmWithSubcodeRange]:
     # load Md doc with all alarm codes we document
     with open(md_file, "r") as fin:
-        d = Document(fin.readlines())
+        lines = fin.readlines()
+        d = Document(lines)
     md_doc = ast_renderer.get_ast(d)
     headings = collapse_heading_children(get_headings_at_lvl(md_doc))
+
+    # extract (line nr, heading) pairs to use later in case of parsing errors.
+    # Mistletoe doesn't provide this yet (miyuchina/mistletoe#144), so just search for
+    # the heading string in the input document
+    hs_with_line_nrs = [
+        (nr, h)
+        for nr, h in enumerate(lines)
+        # NOTE: we assume headings we're interested in are level-3 headings
+        if h.startswith(f"### {ALARM_HEADING_PREFIX} ")
+    ]
 
     # keep only those headings with text of the form "Alarm: nnnn[..]"
     headings = [h for h in headings if h.startswith(ALARM_HEADING_PREFIX)]
@@ -229,7 +244,17 @@ def get_alarm_docs(md_file: str, no_catch_alls: bool) -> list[AlarmWithSubcodeRa
         headings = [h for h in headings if not CATCHALL_RANGE_MARKER in h]
 
     # parse them into tuples
-    return [parse_alarm_code_with_subcode(h) for h in headings]
+    ret = []
+    failed_to_parse = []
+    for heading in headings:
+        parsed = parse_alarm_code_with_subcode(heading)
+        if parsed:
+            ret.append(parsed)
+        else:
+            line_nr = find_heading_line_nr(heading, hs_with_line_nrs)
+            # TODO: find_heading_line_nr(..) might return -1
+            failed_to_parse.append((line_nr, heading))
+    return (ret, failed_to_parse)
 
 
 def get_headings_at_lvl(doc, level=3):
@@ -269,6 +294,14 @@ def parse_alarm_code_with_subcode(subcode_spec) -> AlarmWithSubcodeRange:
         return to_subcode_range(code, SC_RANGE_MIN, SC_RANGE_MAX)
     if code and subcode_n:
         return to_subcode_range(code, subcode_n, subcode_n)
+
+
+def find_heading_line_nr(heading: str, hs_with_line_nrs: list[int, str]) -> int:
+    # naive 'search'
+    for line_nr, h in hs_with_line_nrs:
+        if heading in h:
+            return line_nr
+    return -1
 
 
 def find_subcode_doc(
