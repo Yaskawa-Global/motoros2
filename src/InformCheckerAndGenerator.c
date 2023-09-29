@@ -15,7 +15,13 @@ const char* rosInitJobLines[] =
     "NOP",
     "DOUT OT#(890) OFF",
     "DOUT OT#(889) OFF",
+#if defined(YRC1000) || defined(DX200) //DX2 and YRC use two digit precision on the TIMER
     "TIMER T=0.05",
+#elif defined(YRC1000u) || defined(FS100) //FS and YRCu use three digit precision on the TIMER
+    "TIMER T=0.050",
+#else
+#error Validate the precision of the TIMER instruction on the teach pendant and update this accordingly
+#endif
     "DOUT OT#(889) ON",
     "WAIT OT#(890)=ON",
     "DOUT OT#(890) OFF",
