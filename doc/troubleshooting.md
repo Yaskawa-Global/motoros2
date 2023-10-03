@@ -989,6 +989,39 @@ If the behavior persists, save a copy of the output of the [debug-listener scrip
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
+### Alarm: 8013[16]
+
+*Example:*
+
+```text
+ALARM 8013
+ No calibration: check TF
+[16]
+```
+
+*Solution:*
+MotoROS2 was unable to load any kinematic calibration data during initialisation.
+This calibration data is used to update the origins of TF frames broadcast by MotoROS2 if TF broadcasts are enabled.
+
+Without (valid) calibration data the origins of distinct TF trees might overlap (see [Incorrect transform tree origin with multi-robot setups](../README.md#incorrect-transform-tree-origin-with-multi-robot-setups)), creating potentially dangerous situations when that TF data is consumed by applications which for example use it for collision avoidance motion planning.
+
+This alarm is only raised if all of the following conditions are true:
+
+1. MotoROS2 is configured to broadcast TF (`publish_tf` is `true`)
+1. the controller is configured with multiple motion groups (ie: multiple robots)
+1. none of the motion groups have been calibrated against each other
+
+The alarm can be prevented by performing (robot) group calibration or by disabling TF broadcasts (set `publish_tf` to `false`).
+
+In case TF broadcasting for uncalibrated multi-group systems is still desired, the alarm can be disabled by setting the `ignore_missing_calib_data` item in the MotoROS2 configuration to `true` (default is: `false`).
+When disabling the alarm, make absolutely sure consuming applications are capable of disambiguating potentially overlapping TF trees.
+
+In case of any updates to the configuration file, [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+In case the alarm is still raised after calibration was performed, TF broadcasting was disabled and/or the alarm was disabled, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
 ### Alarm: 8014[0]
 
 *Example:*
