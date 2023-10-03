@@ -725,6 +725,22 @@ BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup)
 }
 
 //-------------------------------------------------------------------
+// Returns TRUE if the specified group is defined as a base
+//-------------------------------------------------------------------
+BOOL Ros_CtrlGroup_IsBase(CtrlGroup const* const ctrlGroup)
+{
+    return ((ctrlGroup->groupId >= MP_B1_GID) && (ctrlGroup->groupId <= MP_B8_GID));
+}
+
+//-------------------------------------------------------------------
+// Returns TRUE if the specified group is defined as a station
+//-------------------------------------------------------------------
+BOOL Ros_CtrlGroup_IsStation(CtrlGroup const* const ctrlGroup)
+{
+    return ((ctrlGroup->groupId >= MP_S1_GID) && (ctrlGroup->groupId <= MP_S24_GID));
+}
+
+//-------------------------------------------------------------------
 // Returns TRUE if the specified axis in the provided group is an
 // invalid one (ie: set to AXIS_INVALID)
 //-------------------------------------------------------------------
