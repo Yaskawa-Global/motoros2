@@ -11,6 +11,9 @@ Controller g_Ros_Controller;
 ControllerStatus_Publishers g_publishers_RobotStatus;
 ControllerStatus_Messages g_messages_RobotStatus;
 
+//'private' APIs
+static BOOL Ros_Controller_LoadGroupCalibrationData(Controller* const controller);
+
 //-------------------------------------------------------------------
 // Wait for the controller to be ready to start initialization
 //-------------------------------------------------------------------
@@ -34,7 +37,6 @@ BOOL Ros_Controller_WaitInitReady()
 BOOL Ros_Controller_Initialize()
 {
     int groupIndex;
-    int i;
     BOOL bInitOk;
     STATUS status;
 
@@ -114,25 +116,7 @@ BOOL Ros_Controller_Initialize()
     }
 
     //get the robot calibration data for multi-robot systems
-    for (i = 0; i < MAX_ROBOT_CALIBRATION_FILES; i += 1)
-    {
-        MP_RB_CALIB_DATA calibData;
-        if (Ros_mpGetRobotCalibrationData(i, &calibData) == OK)
-        {
-            if (calibData.s_rb.grp_no <= MP_R8_GID && //the slave is a robot
-                calibData.m_rb.grp_no <= MP_R8_GID) //the master is another robot's RF
-            {
-                groupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)calibData.s_rb.grp_no);
-                MP_COORD* coord = &g_Ros_Controller.ctrlGroups[groupIndex]->robotCalibrationToBaseFrame;
-                coord->x = calibData.pos_uow[0];
-                coord->y = calibData.pos_uow[1];
-                coord->z = calibData.pos_uow[2];
-                coord->rx = calibData.ang_uow[0];
-                coord->ry = calibData.ang_uow[1];
-                coord->rz = calibData.ang_uow[2];
-            }
-        }
-    }
+    Ros_Controller_LoadGroupCalibrationData(&g_Ros_Controller);
 
 #ifdef DEBUG
     Ros_Debug_BroadcastMsg("g_Ros_Controller.numRobot = %d", g_Ros_Controller.numRobot);
@@ -750,4 +734,32 @@ int Ros_Controller_GetActiveAlarmCodes(USHORT active_alarms[MAX_ALARM_COUNT + MA
     }
 
     return num_entries;
+}
+
+/**
+ * Attempt to load on-controller extrinsic kinematic calibration data to improve
+ * accuracy of TF broadcasts (for frames for which such calibration data exists).
+*/
+static BOOL Ros_Controller_LoadGroupCalibrationData(Controller* const controller)
+{
+    for (int i = 0; i < MAX_ROBOT_CALIBRATION_FILES; i += 1)
+    {
+        MP_RB_CALIB_DATA calibData;
+        if (Ros_mpGetRobotCalibrationData(i, &calibData) == OK)
+        {
+            if (calibData.s_rb.grp_no <= MP_R8_GID && //the slave is a robot
+                calibData.m_rb.grp_no <= MP_R8_GID) //the master is another robot's RF
+            {
+                int groupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)calibData.s_rb.grp_no);
+                MP_COORD* coord = &controller->ctrlGroups[groupIndex]->robotCalibrationToBaseFrame;
+                coord->x = calibData.pos_uow[0];
+                coord->y = calibData.pos_uow[1];
+                coord->z = calibData.pos_uow[2];
+                coord->rx = calibData.ang_uow[0];
+                coord->ry = calibData.ang_uow[1];
+                coord->rz = calibData.ang_uow[2];
+            }
+        }
+    }
+    return TRUE;
 }
