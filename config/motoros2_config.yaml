@@ -268,3 +268,19 @@ publisher_qos:
 #
 # DEFAULT: false
 #allow_custom_inform: false
+
+#-----------------------------------------------------------------------------
+# Ignore missing calibration data on multi-group systems with TF broadcast
+# enabled.
+#
+# MotoROS2 will raise an alarm (8013[16]) on a multi-group controller if it
+# is unable to load any calibration data and broadcasting of TF frames is
+# enabled.
+# This calibration data is needed to correctly disambiguate multiple distinct
+# TF trees which would otherwise potentially (partially) overlap each other.
+#
+# Set this flag to 'true' to prevent the alarm from being raised, for instance
+# in cases where uncalibrated multi-group systems should still broadcast TF.
+#
+# DEFAULT: false
+#ignore_missing_calib_data: false
