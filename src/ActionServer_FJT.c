@@ -417,7 +417,7 @@ void Ros_ActionServer_FJT_UpdateProgressTracker(MP_EXPOS_DATA* incrementData)
         Ros_CtrlGroup_ConvertToRosPos(ctrlGroup, incrementData->grp_pos_info[groupIndex].pos, radRosOrder);
 
         for (int i = 0; i < ctrlGroup->numAxes; i += 1, iteratorAllAxes += 1)
-            feedback_FollowJointTrajectory.feedback.desired.positions.data[iteratorAllAxes] += radRosOrder[i];
+            feedback_FollowJointTrajectory.feedback.desired.positions.data[iteratorAllAxes] = feedback_FollowJointTrajectory.feedback.actual.positions.data[iteratorAllAxes] + radRosOrder[i];
     }
 }
 
