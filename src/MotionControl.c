@@ -748,6 +748,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     int axis;
 
     MP_CTRL_GRP_SEND_DATA ctrlGrpData;
+    MP_PULSE_POS_RSP_DATA prevPulsePosData[MAX_CONTROLLABLE_GROUPS];
     MP_PULSE_POS_RSP_DATA pulsePosData;
 
     LONG newPulseInc[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];		// Pulse increments that we just retrieved from the incQueue
@@ -785,6 +786,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     {
         moveData.ctrl_grp |= (0x01 << i);
         moveData.grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
+        mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
     }
 
     FOREVER
@@ -900,8 +902,8 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                 for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
                 {
                     // Check how many pulses we processed from last increment
-                    processedPulses[axis] = pulsePosData.lPos[axis] - g_Ros_Controller.ctrlGroups[i]->prevPulsePosData[axis];
-                    g_Ros_Controller.ctrlGroups[i]->prevPulsePosData[axis] = pulsePosData.lPos[axis];
+                    processedPulses[axis] = pulsePosData.lPos[axis] - prevPulsePosData[i].lPos[axis];
+                    prevPulsePosData[i].lPos[axis] = pulsePosData.lPos[axis];
 
                     // Remove those pulses from the amount to process.  
                     // If everything was processed, then there should by 0 pulses left. Otherwise FSU Speed limit prevented processing
@@ -1068,6 +1070,16 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                     Ros_MotionControl_StopMotion(/*bKeepJobRunning = */ FALSE);
                     Ros_Debug_BroadcastMsg("Stopping all motion");
                 }
+            }
+        }
+        else
+        {
+            // Reset previous position in case the robot is moved externally
+            memset(toProcessPulses, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+            hasUnprocessedData = FALSE;
+            for (i = 0; i < g_Ros_Controller.numGroup; i++)
+            {
+                mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
             }
         }
     }
