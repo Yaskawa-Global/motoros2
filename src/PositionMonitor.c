@@ -295,16 +295,14 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
         {
             switch (group->baseTrackInfo.motionType[i])
             {
-            case MOTION_TYPE_X: coordTrackTravel.x = track_pos_meters[i]; break;
-            case MOTION_TYPE_Y: coordTrackTravel.y = track_pos_meters[i]; break;
-            case MOTION_TYPE_Z: coordTrackTravel.z = track_pos_meters[i]; break;
-            case MOTION_TYPE_RX: coordTrackTravel.rx = track_pos_meters[i]; break;
-            case MOTION_TYPE_RY: coordTrackTravel.ry = track_pos_meters[i]; break;
-            case MOTION_TYPE_RZ: coordTrackTravel.rz = track_pos_meters[i]; break;
+            case MOTION_TYPE_X: coordTrackTravel.x = METERS_TO_MICROMETERS(track_pos_meters[i]); break;
+            case MOTION_TYPE_Y: coordTrackTravel.y = METERS_TO_MICROMETERS(track_pos_meters[i]); break;
+            case MOTION_TYPE_Z: coordTrackTravel.z = METERS_TO_MICROMETERS(track_pos_meters[i]); break;
+            case MOTION_TYPE_RX: coordTrackTravel.rx = RAD_TO_DEG_0001(track_pos_meters[i]); break;
+            case MOTION_TYPE_RY: coordTrackTravel.ry = RAD_TO_DEG_0001(track_pos_meters[i]); break;
+            case MOTION_TYPE_RZ: coordTrackTravel.rz = RAD_TO_DEG_0001(track_pos_meters[i]); break;
             }
         }
-        Ros_Debug_BroadcastMsg("coordTrackTravel.x = %.3f", coordTrackTravel.x);
-        Ros_Debug_BroadcastMsg("coordTrackTravel.y = %.3f", coordTrackTravel.y);
         mpZYXeulerToFrame(&coordWorldToBase, &frameWorldToTrack);
         mpZYXeulerToFrame(&coordTrackTravel, &frameTrackTravel);
         mpZYXeulerToFrame(&group->baseTrackInfo.offsetFromBaseToRobotOrigin, &frameTrackToRobot);
