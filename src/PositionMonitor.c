@@ -303,6 +303,8 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
             case MOTION_TYPE_RZ: coordTrackTravel.rz = track_pos_meters[i]; break;
             }
         }
+        Ros_Debug_BroadcastMsg("coordTrackTravel.x = %.3f", coordTrackTravel.x);
+        Ros_Debug_BroadcastMsg("coordTrackTravel.y = %.3f", coordTrackTravel.y);
         mpZYXeulerToFrame(&coordWorldToBase, &frameWorldToTrack);
         mpZYXeulerToFrame(&coordTrackTravel, &frameTrackTravel);
         mpZYXeulerToFrame(&group->baseTrackInfo.offsetFromBaseToRobotOrigin, &frameTrackToRobot);
@@ -314,9 +316,9 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     }
 
     geometry_msgs__msg__Transform* transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_WorldToBase].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordWorldToBase.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordWorldToBase.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordWorldToBase.z);
+    transform->translation.x = MICROMETERS_TO_METERS(coordWorldToBase.x);
+    transform->translation.y = MICROMETERS_TO_METERS(coordWorldToBase.y);
+    transform->translation.z = MICROMETERS_TO_METERS(coordWorldToBase.z);
     QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordWorldToBase.rx, coordWorldToBase.ry, coordWorldToBase.rz, &transform->rotation);
 
     //============================
@@ -374,21 +376,21 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     //=======================
 
     transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_BaseToFlange].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordBaseToFlange.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordBaseToFlange.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordBaseToFlange.z);
+    transform->translation.x = MICROMETERS_TO_METERS(coordBaseToFlange.x);
+    transform->translation.y = MICROMETERS_TO_METERS(coordBaseToFlange.y);
+    transform->translation.z = MICROMETERS_TO_METERS(coordBaseToFlange.z);
     QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordBaseToFlange.rx, coordBaseToFlange.ry, coordBaseToFlange.rz, &transform->rotation);
 
     transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTool0].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordFlangeToTool0.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordFlangeToTool0.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordFlangeToTool0.z);
+    transform->translation.x = MICROMETERS_TO_METERS(coordFlangeToTool0.x);
+    transform->translation.y = MICROMETERS_TO_METERS(coordFlangeToTool0.y);
+    transform->translation.z = MICROMETERS_TO_METERS(coordFlangeToTool0.z);
     QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordFlangeToTool0.rx, coordFlangeToTool0.ry, coordFlangeToTool0.rz, &transform->rotation);
 
     transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTcp].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordToolData.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordToolData.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordToolData.z);
+    transform->translation.x = MICROMETERS_TO_METERS(coordToolData.x);
+    transform->translation.y = MICROMETERS_TO_METERS(coordToolData.y);
+    transform->translation.z = MICROMETERS_TO_METERS(coordToolData.z);
     QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordToolData.rx, coordToolData.ry, coordToolData.rz, &transform->rotation);
 }
 

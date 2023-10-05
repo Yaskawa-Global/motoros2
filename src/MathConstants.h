@@ -16,7 +16,7 @@
 #define DEGREES_PER_RAD (57.295779513082)
 
 // macro
-#define NANOMETERS_TO_METERS(x)    (x * 0.000001)
+#define MICROMETERS_TO_METERS(x)    (x * 0.000001)
 
 // used for comparing floating point values
 #define EPSILON_TOLERANCE_DOUBLE (0.001)
