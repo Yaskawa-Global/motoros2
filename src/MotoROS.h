@@ -100,6 +100,7 @@
 #include "TimeConversionUtils.h"
 #include "Tests_CtrlGroup.h"
 #include "Tests_TestUtils.h"
+#include "Tests_RosMotoPlusConversionUtils.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"

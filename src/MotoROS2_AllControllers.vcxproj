@@ -345,6 +345,7 @@
     <ClCompile Include="ServiceSelectMotionTool.c" />
     <ClCompile Include="Tests_CtrlGroup.c" />
     <ClCompile Include="Tests_TestUtils.c" />
+    <ClCompile Include="Tests_RosMotoPlusConversionUtils.c" />
     <ClCompile Include="MotionControl.c" />
     <ClCompile Include="ActionServer_FJT.c" />
     <ClCompile Include="main.c" />
@@ -376,6 +377,7 @@
     <ClInclude Include="ServiceSelectMotionTool.h" />
     <ClInclude Include="Tests_CtrlGroup.h" />
     <ClInclude Include="Tests_TestUtils.h" />
+    <ClInclude Include="Tests_RosMotoPlusConversionUtils.h" />
     <ClInclude Include="TimeConversionUtils.h" />
     <ClInclude Include="MotionControl.h" />
     <ClInclude Include="ActionServer_FJT.h" />

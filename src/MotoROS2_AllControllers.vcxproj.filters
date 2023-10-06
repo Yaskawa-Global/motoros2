@@ -309,6 +309,9 @@
     <ClCompile Include="Tests_TestUtils.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_RosMotoPlusConversionUtils.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
     <ClCompile Include="InformCheckerAndGenerator.c">
       <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
@@ -345,6 +348,9 @@
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
     <ClInclude Include="Tests_TestUtils.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_RosMotoPlusConversionUtils.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
     <ClInclude Include="ConfigFile.h">
