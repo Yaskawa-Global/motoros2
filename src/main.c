@@ -68,7 +68,10 @@ void RosInitTask()
 
 #ifdef MOTOROS2_TESTING_ENABLE
     Ros_Debug_BroadcastMsg("Performing unit tests");
-    Ros_Testing_CtrlGroup() ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
+    BOOL bTestResult = TRUE;
+    bTestResult &= Ros_Testing_CtrlGroup();
+    bTestResult &= Ros_Testing_RosMotoPlusConversionUtils();
+    bTestResult ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
 #endif
 
     Ros_ConfigFile_Parse();
