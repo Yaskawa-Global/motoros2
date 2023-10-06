@@ -50,6 +50,7 @@
 //============================================
 #include <std_srvs/srv/trigger.h>
 #include <sensor_msgs/msg/joint_state.h>
+#include <geometry_msgs/msg/pose_stamped.h>
 #include <geometry_msgs/msg/transform_stamped.h>
 #include <geometry_msgs/msg/quaternion.h>
 #include <tf2_msgs/msg/tf_message.h>
@@ -69,6 +70,7 @@
 #include <motoros2_interfaces/srv/start_point_queue_mode.h>
 #include <motoros2_interfaces/srv/queue_traj_point.h>
 #include <motoros2_interfaces/srv/select_motion_tool.h>
+#include <motoros2_interfaces/srv/get_position_fk.h>
 
 //============================================
 // MotoROS
@@ -93,6 +95,7 @@
 #include "ServiceStartPointQueueMode.h"
 #include "ServiceStopTrajMode.h"
 #include "ServiceSelectMotionTool.h"
+#include "ServiceGetPositionFK.h"
 #include "MotionControl.h"
 #include "ConfigFile.h"
 #include "RosApiNameConstants.h"
