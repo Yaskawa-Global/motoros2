@@ -321,6 +321,9 @@
     <ClCompile Include="Ros_mpGetRobotCalibrationData.c">
       <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
+    <ClCompile Include="RosMotoPlusConversionUtils.c">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
@@ -399,6 +402,9 @@
       <Filter>MotoPlus Libraries</Filter>
     </ClInclude>
     <ClInclude Include="TimeConversionUtils.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="RosMotoPlusConversionUtils.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="MotoPlusExterns.h">
