@@ -99,6 +99,7 @@
 #include "RosApiNameConstants.h"
 #include "TimeConversionUtils.h"
 #include "Tests_CtrlGroup.h"
+#include "Tests_TestUtils.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"

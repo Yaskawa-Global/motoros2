@@ -306,6 +306,9 @@
     <ClCompile Include="Tests_CtrlGroup.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_TestUtils.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
     <ClCompile Include="InformCheckerAndGenerator.c">
       <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
@@ -339,6 +342,9 @@
       <Filter>Header Files\Executors</Filter>
     </ClInclude>
     <ClInclude Include="Tests_CtrlGroup.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_TestUtils.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
     <ClInclude Include="ConfigFile.h">
