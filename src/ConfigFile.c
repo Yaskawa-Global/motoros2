@@ -108,6 +108,7 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "publish_tf", &g_nodeConfigSettings.publish_tf, Value_Bool },
     { "joint_names", &joint_names_iterator, Value_JointNameArray },
     { "log_to_stdout", &g_nodeConfigSettings.log_to_stdout, Value_Bool },
+    { "log_to_rosout", &g_nodeConfigSettings.log_to_rosout, Value_Bool },
     { "executor_sleep_period", &g_nodeConfigSettings.executor_sleep_period, Value_Int },
     { "action_feedback_publisher_period", &g_nodeConfigSettings.action_feedback_publisher_period, Value_Int },
     { "controller_status_monitor_period", &g_nodeConfigSettings.controller_status_monitor_period, Value_Int },
@@ -194,6 +195,10 @@ void Ros_ConfigFile_SetAllDefaultValues()
     //=========
     //log_to_stdout
     g_nodeConfigSettings.log_to_stdout = DEFAULT_LOG_TO_STDOUT;
+
+    //=========
+    //log_to_rosout
+    g_nodeConfigSettings.log_to_rosout = DEFAULT_LOG_TO_ROSOUT;
 
     //=========
     //executor_sleep_period

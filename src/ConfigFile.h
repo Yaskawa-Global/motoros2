@@ -36,6 +36,7 @@
 #define DEFAULT_JOINT_NAME_FMT          "group_%d/joint_%d"
 
 #define DEFAULT_LOG_TO_STDOUT           FALSE
+#define DEFAULT_LOG_TO_ROSOUT           FALSE
 
 #define DEFAULT_EXECUTOR_SLEEP_PERIOD   10 //ms
 #define MIN_EXECUTOR_SLEEP_PERIOD       1
@@ -118,6 +119,7 @@ typedef struct
     char joint_names[MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM][MAX_JOINT_NAME_LENGTH];
 
     BOOL log_to_stdout;
+    BOOL log_to_rosout;
 
     int executor_sleep_period;
     int action_feedback_publisher_period;
