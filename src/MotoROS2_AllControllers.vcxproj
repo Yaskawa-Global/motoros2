@@ -344,6 +344,8 @@
     <ClCompile Include="ServiceStartTrajMode.c" />
     <ClCompile Include="ServiceSelectMotionTool.c" />
     <ClCompile Include="Tests_CtrlGroup.c" />
+    <ClCompile Include="Tests_TestUtils.c" />
+    <ClCompile Include="Tests_RosMotoPlusConversionUtils.c" />
     <ClCompile Include="MotionControl.c" />
     <ClCompile Include="ActionServer_FJT.c" />
     <ClCompile Include="main.c" />
@@ -352,6 +354,7 @@
     <ClCompile Include="ServiceResetError.c" />
     <ClCompile Include="FauxCommandLineArgs.c" />
     <ClCompile Include="Ros_mpGetRobotCalibrationData.c" />
+    <ClCompile Include="RosMotoPlusConversionUtils.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigFile.h" />
@@ -373,6 +376,8 @@
     <ClInclude Include="ServiceStartTrajMode.h" />
     <ClInclude Include="ServiceSelectMotionTool.h" />
     <ClInclude Include="Tests_CtrlGroup.h" />
+    <ClInclude Include="Tests_TestUtils.h" />
+    <ClInclude Include="Tests_RosMotoPlusConversionUtils.h" />
     <ClInclude Include="TimeConversionUtils.h" />
     <ClInclude Include="MotionControl.h" />
     <ClInclude Include="ActionServer_FJT.h" />
@@ -386,6 +391,7 @@
     <ClInclude Include="MathConstants.h" />
     <ClInclude Include="MotoROS_PlatformLib.h" />
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h" />
+    <ClInclude Include="RosMotoPlusConversionUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

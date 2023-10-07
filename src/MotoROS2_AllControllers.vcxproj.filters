@@ -306,6 +306,12 @@
     <ClCompile Include="Tests_CtrlGroup.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_TestUtils.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests_RosMotoPlusConversionUtils.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
     <ClCompile Include="InformCheckerAndGenerator.c">
       <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
@@ -320,6 +326,9 @@
     </ClCompile>
     <ClCompile Include="Ros_mpGetRobotCalibrationData.c">
       <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="RosMotoPlusConversionUtils.c">
+      <Filter>Source Files\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -336,6 +345,12 @@
       <Filter>Header Files\Executors</Filter>
     </ClInclude>
     <ClInclude Include="Tests_CtrlGroup.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_TestUtils.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_RosMotoPlusConversionUtils.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
     <ClInclude Include="ConfigFile.h">
@@ -399,6 +414,9 @@
       <Filter>MotoPlus Libraries</Filter>
     </ClInclude>
     <ClInclude Include="TimeConversionUtils.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="RosMotoPlusConversionUtils.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="MotoPlusExterns.h">

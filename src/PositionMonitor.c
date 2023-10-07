@@ -295,12 +295,12 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
         {
             switch (group->baseTrackInfo.motionType[i])
             {
-            case MOTION_TYPE_X: coordTrackTravel.x = track_pos_meters[i]; break;
-            case MOTION_TYPE_Y: coordTrackTravel.y = track_pos_meters[i]; break;
-            case MOTION_TYPE_Z: coordTrackTravel.z = track_pos_meters[i]; break;
-            case MOTION_TYPE_RX: coordTrackTravel.rx = track_pos_meters[i]; break;
-            case MOTION_TYPE_RY: coordTrackTravel.ry = track_pos_meters[i]; break;
-            case MOTION_TYPE_RZ: coordTrackTravel.rz = track_pos_meters[i]; break;
+            case MOTION_TYPE_X: coordTrackTravel.x = METERS_TO_MICROMETERS(track_pos_meters[i]); break;
+            case MOTION_TYPE_Y: coordTrackTravel.y = METERS_TO_MICROMETERS(track_pos_meters[i]); break;
+            case MOTION_TYPE_Z: coordTrackTravel.z = METERS_TO_MICROMETERS(track_pos_meters[i]); break;
+            case MOTION_TYPE_RX: coordTrackTravel.rx = RAD_TO_DEG_0001(track_pos_meters[i]); break;
+            case MOTION_TYPE_RY: coordTrackTravel.ry = RAD_TO_DEG_0001(track_pos_meters[i]); break;
+            case MOTION_TYPE_RZ: coordTrackTravel.rz = RAD_TO_DEG_0001(track_pos_meters[i]); break;
             }
         }
         mpZYXeulerToFrame(&coordWorldToBase, &frameWorldToTrack);
@@ -314,10 +314,7 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     }
 
     geometry_msgs__msg__Transform* transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_WorldToBase].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordWorldToBase.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordWorldToBase.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordWorldToBase.z);
-    QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordWorldToBase.rx, coordWorldToBase.ry, coordWorldToBase.rz, &transform->rotation);
+    Ros_MpCoord_To_GeomMsgsTransform(&coordWorldToBase, transform);
 
     //============================
     // Calculate Flange and Tool0
@@ -374,22 +371,13 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     //=======================
 
     transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_BaseToFlange].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordBaseToFlange.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordBaseToFlange.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordBaseToFlange.z);
-    QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordBaseToFlange.rx, coordBaseToFlange.ry, coordBaseToFlange.rz, &transform->rotation);
+    Ros_MpCoord_To_GeomMsgsTransform(&coordBaseToFlange, transform);
 
     transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTool0].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordFlangeToTool0.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordFlangeToTool0.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordFlangeToTool0.z);
-    QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordFlangeToTool0.rx, coordFlangeToTool0.ry, coordFlangeToTool0.rz, &transform->rotation);
+    Ros_MpCoord_To_GeomMsgsTransform(&coordFlangeToTool0, transform);
 
     transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTcp].transform;
-    transform->translation.x = NANOMETERS_TO_METERS(coordToolData.x);
-    transform->translation.y = NANOMETERS_TO_METERS(coordToolData.y);
-    transform->translation.z = NANOMETERS_TO_METERS(coordToolData.z);
-    QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coordToolData.rx, coordToolData.ry, coordToolData.rz, &transform->rotation);
+    Ros_MpCoord_To_GeomMsgsTransform(&coordToolData, transform);
 }
 
 void Ros_PositionMonitor_UpdateLocation()

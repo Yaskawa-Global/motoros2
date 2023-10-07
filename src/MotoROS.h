@@ -50,6 +50,7 @@
 //============================================
 #include <std_srvs/srv/trigger.h>
 #include <sensor_msgs/msg/joint_state.h>
+#include <geometry_msgs/msg/pose.h>
 #include <geometry_msgs/msg/transform_stamped.h>
 #include <geometry_msgs/msg/quaternion.h>
 #include <tf2_msgs/msg/tf_message.h>
@@ -98,11 +99,14 @@
 #include "RosApiNameConstants.h"
 #include "TimeConversionUtils.h"
 #include "Tests_CtrlGroup.h"
+#include "Tests_TestUtils.h"
+#include "Tests_RosMotoPlusConversionUtils.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"
 #include "MotoROS_PlatformLib.h"
 #include "Ros_mpGetRobotCalibrationData.h"
+#include "RosMotoPlusConversionUtils.h"
 
 extern void Ros_Sleep(float milliseconds);
 
