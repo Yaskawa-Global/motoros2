@@ -255,6 +255,7 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     double track_pos_meters[MAX_PULSE_AXES];
     BITSTRING figure;
     MP_COORD cartesian_moto;
+    char alarm_msg_buf[ERROR_MSG_MAX_SIZE] = { 0 };
 
     CtrlGroup* group = g_Ros_Controller.ctrlGroups[groupIndex];
 
@@ -301,6 +302,11 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
             case MOTION_TYPE_RX: coordTrackTravel.rx = RAD_TO_DEG_0001(track_pos_meters[i]); break;
             case MOTION_TYPE_RY: coordTrackTravel.ry = RAD_TO_DEG_0001(track_pos_meters[i]); break;
             case MOTION_TYPE_RZ: coordTrackTravel.rz = RAD_TO_DEG_0001(track_pos_meters[i]); break;
+            default:
+                //should never happen, so complain and raise alarm
+                snprintf(alarm_msg_buf, ERROR_MSG_MAX_SIZE, "Invalid motion type: %d", group->baseTrackInfo.motionType[i]);
+                Ros_Debug_BroadcastMsg("%s: %s", alarm_msg_buf);
+                motoRosAssert_withMsg(false, SUBCODE_FAIL_INVALID_BASE_TRACK_MOTION_TYPE, alarm_msg_buf);
             }
         }
         mpZYXeulerToFrame(&coordWorldToBase, &frameWorldToTrack);
