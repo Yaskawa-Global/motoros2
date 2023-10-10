@@ -53,8 +53,10 @@ void RosInitTask()
 {
     g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
 
+#ifndef MOTOROS2_TESTING_ENABLE
     //Check to see if another version of MotoROS2.out is running on this controller.
     motoRosAssert_withMsg(!Ros_IsOtherInstanceRunning(), SUBCODE_MULTIPLE_INSTANCES_DETECTED, "MotoROS2 - Multiple Instances");
+#endif
 
     // init debug broadcast
     Ros_Debug_BroadcastMsg("---");
@@ -74,6 +76,9 @@ void RosInitTask()
     bTestResult &= Ros_Testing_RosMotoPlusConversionUtils();
     bTestResult ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
     Ros_Debug_BroadcastMsg("===");
+
+    //exit immediately after running tests
+    return;
 #endif
 
     Ros_ConfigFile_Parse();
