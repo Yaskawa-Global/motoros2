@@ -130,6 +130,7 @@ extern UCHAR Ros_CtrlGroup_GetAxisConfig(CtrlGroup* ctrlGroup);
 
 extern BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup);
 extern BOOL Ros_CtrlGroup_IsInvalidAxis(CtrlGroup const* const ctrlGroup, size_t axisIdx);
+extern BOOL Ros_CtrlGroup_HasBaseTrack(CtrlGroup const* ctrlGroup);
 
 extern void Ros_CtrlGroup_UpdateJointNamesInMotoOrder(CtrlGroup* ctrlGroup);
 

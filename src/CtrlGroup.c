@@ -733,6 +733,16 @@ BOOL Ros_CtrlGroup_IsInvalidAxis(CtrlGroup const* const ctrlGroup, size_t axisId
     return ctrlGroup->axisType.type[axisIdx] == AXIS_INVALID;
 }
 
+// Returns TRUE if the specified group has an associated base track
+//-------------------------------------------------------------------
+BOOL Ros_CtrlGroup_HasBaseTrack(CtrlGroup const* ctrlGroup)
+{
+    //according to the comment on CtrlGroup.h::CtrlGroup::baseTrackGroupIndex,
+    //checking for this to be != -1 should be sufficient to determine whether
+    //or not this group has a base track configured or not
+    return (ctrlGroup->baseTrackGroupIndex != -1);
+}
+
 //-------------------------------------------------------------------
 // Store the user-defined joint names in the CtrlGroup object using
 // "motoman" order. This will be used as a lookup table when receiving
