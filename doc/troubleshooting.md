@@ -702,6 +702,27 @@ ALARM 8011
 The ETHERNET function must be enabled for one (or both) LAN interface in the robot controller.
 Please contact your local Yaskawa representative to request this function.
 
+### Alarm: 8011[63]
+
+*Example:*
+
+```text
+ALARM 8011
+ Invalid motion type: N
+[63]
+```
+
+Where `N` is an integer.
+
+*Solution:*
+MotoROS2 encountered an illegal value when evaluating base track coordinates for TF broadcast.
+
+This alarm should not be raised during normal usage of MotoROS2.
+
+Save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
 ### Alarm: 8012[xx]
 
 *Example:*
