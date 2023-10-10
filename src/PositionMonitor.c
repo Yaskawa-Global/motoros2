@@ -281,7 +281,7 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
 
     memcpy(&coordWorldToBase, &group->robotCalibrationToBaseFrame, sizeof(MP_COORD));
 
-    if (group->baseTrackGroupIndex != -1) //add in the offset of the base track motion and mounting offset
+    if (Ros_CtrlGroup_HasBaseTrack(group)) //add in the offset of the base track motion and mounting offset
     {
         MP_COORD coordTrackTravel;
         MP_FRAME frameTrackTravel, frameTrackToRobot, frameWorldToTrack;
@@ -416,7 +416,7 @@ void Ros_PositionMonitor_UpdateLocation()
         if (bRet != TRUE)
             continue;
         //if this is attached to a base track, get it's position too
-        if (group->baseTrackGroupIndex != -1)
+        if (Ros_CtrlGroup_HasBaseTrack(group))
             Ros_CtrlGroup_GetFBPulsePos(g_Ros_Controller.ctrlGroups[group->baseTrackGroupIndex], pulsePos_moto_track[groupIndex]);
 
         //----------------------------
