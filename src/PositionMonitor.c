@@ -289,11 +289,16 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
 
         //TODO: This isn't going to work for a motosweep
 
-        Ros_CtrlGroup_ConvertToRosPos(g_Ros_Controller.ctrlGroups[group->baseTrackGroupIndex], pulsePos_moto_track, track_pos_meters);
+        CtrlGroup* baseTrackGroup = g_Ros_Controller.ctrlGroups[group->baseTrackGroupIndex];
+        Ros_CtrlGroup_ConvertToRosPos(baseTrackGroup, pulsePos_moto_track, track_pos_meters);
 
         bzero(&coordTrackTravel, sizeof(MP_COORD));
         for (int i = 0; i < MAX_PULSE_AXES; i += 1)
         {
+            //skip if not a configured axis
+            if (Ros_CtrlGroup_IsInvalidAxis(baseTrackGroup, i))
+                continue;
+
             switch (group->baseTrackInfo.motionType[i])
             {
             case MOTION_TYPE_X: coordTrackTravel.x = METERS_TO_MICROMETERS(track_pos_meters[i]); break;
