@@ -725,6 +725,15 @@ BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup)
 }
 
 //-------------------------------------------------------------------
+// Returns TRUE if the specified axis in the provided group is an
+// invalid one (ie: set to AXIS_INVALID)
+//-------------------------------------------------------------------
+BOOL Ros_CtrlGroup_IsInvalidAxis(CtrlGroup const* const ctrlGroup, size_t axisIdx)
+{
+    return ctrlGroup->axisType.type[axisIdx] == AXIS_INVALID;
+}
+
+//-------------------------------------------------------------------
 // Store the user-defined joint names in the CtrlGroup object using
 // "motoman" order. This will be used as a lookup table when receiving
 // a trajectory request. 
