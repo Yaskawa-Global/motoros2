@@ -708,11 +708,11 @@ Please contact your local Yaskawa representative to request this function.
 
 ```text
 ALARM 8011
- Invalid motion type: N
+ Inv. motion type: N (axis: A)
 [63]
 ```
 
-Where `N` is an integer.
+Where `N` is an integer indicating the configured motion type and `A` indicates the specific axis for which the motion type is invalid.
 
 *Solution:*
 MotoROS2 encountered an illegal value when evaluating base track coordinates for TF broadcast.

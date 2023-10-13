@@ -129,6 +129,7 @@ extern void Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(CtrlGroup* ctrlGroup, doubl
 extern UCHAR Ros_CtrlGroup_GetAxisConfig(CtrlGroup* ctrlGroup);
 
 extern BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup);
+extern BOOL Ros_CtrlGroup_IsInvalidAxis(CtrlGroup const* const ctrlGroup, size_t axisIdx);
 
 extern void Ros_CtrlGroup_UpdateJointNamesInMotoOrder(CtrlGroup* ctrlGroup);
 
