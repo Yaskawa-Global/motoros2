@@ -712,7 +712,7 @@ ALARM 8011
 [63]
 ```
 
-Where `N` is an integer and `A` indicates the specific axis for which the motion type is invalid.
+Where `N` is an integer indicating the configured motion type and `A` indicates the specific axis for which the motion type is invalid.
 
 *Solution:*
 MotoROS2 encountered an illegal value when evaluating base track coordinates for TF broadcast.
