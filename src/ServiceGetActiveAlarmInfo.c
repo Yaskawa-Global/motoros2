@@ -94,15 +94,89 @@ void Ros_ServiceGetActiveAlarmInfo_Trigger(const void* request_msg, void* respon
 
     Ros_Debug_BroadcastMsg("%s: retrieving active alarm & error info", __func__);
 
+    // retrieve active alarms and/or errors
+    MP_ALARM_CODE_RSP_DATA alarmData;
+    bzero(&alarmData, sizeof(alarmData));
+    if (mpGetAlarmCode(&alarmData) != OK)
+    {
+        // can't continue if M+ API fails
+        Ros_Debug_BroadcastMsg("%s: error retrieving alarm data", __func__);
+        // TODO: use proper error codes + strings
+        rosidl_runtime_c__String__assign(&response->result_message, "M+ API error");
+        response->result_code = -1;
+        goto DONE;
+    }
 
-    // TODO: implement actual functionality
+    Ros_Debug_BroadcastMsg("%s: %d alarm(s), %d error(s)", __func__,
+        alarmData.usAlarmNum, 0 != alarmData.usErrorNo);
 
+    // assume there are no alarms, nor errors
+    response->alarms.size = 0;
+    response->errors.size = 0;
+
+    // retrieve info on active alarms and copy data
+    response->alarms.size = alarmData.usAlarmNum;
+    for(size_t i = 0; i < response->alarms.size; ++i)
+    {
+        Ros_Debug_BroadcastMsg("%s: processing alarm %04d (%d out of %d)",
+            __func__, alarmData.AlarmData.usAlarmNo[i],
+            i + 1, response->alarms.size);
+
+        response->alarms.data[i].number = alarmData.AlarmData.usAlarmNo[i];
+        response->alarms.data[i].sub_code = alarmData.AlarmData.usAlarmData[i];
+
+        // retrieve info on active alarm
+        ROS_ALARM_INFO_SEND_DATA alarmInfoSendData = { 0 };
+        ROS_ALARM_INFO_RSP_DATA alarmInfoData;
+        alarmInfoSendData.usIndex = i;
+        bzero(&alarmInfoData, sizeof(ROS_ALARM_INFO_RSP_DATA));
+        STATUS status = Ros_GetAlarmInfo(&alarmInfoSendData, &alarmInfoData);
+        if (status != OK)
+        {
+            Ros_Debug_BroadcastMsg(
+                "%s: error retrieving alarm info (%d), skipping", __func__, status);
+        }
+        else
+        {
+            rosidl_runtime_c__String__assignn(
+                &response->alarms.data[i].message, alarmInfoData.msg, ROS_MAX_ALARM_MSG_LEN);
+        }
+    }
+
+    // retrieve info on active error(s)
+    if (0 < alarmData.usErrorNo)
+    {
+        // there can be only a single active error at any given time
+        const size_t kNumActiveErrors = 1;
+        const size_t kFirstErrorIdx = 0;
+        Ros_Debug_BroadcastMsg("%s: processing error %04d (%d out of %d)",
+            __func__, alarmData.usErrorNo, kNumActiveErrors, MAX_ERROR_COUNT);
+
+        response->errors.size = kNumActiveErrors;
+        response->errors.data[kFirstErrorIdx].number = alarmData.usErrorNo;
+        response->errors.data[kFirstErrorIdx].sub_code = alarmData.usErrorData;
+
+        // retrieve info on active error
+        ROS_ERROR_INFO_RSP_DATA errorInfoData;
+        bzero(&errorInfoData, sizeof(ROS_ERROR_INFO_RSP_DATA));
+        STATUS status = Ros_GetErrorInfo(&errorInfoData);
+        if (status != OK)
+        {
+            Ros_Debug_BroadcastMsg(
+                "%s: error retrieving error info (%d), skipping", __func__, status);
+        }
+        else
+        {
+            rosidl_runtime_c__String__assignn(
+                &response->errors.data[kFirstErrorIdx].message, errorInfoData.msg, ROS_MAX_ERROR_MSG_LEN);
+        }
+    }
 
     // TODO: use proper error codes + strings
-    rosidl_runtime_c__String__assign(&response->message, "success");
+    rosidl_runtime_c__String__assign(&response->result_message, "success");
     response->result_code = 1;
 
 DONE:
-    Ros_Debug_BroadcastMsg("%s: exit: '%s' (%lu)", __func__, response->message.data,
+    Ros_Debug_BroadcastMsg("%s: exit: '%s' (%lu)", __func__, response->result_message.data,
         (unsigned long) response->result_code);
 }
