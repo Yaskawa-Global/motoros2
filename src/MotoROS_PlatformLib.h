@@ -18,7 +18,7 @@
 // -  ZZ: patch version nr
 //
 // Note: no leading zeros, to avoid octal parsing
-#define MOTOROS_PLATFORM_LIB_VERSION 212
+#define MOTOROS_PLATFORM_LIB_VERSION 213
 
 #define MOTOROS_PLATFORM_LIB_MAJOR (MOTOROS_PLATFORM_LIB_VERSION / 100000)
 #define MOTOROS_PLATFORM_LIB_MINOR (MOTOROS_PLATFORM_LIB_VERSION / 100 % 1000)
@@ -103,6 +103,39 @@ extern int clock_gettime(clockid_t clock_id, /* clock ID (always CLOCK_REALTIME)
 #define ROS_USERLAN_STATE_GET_STATE_ERROR -12
 #define ROS_USERLAN_STATE_GENERIC_FAILURE -13
 extern STATUS Ros_UserLan_IsLinkUp(USHORT if_no, BOOL* const is_up /*out*/);
+
+
+// Retrieve information associated with the alarm message at 'usIndex'.
+// If an index (ie: slot) does not have an active alarm, ERROR is returned.
+#define ROS_MAX_ALARM_MSG_LEN (36)
+typedef struct
+{
+    USHORT usIndex;
+    CHAR reserved[6];
+} ROS_ALARM_INFO_SEND_DATA;
+typedef struct
+{
+    LONG code;
+    LONG subcode;
+    CHAR msg[ROS_MAX_ALARM_MSG_LEN + 1];
+    CHAR reserved[1];
+} ROS_ALARM_INFO_RSP_DATA ;
+
+extern STATUS Ros_GetAlarmInfo(ROS_ALARM_INFO_SEND_DATA const* sData, ROS_ALARM_INFO_RSP_DATA* const rData);
+
+
+// Retrieve information associated with the currently active error.
+// If there is no active error, ERROR is returned.
+#define ROS_MAX_ERROR_MSG_LEN (36)
+typedef struct
+{
+    LONG code;
+    LONG subcode;
+    CHAR msg[ROS_MAX_ERROR_MSG_LEN + 1];
+    CHAR reserved[1];
+} ROS_ERROR_INFO_RSP_DATA;
+
+extern STATUS Ros_GetErrorInfo(ROS_ERROR_INFO_RSP_DATA* const rData);
 
 
 #endif  // MOTOROS_PLATFORM_LIB_H
