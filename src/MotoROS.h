@@ -78,6 +78,8 @@
 #include <motoros2_interfaces/srv/select_motion_tool.h>
 #include <builtin_interfaces/msg/duration.h>
 #include <builtin_interfaces/msg/time.h>
+#include <motoros2_interfaces/srv/get_active_alarm_info.h>
+#include <motoros2_interfaces/msg/alarm_info.h>
 
 //============================================
 // MotoROS
@@ -102,6 +104,7 @@
 #include "ServiceStartPointQueueMode.h"
 #include "ServiceStopTrajMode.h"
 #include "ServiceSelectMotionTool.h"
+#include "ServiceGetActiveAlarmInfo.h"
 #include "MotionControl.h"
 #include "ConfigFile.h"
 #include "RosApiNameConstants.h"
