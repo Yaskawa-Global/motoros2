@@ -751,17 +751,27 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     MP_PULSE_POS_RSP_DATA prevPulsePosData[MAX_CONTROLLABLE_GROUPS];
     MP_PULSE_POS_RSP_DATA pulsePosData;
 
-    LONG newPulseInc[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];		// Pulse increments that we just retrieved from the incQueue
-    LONG toProcessPulses[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];	// Total pulses that still need to be sent to the command
-    LONG processedPulses[MP_GRP_AXES_NUM];							// Amount of pulses from the last command that were actually processed (accepted) 
-    LONG prevMaxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
-    LONG prevMaxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
-    LONG maxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
-    LONG maxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
-    BOOL skipReadingQ[MAX_CONTROLLABLE_GROUPS];
-    BOOL queueRead[MAX_CONTROLLABLE_GROUPS];
-    BOOL isMissingPulse;
-    BOOL hasUnprocessedData;
+    // --- FSU Speed Limit related ---
+    // When FSU speed limitation is active, some pulses for an interpolation cycle may not be processed by the controller.
+    // To track the true amount of pulses processed, we keep track of the command position and by substracting the
+    // the previous position from the current one, we can confirm the amount if pulses precessed.
+    // If the amount processed doesn't match the amount sent at the previous cycle, we resend the unprocessed pulses amount.
+    // To keep the motion smooth, the 'maximum speed' (max pulses per cycle) is tracked and used to skip reading
+    // more pulse increment from the queue if the amount of unprocessed pulses is larger than the detected speed.
+    // The 'maximum speed' is also used to prevent exceeding the commanded speed once the FSU Speed Limit is removed.
+    //
+    // The following set of variables are used to track FSU speed limitation.
+    LONG newPulseInc[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];         // Pulse increments that we just retrieved from the incQueue
+    LONG toProcessPulses[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];     // Total pulses that still need to be sent to the command
+    LONG processedPulses[MP_GRP_AXES_NUM];                              // Amount of pulses from the last command that were actually processed (accepted)
+    LONG maxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];            // ROS speed (amount of pulses for one cycle from the data queue) that should not be exceeded
+    LONG maxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];      // Number of pulses (absolute) that remains to be processed at the 'maxSpeed'
+    LONG prevMaxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];        // Previous data queue reading 'maxSpeed'
+    LONG prevMaxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];  // Previous data queue reading 'maxSpeedRemain'
+    BOOL skipReadingQ[MAX_CONTROLLABLE_GROUPS];                         // Flag indicating to skip reading more data from the increment queue (there is enough unprocessed from previous cycles remaining)
+    BOOL queueRead[MAX_CONTROLLABLE_GROUPS];                            // Flag indicating that new increment data was retrieve from the queue on this cycle.
+    BOOL isMissingPulse;                                                // Flag that there are pulses send in last cycle that are missing from the command (pulses were not processed)
+    BOOL hasUnprocessedData;                                            // Flag that at least one axis (any group) still has unprecessed data. (Used to continue sending data after the queue is empty.)
 
     ctrlGrpData.sCtrlGrp = 0;
 
@@ -797,16 +807,19 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
             && (Ros_MotionControl_HasDataInQueue() || hasUnprocessedData)
             && !g_Ros_Controller.bStopMotion)
         {
+            // For each control group, retrieve the new pulse increments for this cycle
             for (i = 0; i < g_Ros_Controller.numGroup; i++)
             {
                 queueRead[i] = FALSE;
                 if (skipReadingQ[i])
                 {
+                    // Reset skip flag and set position increment to 0
                     skipReadingQ[i] = FALSE;
                     bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
                 }
                 else
                 {
+                    // Retrieve position increment from the queue.
                     q = &g_Ros_Controller.ctrlGroups[i]->inc_q;
 
                     // Lock the q before manipulating it
@@ -814,6 +827,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                     {
                         if (q->cnt > 0)
                         {
+                            // Initialize moveData with the next data from the queue
                             inc_data_time = q->data[q->idx].time;
                             q_time = g_Ros_Controller.ctrlGroups[i]->q_time;
                             moveData.grp_pos_info[i].pos_tag.data[2] = q->data[q->idx].tool;
@@ -827,7 +841,10 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                             q->idx = Q_OFFSET_IDX(q->idx, 1, Q_SIZE);
                             q->cnt--;
 
-                            // Check if complete interpolation period covered
+                            // Check if complete interpolation period covered.
+                            // (Because time period of data received from ROS may not be a multiple of the
+                            // controller interpolation clock period, the queue may contain partiel period and
+                            // more than one queue increment maybe required to complete the interpolation period)
                             while (q->cnt > 0)
                             {
                                 if ((q_time <= q->data[q->idx].time)
@@ -864,6 +881,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                         }
                         else
                         {
+                            // Queue is empty, initialize to 0 pulse increment
                             moveData.grp_pos_info[i].pos_tag.data[2] = 0;
                             moveData.grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
                             moveData.grp_pos_info[i].pos_tag.data[4] = 0;
@@ -896,7 +914,10 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                     }
                 }
 
-                // Check if pulses are missing from last increment
+                // Check if pulses are missing from last increment.
+                // Get the current controller command position and substract the previous command position
+                // and check if it matches the amount if increment sent last cycle.  If it doesn't then
+                // some pulses are missing and the amount of unprocessed pulses needs to be added to this cycle.
                 mpGetPulsePos(&ctrlGrpData, &pulsePosData);
                 isMissingPulse = FALSE;
                 for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
@@ -918,6 +939,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                         hasUnprocessedData = TRUE;
                 }
 
+                // Check if pulses are missing which means that the FSU speed limit is enabled
                 if (isMissingPulse)
                 {
                     UINT64 max_inc;
@@ -1012,6 +1034,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
             // motion should continue.
             if (!g_Ros_Controller.bStopMotion && (g_Ros_Communication_AgentIsConnected || !g_nodeConfigSettings.stop_motion_on_disconnect))
             {
+                // Send pulse increment to the controller command position
                 ret = mpExRcsIncrementMove(&moveData);
 
                 Ros_ActionServer_FJT_UpdateProgressTracker(&moveData);
@@ -1021,6 +1044,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
 
             if (ret != 0)
             {
+                // Failure: command rejected by controller.
                 // Update controller status to help identify cause
                 Ros_Controller_IoStatusUpdate();
 
