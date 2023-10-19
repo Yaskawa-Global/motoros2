@@ -93,7 +93,7 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
 
             int baseIdOffset = (int)ctrlGroup->groupId - (int)MP_R1_GID;
             ctrlGroup->baseTrackGroupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)baseIdOffset + MP_B1_GID);
-            if (ctrlGroup->baseTrackGroupIndex != ERROR)
+            if (Ros_CtrlGroup_HasBaseTrack(ctrlGroup))
             {
                 ctrlGroup->baseTrackGroupId = (MP_GRP_ID_TYPE)(baseIdOffset + MP_B1_GID);
                 GP_getBaseAxisInfo(ctrlGroup->baseTrackGroupIndex, &ctrlGroup->baseTrackInfo);
