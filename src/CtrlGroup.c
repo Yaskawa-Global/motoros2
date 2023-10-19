@@ -93,7 +93,7 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
 
             int baseIdOffset = (int)ctrlGroup->groupId - (int)MP_R1_GID;
             ctrlGroup->baseTrackGroupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)baseIdOffset + MP_B1_GID);
-            if (ctrlGroup->baseTrackGroupIndex != ERROR)
+            if (Ros_CtrlGroup_HasBaseTrack(ctrlGroup))
             {
                 ctrlGroup->baseTrackGroupId = (MP_GRP_ID_TYPE)(baseIdOffset + MP_B1_GID);
                 GP_getBaseAxisInfo(ctrlGroup->baseTrackGroupIndex, &ctrlGroup->baseTrackInfo);
@@ -731,6 +731,16 @@ BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup)
 BOOL Ros_CtrlGroup_IsInvalidAxis(CtrlGroup const* const ctrlGroup, size_t axisIdx)
 {
     return ctrlGroup->axisType.type[axisIdx] == AXIS_INVALID;
+}
+
+// Returns TRUE if the specified group has an associated base track
+//-------------------------------------------------------------------
+BOOL Ros_CtrlGroup_HasBaseTrack(CtrlGroup const* ctrlGroup)
+{
+    //according to the comment on CtrlGroup.h::CtrlGroup::baseTrackGroupIndex,
+    //checking for this to be != -1 should be sufficient to determine whether
+    //or not this group has a base track configured or not
+    return (ctrlGroup->baseTrackGroupIndex != -1);
 }
 
 //-------------------------------------------------------------------

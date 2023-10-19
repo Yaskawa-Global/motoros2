@@ -240,11 +240,36 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
     return bAllTestsPassed;
 }
 
+BOOL Ros_Testing_CtrlGroup_HasBaseTrack()
+{
+    CtrlGroup group;
+    BOOL bOk, bAllTestsPassed = TRUE;
+
+    //no base track
+    group.baseTrackGroupId = (MP_GRP_ID_TYPE)-1;
+    group.baseTrackGroupIndex = -1;
+
+    bOk = Ros_CtrlGroup_HasBaseTrack(&group) == FALSE;
+    Ros_Debug_BroadcastMsg("Testing CtrlGroup HasBaseTrack - no base track: %s", bOk ? "PASS" : "FAIL");
+    bAllTestsPassed &= bOk;
+
+    //has base track: R1+B1
+    group.baseTrackGroupId = MP_B1_GID;
+    group.baseTrackGroupIndex = 1;
+
+    bOk = Ros_CtrlGroup_HasBaseTrack(&group) == TRUE;
+    Ros_Debug_BroadcastMsg("Testing CtrlGroup HasBaseTrack - base track (B1): %s", bOk ? "PASS" : "FAIL");
+    bAllTestsPassed &= bOk;
+
+    return bAllTestsPassed;
+}
+
 BOOL Ros_Testing_CtrlGroup()
 {
     BOOL bSuccess = TRUE;
 
     bSuccess &= Ros_Testing_CtrlGroup_PosConverters();
+    bSuccess &= Ros_Testing_CtrlGroup_HasBaseTrack();
 
     return bSuccess;
 }
