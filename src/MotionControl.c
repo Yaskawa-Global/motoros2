@@ -775,15 +775,15 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
 
     ctrlGrpData.sCtrlGrp = 0;
 
-    memset(newPulseInc, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    memset(toProcessPulses, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    memset(processedPulses, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM);
-    memset(prevMaxSpeed, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    memset(prevMaxSpeedRemain, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    memset(maxSpeed, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    memset(maxSpeedRemain, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    memset(skipReadingQ, 0x00, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
-    memset(queueRead, 0x00, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
+    bzero(newPulseInc, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    bzero(toProcessPulses, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    bzero(processedPulses, sizeof(LONG) * MP_GRP_AXES_NUM);
+    bzero(prevMaxSpeed, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    bzero(prevMaxSpeedRemain, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    bzero(maxSpeed, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    bzero(maxSpeedRemain, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+    bzero(skipReadingQ, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
+    bzero(queueRead, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
 
     isMissingPulse = FALSE;
     hasUnprocessedData = FALSE;
@@ -1099,7 +1099,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
         else
         {
             // Reset previous position in case the robot is moved externally
-            memset(toProcessPulses, 0x00, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
+            bzero(toProcessPulses, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
             hasUnprocessedData = FALSE;
             for (i = 0; i < g_Ros_Controller.numGroup; i++)
             {
