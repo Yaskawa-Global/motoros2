@@ -773,8 +773,6 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     BOOL isMissingPulse;                                                // Flag that there are pulses send in last cycle that are missing from the command (pulses were not processed)
     BOOL hasUnprocessedData;                                            // Flag that at least one axis (any group) still has unprecessed data. (Used to continue sending data after the queue is empty.)
 
-    ctrlGrpData.sCtrlGrp = 0;
-
     bzero(newPulseInc, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
     bzero(toProcessPulses, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
     bzero(processedPulses, sizeof(LONG) * MP_GRP_AXES_NUM);
@@ -796,6 +794,8 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     {
         moveData.ctrl_grp |= (0x01 << i);
         moveData.grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
+
+        ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
         mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
     }
 
@@ -918,6 +918,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                 // Get the current controller command position and substract the previous command position
                 // and check if it matches the amount if increment sent last cycle.  If it doesn't then
                 // some pulses are missing and the amount of unprocessed pulses needs to be added to this cycle.
+                ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
                 mpGetPulsePos(&ctrlGrpData, &pulsePosData);
                 isMissingPulse = FALSE;
                 for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
@@ -1103,6 +1104,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
             hasUnprocessedData = FALSE;
             for (i = 0; i < g_Ros_Controller.numGroup; i++)
             {
+                ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
                 mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
             }
         }
