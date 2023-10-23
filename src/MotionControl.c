@@ -1010,7 +1010,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                                 max_inc = g_Ros_Controller.ctrlGroups[i]->maxInc.maxIncrement[axis];
 
                             if(max_inc > 1)
-                                Ros_Debug_BroadcastMsg("Warning undefined speed: Axis %d Defaulting Max Inc: %d (prevSpeed: %d curSpeed %d)\r\n",
+                                Ros_Debug_BroadcastMsg("Warning undefined speed: Axis %d Defaulting Max Inc: %d (prevSpeed: %d curSpeed %d)",
                                 axis, max_inc, prevMaxSpeed[i][axis], maxSpeed[i][axis]);
 
                         }
