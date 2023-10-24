@@ -92,6 +92,10 @@ BOOL Ros_Controller_Initialize()
                                                                 g_Ros_Controller.interpolPeriod);            //Value of the interpolation period (ms) for the robot controller.
             if(g_Ros_Controller.ctrlGroups[groupIndex] != NULL)
             {
+                //keep track of the nr of robots
+                if (Ros_CtrlGroup_IsRobot(g_Ros_Controller.ctrlGroups[groupIndex]))
+                    g_Ros_Controller.numRobot++;
+
                 Ros_CtrlGroup_GetPulsePosCmd(g_Ros_Controller.ctrlGroups[groupIndex], g_Ros_Controller.ctrlGroups[groupIndex]->prevPulsePos); // set the current commanded pulse
                 g_Ros_Controller.totalAxesCount += g_Ros_Controller.ctrlGroups[groupIndex]->numAxes;
 

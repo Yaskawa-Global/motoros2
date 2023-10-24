@@ -70,7 +70,7 @@ typedef struct
 {
     UINT16 interpolPeriod;                                  // Interpolation period of the controller
     int numGroup;                                           // Actual number of defined group
-    //int numRobot;                                         // Actual number of defined robot
+    int numRobot;                                           // Actual number of defined robot
     int totalAxesCount;                                     // Number of axes attached to the controller (all groups)
     CtrlGroup* ctrlGroups[MAX_CONTROLLABLE_GROUPS];         // Array of the controller control group
 
