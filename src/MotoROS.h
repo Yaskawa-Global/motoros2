@@ -101,6 +101,7 @@
 #include "Tests_CtrlGroup.h"
 #include "Tests_TestUtils.h"
 #include "Tests_RosMotoPlusConversionUtils.h"
+#include "Tests_ControllerStatusIO.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"
