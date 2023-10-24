@@ -343,6 +343,7 @@
     <ClCompile Include="ServiceStopTrajMode.c" />
     <ClCompile Include="ServiceStartTrajMode.c" />
     <ClCompile Include="ServiceSelectMotionTool.c" />
+    <ClCompile Include="Tests_ControllerStatusIO.c" />
     <ClCompile Include="Tests_CtrlGroup.c" />
     <ClCompile Include="Tests_TestUtils.c" />
     <ClCompile Include="Tests_RosMotoPlusConversionUtils.c" />
@@ -375,6 +376,7 @@
     <ClInclude Include="ServiceStopTrajMode.h" />
     <ClInclude Include="ServiceStartTrajMode.h" />
     <ClInclude Include="ServiceSelectMotionTool.h" />
+    <ClInclude Include="Tests_ControllerStatusIO.h" />
     <ClInclude Include="Tests_CtrlGroup.h" />
     <ClInclude Include="Tests_TestUtils.h" />
     <ClInclude Include="Tests_RosMotoPlusConversionUtils.h" />

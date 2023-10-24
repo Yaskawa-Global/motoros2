@@ -303,6 +303,9 @@
     <ClCompile Include="ConfigFile.c">
       <Filter>Source Files\Parameters and Config</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_ControllerStatusIO.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
     <ClCompile Include="Tests_CtrlGroup.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
@@ -343,6 +346,9 @@
     </ClInclude>
     <ClInclude Include="CommunicationExecutor.h">
       <Filter>Header Files\Executors</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_ControllerStatusIO.h">
+      <Filter>Header Files\Tests</Filter>
     </ClInclude>
     <ClInclude Include="Tests_CtrlGroup.h">
       <Filter>Header Files\Tests</Filter>
