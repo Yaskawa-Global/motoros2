@@ -695,16 +695,16 @@ This section documents these and provides work-arounds where possible.
 **Description**: the Functional Safety Unit (FSU) can be configured to limit the motion of the robot to avoid injury of surrounding personnel.
 This can include reducing the speed of the arm, restricting the space where the robot may operate, or stopping all motion while external sensors are triggered.
 
-In `v0.1.1` or lower of MotoROS2, any limitation imposed by the FSU will result in an undefined and incomplete trajectory.
+In version `0.1.1` and older of MotoROS2, any limitation imposed by the FSU will result in an undefined and incomplete trajectory execution.
 There is no explicit indicator back to the client PC for notifying that there is any deviation.
 The client must monitor the feedback `/joint_states` topic to determine if the robot is executing the trajectory as planned.
 
-In `v0.1.2`, this behavior has been improved.
-If an FSU limitation is imposed, the robot will execute the complete trajectory as planned.
-However, the client motion planner should be made aware of the possibility that execution may be delayed.
-Otherwise it is possible for the motion planner to prematurely abort the trajectory due to a perceived timeout.
+Versions `0.1.2` and newer have improved support for the FSU when used with MotoROS2 controlled motion.
+If an FSU limitation is imposed, MotoROS2 will try to execute the complete trajectory as specified in the goal, but depending on the exact FSU configuration, may do so at a reduced speed.
+To prevent motion planners (such as MoveIt) from prematurely aborting active motion, they must therefore be configured to allow for such slowdowns.
 
-Please note that `v0.1.2` still does not provide any explicit indicator to the client PC when the FSU limits robot motion.
+Unfortunately, MotoROS2 does not currently publish speed reduction ratios imposed by an FSU, nor does it report FSU activation status.
+We are aware of this limitation and may address it in a future release.
 
 ### Only FastDDS is supported
 
