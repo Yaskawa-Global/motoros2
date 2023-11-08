@@ -335,6 +335,7 @@
     <ClCompile Include="Debug.c" />
     <ClCompile Include="ErrorHandling.c" />
     <ClCompile Include="FileUtilityFunctions.c" />
+    <ClCompile Include="ForceTorqueMonitor.c" />
     <ClCompile Include="InformCheckerAndGenerator.c" />
     <ClCompile Include="MemoryAllocation.c" />
     <ClCompile Include="ServiceQueueTrajPoint.c" />
@@ -364,6 +365,7 @@
     <ClInclude Include="CtrlGroup.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="FileUtilityFunctions.h" />
+    <ClInclude Include="ForceTorqueMonitor.h" />
     <ClInclude Include="InformCheckerAndGenerator.h" />
     <ClInclude Include="MemoryAllocation.h" />
     <ClInclude Include="MemoryTracing.h" />

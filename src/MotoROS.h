@@ -53,6 +53,7 @@
 #include <geometry_msgs/msg/pose.h>
 #include <geometry_msgs/msg/transform_stamped.h>
 #include <geometry_msgs/msg/quaternion.h>
+#include <geometry_msgs/msg/wrench_stamped.h>
 #include <tf2_msgs/msg/tf_message.h>
 #include <industrial_msgs/msg/robot_status.h>
 #include <trajectory_msgs/msg/joint_trajectory.h>
@@ -87,6 +88,7 @@
 #include "CtrlGroup.h"
 #include "ControllerStatusIO.h"
 #include "PositionMonitor.h"
+#include "ForceTorqueMonitor.h"
 #include "ServiceQueueTrajPoint.h"
 #include "ServiceReadWriteIO.h"
 #include "ServiceResetError.h"
