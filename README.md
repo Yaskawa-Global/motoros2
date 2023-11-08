@@ -701,7 +701,7 @@ The client must monitor the feedback `/joint_states` topic to determine if the r
 
 Versions `0.1.2` and newer have improved support for the FSU when used with MotoROS2 controlled motion.
 If an FSU limitation is imposed, MotoROS2 will try to execute the complete trajectory as specified in the goal, but depending on the exact FSU configuration, may do so at a reduced speed.
-To prevent motion planners (such as MoveIt) from prematurely aborting active motion, they must therefore be configured to allow for such slowdowns.
+Motion planners (such as MoveIt) must therefore be configured to allow for such slowdowns to prevent them from prematurely aborting trajectories.
 
 Unfortunately, MotoROS2 does not currently publish speed reduction ratios imposed by an FSU, nor does it report FSU activation status.
 We are aware of this limitation and may address it in a future release.
