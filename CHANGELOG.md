@@ -21,8 +21,8 @@ Changes:
 - Lan port MAC addresses containing 0s no longer cause initialisation failures ([#145](https://github.com/Yaskawa-Global/motoros2/pull/145))
 - Alarm & subcode documentation was updated to include missing subcodes ([#151](https://github.com/Yaskawa-Global/motoros2/pull/151))
 - Generated INFORM jobs no longer fail validation after reboot on YRC1000micro ([#168](https://github.com/Yaskawa-Global/motoros2/pull/168))
-- `/tf` data now publishes correctly when using a base-axis ([#172](https://github.com/Yaskawa-Global/motoros2/pull/172))
-- Trajectories that get slowed by an FSU speed limit will now complete execution as intended ([#157](https://github.com/Yaskawa-Global/motoros2/pull/157))
+- Corrected unit conversion and parameter retrieval for Base-axis TF transforms ([#172](https://github.com/Yaskawa-Global/motoros2/pull/172))
+- Improved support for trajectory execution with an active FSU ([#157](https://github.com/Yaskawa-Global/motoros2/pull/157))
 
 ## 0.1.1 (2023-08-23)
 
