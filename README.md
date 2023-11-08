@@ -75,6 +75,7 @@ The following sections document how to download, install, configure, use and tro
   - [Service server QoS](#service-server-qos)
   - [Action server QoS](#action-server-qos)
 - [Known issues & limitations](#known-issues--limitations)
+  - [Functional Safety Unit interaction](#functional-safety-unit-interaction)
   - [Only FastDDS is supported](#only-fastdds-is-supported)
   - [Maximum length of trajectories](#maximum-length-of-trajectories)
   - [No support for asynchronous motion](#no-support-for-asynchronous-motion)
@@ -688,6 +689,22 @@ MotoROS2 is still under development.
 As such, there are currently a number of known issues and limitations users should be aware of and should take into account.
 
 This section documents these and provides work-arounds where possible.
+
+### Functional Safety Unit interaction
+
+**Description**: the Functional Safety Unit (FSU) can be configured to limit the motion of the robot to avoid injury of surrounding personnel.
+This can include reducing the speed of the arm, restricting the space where the robot may operate, or stopping all motion while external sensors are triggered.
+
+In version `0.1.1` and older of MotoROS2, any limitation imposed by the FSU will result in an undefined and incomplete trajectory execution.
+There is no explicit indicator back to the client PC for notifying that there is any deviation.
+The client must monitor the feedback `/joint_states` topic to determine if the robot is executing the trajectory as planned.
+
+Versions `0.1.2` and newer have improved support for the FSU when used with MotoROS2 controlled motion.
+If an FSU limitation is imposed, MotoROS2 will try to execute the complete trajectory as specified in the goal, but depending on the exact FSU configuration, may do so at a reduced speed.
+Motion planners (such as MoveIt) must therefore be configured to allow for such slowdowns to prevent them from prematurely aborting trajectories.
+
+Unfortunately, MotoROS2 does not currently publish speed reduction ratios imposed by an FSU, nor does it report FSU activation status.
+We are aware of this limitation and may address it in a future release.
 
 ### Only FastDDS is supported
 
