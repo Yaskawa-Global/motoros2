@@ -932,6 +932,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                 ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
                 mpGetPulsePos(&ctrlGrpData, &pulsePosData);
                 isMissingPulse = FALSE;
+                hasUnprocessedData = FALSE;
                 for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
                 {
                     // Check how many pulses we processed from last increment
