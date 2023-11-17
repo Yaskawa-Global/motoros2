@@ -61,8 +61,8 @@ static void Ros_ForceTorqueMonitor_Initialize_Publishers(rmw_qos_profile_t const
     {
         rosidl_runtime_c__String__assign(&g_messages_ForceTorqueMonitor.jointExternalTorque->name.data[jointIndex], g_nodeConfigSettings.joint_names[jointIndex]);
     }
-    rosidl_runtime_c__float64__Sequence__init(&g_messages_ForceTorqueMonitor.jointExternalTorque->position, g_Ros_Controller.totalAxesCount);
-    rosidl_runtime_c__float64__Sequence__init(&g_messages_ForceTorqueMonitor.jointExternalTorque->velocity, g_Ros_Controller.totalAxesCount);
+    rosidl_runtime_c__float64__Sequence__init(&g_messages_ForceTorqueMonitor.jointExternalTorque->position, 0);
+    rosidl_runtime_c__float64__Sequence__init(&g_messages_ForceTorqueMonitor.jointExternalTorque->velocity, 0);
     rosidl_runtime_c__float64__Sequence__init(&g_messages_ForceTorqueMonitor.jointExternalTorque->effort, g_Ros_Controller.totalAxesCount);
 }
 
@@ -158,16 +158,9 @@ void Ros_ForceTorqueMonitor_UpdateLocation()
         torqueJointValues[i] = registerValues[i];
         torqueJointValues[i] = (torqueJointValues[i] - 10000.0) * 0.1;
     }
+
     memcpy(g_messages_ForceTorqueMonitor.jointExternalTorque->effort.data, torqueJointValues, sizeof(double) * g_Ros_Controller.totalAxesCount);
-    
-    bzero(g_messages_ForceTorqueMonitor.jointExternalTorque->position.data, sizeof(double) * g_Ros_Controller.totalAxesCount);
-    bzero(g_messages_ForceTorqueMonitor.jointExternalTorque->velocity.data, sizeof(double) * g_Ros_Controller.totalAxesCount);
-
     g_messages_ForceTorqueMonitor.jointExternalTorque->effort.size = g_Ros_Controller.totalAxesCount;
-    g_messages_ForceTorqueMonitor.jointExternalTorque->position.size = g_Ros_Controller.totalAxesCount;
-    g_messages_ForceTorqueMonitor.jointExternalTorque->velocity.size = g_Ros_Controller.totalAxesCount;
-
-
 
     //**********************************
     //Publish feedback topics
