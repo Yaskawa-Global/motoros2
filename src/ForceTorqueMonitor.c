@@ -100,17 +100,16 @@ void Ros_ForceTorqueMonitor_UpdateLocation()
     USHORT registerValues[6];
     double forceTCPValues[6];
     double torqueJointValues[6];
+    
+    //assign TCP force data register adresses
+    registerInfo[0].ulAddr = TCP_FORCE_FX_REG_ID;
+    registerInfo[1].ulAddr = TCP_FORCE_FY_REG_ID;
+    registerInfo[2].ulAddr = TCP_FORCE_FZ_REG_ID;
+    registerInfo[3].ulAddr = TCP_FORCE_MX_REG_ID;
+    registerInfo[4].ulAddr = TCP_FORCE_MY_REG_ID;
+    registerInfo[5].ulAddr = TCP_FORCE_MZ_REG_ID;
 
-    //Read TCP force torque data from registers
-
-    //TODO: read register addresses from params
-    registerInfo[0].ulAddr = 1000320;
-    registerInfo[1].ulAddr = 1000321;
-    registerInfo[2].ulAddr = 1000322;
-    registerInfo[3].ulAddr = 1000323;
-    registerInfo[4].ulAddr = 1000324;
-    registerInfo[5].ulAddr = 1000325;
-
+    //Read TCP force data from registers
     status = mpReadIO(registerInfo, registerValues, 6);
 
     if (status != OK)
@@ -118,33 +117,25 @@ void Ros_ForceTorqueMonitor_UpdateLocation()
         Ros_Debug_BroadcastMsg("Failed to get TCP force torque data: %u", status);
     }
 
-    //convert result to double array
-    for (int i = 0; i < 6; i += 1)
-    {
-        forceTCPValues[i] = registerValues[i];
-        forceTCPValues[i] = (forceTCPValues[i] - 10000.0) * 0.1;
-    }
-
-    //TODO: create better value assigment
-    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.force.x = forceTCPValues[0];
-    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.force.y = forceTCPValues[1];
-    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.force.z = forceTCPValues[2];
-    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.torque.x = forceTCPValues[3];
-    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.torque.y = forceTCPValues[4];
-    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.torque.z = forceTCPValues[5];
+    //convert register data to proper format and assign to corresponding wrench fields
+    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.force.x = (registerValues[0] - 10000.0) * 0.1;
+    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.force.y = (registerValues[1] - 10000.0) * 0.1;
+    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.force.z = (registerValues[2] - 10000.0) * 0.1;
+    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.torque.x = (registerValues[3] - 10000.0) * 0.1;
+    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.torque.y = (registerValues[4] - 10000.0) * 0.1;
+    g_messages_ForceTorqueMonitor.forceTorqueTCP->wrench.torque.z = (registerValues[5] - 10000.0) * 0.1;
 
     //**********************************
+    
+    //assign joint external torque data register adresses
+    registerInfo[0].ulAddr = EXTERNAL_TORQUE_JOINT_S_REG_ID;
+    registerInfo[1].ulAddr = EXTERNAL_TORQUE_JOINT_L_REG_ID;
+    registerInfo[2].ulAddr = EXTERNAL_TORQUE_JOINT_U_REG_ID;
+    registerInfo[3].ulAddr = EXTERNAL_TORQUE_JOINT_R_REG_ID;
+    registerInfo[4].ulAddr = EXTERNAL_TORQUE_JOINT_B_REG_ID;
+    registerInfo[5].ulAddr = EXTERNAL_TORQUE_JOINT_T_REG_ID;
 
     //Read joint external torque data from registers
-
-    //TODO: read register addresses from params
-    registerInfo[0].ulAddr = 1000310;
-    registerInfo[1].ulAddr = 1000311;
-    registerInfo[2].ulAddr = 1000312;
-    registerInfo[3].ulAddr = 1000313;
-    registerInfo[4].ulAddr = 1000314;
-    registerInfo[5].ulAddr = 1000315;
-
     status = mpReadIO(registerInfo, registerValues, 6);
 
     if (status != OK)
