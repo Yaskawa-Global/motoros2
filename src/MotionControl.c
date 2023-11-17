@@ -911,6 +911,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                 }
             }
 
+            hasUnprocessedData = FALSE;
             for (i = 0; i < g_Ros_Controller.numGroup; i++)
             {
                 memcpy(newPulseInc[i], moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
@@ -931,8 +932,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                 // some pulses are missing and the amount of unprocessed pulses needs to be added to this cycle.
                 ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
                 mpGetPulsePos(&ctrlGrpData, &pulsePosData);
-                isMissingPulse = FALSE;
-                hasUnprocessedData = FALSE;
+                isMissingPulse = FALSE;                
                 for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
                 {
                     // Check how many pulses we processed from last increment
