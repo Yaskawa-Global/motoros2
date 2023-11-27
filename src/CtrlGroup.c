@@ -514,7 +514,7 @@ void Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(CtrlGroup* ctrlGroup, long const m
     //High Speed Picking: (SLU-BT-) All rotary axes
     for (i = 0; i < MAX_PULSE_AXES; i += 1)
     {
-        if (ctrlGroup->axisType.type[i] == AXIS_INVALID)
+        if (Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, i))
         {
             continue;
         }
@@ -561,7 +561,7 @@ void Ros_CtrlGroup_ConvertMotoJointOrderToSequentialJointOrder(CtrlGroup* ctrlGr
 
         for (i = 0; i < ctrlGroup->numAxes; i += 1, rpi += 1, mpi += 1)
         {
-            while (ctrlGroup->axisType.type[mpi] == AXIS_INVALID)
+            while (Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, mpi))
             {
                 mpi += 1;
                 if (mpi >= MAX_PULSE_AXES)
@@ -616,7 +616,7 @@ void Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(CtrlGroup* ctrlGroup, double const
     //High Speed Picking: (SLU-BT-) All rotary axes
     for (int i = 0; i < MAX_PULSE_AXES; i += 1)
     {
-        if (ctrlGroup->axisType.type[i] == AXIS_INVALID)
+        if (Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, i))
         {
             continue;
         }
@@ -665,7 +665,7 @@ void Ros_CtrlGroup_ConvertSequentialJointOrderToMotoJointOrder(CtrlGroup* ctrlGr
 
         for (i = 0; i < ctrlGroup->numAxes; i += 1, rpi += 1, mpi += 1)
         {
-            while (ctrlGroup->axisType.type[mpi] == AXIS_INVALID)
+            while (Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, mpi))
             {
                 mpi += 1;
                 if (mpi >= MAX_PULSE_AXES)
@@ -709,7 +709,7 @@ UCHAR Ros_CtrlGroup_GetAxisConfig(CtrlGroup* ctrlGroup)
 
     for (i = 0; i < MAX_PULSE_AXES; i++)
     {
-        if (ctrlGroup->axisType.type[i] != AXIS_INVALID)
+        if (!Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, i))
             axisConfig |= (0x01 << i);
     }
 
@@ -761,7 +761,7 @@ void Ros_CtrlGroup_UpdateJointNamesInMotoOrder(CtrlGroup* ctrlGroup)
     //  High Speed Picking: (SLU-BT--)
     for (int axisIndex = 0, configIndex = 0; axisIndex < MP_GRP_AXES_NUM; axisIndex += 1)
     {
-        if (ctrlGroup->axisType.type[axisIndex] != AXIS_INVALID)
+        if (!Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, axisIndex))
         {
             int customNameIndex = (ctrlGroup->groupNo * MP_GRP_AXES_NUM) + configIndex;
 

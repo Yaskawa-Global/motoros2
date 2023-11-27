@@ -511,7 +511,7 @@ BOOL Ros_Controller_IsInMotion()
 
             for (i = 0; i < MP_GRP_AXES_NUM; i += 1)
             {
-                if (ctrlGroup->axisType.type[i] != AXIS_INVALID)
+                if (!Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, i))
                 {
                     // Check if position matches current command position
                     if (abs(fbPulsePos[i] - cmdPulsePos[i]) > START_MAX_PULSE_DEVIATION)

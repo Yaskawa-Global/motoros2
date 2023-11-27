@@ -523,7 +523,7 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
                     incData.time = curTrajData->time;
                     for (i = 0; i < MP_GRP_AXES_NUM; i++)
                     {
-                        if (ctrlGroup->axisType.type[i] != AXIS_INVALID)
+                        if (!Ros_CtrlGroup_IsInvalidAxis(ctrlGroup, i))
                             incData.inc[i] = (newPulsePos[i] - ctrlGroup->prevPulsePos[i]);
                         else
                             incData.inc[i] = 0;
