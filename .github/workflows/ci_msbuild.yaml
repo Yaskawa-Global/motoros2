@@ -5,6 +5,14 @@
 
 name: "CI: build VS proj"
 on:
+  # MSBuild CI only runs for PRs originating from this repository (due to
+  # access to secrets). Enable CI runs on pushes to the 'main' branch, to
+  # make sure MSBuild CI also gets run for contributions from external
+  # repositories (after the PR has been merged, but it might still catch
+  # problems that slipped past reviewers)
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
