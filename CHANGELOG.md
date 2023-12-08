@@ -7,6 +7,23 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
+## Forthcoming
+
+Maintenance release.
+
+New functionality:
+
+- Goal validation now includes a check for duplicated joint names ([#162](https://github.com/Yaskawa-Global/motoros2/pull/162))
+- INFORM job validator now prints offending lines to the debug log ([#167](https://github.com/Yaskawa-Global/motoros2/pull/167))
+
+Changes:
+
+- Lan port MAC addresses containing 0s no longer cause initialisation failures ([#145](https://github.com/Yaskawa-Global/motoros2/pull/145))
+- Alarm & subcode documentation was updated to include missing subcodes ([#151](https://github.com/Yaskawa-Global/motoros2/pull/151))
+- Improved support for trajectory execution with an active FSU ([#157](https://github.com/Yaskawa-Global/motoros2/pull/157))
+- Generated INFORM jobs no longer fail validation after reboot on YRC1000micro ([#168](https://github.com/Yaskawa-Global/motoros2/pull/168))
+- Corrected unit conversion and parameter retrieval for Base-axis TF transforms ([#172](https://github.com/Yaskawa-Global/motoros2/pull/172))
+
 ## 0.1.1 (2023-08-23)
 
 First release with official support for DX200 controllers.
