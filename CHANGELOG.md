@@ -7,7 +7,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
-## Forthcoming
+## 0.1.2 (2023-12-08)
 
 Maintenance release.
 

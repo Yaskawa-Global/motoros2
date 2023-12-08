@@ -16,7 +16,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 [![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg "MotoROS2 itself is licensed under the Apache-2.0 license. Please see the LICENSES directory for additional license files")](https://opensource.org/licenses/Apache-2.0)
 [![support level: consortium / vendor](https://img.shields.io/badge/support%20level-consortium%20/%20vendor-brightgreen.svg)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
 
-![Version: 0.1.1](https://img.shields.io/badge/version-0.1.1-informational.svg)
+![Version: 0.1.2](https://img.shields.io/badge/version-0.1.2-informational.svg)
 
 ## Overview
 
@@ -153,7 +153,7 @@ To calculate the MD5 hash on Debian/Ubuntu for the main MotoROS2 binary, run the
 ```shell
 $ cd /path/to/where/the/binary/was/saved
 $ md5sum -b mr2_yrc1_h.out
-a687f415e43a28ae9a34aa6950849a92  mr2_yrc1_h.out
+767c4f8ccc98eb4ee85146342c2984e7  mr2_yrc1_h.out
 ```
 
 Compare the output of `md5sum` when run against the binary downloaded in the previous section ([Downloading the files](#downloading-the-files)) with the values listed in the following table.
@@ -161,15 +161,15 @@ The values must match *exactly*.
 
 |**Controller** |**ROS 2 Version** | **File**          |**Version** | **MD5 hash**                       |
 |:--------------|:-----------------|:------------------|:-----------|:-----------------------------------|
-| DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.1`    | `010b61367c7a90b4315533710aec7716` |
-| DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.1`    | `44c316f860d46fc35326a1c227c28e57` |
-| DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.1`    | `b402e63d03a86cdc8f9d5aecbbc4ab52` |
-| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.1`    | `3779cd33a6397e10e2acdfbc1144798f` |
-| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.1`    | `51d5810cbf96a1cbf503a0158511e4ad` |
-| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.1`    | `a687f415e43a28ae9a34aa6950849a92` |
-| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.1`    | `6cd53f4b8bfbfb428f2c7f208d130818` |
-| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.1`    | `18a38497791b2f1114801c43bb84e93c` |
-| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.1`    | `804fd4d1e9f7b93835011203d8252880` |
+| DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.2`    | `9a8db7cd1ad436d6ace2cca8e0e2eb6b` |
+| DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.2`    | `d7e435ebf58c6b6da59555b941487af6` |
+| DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.2`    | `95da6b0b93407855b8c133ece9a952be` |
+| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.2`    | `813e6ee6a72626bafffa54641d9b77f8` |
+| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.2`    | `41b249ef1132bce67284c41a68289e56` |
+| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.2`    | `767c4f8ccc98eb4ee85146342c2984e7` |
+| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.2`    | `c1ca5fa9f44cf1e1e7de02174b3a6565` |
+| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.2`    | `20a6a332dc76bf657684a634b33c5c5e` |
+| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.2`    | `22522443553457d5bd9ad08785d117ed` |
 
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
