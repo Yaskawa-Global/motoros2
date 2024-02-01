@@ -16,3 +16,8 @@ MD013: false
 # explicitly allow it here
 MD033:
   allowed_elements: ['h1', 'img']
+
+# MD050 - Strong style
+# we use the double asterisk style throughout our documentation
+MD050:
+  style: asterisk
