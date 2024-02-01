@@ -50,6 +50,7 @@ The following sections document how to download, install, configure, use and tro
 - [General Requirements](#general-requirements)
   - [Checking the system software version](#checking-the-system-software-version)
   - [Checking MotoPlus configuration](#checking-motoplus-configuration)
+- [Option Function compatibility](#option-function-compatibility)
 - [Download](#download)
   - [Downloading the files](#downloading-the-files)
   - [Extracting the files](#extracting-the-files)
@@ -82,7 +83,6 @@ The following sections document how to download, install, configure, use and tro
   - [No support for partial goals](#no-support-for-partial-goals)
   - [Upper limit to publishing frequency](#upper-limit-to-publishing-frequency)
   - [Incorrect transform tree origin with multi-robot setups](#incorrect-transform-tree-origin-with-multi-robot-setups)
-  - [Not compatible with Simple Connect](#not-compatible-with-simple-connect)
   - [Memory leak](#memory-leak)
 - [Provisional roadmap](#provisional-roadmap)
 - [Frequently Asked Questions](#frequently-asked-questions)
@@ -125,6 +125,25 @@ Use the following steps to verify MotoPlus has been correctly configured for Mot
  1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
  1. move to `MotoPlus FUNC.`, make sure it is set to `USED`. If it isn't, set it to `USED`
  1. move cursor down to `MOTOMAN DRIVER` and make sure it is set to `USED`. If it isn't, set it to `USED`
+
+## Option Function compatibility
+
+The current version of MotoROS2 (`0.1.2`) is ***not*** compatible with the following Option Function(s) and/or other MotoPlus application(s):
+
+- Simple Connect
+
+  *Simple Connect* is an application installed by Yaskawa America to manage peripheral equipment in a robotic work cell.
+  It is primarily installed on robots that were purchased with an arc-welding configuration.
+  This application is not compatible with MotoROS2 at this time and must be removed to run MotoROS2.
+
+- Absolute Accuracy Compensation
+
+  This feature improves accuracy of supported robots when performing Cartesian motions from INFORM jobs.
+  MotoROS2 currently does not support Cartesian motion and therefore can't benefit from *Absolute Accuracy Compensation*.
+  Please refer to [Yaskawa-Global/motoros2#206](https://github.com/Yaskawa-Global/motoros2/issues/206) for an investigation into the compatibility of MotoROS2 with controllers with *Absolute Accuracy Compensation* enabled.
+
+Please post questions about compatibility of MotoROS2 with specific controller features, Option Functions and/or MotoPlus applications in the [Discussion](https://github.com/Yaskawa-Global/motoros2/discussions/categories/q-a) forum.
+Include information on the specific controller and robot model, as well as system software version and information on the MotoPlus application and/or controller feature in question.
 
 ## Download
 
@@ -783,14 +802,6 @@ For example, an `R1+R2` configuration, without calibration, will have the origin
 Refer to the relevant Yaskawa Motoman documentation for more information on how to perform a robot-to-robot calibration.
 
 After robot-calibration, the transform between the shared `world` frame and each robot's `base` frame will be known, and MotoROS2 will include it in the transforms it broadcasts.
-
-### Not compatible with Simple Connect
-
-**Description**: *Simple Connect* is an application installed by Yaskawa America to manage peripheral equipment in a robotic work cell.
-It is primarily installed on robots that were purchased with an arc-welding configuration.
-This application is not compatible with MotoROS2 at this time.
-
-**Work-around**: none at this time. Simple Connect must be removed to run MotoROS2.
 
 ### Memory leak
 
