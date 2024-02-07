@@ -797,9 +797,9 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_SetAllDefaultValues();
 
-#if defined (YRC1000) || defined (YRC1000u)
-    //config file always resides on USB for DX200/FS100, so only check
-    //on YRC1000 and micro
+#if defined (FS100) || defined (YRC1000) || defined (YRC1000u)
+    //config file always resides on USB for DX200, so only check
+    //on FS100, YRC1000 and micro
     Ros_ConfigFile_CheckUsbForNewConfigFile();
 #endif
 
@@ -820,9 +820,9 @@ void Ros_ConfigFile_Parse()
         int fd;
         struct stat fileStat;
 
-#if defined (FS100) || defined (DX200)
+#if defined (DX200)
         snprintf(storageDrive, CHAR_BUFFER_SIZE, "%s", MP_USB0_DEV_DOS);
-#elif defined (YRC1000) || defined (YRC1000u)
+#elif defined (FS100) || defined (YRC1000) || defined (YRC1000u)
         snprintf(storageDrive, CHAR_BUFFER_SIZE, "%s", MP_SRAM_DEV_DOS);
 #else
 #error Ros_ConfigFile_Parse: unsupported platform
