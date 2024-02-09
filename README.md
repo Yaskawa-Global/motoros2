@@ -10,7 +10,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 ![YRC1000: supported](https://img.shields.io/badge/YRC1000-supported-blue.svg)
 ![YRC1000micro: supported](https://img.shields.io/badge/YRC1000micro-supported-blue.svg)
 ![DX200: supported](https://img.shields.io/badge/DX200-supported-blue.svg)
-![FS100: not supported](https://img.shields.io/badge/FS100-not%20supported-inactive.svg)
+![FS100: supported (alpha)](https://img.shields.io/badge/FS100-supported%20(alpha)-blue.svg)
 ![DX100: not supported](https://img.shields.io/badge/DX100-not%20supported-inactive.svg)
 
 [![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg "MotoROS2 itself is licensed under the Apache-2.0 license. Please see the LICENSES directory for additional license files")](https://opensource.org/licenses/Apache-2.0)
@@ -32,10 +32,12 @@ The following sections document how to download, install, configure, use and tro
 - edit the [configuration file](#configuration), at least Agent IP and port
 - insert USB stick into pendant
 - *Maintenance* mode: load the MotoPlus application [onto the controller](#installation):
+  - FS100: `mr2_fs1_*.out`
   - DX200: `mr2_dx2_*.out`
   - YRC1000: `mr2_yrc1_*.out`
   - YRC1000micro: `mr2_yrc1m_*.out`
 - *Online* mode:
+  - FS100: TODO
   - DX200: insert USB stick with `motoros2_config.yaml` into `CN106` in the controller cabinet
   - YC1000[micro]: load `motoros2_config.yaml` via `USER DEFINED FILES`
 - start an instance of the [micro-ROS Agent](#the-micro-ros-agent) on a PC
@@ -92,12 +94,14 @@ The following sections document how to download, install, configure, use and tro
 
 The following general requirements must be met in order to be able to use MotoROS2 with a Yaskawa Motoman robot controller:
 
-- controller series: DX200, YRC1000, or YRC1000micro
+- controller series: FS100, DX200, YRC1000, or YRC1000micro
 - minimum versions of system software:
+  - `FS4.00.00` for FS100
   - `DN2.44.00-00` for DX200
   - `YAS2.80.00-00` for YRC1000
   - `YBS2.31.00-00` for YRC1000micro
 - the controller must have a correctly configured network connection:
+  - FS100: `LAN`
   - DX200: `LAN`
   - YRC1000: either `LAN2` or `LAN3`
   - YRC1000micro: either `LAN2` or `LAN3`
@@ -113,7 +117,7 @@ To check the version of the system software:
  1. touch `{MAIN MENU}` on the pendant keypad
  1. touch `[System Info]`→`[Version]`
 
-Look for the version number starting with `YAS` or `YBS`.
+Look for the version number starting with `FS`, `YAS` or `YBS`.
 
 ## Option Function compatibility
 
@@ -169,6 +173,7 @@ The values must match *exactly*.
 
 |**Controller** |**ROS 2 Version** | **File**          |**Version** | **MD5 hash**                       |
 |:--------------|:-----------------|:------------------|:-----------|:-----------------------------------|
+| FS100         | Humble           | `mr2_fs1_h.out`   | `9.9.9`    | `TODO` |
 | DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.2`    | `9a8db7cd1ad436d6ace2cca8e0e2eb6b` |
 | DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.2`    | `d7e435ebf58c6b6da59555b941487af6` |
 | DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.2`    | `95da6b0b93407855b8c133ece9a952be` |
@@ -234,13 +239,13 @@ All MotoROS2 release `.zip`s contain a copy of the default INFORM jobs (`.jbi` a
 
 The following variants are shipped with MotoROS2 in the `robot_jobs` sub directory:
 
-| **Directory**               | **Description**      | **Supported controller(s)**  |
-|:----------------------------|:---------------------|:-----------------------------|
-| `single_arm`                | Single robot group   | DX200, YRC1000, YRC1000micro |
-| `single_arm_with_ext_axis`  | Robot + station axis | DX200, YRC1000, YRC1000micro |
-| `single_arm_with_base_axis` | Robot + base axis    | DX200, YRC1000, YRC1000micro |
-| `two_arms`                  | Two robot groups     | DX200, YRC1000, YRC1000micro |
-| `sda_dual_arm`              | SDA robots *only*    | -                            |
+| **Directory**               | **Description**      | **Supported controller(s)**         |
+|:----------------------------|:---------------------|:------------------------------------|
+| `single_arm`                | Single robot group   | FS100, DX200, YRC1000, YRC1000micro |
+| `single_arm_with_ext_axis`  | Robot + station axis | FS100, DX200, YRC1000, YRC1000micro |
+| `single_arm_with_base_axis` | Robot + base axis    | FS100, DX200, YRC1000, YRC1000micro |
+| `two_arms`                  | Two robot groups     | FS100, DX200, YRC1000, YRC1000micro |
+| `sda_dual_arm`              | SDA robots *only*    | FS100                               |
 
 **These jobs are not required.**
 The INFORM job will be automatically generated at startup.
@@ -277,6 +282,8 @@ In *Normal Operation* mode:
  1. set this feature to `INVALID`
  1. turn off the robot controller
 
+### All controllers
+
 Turn on the robot controller while holding the `{Main Menu}` key on the keypad to enter *Maintenance* mode.
 You may release the key when you see the Yaskawa logo appear on the screen.
 
@@ -286,8 +293,8 @@ In *Maintenance* mode:
  1. touch `[MotoPlus APL]`→`[Device]` to select CF, SD, or USB memory type
  1. touch `[MotoPlus APL]`→`[Load (User App)]` to select and load the `mr2_*_*.out` file
  1. touch `[MotoPlus APL]`→`[File List]` and verify that MotoROS2 was properly installed and no other MotoPlus applications are currently loaded on the controller
- 1. (YRC1000[micro] only): touch `[File]`→`[Initialize]` and select `USER DEFINED FILES`
- 1. (YRC1000[micro] only): select `SRAM RAM DRIVE` and initialize it
+ 1. (FS100 and YRC1000[micro] only): touch `[File]`→`[Initialize]` and select `USER DEFINED FILES`
+ 1. (FS100 and YRC1000[micro] only): select `SRAM RAM DRIVE` and initialize it
  1. rotate the pendant key-switch (upper left of pendant) fully counter-clockwise into `TEACH` mode
  1. reboot the robot controller into regular mode
 
@@ -311,7 +318,7 @@ In *Normal Operation* mode:
  1. cursor to `JOB` and press `[SELECT]`
  1. cursor to your job file and press `[SELECT]` then `[ENTER]`
 
-#### YRC1000 and YRC1000 micro
+#### FS100, YRC1000 and YRC1000 micro
 
  1. touch `[EX MEMORY]`→`[Load]`
  1. cursor to `USER DEFINED FILES` and press `[SELECT]`
@@ -334,6 +341,8 @@ Within 30 seconds of loading the configuration file, you should get alarm `8001[
 Reboot again and there should be no alarms.
 
 If you receive any errors or alarms after rebooting, please refer to the [Troubleshooting](#troubleshooting) section for information on how to remedy the issue.
+
+### DX200, YRC1000, and YRC1000micro
 
 If `SAVE DATA CRC CHECK FUNC (FSU)` was disabled at the start of this procedure, then it can now be reenabled.
 
@@ -366,6 +375,8 @@ In *Normal Operation* mode:
  1. reboot the robot controller
 
 #### Older controller software
+
+`TODO: add FS100 steps`
 
 Due to the way the controller treats files, `motoros2_config.yaml` cannot be directly overwritten using the `[EX MEMORY]` menu.
 Instead, MotoROS2 has a built-in mechanism which updates the controller's copy of the `.yaml` file with a new version placed on a USB stick.
@@ -829,7 +840,6 @@ As such, no statements are made about priorities or development schedule for any
 
 The following items are on the MotoROS2 roadmap, and are listed here in no particular order:
 
-- support FS100 controllers
 - read/write of controller variables
 - CRUD of INFORM job files (ie: create, retrieve, update, delete)
 - starting/stopping INFORM jobs (other than `INIT_ROS`)
