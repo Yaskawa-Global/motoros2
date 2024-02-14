@@ -31,6 +31,7 @@ typedef enum
     MOTION_NOT_READY_INC_MOVE_ERROR = motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_INC_MOVE_ERROR,
     MOTION_NOT_READY_OTHER_PROGRAM_RUNNING = motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_OTHER_PROGRAM_RUNNING,
     MOTION_NOT_READY_OTHER_TRAJ_MODE_ACTIVE = motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_OTHER_TRAJ_MODE_ACTIVE,
+    MOTION_NOT_READY_NOT_CONT_CYCLE_MODE = motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_NOT_CONT_CYCLE_MODE,
 } MotionNotReadyCode;
 
 typedef enum
