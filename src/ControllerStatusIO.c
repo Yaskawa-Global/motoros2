@@ -461,6 +461,10 @@ MotionNotReadyCode Ros_Controller_GetNotReadySubcode()
     if(!Ros_Controller_IsWaitingRos())
         return MOTION_NOT_READY_WAITING_ROS;
 
+    // Check if in continuous cycle mode
+    if (!Ros_Controller_IsContinuousCycle())
+        return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
+
     return MOTION_READY;
 }
 
