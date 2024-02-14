@@ -1392,6 +1392,13 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     }
 #endif
 
+    // Check if in continous cycle mode
+    if (!Ros_Controller_IsContinuousCycle())
+    {
+        Ros_Debug_BroadcastMsg("Continuous cycle mode not set, can't enable trajectory mode");
+        return FALSE;
+    }
+
     if (Ros_Controller_IsAnyFaultActive())
     {
         Ros_Debug_BroadcastMsg("Controller is in a fault state. Please call /reset_error");

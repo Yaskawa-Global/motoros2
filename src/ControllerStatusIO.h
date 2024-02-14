@@ -56,6 +56,7 @@ typedef enum
     IO_ROBOTSTATUS_ESTOP_CTRL,
     IO_ROBOTSTATUS_WAITING_ROS,
     IO_ROBOTSTATUS_INECOMODE,
+    IO_ROBOTSTATUS_CONT_CYC_MODE,
 #if (YRC1000||YRC1000u)
     IO_ROBOTSTATUS_PFL_STOP,
     IO_ROBOTSTATUS_PFL_ESCAPE,
@@ -120,6 +121,7 @@ extern BOOL Ros_Controller_IsServoOn();
 extern BOOL Ros_Controller_IsEcoMode();
 extern BOOL Ros_Controller_IsEStop();
 extern BOOL Ros_Controller_IsWaitingRos();
+extern BOOL Ros_Controller_IsContinuousCycle();
 extern BOOL Ros_Controller_IsMotionReady();
 extern BOOL Ros_Controller_IsInMotion();
 extern BOOL Ros_Controller_IsPflActive();

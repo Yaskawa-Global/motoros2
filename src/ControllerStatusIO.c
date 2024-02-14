@@ -283,6 +283,7 @@ void Ros_Controller_StatusInit()
     g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_ESTOP_CTRL].ulAddr = 80027;        // Controller E-Stop
     g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_WAITING_ROS].ulAddr = IO_FEEDBACK_WAITING_MP_INCMOVE; // Job input signaling ready for external motion
     g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_INECOMODE].ulAddr = 50727;         // Energy Saving Mode
+    g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_CONT_CYC_MODE].ulAddr = 50052;     // Continuous Cycle Mode
 #if (YRC1000||YRC1000u)
     g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_STOP].ulAddr = 81702;          // PFL function stopped the motion
     g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_PFL_ESCAPE].ulAddr = 81703;        // PFL function escape from clamping motion
@@ -357,6 +358,11 @@ BOOL Ros_Controller_IsEStop()
 BOOL Ros_Controller_IsWaitingRos()
 {
     return ((g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_WAITING_ROS]!=0));
+}
+
+BOOL Ros_Controller_IsContinuousCycle()
+{
+    return ((g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_CONT_CYC_MODE] != 0));
 }
 
 BOOL Ros_Controller_IsMotionReady()
