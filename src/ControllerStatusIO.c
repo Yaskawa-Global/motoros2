@@ -428,6 +428,10 @@ MotionNotReadyCode Ros_Controller_GetNotReadySubcode()
     if(!Ros_Controller_IsPlay())
         return MOTION_NOT_READY_NOT_PLAY;
 
+    // Check if in continuous cycle mode (Here due to being checked before starting servor power)
+    if (!Ros_Controller_IsContinuousCycle())
+        return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
+
 #ifndef DUMMY_SERVO_MODE
     // Check remote
     if(!Ros_Controller_IsRemote())
@@ -460,10 +464,6 @@ MotionNotReadyCode Ros_Controller_GetNotReadySubcode()
     // Check ready I/O signal (should confirm wait)
     if(!Ros_Controller_IsWaitingRos())
         return MOTION_NOT_READY_WAITING_ROS;
-
-    // Check if in continuous cycle mode
-    if (!Ros_Controller_IsContinuousCycle())
-        return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
 
     return MOTION_READY;
 }
