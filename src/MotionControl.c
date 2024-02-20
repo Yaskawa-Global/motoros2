@@ -1363,6 +1363,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     MP_START_JOB_SEND_DATA sStartData;
     int checkCount;
     int grpNo;
+    bool ecoModeCheck = false;
 
     Ros_Debug_BroadcastMsg("%s: enter", __func__);
 
@@ -1448,6 +1449,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
                 Ros_Debug_BroadcastMsg("%s: couldn't disable eco mode");
                 goto updateStatus;
             }
+            ecoModeCheck = true;
         }
 
         // servos are off, eco mode is not active any more (if it was), so
@@ -1539,6 +1541,10 @@ updateStatus:
     Ros_Controller_IoStatusUpdate();
 
     Ros_Debug_BroadcastMsg("%s: exit", __func__);
+
+    //If recovering from eco mode: Give time for the controller to recognize that the INFORM cursor is sitting on
+    //a WAIT instructions.
+    if (ecoModeCheck) Ros_Sleep(200);
 
     if (Ros_Controller_IsMotionReady())
     {
