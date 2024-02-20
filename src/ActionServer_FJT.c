@@ -190,11 +190,6 @@ rcl_ret_t Ros_ActionServer_FJT_Goal_Received(rclc_action_goal_handle_t* goal_han
 
         Ros_Debug_BroadcastMsg(responseMsg->message.data);
 
-        //Give time for the controller to recognize that the INFORM cursor is sitting on
-        //a WAIT instructions. Without this delay, the first call to mpExRcsIncrementMove
-        //will fail with a (-1).
-        Ros_Sleep(100);
-
         if (responseMsg->result_code.value == MOTION_READY)
             bMotionReady = Ros_Controller_IsMotionReady();
 
