@@ -38,11 +38,17 @@ jobs:
   msbuild:
     runs-on: windows-2022
     needs: msbuild_filter
-    # only run this job if source files were changed,
-    # AND the PR came from a feature branch on the main repository
+    # only run this job if:
+    #  - this is a manually triggered build, or
+    #  - it's a PR and:
+    #    - source files were changed,
+    #    - AND the PR came from a feature branch on the main repository
     if: |
-      needs.msbuild_filter.outputs.needs_msbuild == 'true' &&
+      github.event_name == 'workflow_dispatch' ||
+      (
+        needs.msbuild_filter.outputs.needs_msbuild == 'true' &&
         github.event.pull_request.head.repo.full_name == github.repository
+      )
 
     strategy:
       # keep jobs running even if one fails (we want to know on which
