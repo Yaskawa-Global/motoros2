@@ -49,7 +49,6 @@ The following sections document how to download, install, configure, use and tro
 - [Quickstart](#quickstart)
 - [General Requirements](#general-requirements)
   - [Checking the system software version](#checking-the-system-software-version)
-  - [Checking MotoPlus configuration](#checking-motoplus-configuration)
 - [Option Function compatibility](#option-function-compatibility)
 - [Download](#download)
   - [Downloading the files](#downloading-the-files)
@@ -59,6 +58,7 @@ The following sections document how to download, install, configure, use and tro
   - [Verifying YAML correctness](#verifying-yaml-correctness)
 - [Example INFORM jobs](#example-inform-jobs)
 - [Installation](#installation)
+  - [Checking MotoPlus configuration](#checking-motoplus-configuration)
   - [DX200, YRC1000 and YRC1000micro](#dx200-yrc1000-and-yrc1000micro)
 - [Building from source](#building-from-source)
 - [Updating the configuration](#updating-the-configuration)
@@ -101,7 +101,6 @@ The following general requirements must be met in order to be able to use MotoRO
   - DX200: `LAN`
   - YRC1000: either `LAN2` or `LAN3`
   - YRC1000micro: either `LAN2` or `LAN3`
-- MotoPlus and Motoman-Driver must be enabled on the controller
 - ROS 2 version: Foxy, Galactic or Humble.
   MotoROS2 does not support ROS 2 Iron Irwini nor Rolling Ridley.
 - Docker or a from-source build of the micro-ROS Agent
@@ -115,16 +114,6 @@ To check the version of the system software:
  1. touch `[System Info]`→`[Version]`
 
 Look for the version number starting with `YAS` or `YBS`.
-
-### Checking MotoPlus configuration
-
-Use the following steps to verify MotoPlus has been correctly configured for MotoROS2, and the necessary settings are active:
-
- 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode
- 1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
- 1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
- 1. move to `MotoPlus FUNC.`, make sure it is set to `USED`. If it isn't, set it to `USED`
- 1. move cursor down to `MOTOMAN DRIVER` and make sure it is set to `USED`. If it isn't, set it to `USED`
 
 ## Option Function compatibility
 
@@ -261,10 +250,20 @@ If needed, open a new issue on the [Issue tracker](https://github.com/yaskawa-gl
 
 ## Installation
 
-Place the `.out` (main binary), `.yaml` (configuration), and `.dat` (I/O names) files on an external storage device: Compact Flash (CF), Secure Digital (SD), and USB sticks can be used depending on the controller model.
-Insert the storage device into the robot's programming pendant and refer to the following section.
+### Checking MotoPlus configuration
+
+Use the following steps to verify MotoPlus has been correctly configured for MotoROS2, and the necessary settings are active:
+
+ 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode
+ 1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
+ 1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
+ 1. move to `MotoPlus FUNC.`, make sure it is set to `USED`. If it isn't, set it to `USED`
+ 1. move cursor down to `MOTOMAN DRIVER` and make sure it is set to `USED`. If it isn't, set it to `USED`
 
 ### DX200, YRC1000, and YRC1000micro
+
+Place the `.out` (main binary), `.yaml` (configuration), and `.dat` (I/O names) files on an external storage device: Compact Flash (CF), Secure Digital (SD), and USB sticks can be used depending on the controller model.
+Insert the storage device into the robot's programming pendant.
 
 If the controller is configured with the Functional Safety Unit (FSU), then `SAVE DATA CRC CHECK FUNC (FSU)` must be temporarily disabled during the installation procedure.
 
