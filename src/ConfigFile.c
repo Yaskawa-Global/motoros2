@@ -120,6 +120,7 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "allow_custom_inform_job", &g_nodeConfigSettings.allow_custom_inform_job, Value_Bool },
     { "userlan_monitor_enabled", &g_nodeConfigSettings.userlan_monitor_enabled, Value_Bool },
     { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_UserLanPort },
+    { "ignore_missing_calib_data", &g_nodeConfigSettings.ignore_missing_calib_data, Value_Bool },
 };
 
 void Ros_ConfigFile_SetAllDefaultValues()
@@ -237,6 +238,9 @@ void Ros_ConfigFile_SetAllDefaultValues()
     //userlan monitoring
     g_nodeConfigSettings.userlan_monitor_enabled = DEFAULT_ULAN_MON_ENABLED;
     g_nodeConfigSettings.userlan_monitor_port = DEFAULT_ULAN_MON_LINK;
+
+    //ignore_missing_calib_data
+    g_nodeConfigSettings.ignore_missing_calib_data = DEFAULT_IGNORE_MISSING_CALIB;
 }
 
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
@@ -753,6 +757,7 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: allow_custom_inform_job = %d", config->allow_custom_inform_job);
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_enabled = %d", config->userlan_monitor_enabled);
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_port = %d", config->userlan_monitor_port);
+    Ros_Debug_BroadcastMsg("Config: ignore_missing_calib_data = %d", config->ignore_missing_calib_data);
 }
 
 void Ros_ConfigFile_Parse()

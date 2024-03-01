@@ -11,6 +11,9 @@ Controller g_Ros_Controller;
 ControllerStatus_Publishers g_publishers_RobotStatus;
 ControllerStatus_Messages g_messages_RobotStatus;
 
+//'private' APIs
+static BOOL Ros_Controller_LoadGroupCalibrationData(Controller* const controller);
+
 //-------------------------------------------------------------------
 // Wait for the controller to be ready to start initialization
 //-------------------------------------------------------------------
@@ -34,7 +37,6 @@ BOOL Ros_Controller_WaitInitReady()
 BOOL Ros_Controller_Initialize()
 {
     int groupIndex;
-    int i;
     BOOL bInitOk;
     STATUS status;
 
@@ -114,23 +116,29 @@ BOOL Ros_Controller_Initialize()
     }
 
     //get the robot calibration data for multi-robot systems
-    for (i = 0; i < MAX_ROBOT_CALIBRATION_FILES; i += 1)
+    const BOOL bCalibLoadedOk = Ros_Controller_LoadGroupCalibrationData(&g_Ros_Controller);
+    //see whether the user should be notified about failures (it's OK to not
+    //have/load any calibration in some cases)
+    const BOOL bNeedToWarnAboutCalib = Ros_Controller_ShouldWarnNoCalibDataLoaded(
+        &g_Ros_Controller, bCalibLoadedOk, g_nodeConfigSettings.publish_tf);
+    Ros_Debug_BroadcastMsg(
+        "%s: calib loaded ok: %s, should warn: %s", __func__,
+            bCalibLoadedOk ? "yes" : "no", bNeedToWarnAboutCalib ? "yes" : "no");
+    if (bNeedToWarnAboutCalib)
     {
-        MP_RB_CALIB_DATA calibData;
-        if (Ros_mpGetRobotCalibrationData(i, &calibData) == OK)
+        if (g_nodeConfigSettings.ignore_missing_calib_data)
         {
-            if (calibData.s_rb.grp_no <= MP_R8_GID && //the slave is a robot
-                calibData.m_rb.grp_no <= MP_R8_GID) //the master is another robot's RF
-            {
-                groupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)calibData.s_rb.grp_no);
-                MP_COORD* coord = &g_Ros_Controller.ctrlGroups[groupIndex]->robotCalibrationToBaseFrame;
-                coord->x = calibData.pos_uow[0];
-                coord->y = calibData.pos_uow[1];
-                coord->z = calibData.pos_uow[2];
-                coord->rx = calibData.ang_uow[0];
-                coord->ry = calibData.ang_uow[1];
-                coord->rz = calibData.ang_uow[2];
-            }
+            Ros_Debug_BroadcastMsg(
+                "%s: ignoring absence of calibration data (or load failure) as configured",
+                __func__);
+        }
+        else
+        {
+            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "No calibration: invalid TF",
+                SUBCODE_CONFIGURATION_NO_CALIB_FILES_LOADED);
+            Ros_Debug_BroadcastMsg(
+                "%s: no calibration files loaded: TF potentially incorrect, posting warning "
+                "(disable with 'ignore_missing_calib_data')", __func__);
         }
     }
 
@@ -760,4 +768,83 @@ int Ros_Controller_GetActiveAlarmCodes(USHORT active_alarms[MAX_ALARM_COUNT + MA
     }
 
     return num_entries;
+}
+
+/**
+ * Attempt to load on-controller extrinsic kinematic calibration data to improve
+ * accuracy of TF broadcasts (for frames for which such calibration data exists).
+ *
+ * NOTE: returns TRUE IFF at least one calibration file loaded successfully,
+ *       FALSE in all other cases.
+*/
+static BOOL Ros_Controller_LoadGroupCalibrationData(Controller* const controller)
+{
+    BOOL bOneCalibFileLoaded = FALSE;
+
+    for (int i = 0; i < MAX_ROBOT_CALIBRATION_FILES; i += 1)
+    {
+        MP_RB_CALIB_DATA calibData;
+        if (Ros_mpGetRobotCalibrationData(i, &calibData) == OK)
+        {
+            Ros_Debug_BroadcastMsg("%s: file %d loaded OK", __func__, i);
+
+            //Take note at least one calibration file loaded successfully.
+            //
+            //NOTE: successful loading of a single calibration file will of
+            //course not mean all groups (that would benefit from it) are actually
+            //calibrated correctly. But this is the best we can do, as there is
+            //no requirement to calibrate every group to every other group, nor
+            //will this prevent MotoROS2 from successfully controlling motion.
+            //
+            //TF frame broadcasts for uncalibrated groups will however be incorrect,
+            //which is why posting an alarm in case there are no calibration files
+            //at all on a multigroup system is considered a good thing to do.
+            bOneCalibFileLoaded = TRUE;
+
+            if (calibData.s_rb.grp_no <= MP_R8_GID && //the slave is a robot
+                calibData.m_rb.grp_no <= MP_R8_GID) //the master is another robot's RF
+            {
+                int groupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)calibData.s_rb.grp_no);
+                MP_COORD* coord = &controller->ctrlGroups[groupIndex]->robotCalibrationToBaseFrame;
+                coord->x = calibData.pos_uow[0];
+                coord->y = calibData.pos_uow[1];
+                coord->z = calibData.pos_uow[2];
+                coord->rx = calibData.ang_uow[0];
+                coord->ry = calibData.ang_uow[1];
+                coord->rz = calibData.ang_uow[2];
+            }
+        }
+    }
+
+    return bOneCalibFileLoaded;
+}
+
+//TODO(gavanderhoorn): should be able to make this 'static' once Yaskawa-Global/motoros2#173
+//is implemented and we can unit test static functions
+BOOL Ros_Controller_ShouldWarnNoCalibDataLoaded(Controller const* controller, BOOL bCalibLoadedOk, BOOL bPublishTfEnabled)
+{
+    size_t numRobotsOrStations = 0;
+    for(size_t i=0; i < controller->numGroup; ++i)
+        if (Ros_CtrlGroup_IsRobot(controller->ctrlGroups[i]) || Ros_CtrlGroup_IsStation(controller->ctrlGroups[i]))
+            numRobotsOrStations += 1;
+
+    //It's OK if calibration did not load (for single-group systems fi, or systems
+    //that haven't been calibrated), but it might be prudent to post an alarm just
+    //in case IFF:
+    //
+    // - this is a multi-group system
+    // - there is at least one robot
+    // - there are groups other than base groups (so R1+R2, or R1+S1)
+    // - TF broadcast is enabled, and
+    // - none of the calibration files loaded
+    //
+    //in that case there could be Robot groups that have not been calibrated (to
+    //either other robots and/or Station groups) and this would make their TF
+    //broadcasts incorrect.
+    return (
+        //only groups other than base groups need calibration
+        numRobotsOrStations > 1 &&
+        //and warn only if TF is enabled AND calib failed to load
+        TRUE  == bPublishTfEnabled &&
+        FALSE == bCalibLoadedOk);
 }

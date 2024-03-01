@@ -97,6 +97,8 @@ typedef enum
 #define DEFAULT_ULAN_MON_ENABLED        TRUE
 #define DEFAULT_ULAN_MON_LINK           CFG_ROS_USER_LAN_AUTO
 
+#define DEFAULT_IGNORE_MISSING_CALIB    FALSE
+
 typedef struct
 {
     //TODO(gavanderhoorn): add support for unsigned types
@@ -137,6 +139,8 @@ typedef struct
 
     BOOL userlan_monitor_enabled;
     Ros_UserLan_Port_Setting userlan_monitor_port;
+
+    BOOL ignore_missing_calib_data;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;

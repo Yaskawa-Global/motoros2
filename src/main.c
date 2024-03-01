@@ -72,6 +72,7 @@ void RosInitTask()
     BOOL bTestResult = TRUE;
     bTestResult &= Ros_Testing_CtrlGroup();
     bTestResult &= Ros_Testing_RosMotoPlusConversionUtils();
+    bTestResult &= Ros_Testing_ControllerStatusIO();
     bTestResult ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
     Ros_Debug_BroadcastMsg("===");
 #endif
