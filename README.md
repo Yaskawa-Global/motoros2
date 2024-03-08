@@ -437,6 +437,7 @@ docker run \
   -it \
   --rm \
   --net=host \
+  --user=$(id -u):$(id -g) \
   microros/micro-ros-agent:humble \
     udp4 \
     --port 8888
