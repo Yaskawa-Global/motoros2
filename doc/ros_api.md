@@ -148,7 +148,7 @@ Type: [motoros2_interfaces/srv/QueueTrajPoint](https://github.com/yaskawa-global
 
 Submit a `JointTrajectoryPoint` to be queued for continuous motion.
 
-The `start_point_queue_mode` service must have been called prior to attempting this service.
+The `start_point_queue_mode` service must have been called prior to attempting to use this service.
 
 If this service fails, inspect the `QueueResultEnum` field in the reply to determine the cause.
 The most common type of failure is `BUSY`.
