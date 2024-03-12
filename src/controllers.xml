@@ -5,6 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 <root>
 	<libExtension>
+		<YRC1000_iron>yrcLib_iron;yrcLib</YRC1000_iron>
+		<YRC1000u_iron>yrcmLib_iron;yrcmLib</YRC1000u_iron>
 		<YRC1000_humble>yrcLib_humble;yrcLib</YRC1000_humble>
 		<YRC1000u_humble>yrcmLib_humble;yrcmLib</YRC1000u_humble>
 		<YRC1000_foxy>yrcLib_foxy;yrcLib</YRC1000_foxy>
@@ -17,6 +19,8 @@ SPDX-License-Identifier: Apache-2.0
 	</libExtension>
 	
 	<appName>
+		<YRC1000_iron>MOTOPLUS-YRC1000</YRC1000_iron>
+		<YRC1000u_iron>MOTOPLUS-YRC1000micro</YRC1000u_iron>
 		<YRC1000_humble>MOTOPLUS-YRC1000</YRC1000_humble>
 		<YRC1000u_humble>MOTOPLUS-YRC1000micro</YRC1000u_humble>
 		<YRC1000_foxy>MOTOPLUS-YRC1000</YRC1000_foxy>
@@ -29,6 +33,8 @@ SPDX-License-Identifier: Apache-2.0
 	</appName>
 	
 	<compilers>
+		<YRC1000_iron>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_iron>
+		<YRC1000u_iron>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_iron>
 		<YRC1000_humble>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_humble>
 		<YRC1000u_humble>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_humble>
 		<YRC1000_foxy>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_foxy>
