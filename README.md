@@ -413,7 +413,7 @@ To extract a copy of your current configuration from the teach pendant:
 ## The micro-ROS Agent
 
 The micro-ROS Agent acts as the transparent bridge between MotoROS2 and ROS 2.
-As Micro-ROS applications can not directly communicate with ROS 2 RMWs, the Agent must always be running for MotoROS2 to function correctly.
+As micro-ROS applications can not directly communicate with ROS 2 RMWs, the Agent must always be running for MotoROS2 to function correctly.
 
 There are two main ways to run the Agent: using a Docker image or by building it in a Colcon workspace.
 
