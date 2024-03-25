@@ -7,8 +7,8 @@
 
 #include "MotoROS.h"
 
-#if !(defined (DX200) || defined (YRC1000) || defined (YRC1000u))
-#error MotoROS2 is only supported on DX2 and YRC1 generation controllers
+#if !(defined (FS100) || defined (DX200) || defined (YRC1000) || defined (YRC1000u))
+#error MotoROS2 is only supported on FS, DX2 and YRC1 generation controllers
 #endif
 
 void RosInitTask();
@@ -37,6 +37,7 @@ void Ros_Sleep(float milliseconds)
 //Report version info to display on pendant
 void Ros_ReportVersionInfoToController()
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     MP_APPINFO_SEND_DATA appInfoSendData;
     MP_STD_RSP_DATA stdResponseData;
 
@@ -47,6 +48,7 @@ void Ros_ReportVersionInfoToController()
     snprintf(appInfoSendData.Comment, MP_MAX_APP_COMMENT,
         "%s", "micro-ROS based ROS 2 interface");
     mpApplicationInfoNotify(&appInfoSendData, &stdResponseData); //don't care about return value
+#endif
 }
 
 void RosInitTask()

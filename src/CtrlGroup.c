@@ -66,7 +66,9 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
     STATUS status;
     BOOL bInitOk;
     BOOL slaveAxis;
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     MP_GET_TOOL_NO_RSP_DATA retToolData;
+#endif
 
     // Check if group is defined
     numAxes = GP_getNumberOfAxes(groupIndex);
@@ -87,9 +89,11 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
 
         if (Ros_CtrlGroup_IsRobot(ctrlGroup))
         {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
             mpGetToolNo(ctrlGroup->groupId, &retToolData);
             //TODO: need to update this value when selected tool changes
             ctrlGroup->tool = retToolData.sToolNo;
+#endif
 
             int baseIdOffset = (int)ctrlGroup->groupId - (int)MP_R1_GID;
             ctrlGroup->baseTrackGroupIndex = mpCtrlGrpId2GrpNo((MP_GRP_ID_TYPE)baseIdOffset + MP_B1_GID);
@@ -251,7 +255,7 @@ MP_GRP_ID_TYPE Ros_mpCtrlGrpNo2GrpId(int groupNo)
 #if defined (YRC1000) || defined (YRC1000u)
     return mpCtrlGrpNo2GrpId(groupNo);
 
-#elif defined (FS100) || defined (DX200)
+#elif defined (DX200)
     MP_GRP_ID_TYPE grp_id;
 
     for(grp_id = MP_R1_GID; grp_id < MP_S24_GID; ++grp_id)
@@ -262,9 +266,19 @@ MP_GRP_ID_TYPE Ros_mpCtrlGrpNo2GrpId(int groupNo)
 
     return -1;
 
+#elif defined (FS100)
+    MP_GRP_ID_TYPE grp_id;
+
+    for(grp_id = MP_R1_GID; grp_id < MP_S3_GID; ++grp_id)
+    {
+        if(groupNo == mpCtrlGrpId2GrpNo(grp_id))
+            return grp_id;
+    }
+
+    return -1;
+
 #else
 #error "Ros_mpCtrlGrpNo2GrpId: unsupported platform"
-
 #endif
 }
 
@@ -476,6 +490,7 @@ BOOL Ros_CtrlGroup_GetTorque(CtrlGroup* ctrlGroup, double torqueValues[MAX_PULSE
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_GetEncoderTemperature(CtrlGroup const* const ctrlGroup, long encoderTemp[MAX_PULSE_AXES])
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     MP_CTRL_GRP_SEND_DATA sData;
     MP_ENCODER_TEMP_RSP_DATA rData;
     LONG status = 0;
@@ -496,6 +511,10 @@ BOOL Ros_CtrlGroup_GetEncoderTemperature(CtrlGroup const* const ctrlGroup, long 
     memcpy(encoderTemp, rData.lTemp, MAX_PULSE_AXES * sizeof(long));
 
     return TRUE;
+
+#elif defined(FS100)
+    return FALSE;
+#endif
 }
 
 //Convert the Motoman position units (pulses) to ROS position units (radians/meters).
@@ -721,7 +740,13 @@ UCHAR Ros_CtrlGroup_GetAxisConfig(CtrlGroup* ctrlGroup)
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup)
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     return((ctrlGroup->groupId >= MP_R1_GID) && (ctrlGroup->groupId <= MP_R8_GID));
+#elif defined(FS100)
+    return((ctrlGroup->groupId >= MP_R1_GID) && (ctrlGroup->groupId <= MP_R4_GID));
+#else
+    #error Unsupported platform
+#endif
 }
 
 //-------------------------------------------------------------------
@@ -729,7 +754,13 @@ BOOL Ros_CtrlGroup_IsRobot(CtrlGroup* ctrlGroup)
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_IsBase(CtrlGroup const* const ctrlGroup)
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     return ((ctrlGroup->groupId >= MP_B1_GID) && (ctrlGroup->groupId <= MP_B8_GID));
+#elif defined(FS100)
+    return ((ctrlGroup->groupId >= MP_B1_GID) && (ctrlGroup->groupId <= MP_B4_GID));
+#else
+    #error Unsupported platform
+#endif
 }
 
 //-------------------------------------------------------------------
@@ -737,7 +768,13 @@ BOOL Ros_CtrlGroup_IsBase(CtrlGroup const* const ctrlGroup)
 //-------------------------------------------------------------------
 BOOL Ros_CtrlGroup_IsStation(CtrlGroup const* const ctrlGroup)
 {
+#if defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     return ((ctrlGroup->groupId >= MP_S1_GID) && (ctrlGroup->groupId <= MP_S24_GID));
+#elif defined(FS100)
+    return ((ctrlGroup->groupId >= MP_S1_GID) && (ctrlGroup->groupId <= MP_S3_GID));
+#else
+    #error Unsupported platform
+#endif
 }
 
 //-------------------------------------------------------------------
