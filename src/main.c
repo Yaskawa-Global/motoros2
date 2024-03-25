@@ -120,6 +120,7 @@ void RosInitTask()
         Ros_InformChecker_ValidateJob();
 
         Ros_PositionMonitor_Initialize();
+        Ros_ForceTorqueMonitor_Initialize();  //initialize force torque monitor
         Ros_ActionServer_FJT_Initialize(); //initialize action server - FollowJointTrajectory
 
         Ros_ServiceQueueTrajPoint_Initialize();
@@ -146,7 +147,7 @@ void RosInitTask()
         //==================================
         ULONG tickBefore = 0;
 
-        while(g_Ros_Communication_AgentIsConnected)
+        while (g_Ros_Communication_AgentIsConnected)
         {
             //figure out how long to sleep to achieve the user-configured rate
             ULONG tickNow = tickGet();
@@ -180,6 +181,10 @@ void RosInitTask()
 
             //Update robot's feedback position and publish the topics
             Ros_PositionMonitor_UpdateLocation();
+
+            // Update robot's force torque data and publish the topics
+
+            Ros_ForceTorqueMonitor_UpdateLocation();
         }
 
         //==================================
@@ -211,8 +216,9 @@ void RosInitTask()
 
         Ros_ActionServer_FJT_Cleanup();
         Ros_PositionMonitor_Cleanup();
+        Ros_ForceTorqueMonitor_Cleanup();
         Ros_Controller_Cleanup();
-        Ros_Communication_Cleanup(); 
+        Ros_Communication_Cleanup();
         Ros_mpGetRobotCalibrationData_Cleanup();
 
         //--------------------------------
