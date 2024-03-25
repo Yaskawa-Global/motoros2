@@ -60,7 +60,7 @@ The following sections document how to download, install, configure, use and tro
 - [Installation](#installation)
   - [Checking MotoPlus configuration](#checking-motoplus-configuration)
   - [DX200, YRC1000 and YRC1000micro](#dx200-yrc1000-and-yrc1000micro)
-- [Building from source](#building-from-source)
+- [Building from source](doc/build_from_source.md)
 - [Updating the configuration](#updating-the-configuration)
 - [The micro-ROS Agent](#the-micro-ros-agent)
   - [Using Docker (Linux Only)](#using-docker-linux-only)
@@ -70,7 +70,7 @@ The following sections document how to download, install, configure, use and tro
   - [Basic usage with ROS](#basic-usage-with-ros)
   - [Commanding motion](#commanding-motion)
   - [With MoveIt](#with-moveit)
-- [ROS API](#ros-api)
+- [ROS API](doc/ros_api.md)
 - [Default QoS settings](#default-qos-settings)
   - [Publisher QoS](#publisher-qos)
   - [Service server QoS](#service-server-qos)
@@ -85,8 +85,8 @@ The following sections document how to download, install, configure, use and tro
   - [Incorrect transform tree origin with multi-robot setups](#incorrect-transform-tree-origin-with-multi-robot-setups)
   - [Memory leak](#memory-leak)
 - [Provisional roadmap](#provisional-roadmap)
-- [Frequently Asked Questions](#frequently-asked-questions)
-- [Troubleshooting](#troubleshooting)
+- [Frequently Asked Questions](doc/faq.md)
+- [Troubleshooting](doc/troubleshooting.md)
 
 ## General Requirements
 
