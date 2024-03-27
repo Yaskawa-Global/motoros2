@@ -1355,6 +1355,7 @@ static STATUS Ros_Controller_DisableEcoMode()
 //
 // NOTE: only attempts to start job if necessary, does not reset errors, alarms.
 //       Does attempt to enable servo power (if not on)
+//       Does attempt to set the cycle mode to continuous (if not set)
 //-----------------------------------------------------------------------
 BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
 {
@@ -1392,13 +1393,6 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     }
 #endif
 
-    // Check if in continous cycle mode
-    if (!Ros_Controller_IsContinuousCycle())
-    {
-        Ros_Debug_BroadcastMsg("Continuous cycle mode not set, can't enable trajectory mode");
-        return FALSE;
-    }
-
     if (Ros_Controller_IsAnyFaultActive())
     {
         Ros_Debug_BroadcastMsg("Controller is in a fault state. Please call /reset_error");
@@ -1433,6 +1427,23 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
             mpHold(&holdSendData, &stdRspData);
 
             Ros_Sleep(MOTION_START_CHECK_PERIOD);
+        }
+    }
+
+    // Check if in continous cycle mode
+    if (!Ros_Controller_IsContinuousCycle())
+    {
+        // set the cycle mode to auto if not currently
+        MP_CYCLE_SEND_DATA sCycleData;
+        bzero(&sCycleData, sizeof(sCycleData));
+        bzero(&rData, sizeof(rData));
+        sCycleData.sCycle = 3;  // Auto
+        ret = mpSetCycle(&sCycleData, &rData);
+        if( (ret != 0) || (rData.err_no != 0) ) {
+            Ros_Debug_BroadcastMsg(
+                "Can't set cycle mode to continuous because: '%s' (0x%04X)",
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
+            return FALSE;
         }
     }
 
