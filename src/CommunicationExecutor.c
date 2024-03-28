@@ -142,6 +142,8 @@ void Ros_Communication_Initialize()
     Ros_Debug_BroadcastMsg("rclc_support_init_with_options = %d", (int)ret);
     motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_SUPPORT_INIT);
 
+    rcl_node_options_t node_options = rcl_node_get_default_options();
+#ifndef MOTOPLUS_LIBMICROROS_ROS2_IS_IRON
     //construct a faux command line to pass to rcl_parse_arguments(..)
     char* faux_argv[MAX_REMAP_RULE_NUM];
     size_t faux_argc = 0;
@@ -157,7 +159,6 @@ void Ros_Communication_Initialize()
     faux_argc = Ros_ConstructFauxArgv(
         remap_rules_str_, faux_argv, MAX_REMAP_RULE_NUM);
 
-    rcl_node_options_t node_options = rcl_node_get_default_options();
     if (faux_argc > 0)
     {
         //parse the just constructed argv
@@ -171,6 +172,7 @@ void Ros_Communication_Initialize()
             node_options = rcl_node_get_default_options();
         }
     }
+#endif
 
     //init node with the remap rules and other options from the config file
     ret = rclc_node_init_with_options(
@@ -182,7 +184,9 @@ void Ros_Communication_Initialize()
 
     //we're done with it
     ret = rcl_node_options_fini(&node_options); RCL_UNUSED(ret);
+#ifndef MOTOPLUS_LIBMICROROS_ROS2_IS_IRON
     Ros_CleanupFauxArgv(faux_argv, faux_argc);
+#endif
 
     MOTOROS2_MEM_TRACE_REPORT(comm_exec_init);
 }
