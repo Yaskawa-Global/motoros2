@@ -20,11 +20,11 @@ Files: src/*.mps
 Copyright: 2022-2023 Yaskawa America, Inc.
 License: Apache-2.0
 
-Files: src/ParameterExtraction.*
+Files: lib/ParameterExtraction.*
 Copyright: 2013-2023 Yaskawa America, Inc.
 License: BSD-3-Clause
 
-Files: src/MotoROS_PlatformLib.*Lib
+Files: lib/MotoROS_PlatformLib.*Lib
 Copyright: 2023 Yaskawa America, Inc.
   2023, Delft University of Technology
 License: Apache-2.0
