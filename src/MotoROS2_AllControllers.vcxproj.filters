@@ -109,22 +109,22 @@
     <None Include="YRC1000_humbleLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
-    <None Include="ParameterExtraction.dnLib">
+    <None Include="..\lib\ParameterExtraction.dnLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
-    <None Include="ParameterExtraction.yrcLib">
+    <None Include="..\lib\ParameterExtraction.yrcLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
-    <None Include="ParameterExtraction.yrcmLib">
+    <None Include="..\lib\ParameterExtraction.yrcmLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
-    <None Include="MotoROS_PlatformLib.dnLib">
+    <None Include="..\lib\MotoROS_PlatformLib.dnLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
-    <None Include="MotoROS_PlatformLib.yrcLib">
+    <None Include="..\lib\MotoROS_PlatformLib.yrcLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
-    <None Include="MotoROS_PlatformLib.yrcmLib">
+    <None Include="..\lib\MotoROS_PlatformLib.yrcmLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="..\config\motoros2_config.yaml">
@@ -410,13 +410,13 @@
     <ClInclude Include="MathConstants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CmosParameterTypes.h">
+    <ClInclude Include="..\lib\CmosParameterTypes.h">
       <Filter>MotoPlus Libraries</Filter>
     </ClInclude>
-    <ClInclude Include="CmosParameterExtraction.h">
+    <ClInclude Include="..\lib\CmosParameterExtraction.h">
       <Filter>MotoPlus Libraries</Filter>
     </ClInclude>
-    <ClInclude Include="MotoROS_PlatformLib.h">
+    <ClInclude Include="..\lib\MotoROS_PlatformLib.h">
       <Filter>MotoPlus Libraries</Filter>
     </ClInclude>
     <ClInclude Include="TimeConversionUtils.h">

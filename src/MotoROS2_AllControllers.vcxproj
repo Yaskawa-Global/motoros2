@@ -126,109 +126,109 @@
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_humble\include;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_humble\include;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_dx200_humble\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_dx200_humble\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_galactic|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_galactic\include;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_galactic\include;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_g" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_dx200_galactic\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_dx200_galactic\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_foxy|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_foxy\include;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_foxy\include;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_f" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_dx200_foxy\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_dx200_foxy\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;$(SolutionDir)libmicroros_yrc1000_humble\include;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;$(SolutionDir)libmicroros_yrc1000_humble\include;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000_humble\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000_humble\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_galactic|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_galactic\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_galactic\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_g" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000_galactic\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000_galactic\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_foxy\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000_foxy\include;$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_f" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000_foxy\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000_foxy\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;$(SolutionDir)libmicroros_yrc1000u_humble\include;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;$(SolutionDir)libmicroros_yrc1000u_humble\include;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_h" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_humble\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000u_humble\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_galactic|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_galactic\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_galactic\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_g" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_g" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_galactic\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000u_galactic\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_foxy|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;$(SolutionDir)lib;</NMakeIncludeSearchPath>
     <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_f" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_f" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'">
     <BuildLog>
@@ -294,12 +294,12 @@
     <None Include="DX200_foxyLinkerArguments.mps" />
     <None Include="DX200_galacticCompilerArguments.mps" />
     <None Include="DX200_galacticLinkerArguments.mps" />
-    <None Include="MotoROS_PlatformLib.dnLib" />
-    <None Include="MotoROS_PlatformLib.yrcLib" />
-    <None Include="MotoROS_PlatformLib.yrcmLib" />
-    <None Include="ParameterExtraction.dnLib" />
-    <None Include="ParameterExtraction.yrcLib" />
-    <None Include="ParameterExtraction.yrcmLib" />
+    <None Include="..\lib\MotoROS_PlatformLib.dnLib" />
+    <None Include="..\lib\MotoROS_PlatformLib.yrcLib" />
+    <None Include="..\lib\MotoROS_PlatformLib.yrcmLib" />
+    <None Include="..\lib\ParameterExtraction.dnLib" />
+    <None Include="..\lib\ParameterExtraction.yrcLib" />
+    <None Include="..\lib\ParameterExtraction.yrcmLib" />
     <None Include="..\README.md" />
     <None Include="..\CHANGELOG.md" />
     <None Include="..\robot_jobs\sda_dual_arm\INIT_ROS.JBI" />
@@ -369,7 +369,7 @@
     <ClInclude Include="MemoryAllocation.h" />
     <ClInclude Include="MemoryTracing.h" />
     <ClInclude Include="RosApiNameConstants.h" />
-    <ClInclude Include="MotoPlusExterns.h" />
+    <ClInclude Include="..\lib\MotoPlusExterns.h" />
     <ClInclude Include="ServiceQueueTrajPoint.h" />
     <ClInclude Include="ServiceReadWriteIO.h" />
     <ClInclude Include="ServiceStartPointQueueMode.h" />
@@ -384,14 +384,14 @@
     <ClInclude Include="MotionControl.h" />
     <ClInclude Include="ActionServer_FJT.h" />
     <ClInclude Include="MotoROS.h" />
-    <ClInclude Include="CmosParameterExtraction.h" />
-    <ClInclude Include="CmosParameterTypes.h" />
+    <ClInclude Include="..\lib\CmosParameterExtraction.h" />
+    <ClInclude Include="..\lib\CmosParameterTypes.h" />
     <ClInclude Include="Quaternion_Conversion.h" />
     <ClInclude Include="PositionMonitor.h" />
     <ClInclude Include="ServiceResetError.h" />
     <ClInclude Include="FauxCommandLineArgs.h" />
     <ClInclude Include="MathConstants.h" />
-    <ClInclude Include="MotoROS_PlatformLib.h" />
+    <ClInclude Include="..\lib\MotoROS_PlatformLib.h" />
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h" />
     <ClInclude Include="RosMotoPlusConversionUtils.h" />
   </ItemGroup>
