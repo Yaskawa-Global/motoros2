@@ -33,6 +33,7 @@ jobs:
           filters: |
             vsproj:
               - 'src/**'
+              - 'lib/**'
               - 'MotoROS2.sln'
 
   msbuild:
