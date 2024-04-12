@@ -495,18 +495,59 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         //check to see if each axis is in the desired location
         BOOL positionOk = TRUE;
         int maxAxes = MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM;
-        double violators[MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM];
 
+        double violators[MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM];
         bzero(violators, sizeof(violators));
+
+        double posTolerance[maxAxes];
+        for (int i = 0; i < maxAxes; i++) {
+            posTolerance[i] = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
+        }
+        for (size_t selected_tolerance_idx = 0; selected_tolerance_idx < g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance.size; selected_tolerance_idx +=1)
+        {
+            rosidl_runtime_c__String selected_tolerance_name = g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance.data[selected_tolerance_idx].name;
+            Ros_Debug_BroadcastMsg("FJT found position tolerance: %s, %f", selected_tolerance_name, g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance.data[selected_tolerance_idx].position);
+
+            for (size_t selected_position_idx = 0; selected_position_idx < feedback_FollowJointTrajectory.feedback.joint_names.size; selected_position_idx += 1)
+            {
+                rosidl_runtime_c__String selected_position_name = feedback_FollowJointTrajectory.feedback.joint_names.data[selected_position_idx];
+                if (rosidl_runtime_c__String__are_equal(&selected_position_name,&selected_tolerance_name))
+                {
+                    Ros_Debug_BroadcastMsg("FJT using position tolerance: %s", selected_position_name);
+                    posTolerance[selected_position_idx] = g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance.data[selected_tolerance_idx].position;
+                    break;
+                }
+            }
+        }
+
+        double finalPositions[maxAxes];
+        bzero(finalPositions, sizeof(finalPositions));
+        size_t trajectorySizeOffset = g_actionServer_FJT_SendGoal_Request.goal.trajectory.points.size - 1;
+        for (size_t selected_final_position_idx = 0; selected_final_position_idx < g_actionServer_FJT_SendGoal_Request.goal.trajectory.joint_names.size; selected_final_position_idx += 1)
+        {
+            rosidl_runtime_c__String selected_final_position_name = g_actionServer_FJT_SendGoal_Request.goal.trajectory.joint_names.data[selected_final_position_idx];
+            for (size_t selected_position_idx = 0; selected_position_idx < feedback_FollowJointTrajectory.feedback.joint_names.size; selected_position_idx += 1)
+            {
+                rosidl_runtime_c__String selected_position_name = feedback_FollowJointTrajectory.feedback.joint_names.data[selected_position_idx];
+                if (rosidl_runtime_c__String__are_equal(&selected_position_name, &selected_final_position_name))
+                {
+                    finalPositions[selected_position_idx] = g_actionServer_FJT_SendGoal_Request.goal.trajectory.points.data[trajectorySizeOffset].positions.data[selected_final_position_idx];
+                    Ros_Debug_BroadcastMsg("Final Position Goal: %s, %f", selected_position_name, finalPositions[selected_position_idx]);
+                    break;
+                }
+            }
+        }
+
         for (int axis = 0; axis < maxAxes; axis += 1)
         {
-            diff = fabs(feedback_FollowJointTrajectory.feedback.desired.positions.data[axis] - feedback_FollowJointTrajectory.feedback.actual.positions.data[axis]);
+            diff = fabs(finalPositions[axis] - feedback_FollowJointTrajectory.feedback.actual.positions.data[axis]);
+            // Ros_Debug_BroadcastMsg("desired - actual: %d, %d", (int)(1000 * finalPositions[axis]), (int)(1000 * feedback_FollowJointTrajectory.feedback.actual.positions.data[axis]));
+            double chosen_posTolerance = posTolerance[axis];
+            if (chosen_posTolerance == 0.0) //user did NOT provide a tolerance
+                chosen_posTolerance = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
 
-            double posTolerance = g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance.data[axis].position; //user-provided a goal_tolerance
-            if (posTolerance == 0.0) //user did NOT provide a tolerance
-                posTolerance = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
-
-            if (diff > posTolerance)
+            // A negative tolerance means that tolerance doesn't matter for this axis
+            if ((chosen_posTolerance > 0.0) && (diff > chosen_posTolerance))
             {
                 positionOk = FALSE;
                 //record the deviation for use in the feedback message below
@@ -564,7 +605,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
                     if (violators[axis])
                     {
                         char formatBuffer[64] = { 0 };
-                        snprintf(formatBuffer, 64, " [%s: %.4f deviation]",
+                        snprintf(formatBuffer, 64, " [%s: %d deviation]",
                             feedback_FollowJointTrajectory.feedback.joint_names.data[axis],
                             violators[axis]);
                         strcat(msgBuffer, formatBuffer);
