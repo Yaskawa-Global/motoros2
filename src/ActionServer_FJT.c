@@ -502,9 +502,9 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         {
             diff = fabs(feedback_FollowJointTrajectory.feedback.desired.positions.data[axis] - feedback_FollowJointTrajectory.feedback.actual.positions.data[axis]);
 
-            double posTolerance = g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance.data[axis].position; //user-provided a goal_tolerance
-            if (posTolerance == 0.0) //user did NOT provide a tolerance
-                posTolerance = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
+            //ignore goal tolerance provided by user (https://github.com/Yaskawa-Global/motoros2/issues/233)
+            //TODO(gavanderhoorn): properly implement goal_tolerance parsing and checking
+            double posTolerance = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
 
             if (diff > posTolerance)
             {
