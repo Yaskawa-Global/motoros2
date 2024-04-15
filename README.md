@@ -754,7 +754,7 @@ This maximum number of points in a single trajectory is currently **`200`**.
 This number was derived from testing on a two-robot system (12 axes total).
 On larger systems with more control groups, it is possible 200 points may exceed the memory threshold for transmission.
 
-Unfortunately, due to a known issue with micro-ROS ([micro-ROS/micro-ROS-Agent#143](https://github.com/micro-ROS/micro-ROS-Agent/issues/143)), MotoROS2 currently cannot check whether incoming trajectories are too long, nor can MotoROS2 notify the action client in case trajectories in those cases.
+Unfortunately, due to a known issue with micro-ROS ([micro-ROS/micro-ROS-Agent#143](https://github.com/micro-ROS/micro-ROS-Agent/issues/143)), MotoROS2 currently cannot check whether incoming trajectories are too long, nor can MotoROS2 notify the action client in those cases.
 
 Please make sure to check trajectory length *before* submitting goals, as client applications are currently responsible for making sure trajectories do not go over this limit.
 
