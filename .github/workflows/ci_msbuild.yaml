@@ -74,7 +74,7 @@ jobs:
         path: 'motoros2'
 
     - name: Find MSBuild and add to PATH
-      uses: microsoft/setup-msbuild@v1.3
+      uses: microsoft/setup-msbuild@v2
 
     - name: "Download M+ libmicroros (${{ matrix.ros2_codename }} on ${{ steps.uppercaser.outputs.ctrlr }})"
       id: download_libmicroros
