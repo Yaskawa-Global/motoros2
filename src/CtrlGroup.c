@@ -394,6 +394,45 @@ BOOL Ros_CtrlGroup_GetFBServoSpeed(CtrlGroup* ctrlGroup, long pulseSpeed[MAX_PUL
     int i;
 
 #ifndef DUMMY_SERVO_MODE
+
+//Use mpSvsGetVelTrqFb for older controller models
+#if defined(FS100)
+    MP_GRP_AXES_T dst_vel;
+    LONG status;
+
+    bzero(pulseSpeed, sizeof(long[MAX_PULSE_AXES]));
+
+    if (ctrlGroup->groupNo >= MAX_CONTROLLABLE_GROUPS)
+        return FALSE;
+
+    memset(&dst_vel, 0x00, sizeof(MP_GRP_AXES_T));
+
+    status = mpSvsGetVelTrqFb(dst_vel, NULL); //units are 0.1 pulse/sec
+    if (status != OK)
+        return FALSE;
+
+    for (i = 0; i < MAX_PULSE_AXES; i += 1)
+    {
+        pulseSpeed[i] = dst_vel[ctrlGroup->groupNo][i] * 0.1;
+    }
+
+    // Apply correction to account for cross-axis coupling.
+    // Note: This is only required for feedback.
+    // Controller handles this correction internally when
+    // dealing with command positon.
+    for (i = 0; i< MAX_PULSE_AXES; ++i)
+    {
+        FB_AXIS_CORRECTION *corr = &ctrlGroup->correctionData.correction[i];
+        if (corr->bValid)
+        {
+            int src_axis = corr->ulSourceAxis;
+            int dest_axis = corr->ulCorrectionAxis;
+            pulseSpeed[dest_axis] -= (int)(pulseSpeed[src_axis] * corr->fCorrectionRatio);
+        }
+    }
+
+//DX200 and newer supports the M-register analog feedback (higher precision feedback)
+#elif defined(YRC1000) || defined(YRC1000u) || defined(DX200)
     LONG status;
     MP_IO_INFO registerInfo[MAX_PULSE_AXES * 2]; //values are 4 bytes, which consumes 2 registers
     USHORT registerValues[MAX_PULSE_AXES * 2];
@@ -442,6 +481,10 @@ BOOL Ros_CtrlGroup_GetFBServoSpeed(CtrlGroup* ctrlGroup, long pulseSpeed[MAX_PUL
 
         pulseSpeed[i] = (long)dblRegister;
     }
+
+#else
+#error "Ros_CtrlGroup_GetFBServoSpeed: unsupported platform"
+#endif
 
 #else //dummy-servo mode for testing
     MP_CTRL_GRP_SEND_DATA sData;
