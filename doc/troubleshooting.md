@@ -1117,3 +1117,24 @@ ALARM 8015
 *Solution:*
 Open a new ticket on the MotoROS2 [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
 Please include a copy of the `RBCALIB.DAT` from your robot controller along with the output from the [Debug log client](#debug-log-client).
+
+### Alarm: 8016[0]
+
+*Example:*
+
+```text
+ALARM 8016
+ Failed to set cycle
+[0]
+```
+
+*Solution:*
+The job cycle is currently set to `STEP` and MotoROS2 was unable to automatically change it to `AUTO`.
+
+First, manually set the controller to use `AUTO`.
+
+ 1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
+ 1. touch `[Setup]`→`[Operate Cond.]`
+ 1. change `CYCLE SWITCH IN REMOTE MODE` to `AUTO`
+
+If the problem persists, verify that the `CIOPRG.LST` ladder program is not writing to `#40050 - #40052`.

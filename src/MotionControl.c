@@ -1439,11 +1439,22 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         bzero(&rData, sizeof(rData));
         sCycleData.sCycle = 3;  // Auto
         ret = mpSetCycle(&sCycleData, &rData);
-        if( (ret != 0) || (rData.err_no != 0) ) {
+        if( (ret != 0) || (rData.err_no != 0) ) 
+        {
             Ros_Debug_BroadcastMsg(
                 "Can't set cycle mode to continuous because: '%s' (0x%04X)",
                 Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
+            mpSetAlarm(ALARM_OPERATION_FAIL, "Set job-cycle to AUTO", SUBCODE_OPERATION_SET_CYCLE);
             return FALSE;
+        }
+
+        Ros_Controller_IoStatusUpdate(); //verify the cycle got set and wasn't forced back due to CIO logic
+
+        if (!Ros_Controller_IsContinuousCycle())
+        {
+            Ros_Debug_BroadcastMsg("Can't set cycle mode. Check CIOPRG.LST for OUT #40050 - #40052");
+            mpSetAlarm(ALARM_OPERATION_FAIL, "Set job-cycle to AUTO", SUBCODE_OPERATION_SET_CYCLE);
+            return false;
         }
     }
 
