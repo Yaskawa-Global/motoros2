@@ -822,3 +822,7 @@ void Ros_ActionServer_FJT_ProcessResult()
         }
     }
 }
+
+
+//included here as this tests 'static' functions
+#include "Tests_ActionServer_FJT.c"
