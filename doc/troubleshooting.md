@@ -1124,7 +1124,7 @@ Please include a copy of the `RBCALIB.DAT` from your robot controller along with
 
 ```text
 ALARM 8016
- Failed to set cycle
+ Set job-cycle to AUTO
 [0]
 ```
 
