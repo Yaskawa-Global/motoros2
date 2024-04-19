@@ -493,11 +493,13 @@ static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
         return -1;
     }
 
+    //always configure defaults
+    for (int i = 0; i < posTolerances_len; ++i)
+        posTolerances[i] = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
+
     //if caller hasn't passed any JointTolerances, set all entries to default
     if (goal_joint_tolerances->size == 0)
     {
-        for (int i = 0; i < posTolerances_len; ++i)
-            posTolerances[i] = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
         Ros_Debug_BroadcastMsg("%s: no joint tolerances specified, returning %d defaults",
             __func__, posTolerances_len);
         return OK;
