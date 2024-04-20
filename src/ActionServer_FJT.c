@@ -547,6 +547,10 @@ static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
     return OK;
 }
 
+/**
+ * Note: this assumes neither 'traj_point_names' nor 'internal_jnames' contain
+ * duplicate joint names. This function does not check whether this is true.
+ */
 static STATUS Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order(
     trajectory_msgs__msg__JointTrajectoryPoint const* const traj_point /* in */,
     rosidl_runtime_c__String__Sequence const* const traj_point_jnames /* in */,
@@ -571,6 +575,13 @@ static STATUS Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order(
         Ros_Debug_BroadcastMsg("%s: partial traj pt not supported (%d pos, need: %d)",
             __func__, traj_point->positions.size, internal_jnames->size);
         return -3;
+    }
+
+    if (trajPtValues_len < traj_point->positions.size)
+    {
+        Ros_Debug_BroadcastMsg("%s: output array too small: %d < %d (nr of joints)",
+            __func__, trajPtValues_len, traj_point->positions.size);
+        return -4;
     }
 
     //this:
