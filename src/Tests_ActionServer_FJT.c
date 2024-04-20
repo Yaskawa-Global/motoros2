@@ -12,7 +12,7 @@
 #include <control_msgs/msg/joint_tolerance.h>
 
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_null_args()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_null_args()
 {
     BOOL bSuccess = TRUE;
 
@@ -46,7 +46,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_null_args()
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_empty_jtolerances()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_empty_jtolerances()
 {
     BOOL bSuccess = TRUE;
 
@@ -84,7 +84,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_empty_jtolerances(
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_out_array_too_small()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_out_array_too_small()
 {
     //output array of size == 1, two joints, single JointTolerance instance in goal.
     //success if 'output array too small' return value is returned
@@ -130,7 +130,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_out_array_too_smal
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_more_jtol_than_jnames()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_more_jtol_than_jnames()
 {
     //hypothetical controller with zero joints (so zero joint names, normal sized output array),
     //but goal with single JointTolerance instance.
@@ -185,7 +185,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_more_jtol_than_jna
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slot0()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slot0()
 {
     //hypothetical controller with single joint, goal with single JointTolerance instance.
     //success if JointTolerance position value == first element in output array.
@@ -239,7 +239,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slot0()
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slot2()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slot2()
 {
     //hypothetical controller with single joint, goal with single JointTolerance instance.
     //success if JointTolerance position value == third element in output array.
@@ -296,7 +296,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slot2()
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_last_setting_wins()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_last_setting_wins()
 {
     BOOL bSuccess = TRUE;
 
@@ -368,7 +368,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_last_setting_wins(
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_null_args()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_null_args()
 {
     BOOL bSuccess = TRUE;
 
@@ -411,7 +411,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_null_args
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_jnames_len_neq()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_jnames_len_neq()
 {
     BOOL bSuccess = TRUE;
 
@@ -449,7 +449,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_jnames_le
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_traj_pt_jnames_neq()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_traj_pt_jnames_neq()
 {
     //try to re-order values for a trajectory point which doesn't have a sufficient
     //nr of position values (at least not when compared to the nr of internal joint
@@ -505,7 +505,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_traj_pt_j
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_out_array_too_small()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_out_array_too_small()
 {
     //try to re-order values for a trajectory point while the output array is
     //too small.
@@ -558,7 +558,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_out_array
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_single_jt()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_single_jt()
 {
     //try to re-order values for a trajectory point for a single joint
 
@@ -609,7 +609,7 @@ BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_single_jt
     return bSuccess;
 }
 
-BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_6_jt_reorder()
+static BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_6_jt_reorder()
 {
     BOOL bSuccess = TRUE;
 
