@@ -529,7 +529,7 @@ static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
     for (size_t jtol_idx = 0; jtol_idx < goal_joint_tolerances->size; jtol_idx +=1)
     {
         rosidl_runtime_c__String selected_tolerance_name = goal_joint_tolerances->data[jtol_idx].name;
-        Ros_Debug_BroadcastMsg("%s: found position tolerance: %s, %f", __func__,
+        Ros_Debug_BroadcastMsg("%s: parsing JointTolerance for '%s': pos: %f", __func__,
             selected_tolerance_name.data, goal_joint_tolerances->data[jtol_idx].position);
 
         for (size_t ptol_idx = 0; ptol_idx < joint_names->size; ptol_idx += 1)
@@ -537,7 +537,8 @@ static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
             rosidl_runtime_c__String selected_position_name = joint_names->data[ptol_idx];
             if (rosidl_runtime_c__String__are_equal(&selected_position_name, &selected_tolerance_name))
             {
-                Ros_Debug_BroadcastMsg("%s: using position tolerance: %s", __func__, selected_position_name.data);
+                Ros_Debug_BroadcastMsg("%s: mapping '%s' (at %d) to internal index %d",
+                    __func__, selected_position_name.data, jtol_idx, ptol_idx);
                 posTolerances[ptol_idx] = goal_joint_tolerances->data[jtol_idx].position;
                 break;
             }
@@ -598,8 +599,8 @@ static STATUS Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order(
             if (rosidl_runtime_c__String__are_equal(&internal_jname, &traj_jname))
             {
                 trajPtValues[internal_jname_idx] = traj_point->positions.data[traj_jname_idx];
-                Ros_Debug_BroadcastMsg("%s: '%s' at %d: %f",
-                    __func__, internal_jname.data, internal_jname_idx, trajPtValues[internal_jname_idx]);
+                Ros_Debug_BroadcastMsg("%s: mapping ('%s'; %f) at %d to internal index %d",
+                    __func__, traj_jname.data, trajPtValues[internal_jname_idx], traj_jname_idx, internal_jname_idx);
                 break;
             }
         }
