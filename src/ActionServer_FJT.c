@@ -621,19 +621,22 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         //-----------------------------------------------------------------------
         //check to see if each axis is in the desired location
         BOOL positionOk = TRUE;
-        int maxAxes = MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM;
+#define MR2_JTA_MAX_NUM_AXES (MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM)
+        int numAxesToCheck = feedback_FollowJointTrajectory.feedback.joint_names.size;
 
-        double violators[MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM];
+        //NOTE: we allocate for the maximum nr of axes, but only check the nr of configured
+        //axes later (which is in almost all cases significantly smaller)
+        double violators[MR2_JTA_MAX_NUM_AXES];
+        double posTolerance[MR2_JTA_MAX_NUM_AXES];
         bzero(violators, sizeof(violators));
-
-        double posTolerance[maxAxes];
+        bzero(posTolerance, sizeof(posTolerance));
 
         //'parse' the JointTolerance elements from the goal. Map their 'name:tolerance'
         //to the 'joint_index:tolerance' we need
         STATUS status = Ros_ActionServer_FJT_Parse_GoalPosTolerances(
             &g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance,
             &feedback_FollowJointTrajectory.feedback.joint_names,
-            posTolerance, maxAxes);
+            posTolerance, numAxesToCheck);
 
         if (status != OK)
         {
@@ -644,7 +647,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         //retrieve the last traj pt from the goal traj and re-order position values such
         //that they correspond to the internal MotoROS2 ordering (as used in
         //feedback_FollowJointTrajectory.feedback)
-        double lastTrajPtPositions[maxAxes];
+        double lastTrajPtPositions[MR2_JTA_MAX_NUM_AXES];
         bzero(lastTrajPtPositions, sizeof(lastTrajPtPositions));
         size_t finalTrajPtIdx = g_actionServer_FJT_SendGoal_Request.goal.trajectory.points.size - 1;
 
@@ -653,7 +656,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
             &g_actionServer_FJT_SendGoal_Request.goal.trajectory.joint_names,
             &feedback_FollowJointTrajectory.feedback.joint_names,
             lastTrajPtPositions,
-            maxAxes);
+            numAxesToCheck);
 
         if (status != OK)
         {
@@ -663,7 +666,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
 
 
         //compare current state with target positions from last traj point
-        for (int axis = 0; axis < maxAxes; axis += 1)
+        for (int axis = 0; axis < numAxesToCheck; axis += 1)
         {
             double current_jstate = feedback_FollowJointTrajectory.feedback.actual.positions.data[axis];
             diff = fabs(lastTrajPtPositions[axis] - current_jstate);
@@ -726,7 +729,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
             if (!positionOk)
             {
                 sprintf(msgBuffer, "Final position was outside tolerance. Check robot safety-limits that could be inhibiting motion.");
-                for (int axis = 0; axis < maxAxes; axis += 1)
+                for (int axis = 0; axis < numAxesToCheck; axis += 1)
                 {
                     //append info on which joints were outside tolerance
                     if (violators[axis])
