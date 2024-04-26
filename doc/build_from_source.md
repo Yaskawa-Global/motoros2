@@ -23,7 +23,7 @@ This is not the same as MotoPlus IDE. Users in Asian regions will need to purcha
 If you already have a license for an older version of the MotoPlus SDK, please contact `techsupport@motoman.com` or `ccs@yaskawa.eu` for assistance obtaining a newer edition.
 - **libmicroros library and headers** that corresponds to your target edition of ROS 2 (Foxy, Humble, etc) and the Yaskawa controller series you are building MotoROS2 for
 Although `libmicroros` as used by MotoROS2 is derived from the open-source [micro-ROS](https://micro.ros.org) project, various patches were needed to make it compatible with MotoPlus. As of writing, these patches can not be made open-source yet. Because of this, we distribute the `libmicroros` dependency as a closed-source library.
-These can be found on the [Releases](https://github.com/yaskawa-global/motoros2/releases) page
+These can be found on the [micro_ros_motoplus/Releases](https://github.com/yaskawa-global/micro_ros_motoplus/releases) page.
 
 ## Setup
 
@@ -31,7 +31,7 @@ Clone the [yaskawa-global/motoros2](https://github.com/yaskawa-global/motoros2.g
 
 Obtain the `libmicroros` and headers for your target ROS 2 variant and controller series.
 
-These are provided as downloads together with the MotoROS2 releases which can be found on the [Releases](https://github.com/yaskawa-global/motoros2/releases) page.
+These are provided as separate downloads and can be found on the [micro_ros_motoplus/Releases](https://github.com/yaskawa-global/micro_ros_motoplus/releases) page.
 
 When downloading `libmicroros` from the repo, the folder will be named with a unique identifier corresponding to the time stamp of the build.
 Rename the folder to `libmicroros_<controller-series>_<ros-2-variant>`.
