@@ -85,7 +85,7 @@ jobs:
         regex: true
         # download the M+ libmicroros distribution for the latest release of
         # MotoROS2 corresponding to the controller this workflow is run for
-        file: ".*_libmicroros_${{ matrix.ros2_codename }}-.*_${{ matrix.controller }}\\.zip"
+        file: "micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.ros2_codename }}.*\\.zip"
         # work-around for https://github.com/dsaltares/fetch-gh-release-asset/issues/48
         target: "./"
 
@@ -106,7 +106,7 @@ jobs:
       # files if we use a regex to match 'unknown' files instead of hard-coding
       # everything.
       run: |
-        LIBM_ZIP=$(find /c/build -type f -regextype posix-extended -regex ".*[[:digit:]]+_libmicroros_${{ matrix.ros2_codename }}.*${{ matrix.controller}}\.zip")
+        LIBM_ZIP=$(find /c/build -type f -regextype posix-extended -regex "/c/build/micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.ros2_codename }}.*[[:digit:]]+\.zip")
         echo "libmicroros_zip=${LIBM_ZIP}" >> $GITHUB_OUTPUT
         echo "libmicroros_zip_win=$(cygpath -w ${LIBM_ZIP})" >> $GITHUB_OUTPUT
         echo "Found libmicroros zip: '${LIBM_ZIP}'"
