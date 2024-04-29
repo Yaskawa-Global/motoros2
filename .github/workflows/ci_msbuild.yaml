@@ -78,7 +78,7 @@ jobs:
 
     - name: "Download M+ libmicroros (${{ matrix.ros2_codename }} on ${{ steps.uppercaser.outputs.ctrlr }})"
       id: download_libmicroros
-      uses: dsaltares/fetch-gh-release-asset@1.1.1
+      uses: dsaltares/fetch-gh-release-asset@1.1.2
       with:
         repo: 'yaskawa-global/motoros2'
         version: 'latest'
