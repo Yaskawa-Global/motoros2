@@ -532,7 +532,8 @@ static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
         Ros_Debug_BroadcastMsg("%s: parsing JointTolerance for '%s': pos: %f", __func__,
             selected_tolerance_name.data, goal_joint_tolerances->data[jtol_idx].position);
 
-        for (size_t ptol_idx = 0; ptol_idx < joint_names->size; ptol_idx += 1)
+        size_t ptol_idx = 0;
+        for (; ptol_idx < joint_names->size; ptol_idx += 1)
         {
             rosidl_runtime_c__String selected_position_name = joint_names->data[ptol_idx];
             if (rosidl_runtime_c__String__are_equal(&selected_position_name, &selected_tolerance_name))
@@ -542,6 +543,14 @@ static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
                 posTolerances[ptol_idx] = goal_joint_tolerances->data[jtol_idx].position;
                 break;
             }
+        }
+
+        //couldn't find joint
+        if (ptol_idx == joint_names->size)
+        {
+            //TODO(gavanderhoorn): make this a fatal error?
+            Ros_Debug_BroadcastMsg("%s: WARNING: couldn't find '%s' in internal joint names, ignoring",
+                __func__, selected_tolerance_name.data);
         }
     }
 
