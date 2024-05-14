@@ -642,15 +642,19 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
 
         //'parse' the JointTolerance elements from the goal. Map their 'name:tolerance'
         //to the 'joint_index:tolerance' we need
-        STATUS status = Ros_ActionServer_FJT_Parse_GoalPosTolerances(
+        STATUS statusParseGoalTolerance = Ros_ActionServer_FJT_Parse_GoalPosTolerances(
             &g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance,
             &feedback_FollowJointTrajectory.feedback.joint_names,
             posTolerance, numAxesToCheck);
 
-        if (status != OK)
+        BOOL bToleranceParseOk = TRUE;
+        if (statusParseGoalTolerance != OK)
         {
-            Ros_Debug_BroadcastMsg("%s: parsing 'goal_tolerance' field failed: %d", __func__, status);
-            //TODO(gavanderhoorn): what do we do here?
+            Ros_Debug_BroadcastMsg("%s: parsing 'goal_tolerance' field failed: %d", __func__, statusParseGoalTolerance);
+            //TODO(gavanderhoorn): implement tolerance parsing in Ros_ActionServer_FJT_Goal_Received(..) instead
+            bToleranceParseOk = FALSE;
+            Ros_Debug_BroadcastMsg("%s: skipping goal tolerance check", __func__);
+            goto goal_complete_skip_tolerance_comparison;
         }
 
         //retrieve the last traj pt from the goal traj and re-order position values such
@@ -660,17 +664,20 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         bzero(lastTrajPtPositions, sizeof(lastTrajPtPositions));
         size_t finalTrajPtIdx = g_actionServer_FJT_SendGoal_Request.goal.trajectory.points.size - 1;
 
-        status = Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order(
+        STATUS statusGoalToleranceReorder = Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order(
             &g_actionServer_FJT_SendGoal_Request.goal.trajectory.points.data[finalTrajPtIdx],
             &g_actionServer_FJT_SendGoal_Request.goal.trajectory.joint_names,
             &feedback_FollowJointTrajectory.feedback.joint_names,
             lastTrajPtPositions,
             numAxesToCheck);
 
-        if (status != OK)
+        if (statusGoalToleranceReorder != OK)
         {
-            Ros_Debug_BroadcastMsg("%s: reordering final traj pt failed: %d", __func__, status);
-            //TODO(gavanderhoorn): what do we do here?
+            Ros_Debug_BroadcastMsg("%s: reordering final traj pt failed: %d", __func__, statusGoalToleranceReorder);
+            //TODO(gavanderhoorn): check re-ordering in Ros_ActionServer_FJT_Goal_Received(..) instead
+            bToleranceParseOk = FALSE;
+            Ros_Debug_BroadcastMsg("%s: skipping goal tolerance check", __func__);
+            goto goal_complete_skip_tolerance_comparison;
         }
 
 
@@ -695,6 +702,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
             }
         }
 
+goal_complete_skip_tolerance_comparison: ;
         //-----------------------------------------------------------------------
         //check execution time
         control_msgs__action__FollowJointTrajectory_SendGoal_Request*  ros_goal_request = (control_msgs__action__FollowJointTrajectory_SendGoal_Request*)fjt_active_goal_handle->ros_goal_request;
@@ -718,7 +726,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         BOOL timeOk = (diff <= timeTolerance);
 
         //-----------------------------------------------------------------------
-        if (positionOk && timeOk)
+        if (bToleranceParseOk && positionOk && timeOk)
         {
             Ros_Debug_BroadcastMsg("FJT action successful");
             fjt_result_response.status = GOAL_STATE_SUCCEEDED;
@@ -736,7 +744,13 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
 
             char msgBuffer[500] = { 0 };
 
-            if (!positionOk)
+            if (!bToleranceParseOk)
+            {
+                sprintf(msgBuffer, "Parsing goal_tolerance failed (%d; %d). Failing trajectory execution.", statusParseGoalTolerance, statusGoalToleranceReorder);
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, msgBuffer);
+                fjt_result_response.result.error_code = RESULT_REPONSE_ERROR_CODE(control_msgs__action__FollowJointTrajectory_Result__GOAL_TOLERANCE_VIOLATED, FAIL_TRAJ_TOLERANCE_PARSE);
+            }
+            else if (!positionOk)
             {
                 sprintf(msgBuffer, "Final position was outside tolerance. Check robot safety-limits that could be inhibiting motion.");
                 for (int axis = 0; axis < numAxesToCheck; axis += 1)

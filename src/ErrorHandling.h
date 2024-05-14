@@ -60,6 +60,7 @@ typedef enum
     FAIL_TRAJ_POSITION,
     FAIL_TRAJ_TIME,
     FAIL_TRAJ_ALARM,
+    FAIL_TRAJ_TOLERANCE_PARSE,
 } Failed_Trajectory_Status;
 
 //**********************************************************************
