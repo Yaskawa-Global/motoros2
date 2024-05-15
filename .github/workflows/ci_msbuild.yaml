@@ -57,7 +57,17 @@ jobs:
       fail-fast: false
       matrix:
         controller: [dx200, yrc1000, yrc1000u]
-        ros2_codename: [humble, galactic, foxy]
+        # officially matrix doesn't support non-scalar values, but it does
+        # seem to work, so let's use it. We specify M+ uROS release distributions
+        # like this as it provides a (very) compact way to specify specific
+        # upstream releases. As not all controllers have all releases of all
+        # supported ROS 2 versions, this is less verbose than having to 'include'
+        # or 'exclude' certain entries from a regular full matrix spec (with lists).
+        uros: [
+          { release: 20221102, codename: foxy     },
+          { release: 20221102, codename: galactic },
+          { release: 20221102, codename: humble   },
+        ]
 
     steps:
     - name: Uppercase controller identifier
@@ -76,16 +86,16 @@ jobs:
     - name: Find MSBuild and add to PATH
       uses: microsoft/setup-msbuild@v2
 
-    - name: "Download M+ libmicroros (${{ matrix.ros2_codename }} on ${{ steps.uppercaser.outputs.ctrlr }})"
+    - name: "Download M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
       id: download_libmicroros
       uses: dsaltares/fetch-gh-release-asset@1.1.2
       with:
         repo: 'yaskawa-global/micro_ros_motoplus'
-        version: 'tags/release-${{ matrix.ros2_codename }}-${{ matrix.controller }}-20221102'
+        version: 'tags/release-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}'
         regex: true
         # download the M+ libmicroros distribution for the latest release of
         # MotoROS2 corresponding to the controller this workflow is run for
-        file: "micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.ros2_codename }}.*\\.zip"
+        file: "micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.uros.codename }}.*\\.zip"
         # work-around for https://github.com/dsaltares/fetch-gh-release-asset/issues/48
         target: "./"
 
@@ -98,15 +108,18 @@ jobs:
         cp -r "${{ github.workspace }}"/* /c/build/
         ls -al /c/build
 
-    - name: "Find downloaded M+ libmicroros (${{ matrix.ros2_codename }} on ${{ steps.uppercaser.outputs.ctrlr }})"
+    - name: "Find downloaded M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
       id: find_libmicroros
       shell: bash
       # bit of a kludge, but works for now.
       # we need to do this as 'fetch-gh-release-asset' will try to rename downloaded
       # files if we use a regex to match 'unknown' files instead of hard-coding
       # everything.
+      # NOTE: the regex includes the absolute path to the location of the .zip as that's
+      # how find reports them to the regex engine (because we specify an absolute path
+      # as the location for find to search for files)
       run: |
-        LIBM_ZIP=$(find /c/build -type f -regextype posix-extended -regex "/c/build/micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.ros2_codename }}.*[[:digit:]]+\.zip")
+        LIBM_ZIP=$(find /c/build -type f -regextype posix-extended -regex "/c/build/micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.uros.codename }}.*[[:digit:]]+\.zip")
         echo "libmicroros_zip=${LIBM_ZIP}" >> $GITHUB_OUTPUT
         echo "libmicroros_zip_win=$(cygpath -w ${LIBM_ZIP})" >> $GITHUB_OUTPUT
         echo "Found libmicroros zip: '${LIBM_ZIP}'"
@@ -114,7 +127,7 @@ jobs:
       shell: bash
       run: |
         unzip -q "${{ steps.find_libmicroros.outputs.libmicroros_zip }}" \
-          -d /c/build/motoros2/libmicroros_${{ matrix.controller }}_${{ matrix.ros2_codename }}
+          -d /c/build/motoros2/libmicroros_${{ matrix.controller }}_${{ matrix.uros.codename }}
 
     - name: Download and setup M+ SDK (mpBuilder)
       shell: cmd
@@ -129,7 +142,7 @@ jobs:
     - name: Register mpBuilder problem matcher
       run: echo "::add-matcher::motoros2/.github/matchers/mpbuilder.json"
 
-    - name: "Build MotoROS2 (config: ${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.ros2_codename }})"
+    - name: "Build MotoROS2 (config: ${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.uros.codename }})"
       shell: cmd
       env:
         MP_VS_Install: "C:/build/mpsdk/"
@@ -142,4 +155,4 @@ jobs:
           -t:Build ^
           -nologo ^
           -v:minimal ^
-          -p:Configuration=${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.ros2_codename }}
+          -p:Configuration=${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.uros.codename }}
