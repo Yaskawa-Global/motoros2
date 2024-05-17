@@ -1448,6 +1448,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
             return FALSE;
         }
 
+        Ros_Sleep(g_Ros_Controller.interpolPeriod); //give CIO time to potentially overwrite the cycle (Ladder scan time is smaller than the interpolPeriod)
         Ros_Controller_IoStatusUpdate(); //verify the cycle got set and wasn't forced back due to CIO logic
 
         if (!Ros_Controller_IsContinuousCycle())
