@@ -686,7 +686,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         {
             double current_jstate = feedback_FollowJointTrajectory.feedback.actual.positions.data[axis];
             diff = fabs(lastTrajPtPositions[axis] - current_jstate);
-            Ros_Debug_BroadcastMsg("desired - actual: %12.8f - %12.8f: %12.8f",
+            Ros_Debug_BroadcastMsg("target pos (%12.8f) - actual pos (%12.8f) = (%12.8f)",
                 lastTrajPtPositions[axis], current_jstate, diff);
 
             double chosen_posTolerance = posTolerance[axis];
