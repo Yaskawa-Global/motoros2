@@ -1437,7 +1437,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         MP_CYCLE_SEND_DATA sCycleData;
         bzero(&sCycleData, sizeof(sCycleData));
         bzero(&rData, sizeof(rData));
-        sCycleData.sCycle = 3;  // 3 = Auto; 2 = Cycle; 1 = Step
+        sCycleData.sCycle = MP_CYCLE_MODE_AUTO;
         ret = mpSetCycle(&sCycleData, &rData);
         if( (ret != 0) || (rData.err_no != 0) ) 
         {
