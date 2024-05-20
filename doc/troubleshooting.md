@@ -1134,7 +1134,7 @@ This will prevent the `INIT_ROS` from operating continuously and will prevent th
 
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
  1. touch `[Job]`→`[Cycle]`
- 1. Change `WORK SELECT` to `AUTO`
+ 1. change `WORK SELECT` to `AUTO`
  1. touch `[Setup]`→`[Operate Cond.]`
  1. change `CYCLE SWITCH IN REMOTE MODE` to `AUTO`
 
