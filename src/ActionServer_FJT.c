@@ -485,7 +485,7 @@ void Ros_ActionServer_FJT_ProcessFeedback()
 static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
     control_msgs__msg__JointTolerance__Sequence const* const goal_joint_tolerances /* in */,
     rosidl_runtime_c__String__Sequence const* const joint_names /* in */,
-    double* posTolerances /* in/out */, size_t posTolerances_len /* in */)
+    double* posTolerances /* out */, size_t posTolerances_len /* in */)
 {
     if (goal_joint_tolerances == NULL || joint_names == NULL || posTolerances == NULL)
     {
