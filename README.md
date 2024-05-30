@@ -113,7 +113,7 @@ To check the version of the system software:
  1. touch `{MAIN MENU}` on the pendant keypad
  1. touch `[System Info]`→`[Version]`
 
-Look for the version number starting with `YAS` or `YBS`.
+Look for the version number starting with `DN`, `YAS` or `YBS`.
 
 ## Option Function compatibility
 
