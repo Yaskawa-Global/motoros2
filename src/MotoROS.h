@@ -102,6 +102,7 @@
 #include "Tests_TestUtils.h"
 #include "Tests_RosMotoPlusConversionUtils.h"
 #include "Tests_ControllerStatusIO.h"
+#include "Tests_ActionServer_FJT.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"
