@@ -15,6 +15,8 @@
 #define TOPIC_NAME_TF "tf"
 #define TOPIC_NAME_ROBOT_STATUS "robot_status"
 #define TOPIC_NAME_JOINT_STATES "joint_states"
+#define TOPIC_NAME_FORCE_TORQUE_TCP "tcp_force_torque"
+#define TOPIC_NAME_JOINT_EXTERNAL_TORQUE "joint_external_torque"
 
 #define SERVICE_NAME_READ_SINGLE_IO "read_single_io"
 #define SERVICE_NAME_READ_GROUP_IO "read_group_io"
