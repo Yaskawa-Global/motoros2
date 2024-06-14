@@ -52,12 +52,13 @@ void Ros_ServiceStartPointQueueMode_Trigger(const void* request_msg, void* respo
     // trust ..
     response->result_code.value = MOTION_READY;
     rosidl_runtime_c__String__assign(&response->message, "");
-    
-    if (!Ros_MotionControl_StartMotionMode(MOTION_MODE_POINTQUEUE))
+    int motion_result_code = Ros_MotionControl_StartMotionMode(MOTION_MODE_POINTQUEUE);
+    if (motion_result_code != 0)
     {
+        if (motion_result_code == MOTION_NOT_READY_UNSPECIFIED)
+            motion_result_code = Ros_Controller_GetNotReadySubcode();
         // update response
-        response->result_code.value = Ros_Controller_GetNotReadySubcode();
-
+        response->result_code.value = motion_result_code;
         if (response->result_code.value == MOTION_READY || Ros_MotionControl_IsMotionMode_Trajectory() || Ros_MotionControl_IsMotionMode_RawStreaming())
         {
             //Motion is ready, but the StartPointQueueMode service failed

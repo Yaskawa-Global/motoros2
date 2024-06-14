@@ -32,7 +32,7 @@ extern BOOL Ros_MotionControl_IsRosControllingMotion();
 extern int Ros_MotionControl_GetQueueCnt(int groupNo);
 extern BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning);
 extern BOOL Ros_MotionControl_ClearQ_All();
-extern BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode);
+extern int Ros_MotionControl_StartMotionMode(MOTION_MODE mode);
 extern void Ros_MotionControl_StopTrajMode();
 
 extern BOOL Ros_MotionControl_IsMotionMode_Trajectory();
