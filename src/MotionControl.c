@@ -1356,14 +1356,14 @@ static STATUS Ros_Controller_DisableEcoMode()
 // NOTE: only attempts to start job if necessary, does not reset errors, alarms.
 //       Does attempt to enable servo power (if not on)
 //-----------------------------------------------------------------------
-int Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
+MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_runtime_c__String *responseMessage)
 {
     int ret;
     MP_STD_RSP_DATA rData;
     MP_START_JOB_SEND_DATA sStartData;
     int checkCount;
     int grpNo;
-    int motion_readiness_code = MOTION_NOT_READY_UNSPECIFIED;
+    MotionNotReadyCode motion_readiness_code = MOTION_NOT_READY_UNSPECIFIED;
 
     Ros_Debug_BroadcastMsg("%s: enter", __func__);
 
@@ -1381,7 +1381,7 @@ int Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     if(Ros_Controller_IsMotionReady())
     {
         Ros_Debug_BroadcastMsg("Already active");
-        return 0;
+        return MOTION_READY;
     }
 
 #ifndef DUMMY_SERVO_MODE
@@ -1491,10 +1491,14 @@ int Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         {
             //TODO(gavanderhoorn): should this be reported to user, or are causes
             //covered by errors in MotionNotReadyCode?
-            Ros_Debug_BroadcastMsg(
-                "Can't turn on servo because: '%s' (0x%04X)",
-                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
-            motion_readiness_code = rData.err_no;
+            char output[256] = {0};
+            snprintf(output, 256, "%s: Can't turn on servo because: '%s' (0x%04X)",
+                Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), 
+                rData.err_no);
+            Ros_Debug_BroadcastMsg(output);
+            rosidl_runtime_c__String__assign(responseMessage, output);
+            motion_readiness_code = MOTION_NOT_READY_ERROR;
             goto updateStatus;
         }
     }
@@ -1528,10 +1532,15 @@ int Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     if( (ret != 0) || (rData.err_no !=0) )
     {
         //TODO(gavanderhoorn): special check for "job is not loaded"
-        Ros_Debug_BroadcastMsg(
-            "Can't start '%s' because: '%s' (0x%04X)", g_nodeConfigSettings.inform_job_name,
-            Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
-        motion_readiness_code = rData.err_no;
+        char output[256] = { 0 };
+        snprintf(output, 256, "%s: Can't start '%s' because: '%s' (0x%04X)", 
+            Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR), 
+            g_nodeConfigSettings.inform_job_name,
+            Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
+            rData.err_no);
+        Ros_Debug_BroadcastMsg(output);
+        rosidl_runtime_c__String__assign(responseMessage, output);
+        motion_readiness_code = MOTION_NOT_READY_ERROR;
         goto updateStatus;
     }
 
@@ -1567,7 +1576,7 @@ updateStatus:
         if (Ros_MotionControl_IsMotionMode_PointQueue())
             Ros_MotionControl_MustInitializePointQueue = TRUE;
 
-        return 0;
+        return MOTION_READY;
     }
     else
         return motion_readiness_code;
