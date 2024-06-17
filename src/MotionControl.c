@@ -1355,6 +1355,7 @@ static STATUS Ros_Controller_DisableEcoMode()
 //
 // NOTE: only attempts to start job if necessary, does not reset errors, alarms.
 //       Does attempt to enable servo power (if not on)
+//       Does attempt to set the cycle mode to continuous (if not set)
 //-----------------------------------------------------------------------
 BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
 {
@@ -1392,13 +1393,6 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     }
 #endif
 
-    // Check if in continous cycle mode
-    if (!Ros_Controller_IsContinuousCycle())
-    {
-        Ros_Debug_BroadcastMsg("Continuous cycle mode not set, can't enable trajectory mode");
-        return FALSE;
-    }
-
     if (Ros_Controller_IsAnyFaultActive())
     {
         Ros_Debug_BroadcastMsg("Controller is in a fault state. Please call /reset_error");
@@ -1433,6 +1427,35 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
             mpHold(&holdSendData, &stdRspData);
 
             Ros_Sleep(MOTION_START_CHECK_PERIOD);
+        }
+    }
+
+    // Check if in continous cycle mode
+    if (!Ros_Controller_IsContinuousCycle())
+    {
+        // set the cycle mode to auto if not currently
+        MP_CYCLE_SEND_DATA sCycleData;
+        bzero(&sCycleData, sizeof(sCycleData));
+        bzero(&rData, sizeof(rData));
+        sCycleData.sCycle = MP_CYCLE_MODE_AUTO;
+        ret = mpSetCycle(&sCycleData, &rData);
+        if( (ret != 0) || (rData.err_no != 0) ) 
+        {
+            Ros_Debug_BroadcastMsg(
+                "Can't set cycle mode to continuous because: '%s' (0x%04X)",
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
+            mpSetAlarm(ALARM_OPERATION_FAIL, "Set job-cycle to AUTO", SUBCODE_OPERATION_SET_CYCLE);
+            return FALSE;
+        }
+
+        Ros_Sleep(g_Ros_Controller.interpolPeriod); //give CIO time to potentially overwrite the cycle (Ladder scan time is smaller than the interpolPeriod)
+        Ros_Controller_IoStatusUpdate(); //verify the cycle got set and wasn't forced back due to CIO logic
+
+        if (!Ros_Controller_IsContinuousCycle())
+        {
+            Ros_Debug_BroadcastMsg("Can't set cycle mode. Check CIOPRG.LST for OUT #40050 - #40052");
+            mpSetAlarm(ALARM_OPERATION_FAIL, "Set job-cycle to AUTO", SUBCODE_OPERATION_SET_CYCLE);
+            return false;
         }
     }
 
