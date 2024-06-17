@@ -1384,6 +1384,17 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         return MOTION_READY;
     }
 
+    if (Ros_Controller_IsEStop())
+        return MOTION_NOT_READY_ESTOP;
+
+    // Check play mode
+    if (!Ros_Controller_IsPlay())
+        return MOTION_NOT_READY_NOT_PLAY;
+
+    // Check if in continuous cycle mode (Here due to being checked before starting servo power)
+    if (!Ros_Controller_IsContinuousCycle())
+        return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
+
 #ifndef DUMMY_SERVO_MODE
     // Check for condition that need operator manual intervention
     if(!Ros_Controller_IsRemote())
@@ -1405,8 +1416,19 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         Ros_Debug_BroadcastMsg("Controller is in a fault state. Please call /reset_error");
         if (Ros_Controller_IsAlarm())
             return MOTION_NOT_READY_ALARM;
-        else if (Ros_Controller_IsError())
+        else if (Ros_Controller_IsError()) 
+        {
+            //Function returns the error code if there is no alarm
+            int alarmcode = Ros_Controller_GetAlarmCode();
+            char output[256] = { 0 };
+            snprintf(output, 256, "%s: '%s' (0x%04X)",
+                Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
+                Ros_ErrorHandling_ErrNo_ToString(alarmcode),
+                alarmcode);
+            Ros_Debug_BroadcastMsg(output);
+            rosidl_runtime_c__String__assign(responseMessage, output);
             return MOTION_NOT_READY_ERROR;
+        }
         else if (Ros_Controller_IsMpIncMoveErrorActive())
             return MOTION_NOT_READY_INC_MOVE_ERROR;
         else if (Ros_Controller_IsPflActive())
