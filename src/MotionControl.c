@@ -1591,7 +1591,7 @@ updateStatus:
     {
         //set an indicator of which motion mode is now active
         Ros_MotionControl_ActiveMotionMode = mode;
-        Ros_Debug_BroadcastMsg("Ros_MotionControl_ActiveTrajMode = %d", Ros_MotionControl_ActiveMotionMode);
+        Ros_Debug_BroadcastMsg("Ros_MotionControl_ActiveMotionMode = %d", Ros_MotionControl_ActiveMotionMode);
 
         //This indicates that the next incoming point will be the FIRST point in
         //the queue. As such, it will need to go through an initialization routine
