@@ -1391,10 +1391,6 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
     if (!Ros_Controller_IsPlay())
         return MOTION_NOT_READY_NOT_PLAY;
 
-    // Check if in continuous cycle mode (Here due to being checked before starting servo power)
-    if (!Ros_Controller_IsContinuousCycle())
-        return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
-
 #ifndef DUMMY_SERVO_MODE
     // Check for condition that need operator manual intervention
     if(!Ros_Controller_IsRemote())
