@@ -1355,7 +1355,7 @@ static STATUS Ros_Controller_DisableEcoMode()
 //
 // NOTE: only attempts to start job if necessary, does not reset errors, alarms.
 //       Does attempt to enable servo power (if not on)
-//       Does attempt to set the cycle mode to continuous (if not set)
+//       Does attempt to set the cycle mode to AUTO (if not set)
 //-----------------------------------------------------------------------
 MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_runtime_c__String *responseMessage)
 {
@@ -1469,7 +1469,8 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         if( (ret != 0) || (rData.err_no != 0) ) 
         {
             char output[256] = { 0 };
-            snprintf(output, 256, "Can't set cycle mode to continuous because: '%s' (0x%04X)",
+            snprintf(output, 256, "%s: Can't set cycle mode to AUTO because: '%s' (0x%04X)",
+                Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
                 Ros_ErrorHandling_ErrNo_ToString(rData.err_no), 
                 rData.err_no);
             Ros_Debug_BroadcastMsg(output);
