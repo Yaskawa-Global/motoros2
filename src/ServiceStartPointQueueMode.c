@@ -55,12 +55,6 @@ void Ros_ServiceStartPointQueueMode_Trigger(const void* request_msg, void* respo
     MotionNotReadyCode motion_result_code = Ros_MotionControl_StartMotionMode(MOTION_MODE_POINTQUEUE, &response->message);
     if (motion_result_code != MOTION_READY)
     {
-        if (motion_result_code == MOTION_NOT_READY_UNSPECIFIED)
-        {
-            motion_result_code = Ros_Controller_GetNotReadySubcode();
-            if (motion_result_code == MOTION_READY)
-                motion_result_code = MOTION_NOT_READY_UNSPECIFIED;
-        }
         // update response
         response->result_code.value = motion_result_code;
 

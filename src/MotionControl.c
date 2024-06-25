@@ -1365,6 +1365,7 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
     int checkCount;
     int grpNo;
     MotionNotReadyCode motion_readiness_code = MOTION_NOT_READY_UNSPECIFIED;
+    char output[256] = { 0 };
 
     Ros_Debug_BroadcastMsg("%s: enter", __func__);
 
@@ -1410,7 +1411,6 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         {
             //Function returns the error code if there is no alarm
             int alarmcode = Ros_Controller_GetAlarmCode();
-            char output[256] = { 0 };
             snprintf(output, 256, "%s: '%s' (0x%04X)",
                 Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
                 Ros_ErrorHandling_ErrNo_ToString(alarmcode),
@@ -1468,14 +1468,13 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         ret = mpSetCycle(&sCycleData, &rData);
         if( (ret != 0) || (rData.err_no != 0) ) 
         {
-            char output[256] = { 0 };
             snprintf(output, 256, "%s: Can't set cycle mode to AUTO because: '%s' (0x%04X)",
                 Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
-                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), 
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
                 rData.err_no);
             Ros_Debug_BroadcastMsg(output);
             rosidl_runtime_c__String__assign(responseMessage, output);
-
+            
             mpSetAlarm(ALARM_OPERATION_FAIL, "Set job-cycle to AUTO", SUBCODE_OPERATION_SET_CYCLE);
             return MOTION_NOT_READY_ERROR;
         }
@@ -1537,13 +1536,12 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         {
             //TODO(gavanderhoorn): should this be reported to user, or are causes
             //covered by errors in MotionNotReadyCode?
-            char output[256] = {0};
             snprintf(output, 256, "%s: Can't turn on servo because: '%s' (0x%04X)",
                 Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
-                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), 
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
                 rData.err_no);
             Ros_Debug_BroadcastMsg(output);
-            rosidl_runtime_c__String__assign(responseMessage, output);
+            rosidl_runtime_c__String__assign(responseMessage, output);         
             motion_readiness_code = MOTION_NOT_READY_ERROR;
             goto updateStatus;
         }
@@ -1578,9 +1576,8 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
     if( (ret != 0) || (rData.err_no !=0) )
     {
         //TODO(gavanderhoorn): special check for "job is not loaded"
-        char output[256] = { 0 };
-        snprintf(output, 256, "%s: Can't start '%s' because: '%s' (0x%04X)", 
-            Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR), 
+        snprintf(output, 256, "%s: Can't start '%s' because: '%s' (0x%04X)",
+            Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
             g_nodeConfigSettings.inform_job_name,
             Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
             rData.err_no);
@@ -1610,8 +1607,9 @@ updateStatus:
 
     //Required to allow motion api to work (Potential race condition)
     Ros_Sleep(200);
+    MotionNotReadyCode ending_code = Ros_Controller_GetNotReadySubcode();
 
-    if (Ros_Controller_IsMotionReady())
+    if (ending_code == MOTION_READY)
     {
         //set an indicator of which motion mode is now active
         Ros_MotionControl_ActiveMotionMode = mode;
@@ -1624,8 +1622,9 @@ updateStatus:
 
         return MOTION_READY;
     }
-    else
-        return motion_readiness_code;
+    else if (motion_readiness_code == MOTION_NOT_READY_UNSPECIFIED)
+        return ending_code;
+    return motion_readiness_code;
 }
 
 void Ros_MotionControl_StopTrajMode()
