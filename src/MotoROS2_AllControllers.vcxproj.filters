@@ -103,6 +103,12 @@
     <None Include="DX200_humbleLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
+    <None Include="FS100_humbleCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="FS100_humbleLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
     <None Include="YRC1000_humbleCompilerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
@@ -112,6 +118,9 @@
     <None Include="..\lib\ParameterExtraction.dnLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
+    <None Include="..\lib\ParameterExtraction.fsLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
     <None Include="..\lib\ParameterExtraction.yrcLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
@@ -119,6 +128,9 @@
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="..\lib\MotoROS_PlatformLib.dnLib">
+      <Filter>MotoPlus Libraries</Filter>
+    </None>
+    <None Include="..\lib\MotoROS_PlatformLib.fsLib">
       <Filter>MotoPlus Libraries</Filter>
     </None>
     <None Include="..\lib\MotoROS_PlatformLib.yrcLib">
@@ -194,6 +206,9 @@
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
     <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_fs100_humble\libmicroros.fsLib_humble">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
     <None Include="YRC1000u_galacticCompilerArguments.mps">
@@ -333,6 +348,9 @@
     <ClCompile Include="RosMotoPlusConversionUtils.c">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Ros_mpGetCalendar.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
@@ -441,6 +459,9 @@
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="Ros_mpGetCalendar.h">
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
   </ItemGroup>

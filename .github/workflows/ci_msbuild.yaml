@@ -56,7 +56,7 @@ jobs:
       # controllers and for which ROS 2 versions builds fail / succeed)
       fail-fast: false
       matrix:
-        controller: [dx200, yrc1000, yrc1000u]
+        controller: [fs100]
         # officially matrix doesn't support non-scalar values, but it does
         # seem to work, so let's use it. We specify M+ uROS release distributions
         # like this as it provides a (very) compact way to specify specific
@@ -64,9 +64,7 @@ jobs:
         # supported ROS 2 versions, this is less verbose than having to 'include'
         # or 'exclude' certain entries from a regular full matrix spec (with lists).
         uros: [
-          { release: 20221102, codename: foxy     },
-          { release: 20221102, codename: galactic },
-          { release: 20221102, codename: humble   },
+          { release: "20230724-alpha", codename: humble},
         ]
 
     steps:
@@ -86,18 +84,20 @@ jobs:
     - name: Find MSBuild and add to PATH
       uses: microsoft/setup-msbuild@v2
 
-    - name: "Download M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
-      id: download_libmicroros
-      uses: dsaltares/fetch-gh-release-asset@1.1.2
+    - name: Generate token (micro_ros_motoplus)
+      id: gen_token
+      uses: actions/create-github-app-token@v1
       with:
-        repo: 'yaskawa-global/micro_ros_motoplus'
-        version: 'tags/release-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}'
-        regex: true
-        # download the M+ libmicroros distribution for the latest release of
-        # MotoROS2 corresponding to the controller this workflow is run for
-        file: "micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.uros.codename }}.*\\.zip"
-        # work-around for https://github.com/dsaltares/fetch-gh-release-asset/issues/48
-        target: "./"
+        app-id: ${{ secrets.MPLMB_APP_ID }}
+        private-key: ${{ secrets.MPLMB_APP_PRIVATE_KEY }}
+        owner: "yaskawa-global"
+        repositories: "micro_ros_motoplus"
+
+    - name: "Download M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
+      env:
+        GITHUB_TOKEN: ${{ steps.gen_token.outputs.token }}
+      run: |
+        gh release --repo="yaskawa-global/micro_ros_motoplus" download prerelease-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}
 
     - name: Setup MotoROS2 build dir
       shell: bash
