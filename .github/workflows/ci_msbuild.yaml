@@ -58,11 +58,7 @@ jobs:
       matrix:
         controller: [dx200, yrc1000, yrc1000u]
         # officially matrix doesn't support non-scalar values, but it does
-        # seem to work, so let's use it. We specify M+ uROS release distributions
-        # like this as it provides a (very) compact way to specify specific
-        # upstream releases. As not all controllers have all releases of all
-        # supported ROS 2 versions, this is less verbose than having to 'include'
-        # or 'exclude' certain entries from a regular full matrix spec (with lists).
+        # seem to work, so let's use it.
         uros: [
           { release: 20221102, codename: foxy     },
           { release: 20221102, codename: galactic },
