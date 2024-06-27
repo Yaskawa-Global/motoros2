@@ -99,6 +99,7 @@ jobs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ steps.gen_token.outputs.token }}
+        RELEASE_TYPE: ${{ (matrix.uros.prerelease && 'prerelease') || 'release' }}
       run: |
         gh \
           release \
@@ -106,7 +107,7 @@ jobs:
           download \
             --pattern="micro_ros_motoplus*.zip" \
             --output="micro_ros_motoplus.zip" \
-            release-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}
+            ${{ env.RELEASE_TYPE }}-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}
 
     - name: Setup MotoROS2 build dir
       shell: bash
