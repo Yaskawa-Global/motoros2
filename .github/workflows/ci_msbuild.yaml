@@ -64,6 +64,9 @@ jobs:
           { release: 20221102, codename: galactic },
           { release: 20221102, codename: humble   },
         ]
+        include:
+          - controller: fs100
+            uros: { release: "20230724-alpha", codename: humble, prerelease: true }
 
     steps:
     - name: Uppercase controller identifier
