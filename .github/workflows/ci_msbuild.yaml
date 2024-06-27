@@ -105,6 +105,7 @@ jobs:
             --repo="yaskawa-global/micro_ros_motoplus" \
           download \
             --pattern="micro_ros_motoplus*.zip" \
+            --output="micro_ros_motoplus.zip" \
             release-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}
 
     - name: Setup MotoROS2 build dir
@@ -116,25 +117,10 @@ jobs:
         cp -r "${{ github.workspace }}"/* /c/build/
         ls -al /c/build
 
-    - name: "Find downloaded M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
-      id: find_libmicroros
-      shell: bash
-      # bit of a kludge, but works for now.
-      # we need to do this as 'fetch-gh-release-asset' will try to rename downloaded
-      # files if we use a regex to match 'unknown' files instead of hard-coding
-      # everything.
-      # NOTE: the regex includes the absolute path to the location of the .zip as that's
-      # how find reports them to the regex engine (because we specify an absolute path
-      # as the location for find to search for files)
-      run: |
-        LIBM_ZIP=$(find /c/build -type f -regextype posix-extended -regex "/c/build/micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.uros.codename }}.*[[:digit:]]+\.zip")
-        echo "libmicroros_zip=${LIBM_ZIP}" >> $GITHUB_OUTPUT
-        echo "libmicroros_zip_win=$(cygpath -w ${LIBM_ZIP})" >> $GITHUB_OUTPUT
-        echo "Found libmicroros zip: '${LIBM_ZIP}'"
     - name: Extract M+ libmicroros distribution
       shell: bash
       run: |
-        unzip -q "${{ steps.find_libmicroros.outputs.libmicroros_zip }}" \
+        unzip -q /c/build/micro_ros_motoplus.zip \
           -d /c/build/motoros2/libmicroros_${{ matrix.controller }}_${{ matrix.uros.codename }}
 
     - name: Download and setup M+ SDK (mpBuilder)
