@@ -86,8 +86,19 @@ jobs:
     - name: Find MSBuild and add to PATH
       uses: microsoft/setup-msbuild@v2
 
+    - name: Generate token (micro_ros_motoplus)
+      id: gen_token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.MPLMB_APP_ID }}
+        private-key: ${{ secrets.MPLMB_APP_PRIVATE_KEY }}
+        owner: "yaskawa-global"
+        repositories: "micro_ros_motoplus"
+
     - name: "Download M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ steps.gen_token.outputs.token }}
       run: |
         gh \
           release \
