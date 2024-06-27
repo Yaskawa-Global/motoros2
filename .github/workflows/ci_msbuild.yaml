@@ -87,17 +87,14 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: "Download M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
-      id: download_libmicroros
-      uses: dsaltares/fetch-gh-release-asset@1.1.2
-      with:
-        repo: 'yaskawa-global/micro_ros_motoplus'
-        version: 'tags/release-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}'
-        regex: true
-        # download the M+ libmicroros distribution for the latest release of
-        # MotoROS2 corresponding to the controller this workflow is run for
-        file: "micro_ros_motoplus_${{ matrix.controller }}-${{ matrix.uros.codename }}.*\\.zip"
-        # work-around for https://github.com/dsaltares/fetch-gh-release-asset/issues/48
-        target: "./"
+      shell: bash
+      run: |
+        gh \
+          release \
+            --repo="yaskawa-global/micro_ros_motoplus" \
+          download \
+            --pattern="micro_ros_motoplus*.zip" \
+            release-${{ matrix.uros.codename }}-${{ matrix.controller }}-${{ matrix.uros.release }}
 
     - name: Setup MotoROS2 build dir
       shell: bash
