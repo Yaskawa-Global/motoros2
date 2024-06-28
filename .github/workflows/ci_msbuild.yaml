@@ -63,6 +63,7 @@ jobs:
           { release: 20221102, codename: foxy     },
           { release: 20221102, codename: galactic },
           { release: 20221102, codename: humble   },
+          { release: "20230724-rc1", codename: humble, prerelease: true },
         ]
         include:
           - controller: fs100
