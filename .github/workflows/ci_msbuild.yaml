@@ -60,14 +60,14 @@ jobs:
         # officially matrix doesn't support non-scalar values, but it does
         # seem to work, so let's use it.
         uros: [
-          { release: 20221102, codename: foxy     },
-          { release: 20221102, codename: galactic },
-          { release: 20221102, codename: humble   },
-          { release: "20230724-rc1", codename: humble, prerelease: true },
+          { release: 20221102, codename: foxy, allow_failure: true },
+          { release: 20221102, codename: galactic, allow_failure: true },
+          { release: 20221102, codename: humble, allow_failure: true },
+          { release: "20230724-rc1", codename: humble, prerelease: true, allow_failure: false },
         ]
         include:
           - controller: fs100
-            uros: { release: "20230724-alpha", codename: humble, prerelease: true }
+            uros: { release: "20230724-alpha", codename: humble, prerelease: true, allow_failure: false }
 
     steps:
     - name: Uppercase controller identifier
@@ -151,3 +151,4 @@ jobs:
           -nologo ^
           -v:minimal ^
           -p:Configuration=${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.uros.codename }}
+      continue-on-error: ${{ matrix.uros.allow_failure }}
