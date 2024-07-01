@@ -436,7 +436,7 @@ MotionNotReadyCode Ros_Controller_GetNotReadySubcode()
     if(!Ros_Controller_IsPlay())
         return MOTION_NOT_READY_NOT_PLAY;
 
-    // Check if in continuous cycle mode (Here due to being checked before starting servor power)
+    // Check if in continuous cycle mode (Here due to being checked before starting servo power)
     if (!Ros_Controller_IsContinuousCycle())
         return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
 

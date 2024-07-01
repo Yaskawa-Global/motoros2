@@ -28,6 +28,7 @@ const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo)
     case 0x3050: return "Out of range (ABSO data)";
     case 0x3400: return "Cannot operate MASTER JOB";
     case 0x3410: return "The JOB name is already registered in another task";
+    case 0x3450: return "Servo power cannot be turned on";
     case 0x4040: return "Specified JOB not found";
     case 0x5200: return "Over data range";
     default:     return "Unspecified reason";
@@ -71,6 +72,10 @@ const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCo
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_OTHER_TRAJ_MODE_ACTIVE_STR;
     case MOTION_NOT_READY_NOT_CONT_CYCLE_MODE:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_NOT_CONT_CYCLE_MODE_STR;
+    case MOTION_NOT_READY_ECO_MODE:
+        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_ECO_MODE_STR;
+    case MOTION_NOT_READY_SERVO_ON_TIMEOUT:
+        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_SERVO_ON_TIMEOUT_STR;
     default:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_UNSPECIFIED_STR;
     }
