@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 
-#ifdef MOTOROS2_TESTING_ENABLE
+#if defined(MOTOROS2_TESTING_ENABLE) && defined(MOTOROS2_INCLUDE_TESTS_FJT_C)
 
 #include "MotoROS.h"
 #include <control_msgs/msg/joint_tolerance.h>
@@ -714,4 +714,4 @@ BOOL Ros_Testing_ActionServer_FJT()
     return bSuccess;
 }
 
-#endif //MOTOROS2_TESTING_ENABLE
+#endif //#if defined(MOTOROS2_TESTING_ENABLE) && defined(MOTOROS2_INCLUDE_TESTS_FJT_C)

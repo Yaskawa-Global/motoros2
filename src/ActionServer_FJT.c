@@ -864,4 +864,6 @@ void Ros_ActionServer_FJT_ProcessResult()
 
 
 //included here as this tests 'static' functions
+#define MOTOROS2_INCLUDE_TESTS_FJT_C
 #include "Tests_ActionServer_FJT.c"
+#undef MOTOROS2_INCLUDE_TESTS_FJT_C
