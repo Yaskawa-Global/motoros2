@@ -300,6 +300,9 @@
     <ClCompile Include="ServiceResetError.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceInformJobList.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
     <ClCompile Include="ConfigFile.c">
       <Filter>Source Files\Parameters and Config</Filter>
     </ClCompile>
@@ -387,6 +390,9 @@
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="ServiceResetError.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceInformJobList.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="PositionMonitor.h">

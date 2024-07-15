@@ -337,6 +337,7 @@
     <ClCompile Include="FileUtilityFunctions.c" />
     <ClCompile Include="InformCheckerAndGenerator.c" />
     <ClCompile Include="MemoryAllocation.c" />
+    <ClCompile Include="ServiceInformJobList.c" />
     <ClCompile Include="ServiceQueueTrajPoint.c" />
     <ClCompile Include="ServiceReadWriteIO.c" />
     <ClCompile Include="ServiceStartPointQueueMode.c" />
@@ -371,6 +372,7 @@
     <ClInclude Include="MemoryTracing.h" />
     <ClInclude Include="RosApiNameConstants.h" />
     <ClInclude Include="..\lib\MotoPlusExterns.h" />
+    <ClInclude Include="ServiceInformJobList.h" />
     <ClInclude Include="ServiceQueueTrajPoint.h" />
     <ClInclude Include="ServiceReadWriteIO.h" />
     <ClInclude Include="ServiceStartPointQueueMode.h" />
