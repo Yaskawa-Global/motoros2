@@ -429,6 +429,12 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
         &g_messages_ReadWriteIO.resp_mreg_write, Ros_ServiceWriteMRegister_Trigger);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_WRITE_M_REG, "Failed adding service (%d)", (int)rc);
 
+    //INFORM job CRUD services
+    rc = rclc_executor_add_service(
+        &executor_io_control, &g_serviceListInformJobs, &g_messages_ListInformJobs.request,
+        &g_messages_ListInformJobs.response, Ros_ServiceListInformJobs_Trigger);
+    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_LIST_INFORM_JOBS, "Failed adding service (%d)", (int)rc);
+
     //===========================================================
 
     // Optional prepare for avoiding allocations during spin
