@@ -131,6 +131,8 @@ void RosInitTask()
         Ros_ServiceStopTrajMode_Initialize();
         Ros_ServiceSelectMotionTool_Initialize();
 
+        Ros_ServiceListInformJobs_Initialize();
+
         // Start executor that performs all communication
         // (This task deletes itself when the agent disconnects.)
         SEM_ID semCommunicationExecutorStatus = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
@@ -201,6 +203,8 @@ void RosInitTask()
         //wait for Ros_Communication_StartExecutors to finish
         mpSemTake(semCommunicationExecutorStatus, WAIT_FOREVER);
         mpSemDelete(semCommunicationExecutorStatus);
+
+        Ros_ServiceListInformJobs_Cleanup();
 
         Ros_ServiceSelectMotionTool_Cleanup();
         Ros_ServiceStopTrajMode_Cleanup();
