@@ -27,6 +27,7 @@ jobs:
           python \
             .ci/alarm_subcode_doc_linter.py \
               --check-all \
+              --warn-catch-alls \
               --ignore-enum Failed_Trajectory_Status \
               --ignore-enum Init_Trajectory_Status \
               --ignore-enum MotionNotReadyCode \
