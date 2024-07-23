@@ -17,6 +17,9 @@ typedef motoros2_interfaces__srv__ListInformJobs_Response ListInformJobsResponse
 static const size_t RESP_NAMES_LIST_INITIAL_SIZE = 1;
 static const size_t MAX_NUMBER_OF_JOBS_TO_REPORT = 1024;
 
+#define MSG_RC(x) (motoros2_interfaces__msg__InformJobCrudResultCodes__RC_ ## x)
+#define MSG_RC_STR(x) (motoros2_interfaces__msg__InformJobCrudResultCodes__STR_ ## x)
+
 
 void Ros_ServiceListInformJobs_Initialize()
 {
@@ -75,9 +78,8 @@ void Ros_ServiceListInformJobs_Trigger(const void* request_msg, void* response_m
     if (status != OK)
     {
         Ros_Debug_BroadcastMsg("%s: error refreshing job list", __func__);
-        rosidl_runtime_c__String__assign(&response->message, "error refreshing job list");
-        //TODO(gavanderhoorn): define status/error codes
-        response->result_code = 10;
+        rosidl_runtime_c__String__assign(&response->message, MSG_RC_STR(ERR_REFRESHING_JOB_LIST));
+        response->result_code = MSG_RC(ERR_REFRESHING_JOB_LIST);
         goto DONE;
     }
 
@@ -86,9 +88,8 @@ void Ros_ServiceListInformJobs_Trigger(const void* request_msg, void* response_m
     if (job_count < 0)
     {
         Ros_Debug_BroadcastMsg("%s: error retrieving file count: %d", __func__, job_count);
-        rosidl_runtime_c__String__assign(&response->message, "error retrieving file count");
-        //TODO(gavanderhoorn): define status/error codes
-        response->result_code = 11;
+        rosidl_runtime_c__String__assign(&response->message, MSG_RC_STR(ERR_RETRIEVING_FILE_COUNT));
+        response->result_code = MSG_RC(ERR_RETRIEVING_FILE_COUNT);
         goto DONE;
     }
     Ros_Debug_BroadcastMsg("%s: found %d jobs", __func__, job_count);
@@ -97,9 +98,8 @@ void Ros_ServiceListInformJobs_Trigger(const void* request_msg, void* response_m
     if (job_count > MAX_NUMBER_OF_JOBS_TO_REPORT)
     {
         Ros_Debug_BroadcastMsg("%s: too many jobs, aborting", __func__);
-        rosidl_runtime_c__String__assign(&response->message, "too many jobs");
-        //TODO(gavanderhoorn): define status/error codes
-        response->result_code = 12;
+        rosidl_runtime_c__String__assign(&response->message, MSG_RC_STR(ERR_TOO_MANY_JOBS));
+        response->result_code = MSG_RC(ERR_TOO_MANY_JOBS);
         goto DONE;
     }
 
@@ -126,9 +126,8 @@ void Ros_ServiceListInformJobs_Trigger(const void* request_msg, void* response_m
         if (status != OK)
         {
             Ros_Debug_BroadcastMsg("%s: failed retrieving job %d from list", __func__, i);
-            rosidl_runtime_c__String__assign(&response->message, "failed retrieving job from list");
-            //TODO(gavanderhoorn): define status/error codes
-            response->result_code = 13;
+            rosidl_runtime_c__String__assign(&response->message, MSG_RC_STR(ERR_RETRIEVING_JOB_NAME_FROM_LIST));
+            response->result_code = MSG_RC(ERR_RETRIEVING_JOB_NAME_FROM_LIST);
             goto DONE;
         }
 
@@ -148,9 +147,8 @@ void Ros_ServiceListInformJobs_Trigger(const void* request_msg, void* response_m
         if (!rosidl_runtime_c__String__assignn(&response->names.data[i], name_buf, name_len))
         {
             Ros_Debug_BroadcastMsg("%s: failed adding job name %d to response, aborting", __func__, i);
-            rosidl_runtime_c__String__assign(&response->message, "Error adding job name to response");
-            //TODO(gavanderhoorn): define status/error codes
-            response->result_code = 14;
+            rosidl_runtime_c__String__assign(&response->message, MSG_RC_STR(ERR_APPENDING_JOB_NAME_TO_SVC_RESPONSE));
+            response->result_code = MSG_RC(ERR_APPENDING_JOB_NAME_TO_SVC_RESPONSE);
             goto DONE;
         }
     }
@@ -162,9 +160,8 @@ void Ros_ServiceListInformJobs_Trigger(const void* request_msg, void* response_m
 
     //done, report to client
     Ros_Debug_BroadcastMsg("%s: returning %d job names", __func__, response->names.size);
-    rosidl_runtime_c__String__assign(&response->message, "success");
-    //TODO(gavanderhoorn): define status/error codes
-    response->result_code = 1;
+    rosidl_runtime_c__String__assign(&response->message, MSG_RC_STR(OK));
+    response->result_code = MSG_RC(OK);
 
 DONE:
     Ros_Debug_BroadcastMsg("%s: exit", __func__);
