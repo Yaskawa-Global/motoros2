@@ -71,6 +71,7 @@
 #include <motoros2_interfaces/srv/queue_traj_point.h>
 #include <motoros2_interfaces/srv/select_motion_tool.h>
 #include <motoros2_interfaces/srv/list_inform_jobs.h>
+#include <motoros2_interfaces/msg/inform_job_crud_result_codes.h>
 
 //============================================
 // MotoROS
