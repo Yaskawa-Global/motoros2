@@ -102,7 +102,7 @@ The following general requirements must be met in order to be able to use MotoRO
   - YRC1000: either `LAN2` or `LAN3`
   - YRC1000micro: either `LAN2` or `LAN3`
 - ROS 2 version: Foxy, Galactic or Humble.
-  MotoROS2 does not support ROS 2 Iron Irwini nor Rolling Ridley.
+  MotoROS2 does not support ROS 2 Iron Irwini, nor Jazzy nor Rolling Ridley.
 - Docker or a from-source build of the micro-ROS Agent
 - FastDDS as RMW (even when using ROS 2 Galactic)
 
