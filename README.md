@@ -96,7 +96,7 @@ The following general requirements must be met in order to be able to use MotoRO
 - minimum versions of system software:
   - `DN2.44.00-00` for DX200
   - `YAS2.80.00-00` for YRC1000
-  - `YBS2.31.00-00` for YRC1000micro
+  - `YBS2.45.00-00` for YRC1000micro
 - the controller must have a correctly configured network connection:
   - DX200: `LAN`
   - YRC1000: either `LAN2` or `LAN3`
