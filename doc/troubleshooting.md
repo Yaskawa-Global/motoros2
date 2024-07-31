@@ -71,6 +71,8 @@ The provided Visual Studio solution should be set up correctly.
 Pay special attention to any errors or warnings displayed by Visual Studio as part of the build process.
 
 If the error persists, you may need to upgrade the robot controller system software.
+For YRC1000, the controller must have `YAS2.80.00-00` or higher.
+For YRC1000micro, the controller must have `YBS2.45.00-00` or higher.
 Please contact Yaskawa technical support for assistance with upgrading the controller.
 
 ### Alarm: 1020[6]
@@ -220,7 +222,7 @@ Your robot controller requires internal configuration changes to support the Mot
 
 For DX200: ensure the controller is updated to at least `DN2.44.00-00`.
 
-For YRC1000 and YRC1000micro: ensure the controller is updated to at least `YAS2.80.00-00` (for YRC1000) and `YBS2.31.00-00` (for YRC1000micro).
+For YRC1000 and YRC1000micro: ensure the controller is updated to at least `YAS2.80.00-00` (for YRC1000) and `YBS2.45.00-00` (for YRC1000micro).
 If the system software version is below this, please contact Yaskawa Motoman for assistance with upgrading the controller.
 
 Then boot the controller into *Maintenance* mode by holding `{Main Menu}` on the keypad.
@@ -372,7 +374,7 @@ Now follow the installation tutorial to install the latest version.
 
 Additionally, the robot controller must meet a minimum version of system software.
 For YRC1000, the controller must have `YAS2.80.00-00` or higher.
-For YRC1000micro, the controller must have `YBS2.31.00-00` or higher.
+For YRC1000micro, the controller must have `YBS2.45.00-00` or higher.
 Please contact Yaskawa technical support for assistance in upgrading the controller software.
 
 ### Alarm: 8003[9]
@@ -396,7 +398,7 @@ Now follow the installation tutorial to install the latest version.
 
 Additionally, the robot controller must meet a minimum version of system software.
 For YRC1000, the controller must have `YAS2.80.00-00` or higher.
-For YRC1000micro, the controller must have `YBS2.31.00-00` or higher.
+For YRC1000micro, the controller must have `YBS2.45.00-00` or higher.
 Please contact Yaskawa technical support for assistance in upgrading the controller software.
 
 ### Alarm: 8003[11]
