@@ -7,7 +7,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
-## Forthcoming
+## 0.1.3 (2024-08-01)
 
 MotoROS2 is now built against `micro_ros_motoplus` version `20240710`.
 
