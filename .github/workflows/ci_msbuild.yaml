@@ -60,9 +60,9 @@ jobs:
         # officially matrix doesn't support non-scalar values, but it does
         # seem to work, so let's use it.
         uros: [
-          { release: 20221102, codename: foxy     },
-          { release: 20221102, codename: galactic },
-          { release: 20221102, codename: humble   },
+          { release: 20240710, codename: foxy     },
+          { release: 20240710, codename: galactic },
+          { release: 20240710, codename: humble   },
         ]
 
     steps:
