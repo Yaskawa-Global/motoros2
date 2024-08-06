@@ -73,6 +73,17 @@ Note: this topic is only namespaced if a namespace is configured *and* `namespac
 
 ## Services
 
+### inform_job/list
+
+Type: [motoros2_interfaces/srv/ListInformJobs](https://github.com/Yaskawa-Global/motoros2_interfaces/blob/e6d75c5ead964542f7828171a6cff409d7aac592/srv/ListInformJobs.srv)
+
+Retrieve the list of INFORM jobs present on the controller.
+
+Note: this service supports a maximum of `1024` INFORM jobs.
+On controllers with more jobs than this maximum, MotoROS2 will return an error to the client and the `names` field in the service response will be empty.
+
+Please refer to the documentation embedded in the service definition for more information about service fields and general behaviour.
+
 ### read_group_io
 
 Type: [motoros2_interfaces/srv/ReadGroupIO](https://github.com/yaskawa-global/motoros2_interfaces/blob/d6805d32714df4430f7db3d8ddc736c340ddeba8/srv/ReadGroupIO.srv)
