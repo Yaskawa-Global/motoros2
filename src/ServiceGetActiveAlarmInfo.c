@@ -20,8 +20,13 @@ static micro_ros_utilities_memory_rule_t mem_rules_response_[] =
 
     {"alarms", MAX_ALARM_COUNT},
     {"alarms.message", ROS_MAX_ALARM_MSG_LEN},
-    {"alarms.contents", 1}, //NOTE: zero-length strings don't appear to work
-    {"alarms.description", 1}, //NOTE: zero-length strings don't appear to work
+    //field reserved for future use, zero-allocation
+    //NOTE: zero-length strings don't appear to work: init length 1
+    {"alarms.contents", 1},
+    //field reserved for future use, zero-allocation
+    //NOTE: zero-length strings don't appear to work: init length 1
+    {"alarms.description", 1},
+    //field reserved for future use, zero-allocation
     {"alarms.help", 0},
 
     {"errors", MAX_ERROR_COUNT},
@@ -80,6 +85,9 @@ void Ros_ServiceGetActiveAlarmInfo_Cleanup()
         Ros_Debug_BroadcastMsg("Failed cleaning up "
             SERVICE_NAME_GET_ACTIVE_ALARM_INFO " service: %d", ret);
 
+    //use destroy_message_memory(..) here as we initialised using
+    //create_message_memory(..) and it knows how to process the memory
+    //configuration struct
     bool result = micro_ros_utilities_destroy_message_memory(
         type_support_response_, &g_messages_GetActiveAlarmInfo.response, mem_conf_response_);
     Ros_Debug_BroadcastMsg("%s: cleanup response msg memory: %d", __func__, result);
@@ -107,6 +115,9 @@ void Ros_ServiceGetActiveAlarmInfo_Trigger(const void* request_msg, void* respon
         goto DONE;
     }
 
+    // NOTE: we exploit the fact a bool is an int in C and avoid having to use
+    // a full if-else to print the nr of active errors that way (last arg to
+    // Ros_Debug_BroadcastMsg(..))
     Ros_Debug_BroadcastMsg("%s: %d alarm(s), %d error(s)", __func__,
         alarmData.usAlarmNum, 0 != alarmData.usErrorNo);
 
@@ -146,7 +157,8 @@ void Ros_ServiceGetActiveAlarmInfo_Trigger(const void* request_msg, void* respon
     // retrieve info on active error(s)
     if (0 < alarmData.usErrorNo)
     {
-        // there can be only a single active error at any given time
+        // there can be only a single active error at any given time, but use
+        // the same code structure as for warnings (but just use constants)
         const size_t kNumActiveErrors = 1;
         const size_t kFirstErrorIdx = 0;
         Ros_Debug_BroadcastMsg("%s: processing error %04d (%d out of %d)",
