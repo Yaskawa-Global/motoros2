@@ -73,6 +73,14 @@ Note: this topic is only namespaced if a namespace is configured *and* `namespac
 
 ## Services
 
+### get_active_alarm_info
+
+Type: [motoros2_interfaces/srv/GetActiveAlarmInfo](https://github.com/Yaskawa-Global/motoros2_interfaces/blob/3ec808b361e103d4fd8c63a964df5bd593c923be/srv/GetActiveAlarmInfo.srv)
+
+Retrieve information about active alarms and/or errors on the controller.
+
+Please refer to the documentation embedded in the service definition for more information about addressing and general service behaviour.
+
 ### read_group_io
 
 Type: [motoros2_interfaces/srv/ReadGroupIO](https://github.com/yaskawa-global/motoros2_interfaces/blob/d6805d32714df4430f7db3d8ddc736c340ddeba8/srv/ReadGroupIO.srv)
