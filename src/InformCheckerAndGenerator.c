@@ -307,7 +307,7 @@ void Ros_InformChecker_ValidateJob()
         //Don't check the job contents if the user is allowing custom inform
         if (!g_nodeConfigSettings.allow_custom_inform_job)
         {
-            fdJob = mpOpen(pathDram, 0, O_RDONLY);
+            fdJob = mpOpen(pathDram, O_RDONLY, 0);
 
             if (fdJob < 0)
                 mpSetAlarm(ALARM_INFORM_JOB_FAIL, APPLICATION_NAME " failed to validate job", SUBCODE_INFORM_FAIL_TO_OPEN_DRAM);
