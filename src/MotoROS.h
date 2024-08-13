@@ -9,7 +9,7 @@
 #define MOTOROS2_MOTOROS_H
 
 #define APPLICATION_NAME            "MotoROS2"
-#define APPLICATION_VERSION         "0.1.4pre"
+#define APPLICATION_VERSION         "9.9.9alpha"
 
 #include "motoPlus.h"
 
