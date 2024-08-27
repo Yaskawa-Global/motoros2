@@ -1355,15 +1355,17 @@ static STATUS Ros_Controller_DisableEcoMode()
 //
 // NOTE: only attempts to start job if necessary, does not reset errors, alarms.
 //       Does attempt to enable servo power (if not on)
-//       Does attempt to set the cycle mode to continuous (if not set)
+//       Does attempt to set the cycle mode to AUTO (if not set)
 //-----------------------------------------------------------------------
-BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
+MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_runtime_c__String* responseMessage)
 {
     int ret;
     MP_STD_RSP_DATA rData;
     MP_START_JOB_SEND_DATA sStartData;
     int checkCount;
     int grpNo;
+    MotionNotReadyCode motion_readiness_code = MOTION_NOT_READY_UNSPECIFIED;
+    char output[256] = { 0 };
 
     Ros_Debug_BroadcastMsg("%s: enter", __func__);
 
@@ -1371,7 +1373,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         Ros_MotionControl_ActiveMotionMode != mode)
     {
         Ros_Debug_BroadcastMsg("Another trajectory mode (%d) is already active.", mode);
-        return FALSE;
+        return MOTION_NOT_READY_OTHER_TRAJ_MODE_ACTIVE;
     }
 
     // Update status
@@ -1381,22 +1383,46 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     if(Ros_Controller_IsMotionReady())
     {
         Ros_Debug_BroadcastMsg("Already active");
-        return TRUE;
+        return MOTION_READY;
     }
+
+    if (Ros_Controller_IsEStop())
+        return MOTION_NOT_READY_ESTOP;
+
+    // Check play mode
+    if (!Ros_Controller_IsPlay())
+        return MOTION_NOT_READY_NOT_PLAY;
 
 #ifndef DUMMY_SERVO_MODE
     // Check for condition that need operator manual intervention
     if(!Ros_Controller_IsRemote())
     {
         Ros_Debug_BroadcastMsg("Not remote, can't enable trajectory mode");
-        return FALSE;
+        return MOTION_NOT_READY_NOT_REMOTE;
     }
 #endif
 
     if (Ros_Controller_IsAnyFaultActive())
     {
         Ros_Debug_BroadcastMsg("Controller is in a fault state. Please call /reset_error");
-        return FALSE;
+        if (Ros_Controller_IsAlarm())
+            return MOTION_NOT_READY_ALARM;
+        else if (Ros_Controller_IsError())
+        {
+            //Function returns the error code if there is no alarm
+            int alarmcode = Ros_Controller_GetAlarmCode();
+            snprintf(output, 256, "%s: '%s' (0x%04X)",
+                Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
+                Ros_ErrorHandling_ErrNo_ToString(alarmcode),
+                alarmcode);
+            Ros_Debug_BroadcastMsg(output);
+            rosidl_runtime_c__String__assign(responseMessage, output);
+            return MOTION_NOT_READY_ERROR;
+        }
+        else if (Ros_Controller_IsMpIncMoveErrorActive())
+            return MOTION_NOT_READY_INC_MOVE_ERROR;
+        else if (Ros_Controller_IsPflActive())
+            return MOTION_NOT_READY_PFL_ACTIVE;
     }
 
     // Check if currently in operation, we don't want to interrupt current operation
@@ -1406,6 +1432,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         {
             Ros_Debug_BroadcastMsg("%s: robot is running another job (expected: '%s')",
                 __func__, g_nodeConfigSettings.inform_job_name);
+            motion_readiness_code = MOTION_NOT_READY_OTHER_PROGRAM_RUNNING;
             goto updateStatus;
         }
         else
@@ -1441,11 +1468,15 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         ret = mpSetCycle(&sCycleData, &rData);
         if( (ret != 0) || (rData.err_no != 0) ) 
         {
-            Ros_Debug_BroadcastMsg(
-                "Can't set cycle mode to continuous because: '%s' (0x%04X)",
-                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
+            snprintf(output, 256, "%s: Can't set cycle mode to AUTO because: '%s' (0x%04X)",
+                Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
+                rData.err_no);
+            Ros_Debug_BroadcastMsg(output);
+            rosidl_runtime_c__String__assign(responseMessage, output);
+
             mpSetAlarm(ALARM_OPERATION_FAIL, "Set job-cycle to AUTO", SUBCODE_OPERATION_SET_CYCLE);
-            return FALSE;
+            return MOTION_NOT_READY_ERROR;
         }
 
         Ros_Sleep(g_Ros_Controller.interpolPeriod); //give CIO time to potentially overwrite the cycle (Ladder scan time is smaller than the interpolPeriod)
@@ -1455,7 +1486,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         {
             Ros_Debug_BroadcastMsg("Can't set cycle mode. Check CIOPRG.LST for OUT #40050 - #40052");
             mpSetAlarm(ALARM_OPERATION_FAIL, "Set job-cycle to AUTO", SUBCODE_OPERATION_SET_CYCLE);
-            return false;
+            return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
         }
     }
 
@@ -1469,6 +1500,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
             if (Ros_Controller_DisableEcoMode() == NG)
             {
                 Ros_Debug_BroadcastMsg("%s: couldn't disable eco mode");
+                motion_readiness_code = MOTION_NOT_READY_ECO_MODE;
                 goto updateStatus;
             }
         }
@@ -1496,6 +1528,7 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
             if(Ros_Controller_IsServoOn() == FALSE)
             {
                 Ros_Debug_BroadcastMsg("%s: timed out waiting for servo on");
+                motion_readiness_code = MOTION_NOT_READY_SERVO_ON_TIMEOUT;
                 goto updateStatus;
             }
         }
@@ -1503,9 +1536,13 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
         {
             //TODO(gavanderhoorn): should this be reported to user, or are causes
             //covered by errors in MotionNotReadyCode?
-            Ros_Debug_BroadcastMsg(
-                "Can't turn on servo because: '%s' (0x%04X)",
-                Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
+            snprintf(output, 256, "%s: Can't turn on servo because: '%s' (0x%04X)",
+                Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
+                Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
+                rData.err_no);
+            Ros_Debug_BroadcastMsg(output);
+            rosidl_runtime_c__String__assign(responseMessage, output);
+            motion_readiness_code = MOTION_NOT_READY_ERROR;
             goto updateStatus;
         }
     }
@@ -1539,9 +1576,14 @@ BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode)
     if( (ret != 0) || (rData.err_no !=0) )
     {
         //TODO(gavanderhoorn): special check for "job is not loaded"
-        Ros_Debug_BroadcastMsg(
-            "Can't start '%s' because: '%s' (0x%04X)", g_nodeConfigSettings.inform_job_name,
-            Ros_ErrorHandling_ErrNo_ToString(rData.err_no), rData.err_no);
+        snprintf(output, 256, "%s: Can't start '%s' because: '%s' (0x%04X)",
+            Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
+            g_nodeConfigSettings.inform_job_name,
+            Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
+            rData.err_no);
+        Ros_Debug_BroadcastMsg(output);
+        rosidl_runtime_c__String__assign(responseMessage, output);
+        motion_readiness_code = MOTION_NOT_READY_ERROR;
         goto updateStatus;
     }
 
@@ -1565,22 +1607,24 @@ updateStatus:
 
     //Required to allow motion api to work (Potential race condition)
     Ros_Sleep(200);
+    MotionNotReadyCode ending_code = Ros_Controller_GetNotReadySubcode();
 
-    if (Ros_Controller_IsMotionReady())
+    if (ending_code == MOTION_READY)
     {
         //set an indicator of which motion mode is now active
         Ros_MotionControl_ActiveMotionMode = mode;
-        Ros_Debug_BroadcastMsg("Ros_MotionControl_ActiveTrajMode = %d", Ros_MotionControl_ActiveMotionMode);
+        Ros_Debug_BroadcastMsg("Ros_MotionControl_ActiveMotionMode = %d", Ros_MotionControl_ActiveMotionMode);
 
         //This indicates that the next incoming point will be the FIRST point in
         //the queue. As such, it will need to go through an initialization routine
         if (Ros_MotionControl_IsMotionMode_PointQueue())
             Ros_MotionControl_MustInitializePointQueue = TRUE;
 
-        return TRUE;
+        return MOTION_READY;
     }
-    else
-        return FALSE;
+    else if (motion_readiness_code == MOTION_NOT_READY_UNSPECIFIED)
+        return ending_code;
+    return motion_readiness_code;
 }
 
 void Ros_MotionControl_StopTrajMode()
