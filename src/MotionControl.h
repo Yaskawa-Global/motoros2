@@ -12,6 +12,7 @@
 
 #define MOTION_START_TIMEOUT                5000  // in milliseconds
 #define MOTION_START_CHECK_PERIOD           50  // in millisecond
+#define MOTION_START_ERROR_MESSSAGE_LENGTH  256
 #define MOTION_STOP_TIMEOUT                 20
 
 typedef enum
