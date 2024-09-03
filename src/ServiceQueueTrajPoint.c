@@ -23,8 +23,8 @@ void Ros_ServiceQueueTrajPoint_Initialize()
 
     rcl_ret_t ret;
     ret = rclc_service_init_default(&g_serviceQueueTrajPoint, &g_microRosNodeInfo.node, type_support, SERVICE_NAME_QUEUE_TRAJ_POINT);
-    motoRosAssert_RCLAssertOK(ret);
-    //motoRosAssert((ret == RCL_RET_OK), SUBCODE_FAIL_CREATE_SERVICE_QUEUE_POINT);
+    motoRosAssert_RCLAssertOK(ret, false);
+    motoRosAssert((ret == RCL_RET_OK), SUBCODE_FAIL_CREATE_SERVICE_QUEUE_POINT);
 
     //--------------
     //I'm intentionally allocating for all possible axes, rather than the actual number used.

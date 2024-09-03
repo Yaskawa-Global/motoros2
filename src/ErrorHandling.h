@@ -70,7 +70,7 @@ typedef enum
 //**********************************************************************
 
 #define ERROR_MSG_MAX_SIZE 32
-
+#define DEBUG_MSG_MAX_SIZE 256
 //===================================
 //Main Codes
 //===================================
@@ -277,21 +277,20 @@ typedef enum
     SUBCODE_RCL_RCLC_FAIL_LIFECYCLE_STATE_NOT_REGISTERED,
 } ALARM_RCL_RCLC_FAIL_SUBCODE; //8017
 
-typedef struct Container_rcl_rclc_fail_info
+typedef struct FailureInfo
 {
-    ALARM_RCL_RCLC_FAIL_SUBCODE subcode;
-    /// string representation of the value in 'result_code', for humans
-    rosidl_runtime_c__String message;
-} Container_rcl_rclc_fail_info;
+    short maincode;
+    char subcode;
+    rosidl_runtime_c__String alarm_message;
+    rosidl_runtime_c__String debug_log_message;
+} FailureInfo;
 
 extern void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
 extern void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
-extern void motoRosAssert_RCLAssertOK(rcl_ret_t code);
-extern void motoRosAssert_RCLAssertOK_withAlarmAssertionFailSubcode(rcl_ret_t code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
-extern void motoRosAssert_RCLAssertOK_withAlarmAssertionFailSubcode_withMsg(rcl_ret_t code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
+extern void motoRosAssert_RCLAssertOK(rcl_ret_t code, bool forever);
 
 extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
 extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
-extern void Ros_ErrorHandling_Container_rcl_rclc_fail_info_Populate(int errNo ,Container_rcl_rclc_fail_info* info);
+extern void Ros_ErrorHandling_RCL_Ret_Populate(int errNo , FailureInfo* problems);
 
 #endif  // MOTOROS2_ERROR_HANDLING_H
