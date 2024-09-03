@@ -111,6 +111,7 @@ extern void Ros_Controller_StatusInit();
 extern BOOL Ros_Controller_StatusRead(USHORT ioStatus[IO_ROBOTSTATUS_MAX]);
 extern BOOL Ros_Controller_IoStatusUpdate();
 extern BOOL Ros_Controller_IsAlarm();
+extern BOOL Ros_Controller_IsMajorAlarm();
 extern BOOL Ros_Controller_IsError();
 extern BOOL Ros_Controller_IsPlay();
 extern BOOL Ros_Controller_IsTeach();

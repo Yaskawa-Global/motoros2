@@ -71,6 +71,8 @@ const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCo
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_OTHER_TRAJ_MODE_ACTIVE_STR;
     case MOTION_NOT_READY_NOT_CONT_CYCLE_MODE:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_NOT_CONT_CYCLE_MODE_STR;
+    case MOTION_NOT_READY_MAJOR_ALARM:
+        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_MAJOR_ALARM_STR;
     default:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_UNSPECIFIED_STR;
     }

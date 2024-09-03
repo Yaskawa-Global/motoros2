@@ -83,7 +83,15 @@ void Ros_ServiceResetError_Trigger(const void* request_msg, void* response_msg)
         }
     }
 
-    // Check for condition that can be fixed remotely
+    // Major alarms cannot be reset remotely
+    if (Ros_Controller_IsMajorAlarm())
+    {
+        rosidl_runtime_c__String__assign(&response->message, "Major alarm active. Cannot be reset. Check teach pendant");
+        response->result_code.value = MOTION_NOT_READY_MAJOR_ALARM;
+        goto DONE;
+    }
+
+    // Other alarm types can be reset remotely
     if (Ros_Controller_IsAlarm())
     {
         // Reset alarm
