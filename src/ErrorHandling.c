@@ -81,28 +81,27 @@ void Ros_ErrorHandling_RCL_Ret_Populate(int errNo, FailureInfo* problems) {
     switch (errNo)
     {
     case RCL_RET_OK:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - Success");
-
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Success");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_OK;
         break;
     case RCL_RET_ERROR:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - Unspecified error");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Unspecified error");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_ERROR;
         break;
     case RCL_RET_TIMEOUT:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - Timeout occurred");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Timeout occurred");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_TIMEOUT;
         break;
     case RCL_RET_BAD_ALLOC:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC failed to alloc memory");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Failed to allocate memory");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_BAD_ALLOC;
         break;
     case RCL_RET_INVALID_ARGUMENT:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - Invalid argument");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Invalid argument");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_INVALID_ARGUMENT;
         break;
     case RCL_RET_UNSUPPORTED:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC- unsupported ret. code");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Unsupported op./event handling");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_UNSUPPORTED;
         break;
     case RCL_RET_ALREADY_INIT:
@@ -114,19 +113,19 @@ void Ros_ErrorHandling_RCL_Ret_Populate(int errNo, FailureInfo* problems) {
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_NOT_INIT;
         break;
     case RCL_RET_MISMATCHED_RMW_ID:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC mismatched rmw ident.");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Mismatched rmw identifier");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_MISMATCHED_RMW_ID;
         break;
     case RCL_RET_TOPIC_NAME_INVALID:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - topic name invalid");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Topic name invalid");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_TOPIC_NAME_INVALID;
         break;
     case RCL_RET_SERVICE_NAME_INVALID:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - service name invalid");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Service name invalid");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_SERVICE_NAME_INVALID;
         break;
     case RCL_RET_UNKNOWN_SUBSTITUTION:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC topic name sub unknown");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Topic name substitution unknown");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_UNKNOWN_SUBSTITUTION;
         break;
     case RCL_RET_ALREADY_SHUTDOWN:
@@ -138,15 +137,15 @@ void Ros_ErrorHandling_RCL_Ret_Populate(int errNo, FailureInfo* problems) {
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_NODE_INVALID;
         break;
     case RCL_RET_NODE_INVALID_NAME:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC invalid node name");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Invalid node name");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_NODE_INVALID_NAME;
         break;
     case RCL_RET_NODE_INVALID_NAMESPACE:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC invalid node namespace");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Invalid node namespace");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_NODE_INVALID_NAMESPACE;
         break;
     case RCL_RET_NODE_NAME_NON_EXISTENT:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC cannot find node name");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Cannot find node name");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_NODE_NAME_NON_EXISTENT;
         break;
     case RCL_RET_PUBLISHER_INVALID:
@@ -158,7 +157,7 @@ void Ros_ErrorHandling_RCL_Ret_Populate(int errNo, FailureInfo* problems) {
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_SUBSCRIPTION_INVALID;
         break;
     case RCL_RET_SUBSCRIPTION_TAKE_FAILED:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC Take msg from sub fail");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Take msg from subscription fail");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_SUBSCRIPTION_TAKE_FAILED;
         break;
     case RCL_RET_CLIENT_INVALID:
@@ -166,23 +165,23 @@ void Ros_ErrorHandling_RCL_Ret_Populate(int errNo, FailureInfo* problems) {
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_CLIENT_INVALID;
         break;
     case RCL_RET_CLIENT_TAKE_FAILED:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC client take res failed");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Client take response failed");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_CLIENT_TAKE_FAILED;
         break;
     case RCL_RET_SERVICE_INVALID:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC invalid rcl_service_t");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Invalid rcl_service_t");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_SERVICE_INVALID;
         break;
     case RCL_RET_SERVICE_TAKE_FAILED:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCL get service req. failed");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Take request from service fail");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_SERVICE_TAKE_FAILED;
         break;
     case RCL_RET_TIMER_INVALID:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - invalid rcl_timer_t ");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Invalid rcl_timer_t ");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_TIMER_INVALID;
         break;
     case RCL_RET_TIMER_CANCELED:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - given timer canceled");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Given timer canceled");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_TIMER_CANCELED;
         break;
     case RCL_RET_WAIT_SET_INVALID:
@@ -198,31 +197,31 @@ void Ros_ErrorHandling_RCL_Ret_Populate(int errNo, FailureInfo* problems) {
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_WAIT_SET_FULL;
         break;
     case RCL_RET_INVALID_REMAP_RULE:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC not a valid remap rule");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Not a valid remap rule");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_INVALID_REMAP_RULE;
         break;
     case RCL_RET_WRONG_LEXEME:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC wrong lexeme");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Wrong lexeme");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_WRONG_LEXEME;
         break;
     case RCL_RET_INVALID_ROS_ARGS:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC found invalid ros arg");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Found invalid ros argument");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_INVALID_ROS_ARGS;
         break;
     case RCL_RET_INVALID_PARAM_RULE:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC Arg not valid param");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Arg. not valid parameter rule");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_INVALID_PARAM_RULE;
         break;
     case RCL_RET_INVALID_LOG_LEVEL_RULE:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC Arg not valid log lvl");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Arg not valid log level rule");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_INVALID_LOG_LEVEL_RULE;
         break;
     case RCL_RET_EVENT_INVALID:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC - Invalid rcl_event_t");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Invalid rcl_event_t");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_EVENT_INVALID;
         break;
     case RCL_RET_EVENT_TAKE_FAILED:
-        rosidl_runtime_c__String__assign(&problems->alarm_message, "RCL/RCLC Failed to get event");
+        rosidl_runtime_c__String__assign(&problems->alarm_message, "Take event from handle failed");
         problems->subcode = SUBCODE_RCL_RCLC_FAIL_EVENT_TAKE_FAILED;
         break;
     case RCL_RET_LIFECYCLE_STATE_REGISTERED:
