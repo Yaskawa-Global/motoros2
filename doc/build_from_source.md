@@ -21,7 +21,7 @@ The MotoPlus SDK is not compatible with Visual Studio Code.
 - **MotoPlus SDK for Visual Studio v1.5.1 or higher**.
 This is not the same as MotoPlus IDE. Users in Asian regions will need to purchase this software from [Yaskawa America directly](https://www.motoman.com/en-us/products/robots/sales-quote).
 If you already have a license for an older version of the MotoPlus SDK, please contact `techsupport@motoman.com` or `ccs@yaskawa.eu` for assistance obtaining a newer edition.
-- **libmicroros library and headers** that corresponds to your target edition of ROS 2 (Foxy, Humble, etc) and the Yaskawa controller series you are building MotoROS2 for
+- **libmicroros library and headers** that corresponds to your target edition of ROS 2 (Humble, Iron, etc) and the Yaskawa controller series you are building MotoROS2 for
 Although `libmicroros` as used by MotoROS2 is derived from the open-source [micro-ROS](https://micro.ros.org) project, various patches were needed to make it compatible with MotoPlus. As of writing, these patches can not be made open-source yet. Because of this, we distribute the `libmicroros` dependency as a closed-source library.
 These can be found on the [Releases](https://github.com/yaskawa-global/motoros2/releases) page
 

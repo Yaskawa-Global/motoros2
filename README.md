@@ -101,8 +101,8 @@ The following general requirements must be met in order to be able to use MotoRO
   - DX200: `LAN`
   - YRC1000: either `LAN2` or `LAN3`
   - YRC1000micro: either `LAN2` or `LAN3`
-- ROS 2 version: Foxy, Galactic or Humble.
-  MotoROS2 does not support ROS 2 Iron Irwini nor Rolling Ridley.
+- ROS 2 version: Foxy, Galactic, Humble or Iron
+  MotoROS2 does not support ROS 2 Jazzy Jalisco nor Rolling Ridley.
 - Docker or a from-source build of the micro-ROS Agent
 - FastDDS as RMW (even when using ROS 2 Galactic)
 
@@ -172,12 +172,15 @@ The values must match *exactly*.
 | DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.2`    | `9a8db7cd1ad436d6ace2cca8e0e2eb6b` |
 | DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.2`    | `d7e435ebf58c6b6da59555b941487af6` |
 | DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.2`    | `95da6b0b93407855b8c133ece9a952be` |
+| DX200         | Iron             | `mr2_dx2_i.out`   | ``    | `` |
 | YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.2`    | `813e6ee6a72626bafffa54641d9b77f8` |
 | YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.2`    | `41b249ef1132bce67284c41a68289e56` |
 | YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.2`    | `767c4f8ccc98eb4ee85146342c2984e7` |
+| YRC1000       | Iron             | `mr2_yrc1_i.out`  | ``    | `` |
 | YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.2`    | `c1ca5fa9f44cf1e1e7de02174b3a6565` |
 | YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.2`    | `20a6a332dc76bf657684a634b33c5c5e` |
 | YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.2`    | `22522443553457d5bd9ad08785d117ed` |
+| YRC1000micro  | Iron             | `mr2_yrc1m_i.out` | ``    | `` |
 
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
@@ -427,8 +430,8 @@ Choose one or the other.
 The command shown here starts the `humble` version of the `micro-ros-agent` Docker image.
 However, always make sure to use a version of the Agent image which corresponds to the version of ROS 2 that is being used.
 
-With ROS 2 Foxy, use `microros/micro-ros-agent:foxy`.
 With ROS 2 Humble, use `microros/micro-ros-agent:humble`.
+With ROS 2 Iron, use `microros/micro-ros-agent:iron`.
 
 To start the Agent (on a machine with Docker already installed and setup to allow non-root access):
 
@@ -453,8 +456,8 @@ This procedure is rather involved, so only do this if the pre-configured Docker 
 The following sections show how to build the Humble version of the Agent in a dedicated workspace (adapt the paths used below if a different workspace should be used instead).
 
 Note: always make sure to use a version of the Agent which corresponds to the version of ROS 2 that is being used.
-For ROS 2 Foxy, checkout the `foxy` branch.
 For ROS 2 Humble, checkout the `humble` branch.
+For ROS 2 Iron, checkout the `iron` branch.
 
 #### Linux (Debian/Ubuntu)
 
@@ -544,7 +547,7 @@ After the final reboot of the controller, and after [starting the micro-ROS Agen
 
 Note: if you are using ROS 2 Galactic, please first read [Only FastDDS is supported](#only-fastdds-is-supported).
 
-On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS) or Humble):
+On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS), Humble or Iron):
 
 1. open a new terminal
 1. `source` the ROS 2 installation
@@ -732,7 +735,7 @@ None of the other RMWs are supported, including Cyclone DDS, which is the defaul
 
 Symptoms of this incompatibility are seemingly functional ROS 2 network connections, where topics are succesfully published and subscribed to, but service invocations and action goal submissions appear to *hang*.
 
-**Note**: ROS 2 Foxy, ROS 2 Humble and ROS 2 Rolling all use FastDDS by default.
+**Note**: ROS 2 Foxy, ROS 2 Humble, ROS2 Iron and ROS 2 Rolling all use FastDDS by default.
 If you haven't changed your default RMW, you should not need to change anything for MotoROS2.
 
 **Work-around**: unfortunately, this limitation is caused by a middleware-layer incompatibility with respect to how service requests are (de)serialised by the respective RMWs ([ros2/rmw_cyclonedds#184](https://github.com/ros2/rmw_cyclonedds/issues/184)), and without significant changes to the way MotoROS2 operates, has no known work-around.
