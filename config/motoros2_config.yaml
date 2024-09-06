@@ -42,6 +42,8 @@
 #-----------------------------------------------------------------------------
 # Remap rules to apply to ROS 2 resource names.
 #
+# (NOT COMPATIBLE WITH IRON IRWINI)
+#
 # This configures the micro-ROS equivalent of the ROS 2 remap functionality.
 #
 # The current implementation expects all remap rules as a single,
