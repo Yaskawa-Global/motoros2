@@ -182,7 +182,6 @@ The values must match *exactly*.
 | YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.3`    | `c0e61adbf5bf6fd6a734211f15bb0f0a` |
 | YRC1000micro  | Iron             | `mr2_yrc1m_i.out` | ``    | `` |
 
-
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
 If the hash does not match, download the correct version from the [Releases](https://github.com/yaskawa-global/motoros2/releases) page again (to exclude a failed download was the cause), extract it and run `md5sum` on the binary again.
