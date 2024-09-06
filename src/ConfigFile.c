@@ -769,7 +769,7 @@ void Ros_ConfigFile_Parse()
 
     do
     {
-#if defined (FS100) ||defined (YRC1000) || defined (YRC1000u)
+#if defined (FS100) || defined (YRC1000) || defined (YRC1000u)
         //config file always resides on USB for DX200, so only check
         //on YRC1000 and micro
         Ros_ConfigFile_CheckUsbForNewConfigFile();
