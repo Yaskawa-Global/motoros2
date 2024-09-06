@@ -767,14 +767,14 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_SetAllDefaultValues();
 
-#if defined (YRC1000) || defined (YRC1000u)
-    //config file always resides on USB for DX200/FS100, so only check
-    //on YRC1000 and micro
-    Ros_ConfigFile_CheckUsbForNewConfigFile();
-#endif
-
     do
     {
+#if defined (FS100) || defined (YRC1000) || defined (YRC1000u)
+        //config file always resides on USB for DX200, so only check
+        //on YRC1000 and micro
+        Ros_ConfigFile_CheckUsbForNewConfigFile();
+#endif
+
         if (!bOkToInit)
             Ros_Sleep(3000);
 
