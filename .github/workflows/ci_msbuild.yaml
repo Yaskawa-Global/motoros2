@@ -130,9 +130,6 @@ jobs:
       shell: bash
       run: echo "C:/build/mpsdk" >> $GITHUB_PATH
 
-    - name: Register mpBuilder problem matcher
-      run: echo "::add-matcher::motoros2/.github/matchers/mpbuilder.json"
-
     - name: "Build MotoROS2 (config: ${{ steps.uppercaser.outputs.ctrlr }}_${{ matrix.uros.codename }})"
       shell: cmd
       env:
