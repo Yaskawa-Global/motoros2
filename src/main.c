@@ -156,7 +156,7 @@ void RosInitTask()
             if (tickNow > tickBefore)
                 tickDiff = tickNow - tickBefore;
             else //unsigned rollover
-                tickDiff = (UINT_MAX - tickBefore) + tickNow;
+                tickDiff = (ULONG_MAX - tickBefore) + tickNow;
 
             float elapsedMs = tickDiff * mpGetRtc(); //time it took to read and publish data
 
