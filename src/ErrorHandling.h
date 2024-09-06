@@ -60,6 +60,7 @@ typedef enum
     FAIL_TRAJ_POSITION,
     FAIL_TRAJ_TIME,
     FAIL_TRAJ_ALARM,
+    FAIL_TRAJ_TOLERANCE_PARSE,
 } Failed_Trajectory_Status;
 
 //**********************************************************************
@@ -81,6 +82,7 @@ typedef enum
     ALARM_CONFIGURATION_FAIL,
     ALARM_INFORM_JOB_FAIL,
     ALARM_DAT_FILE_PARSE_FAIL,
+    ALARM_OPERATION_FAIL,
 } ALARM_MAIN_CODE;
 
 
@@ -215,6 +217,11 @@ typedef enum
     SUBCODE_DAT_FAIL_PARSE_SGROUP,
     SUBCODE_DAT_FAIL_PARSE_SRANG
 } ALARM_DAT_FILE_PARSE_FAIL_SUBCODE; //8015
+
+typedef enum
+{
+    SUBCODE_OPERATION_SET_CYCLE,
+} ALARM_OPERATION_FAIL_SUBCODE; //8016
 
 extern void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
 extern void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);

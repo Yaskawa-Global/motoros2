@@ -16,7 +16,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 [![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg "MotoROS2 itself is licensed under the Apache-2.0 license. Please see the LICENSES directory for additional license files")](https://opensource.org/licenses/Apache-2.0)
 [![support level: consortium / vendor](https://img.shields.io/badge/support%20level-consortium%20/%20vendor-brightgreen.svg)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
 
-![Version: 0.1.2](https://img.shields.io/badge/version-0.1.2-informational.svg)
+![Version: 0.1.3](https://img.shields.io/badge/version-0.1.3-informational.svg)
 
 ## Overview
 
@@ -60,7 +60,7 @@ The following sections document how to download, install, configure, use and tro
 - [Installation](#installation)
   - [Checking MotoPlus configuration](#checking-motoplus-configuration)
   - [DX200, YRC1000 and YRC1000micro](#dx200-yrc1000-and-yrc1000micro)
-- [Building from source](#building-from-source)
+- [Building from source](doc/build_from_source.md)
 - [Updating the configuration](#updating-the-configuration)
 - [The micro-ROS Agent](#the-micro-ros-agent)
   - [Using Docker (Linux Only)](#using-docker-linux-only)
@@ -70,7 +70,7 @@ The following sections document how to download, install, configure, use and tro
   - [Basic usage with ROS](#basic-usage-with-ros)
   - [Commanding motion](#commanding-motion)
   - [With MoveIt](#with-moveit)
-- [ROS API](#ros-api)
+- [ROS API](doc/ros_api.md)
 - [Default QoS settings](#default-qos-settings)
   - [Publisher QoS](#publisher-qos)
   - [Service server QoS](#service-server-qos)
@@ -85,8 +85,8 @@ The following sections document how to download, install, configure, use and tro
   - [Incorrect transform tree origin with multi-robot setups](#incorrect-transform-tree-origin-with-multi-robot-setups)
   - [Memory leak](#memory-leak)
 - [Provisional roadmap](#provisional-roadmap)
-- [Frequently Asked Questions](#frequently-asked-questions)
-- [Troubleshooting](#troubleshooting)
+- [Frequently Asked Questions](doc/faq.md)
+- [Troubleshooting](doc/troubleshooting.md)
 
 ## General Requirements
 
@@ -96,13 +96,13 @@ The following general requirements must be met in order to be able to use MotoRO
 - minimum versions of system software:
   - `DN2.44.00-00` for DX200
   - `YAS2.80.00-00` for YRC1000
-  - `YBS2.31.00-00` for YRC1000micro
+  - `YBS2.45.00-00` for YRC1000micro
 - the controller must have a correctly configured network connection:
   - DX200: `LAN`
   - YRC1000: either `LAN2` or `LAN3`
   - YRC1000micro: either `LAN2` or `LAN3`
 - ROS 2 version: Foxy, Galactic, Humble or Iron
-  MotoROS2 does not support ROS 2 Jazzy Jalisco nor Rolling Ridley.
+  MotoROS2 does not support ROS 2 Iron Irwini, nor Jazzy nor Rolling Ridley.
 - Docker or a from-source build of the micro-ROS Agent
 - FastDDS as RMW (even when using ROS 2 Galactic)
 
@@ -113,11 +113,11 @@ To check the version of the system software:
  1. touch `{MAIN MENU}` on the pendant keypad
  1. touch `[System Info]`→`[Version]`
 
-Look for the version number starting with `YAS` or `YBS`.
+Look for the version number starting with `DN`, `YAS` or `YBS`.
 
 ## Option Function compatibility
 
-The current version of MotoROS2 (`0.1.2`) is ***not*** compatible with the following Option Function(s) and/or other MotoPlus application(s):
+The current version of MotoROS2 (`0.1.3`) is ***not*** compatible with the following Option Function(s) and/or other MotoPlus application(s):
 
 - Simple Connect
 
@@ -161,7 +161,7 @@ To calculate the MD5 hash on Debian/Ubuntu for the main MotoROS2 binary, run the
 ```shell
 $ cd /path/to/where/the/binary/was/saved
 $ md5sum -b mr2_yrc1_h.out
-767c4f8ccc98eb4ee85146342c2984e7  mr2_yrc1_h.out
+e2d088b765a0bfed501aa213a1be1de0  mr2_yrc1_h.out
 ```
 
 Compare the output of `md5sum` when run against the binary downloaded in the previous section ([Downloading the files](#downloading-the-files)) with the values listed in the following table.
@@ -169,18 +169,19 @@ The values must match *exactly*.
 
 |**Controller** |**ROS 2 Version** | **File**          |**Version** | **MD5 hash**                       |
 |:--------------|:-----------------|:------------------|:-----------|:-----------------------------------|
-| DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.2`    | `9a8db7cd1ad436d6ace2cca8e0e2eb6b` |
-| DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.2`    | `d7e435ebf58c6b6da59555b941487af6` |
-| DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.2`    | `95da6b0b93407855b8c133ece9a952be` |
+| DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.3`    | `a9a9e10403f726062c25d97654fad316` |
+| DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.3`    | `e8db7512215da240b28b985f2f2af98b` |
+| DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.3`    | `611bda537655cf8a60d85600da6043f4` |
 | DX200         | Iron             | `mr2_dx2_i.out`   | ``    | `` |
-| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.2`    | `813e6ee6a72626bafffa54641d9b77f8` |
-| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.2`    | `41b249ef1132bce67284c41a68289e56` |
-| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.2`    | `767c4f8ccc98eb4ee85146342c2984e7` |
+| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.3`    | `84bfb44e2043372127d9dfc1157a79b5` |
+| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.3`    | `866e090b6c724429ce03117712c951f4` |
+| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.3`    | `e2d088b765a0bfed501aa213a1be1de0` |
 | YRC1000       | Iron             | `mr2_yrc1_i.out`  | ``    | `` |
-| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.2`    | `c1ca5fa9f44cf1e1e7de02174b3a6565` |
-| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.2`    | `20a6a332dc76bf657684a634b33c5c5e` |
-| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.2`    | `22522443553457d5bd9ad08785d117ed` |
+| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.3`    | `027e77b427a212aa63e5d7962d48ad92` |
+| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.3`    | `042d753a7729784fec8c5c23bef3e685` |
+| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.3`    | `c0e61adbf5bf6fd6a734211f15bb0f0a` |
 | YRC1000micro  | Iron             | `mr2_yrc1m_i.out` | ``    | `` |
+
 
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
@@ -416,7 +417,7 @@ To extract a copy of your current configuration from the teach pendant:
 ## The micro-ROS Agent
 
 The micro-ROS Agent acts as the transparent bridge between MotoROS2 and ROS 2.
-As Micro-ROS applications can not directly communicate with ROS 2 RMWs, the Agent must always be running for MotoROS2 to function correctly.
+As micro-ROS applications can not directly communicate with ROS 2 RMWs, the Agent must always be running for MotoROS2 to function correctly.
 
 There are two main ways to run the Agent: using a Docker image or by building it in a Colcon workspace.
 
@@ -757,7 +758,7 @@ This maximum number of points in a single trajectory is currently **`200`**.
 This number was derived from testing on a two-robot system (12 axes total).
 On larger systems with more control groups, it is possible 200 points may exceed the memory threshold for transmission.
 
-Unfortunately, due to a known issue with micro-ROS ([micro-ROS/micro-ROS-Agent#143](https://github.com/micro-ROS/micro-ROS-Agent/issues/143)), MotoROS2 currently cannot check whether incoming trajectories are too long, nor can MotoROS2 notify the action client in case trajectories in those cases.
+Unfortunately, due to a known issue with micro-ROS ([micro-ROS/micro-ROS-Agent#143](https://github.com/micro-ROS/micro-ROS-Agent/issues/143)), MotoROS2 currently cannot check whether incoming trajectories are too long, nor can MotoROS2 notify the action client in those cases.
 
 Please make sure to check trajectory length *before* submitting goals, as client applications are currently responsible for making sure trajectories do not go over this limit.
 

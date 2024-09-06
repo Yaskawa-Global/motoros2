@@ -9,7 +9,7 @@
 #define MOTOROS2_MOTOROS_H
 
 #define APPLICATION_NAME            "MotoROS2"
-#define APPLICATION_VERSION         "0.1.3pre"
+#define APPLICATION_VERSION         "0.1.4pre"
 
 #include "motoPlus.h"
 
@@ -102,6 +102,7 @@
 #include "Tests_TestUtils.h"
 #include "Tests_RosMotoPlusConversionUtils.h"
 #include "Tests_ControllerStatusIO.h"
+#include "Tests_ActionServer_FJT.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"

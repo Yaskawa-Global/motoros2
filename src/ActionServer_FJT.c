@@ -482,6 +482,142 @@ void Ros_ActionServer_FJT_ProcessFeedback()
     }
 }
 
+static STATUS Ros_ActionServer_FJT_Parse_GoalPosTolerances(
+    control_msgs__msg__JointTolerance__Sequence const* const goal_joint_tolerances /* in */,
+    rosidl_runtime_c__String__Sequence const* const joint_names /* in */,
+    double* posTolerances /* out */, size_t posTolerances_len /* in */)
+{
+    if (goal_joint_tolerances == NULL || joint_names == NULL || posTolerances == NULL)
+    {
+        Ros_Debug_BroadcastMsg("%s: one or more inputs NULL, abort", __func__);
+        return -1;
+    }
+
+    //always configure defaults
+    for (int i = 0; i < posTolerances_len; ++i)
+        posTolerances[i] = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
+
+    //if caller hasn't passed any JointTolerances, set all entries to default
+    if (goal_joint_tolerances->size == 0)
+    {
+        Ros_Debug_BroadcastMsg("%s: no joint tolerances specified, returning %d defaults",
+            __func__, posTolerances_len);
+        return OK;
+    }
+
+    //it's OK if we are passed more JointTolerance instances than we have joints,
+    //as technically a client could send duplicate tolerance specs (ie: multiple
+    //JointTolerance instances referring to the same joint).
+    //Last-setting wins, so we can just parse all of them.
+
+    //it's NOT ok to have less elements in the output array than the number of
+    //known joint names: maximum nr of tolerances we can store is equal to the
+    //number of joints this controller is configured with, so we must have at
+    //least that number of elements in the output array
+    if (posTolerances_len < joint_names->size)
+    {
+        Ros_Debug_BroadcastMsg("%s: pos tolerance output array too small: %d < %d (nr of joints)",
+            __func__, posTolerances_len, joint_names->size);
+        return -2;
+    }
+
+    //this:
+    // - loops over all JointTolerance instances
+    // - checks which joint they reference (based on the joint name)
+    // - looks up joint index of that joint in the joint_names array
+    // - stores the position tolerance value in the output array at the correct index for that joint
+    for (size_t jtol_idx = 0; jtol_idx < goal_joint_tolerances->size; jtol_idx +=1)
+    {
+        rosidl_runtime_c__String selected_tolerance_name = goal_joint_tolerances->data[jtol_idx].name;
+        Ros_Debug_BroadcastMsg("%s: parsing JointTolerance for '%s': pos: %f", __func__,
+            selected_tolerance_name.data, goal_joint_tolerances->data[jtol_idx].position);
+
+        size_t ptol_idx = 0;
+        for (; ptol_idx < joint_names->size; ptol_idx += 1)
+        {
+            rosidl_runtime_c__String selected_position_name = joint_names->data[ptol_idx];
+            if (rosidl_runtime_c__String__are_equal(&selected_position_name, &selected_tolerance_name))
+            {
+                Ros_Debug_BroadcastMsg("%s: mapping '%s' (at %d) to internal index %d",
+                    __func__, selected_position_name.data, jtol_idx, ptol_idx);
+                posTolerances[ptol_idx] = goal_joint_tolerances->data[jtol_idx].position;
+                break;
+            }
+        }
+
+        //couldn't find joint
+        if (ptol_idx == joint_names->size)
+        {
+            //TODO(gavanderhoorn): make this a fatal error?
+            Ros_Debug_BroadcastMsg("%s: WARNING: couldn't find '%s' in internal joint names, ignoring",
+                __func__, selected_tolerance_name.data);
+        }
+    }
+
+    return OK;
+}
+
+/**
+ * Note: this assumes neither 'traj_point_names' nor 'internal_jnames' contain
+ * duplicate joint names. This function does not check whether this is true.
+ */
+static STATUS Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order(
+    trajectory_msgs__msg__JointTrajectoryPoint const* const traj_point /* in */,
+    rosidl_runtime_c__String__Sequence const* const traj_point_jnames /* in */,
+    rosidl_runtime_c__String__Sequence const* const internal_jnames /* in */,
+    double* trajPtValues /* in/out */, size_t trajPtValues_len /* in */)
+{
+    if (traj_point == NULL || traj_point_jnames == NULL || internal_jnames == NULL || trajPtValues == NULL)
+    {
+        Ros_Debug_BroadcastMsg("%s: one or more inputs NULL, abort", __func__);
+        return -1;
+    }
+
+    if (traj_point_jnames->size != internal_jnames->size)
+    {
+        Ros_Debug_BroadcastMsg("%s: partial traj pt not supported (%d names, need: %d)",
+            __func__, traj_point_jnames->size, internal_jnames->size);
+        return -2;
+    }
+
+    if (traj_point->positions.size != internal_jnames->size)
+    {
+        Ros_Debug_BroadcastMsg("%s: partial traj pt not supported (%d pos, need: %d)",
+            __func__, traj_point->positions.size, internal_jnames->size);
+        return -3;
+    }
+
+    if (trajPtValues_len < traj_point->positions.size)
+    {
+        Ros_Debug_BroadcastMsg("%s: output array too small: %d < %d (nr of joints)",
+            __func__, trajPtValues_len, traj_point->positions.size);
+        return -4;
+    }
+
+    //this:
+    // - loops over all joint names in the trajectory point
+    // - retrieves the position data for each joint in the traj point
+    // - determines at which index the joint name occurs in the internal joint name ordering
+    // - stores the retrieved position data at the identified internal index
+    for (size_t traj_jname_idx = 0; traj_jname_idx < traj_point_jnames->size; traj_jname_idx += 1)
+    {
+        rosidl_runtime_c__String traj_jname = traj_point_jnames->data[traj_jname_idx];
+        for (size_t internal_jname_idx = 0; internal_jname_idx < internal_jnames->size; internal_jname_idx += 1)
+        {
+            rosidl_runtime_c__String internal_jname = internal_jnames->data[internal_jname_idx];
+            if (rosidl_runtime_c__String__are_equal(&internal_jname, &traj_jname))
+            {
+                trajPtValues[internal_jname_idx] = traj_point->positions.data[traj_jname_idx];
+                Ros_Debug_BroadcastMsg("%s: mapping ('%s'; %f) at %d to internal index %d",
+                    __func__, traj_jname.data, trajPtValues[internal_jname_idx], traj_jname_idx, internal_jname_idx);
+                break;
+            }
+        }
+    }
+
+    return OK;
+}
+
 void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
 {
     //**********************************************************************
@@ -494,19 +630,71 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         //-----------------------------------------------------------------------
         //check to see if each axis is in the desired location
         BOOL positionOk = TRUE;
-        int maxAxes = MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM;
-        double violators[MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM];
+#define MR2_JTA_MAX_NUM_AXES (MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM)
+        int numAxesToCheck = feedback_FollowJointTrajectory.feedback.joint_names.size;
 
+        //NOTE: we allocate for the maximum nr of axes, but only check the nr of configured
+        //axes later (which is in almost all cases significantly smaller)
+        double violators[MR2_JTA_MAX_NUM_AXES];
+        double posTolerance[MR2_JTA_MAX_NUM_AXES];
         bzero(violators, sizeof(violators));
-        for (int axis = 0; axis < maxAxes; axis += 1)
+        bzero(posTolerance, sizeof(posTolerance));
+
+        //'parse' the JointTolerance elements from the goal. Map their 'name:tolerance'
+        //to the 'joint_index:tolerance' we need
+        STATUS statusParseGoalTolerance = Ros_ActionServer_FJT_Parse_GoalPosTolerances(
+            &g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance,
+            &feedback_FollowJointTrajectory.feedback.joint_names,
+            posTolerance, numAxesToCheck);
+
+        BOOL bToleranceParseOk = TRUE;
+        if (statusParseGoalTolerance != OK)
         {
-            diff = fabs(feedback_FollowJointTrajectory.feedback.desired.positions.data[axis] - feedback_FollowJointTrajectory.feedback.actual.positions.data[axis]);
+            Ros_Debug_BroadcastMsg("%s: parsing 'goal_tolerance' field failed: %d", __func__, statusParseGoalTolerance);
+            //TODO(gavanderhoorn): implement tolerance parsing in Ros_ActionServer_FJT_Goal_Received(..) instead
+            bToleranceParseOk = FALSE;
+            Ros_Debug_BroadcastMsg("%s: skipping goal tolerance check", __func__);
+            goto goal_complete_skip_tolerance_comparison;
+        }
 
-            double posTolerance = g_actionServer_FJT_SendGoal_Request.goal.goal_tolerance.data[axis].position; //user-provided a goal_tolerance
-            if (posTolerance == 0.0) //user did NOT provide a tolerance
-                posTolerance = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
+        //retrieve the last traj pt from the goal traj and re-order position values such
+        //that they correspond to the internal MotoROS2 ordering (as used in
+        //feedback_FollowJointTrajectory.feedback)
+        double lastTrajPtPositions[MR2_JTA_MAX_NUM_AXES];
+        bzero(lastTrajPtPositions, sizeof(lastTrajPtPositions));
+        size_t finalTrajPtIdx = g_actionServer_FJT_SendGoal_Request.goal.trajectory.points.size - 1;
 
-            if (diff > posTolerance)
+        STATUS statusGoalToleranceReorder = Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order(
+            &g_actionServer_FJT_SendGoal_Request.goal.trajectory.points.data[finalTrajPtIdx],
+            &g_actionServer_FJT_SendGoal_Request.goal.trajectory.joint_names,
+            &feedback_FollowJointTrajectory.feedback.joint_names,
+            lastTrajPtPositions,
+            numAxesToCheck);
+
+        if (statusGoalToleranceReorder != OK)
+        {
+            Ros_Debug_BroadcastMsg("%s: reordering final traj pt failed: %d", __func__, statusGoalToleranceReorder);
+            //TODO(gavanderhoorn): check re-ordering in Ros_ActionServer_FJT_Goal_Received(..) instead
+            bToleranceParseOk = FALSE;
+            Ros_Debug_BroadcastMsg("%s: skipping goal tolerance check", __func__);
+            goto goal_complete_skip_tolerance_comparison;
+        }
+
+
+        //compare current state with target positions from last traj point
+        for (int axis = 0; axis < numAxesToCheck; axis += 1)
+        {
+            double current_jstate = feedback_FollowJointTrajectory.feedback.actual.positions.data[axis];
+            diff = fabs(lastTrajPtPositions[axis] - current_jstate);
+            Ros_Debug_BroadcastMsg("target pos (%12.8f) - actual pos (%12.8f) = (%12.8f)",
+                lastTrajPtPositions[axis], current_jstate, diff);
+
+            double chosen_posTolerance = posTolerance[axis];
+            if (chosen_posTolerance == 0.0) //user did NOT provide a tolerance
+                chosen_posTolerance = DEFAULT_FJT_GOAL_POSITION_TOLERANCE;
+
+            // A negative tolerance means that tolerance doesn't matter for this axis
+            if ((chosen_posTolerance > 0.0) && (diff > chosen_posTolerance))
             {
                 positionOk = FALSE;
                 //record the deviation for use in the feedback message below
@@ -514,6 +702,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
             }
         }
 
+goal_complete_skip_tolerance_comparison: ;
         //-----------------------------------------------------------------------
         //check execution time
         control_msgs__action__FollowJointTrajectory_SendGoal_Request*  ros_goal_request = (control_msgs__action__FollowJointTrajectory_SendGoal_Request*)fjt_active_goal_handle->ros_goal_request;
@@ -537,7 +726,7 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
         BOOL timeOk = (diff <= timeTolerance);
 
         //-----------------------------------------------------------------------
-        if (positionOk && timeOk)
+        if (bToleranceParseOk && positionOk && timeOk)
         {
             Ros_Debug_BroadcastMsg("FJT action successful");
             fjt_result_response.status = GOAL_STATE_SUCCEEDED;
@@ -555,17 +744,23 @@ void Ros_ActionServer_FJT_Goal_Complete(GOAL_END_TYPE goal_end_type)
 
             char msgBuffer[500] = { 0 };
 
-            if (!positionOk)
+            if (!bToleranceParseOk)
+            {
+                sprintf(msgBuffer, "Parsing goal_tolerance failed (%d; %d). Failing trajectory execution.", statusParseGoalTolerance, statusGoalToleranceReorder);
+                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, msgBuffer);
+                fjt_result_response.result.error_code = RESULT_REPONSE_ERROR_CODE(control_msgs__action__FollowJointTrajectory_Result__GOAL_TOLERANCE_VIOLATED, FAIL_TRAJ_TOLERANCE_PARSE);
+            }
+            else if (!positionOk)
             {
                 sprintf(msgBuffer, "Final position was outside tolerance. Check robot safety-limits that could be inhibiting motion.");
-                for (int axis = 0; axis < maxAxes; axis += 1)
+                for (int axis = 0; axis < numAxesToCheck; axis += 1)
                 {
                     //append info on which joints were outside tolerance
                     if (violators[axis])
                     {
                         char formatBuffer[64] = { 0 };
-                        snprintf(formatBuffer, 64, " [%s: %.4f deviation]",
-                            feedback_FollowJointTrajectory.feedback.joint_names.data[axis],
+                        snprintf(formatBuffer, 64, " [%s: %d deviation]",
+                            feedback_FollowJointTrajectory.feedback.joint_names.data[axis].data,
                             violators[axis]);
                         strcat(msgBuffer, formatBuffer);
                     }
@@ -666,3 +861,9 @@ void Ros_ActionServer_FJT_ProcessResult()
         }
     }
 }
+
+
+//included here as this tests 'static' functions
+#define MOTOROS2_INCLUDE_TESTS_FJT_C
+#include "Tests_ActionServer_FJT.c"
+#undef MOTOROS2_INCLUDE_TESTS_FJT_C

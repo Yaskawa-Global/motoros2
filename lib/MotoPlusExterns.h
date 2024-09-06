@@ -32,4 +32,10 @@ extern MP_GRP_ID_TYPE mpCtrlGrpNo2GrpId(int grp_no);
 #define E_EXRCS_UNDER_ENERGY_SAVING         (-20)
 #endif
 
+//from the M+ API Function Specifications on mpSetCycle(..) (HW1483602)
+#define MP_CYCLE_MODE_STEP 1
+#define MP_CYCLE_MODE_1CYCLE 2
+#define MP_CYCLE_MODE_AUTO 3
+
+
 #endif // MOTOROS2_MOTOPLUS_EXTERNS_H

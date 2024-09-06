@@ -73,6 +73,7 @@ void RosInitTask()
     bTestResult &= Ros_Testing_CtrlGroup();
     bTestResult &= Ros_Testing_RosMotoPlusConversionUtils();
     bTestResult &= Ros_Testing_ControllerStatusIO();
+    bTestResult &= Ros_Testing_ActionServer_FJT();
     bTestResult ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
     Ros_Debug_BroadcastMsg("===");
 #endif
@@ -155,7 +156,7 @@ void RosInitTask()
             if (tickNow > tickBefore)
                 tickDiff = tickNow - tickBefore;
             else //unsigned rollover
-                tickDiff = (UINT_MAX - tickBefore) + tickNow;
+                tickDiff = (ULONG_MAX - tickBefore) + tickNow;
 
             float elapsedMs = tickDiff * mpGetRtc(); //time it took to read and publish data
 

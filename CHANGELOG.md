@@ -7,6 +7,24 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
+## 0.1.3 (2024-08-01)
+
+MotoROS2 is now built against `micro_ros_motoplus` version `20240710`.
+
+Note that ROS 2 Foxy and Galactic are EOL and do not receive updates anymore (neither feature nor security updates).
+This is the last release of MotoROS2 to support Foxy and Galactic and users are encouraged to upgrade to a supported ROS 2 release if possible.
+
+New functionality:
+
+- Raise alarm on multi-group systems without calibration data and TF enabled ([#169](https://github.com/Yaskawa-Global/motoros2/pull/169))
+- Check *Cycle Mode* is set to *Auto* ([#212](https://github.com/Yaskawa-Global/motoros2/pull/212))
+- Switch *Cycle Mode* to *Auto* automatically when needed ([#229](https://github.com/Yaskawa-Global/motoros2/pull/229))
+
+Changes:
+
+- Fix `start_traj_mode` failure with *Eco Mode* active ([#214](https://github.com/Yaskawa-Global/motoros2/pull/214))
+- Correct goal tolerance parsing in the `FollowJointTrajectory` action server ([#241](https://github.com/Yaskawa-Global/motoros2/pull/241))
+
 ## 0.1.2 (2023-12-08)
 
 Maintenance release.

@@ -123,5 +123,5 @@ void Ros_ServiceResetError_Trigger(const void* request_msg, void* response_msg)
     response->result_code.value = MOTION_READY;
 
 DONE:
-    Ros_Debug_BroadcastMsg("reset: %s", response->message);
+    Ros_Debug_BroadcastMsg("reset: %s", response->message.data);
 }
