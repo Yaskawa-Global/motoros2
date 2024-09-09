@@ -1364,7 +1364,7 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
     MP_START_JOB_SEND_DATA sStartData;
     int checkCount, grpNo, alarmcode;
     MotionNotReadyCode motion_readiness_code;
-    char output[MOTION_START_ERROR_MESSSAGE_LENGTH] = { 0 };
+    char output[MOTION_START_ERROR_MESSAGE_LENGTH] = { 0 };
 
     Ros_Debug_BroadcastMsg("%s: enter", __func__);
 
@@ -1394,12 +1394,14 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
             return motion_readiness_code;
         case MOTION_NOT_READY_ERROR:
             alarmcode = Ros_Controller_GetAlarmCode();
-            snprintf(output, MOTION_START_ERROR_MESSSAGE_LENGTH, "%s: '%s' (0x%04X)",
+            snprintf(output, MOTION_START_ERROR_MESSAGE_LENGTH, "%s: '%s' (0x%04X)",
                 Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
                 Ros_ErrorHandling_ErrNo_ToString(alarmcode),
                 alarmcode);
             Ros_Debug_BroadcastMsg(output);
             rosidl_runtime_c__String__assign(responseMessage, output);
+            Ros_Debug_BroadcastMsg("Controller is in a fault state. Please call /reset_error");
+            return motion_readiness_code;
         case MOTION_NOT_READY_ALARM:
         case MOTION_NOT_READY_PFL_ACTIVE:
         case MOTION_NOT_READY_INC_MOVE_ERROR:
@@ -1409,6 +1411,8 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
             Ros_Debug_BroadcastMsg("%s: robot is running another job (expected: '%s')",
                 __func__, g_nodeConfigSettings.inform_job_name);
             return MOTION_NOT_READY_OTHER_PROGRAM_RUNNING;
+        default: //Only here to get rid of warnings while compiling...
+            ;
     }
     if (Ros_Controller_IsOperating()) 
     {
@@ -1438,7 +1442,7 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         ret = mpSetCycle(&sCycleData, &rData);
         if ((ret != 0) || (rData.err_no != 0))
         {
-            snprintf(output, MOTION_START_ERROR_MESSSAGE_LENGTH, 
+            snprintf(output, MOTION_START_ERROR_MESSAGE_LENGTH, 
                 "%s: Can't set cycle mode to AUTO because: '%s' (0x%04X)",
                 Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
                 Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
@@ -1504,7 +1508,7 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         {
             //TODO(gavanderhoorn): should this be reported to user, or are causes
             //covered by errors in MotionNotReadyCode?
-            snprintf(output, MOTION_START_ERROR_MESSSAGE_LENGTH, 
+            snprintf(output, MOTION_START_ERROR_MESSAGE_LENGTH, 
                 "%s: Can't turn on servo because: '%s' (0x%04X)",
                 Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
                 Ros_ErrorHandling_ErrNo_ToString(rData.err_no),
@@ -1544,7 +1548,7 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
     if( (ret != 0) || (rData.err_no !=0) )
     {
         //TODO(gavanderhoorn): special check for "job is not loaded"
-        snprintf(output, MOTION_START_ERROR_MESSSAGE_LENGTH, 
+        snprintf(output, MOTION_START_ERROR_MESSAGE_LENGTH, 
             "%s: Can't start '%s' because: '%s' (0x%04X)",
             Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
             g_nodeConfigSettings.inform_job_name,
@@ -1573,6 +1577,11 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
 
     //Required to allow motion api to work (Potential race condition)
     Ros_Sleep(200);
+
+    // This is essentially a call to Ros_Controller_IsMotionReady(), but the return code is manually being 
+    // checked so that if it fails, then it will return the proper subcode so the message is useful. The 
+    // first call to Ros_Controller_GetNotReadySubcode() earlier in this function ignored "tractable problems", 
+    // but those should all be fixed by now. If they are not then somehting went wrong. 
     motion_readiness_code = Ros_Controller_GetNotReadySubcode(false);
 
     if (motion_readiness_code == MOTION_READY)

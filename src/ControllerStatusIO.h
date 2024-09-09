@@ -129,7 +129,7 @@ extern BOOL Ros_Controller_IsPflActive();
 extern BOOL Ros_Controller_IsMpIncMoveErrorActive();
 extern BOOL Ros_Controller_IsAnyFaultActive();
 extern BOOL Ros_Controller_MasterTaskIsJobName(const char* const jobName);
-extern MotionNotReadyCode Ros_Controller_GetNotReadySubcode(bool attemptingToStartMotion);
+extern MotionNotReadyCode Ros_Controller_GetNotReadySubcode(bool ignoreTractableProblems);
 
 //reset internal flag indicating whether PFL became active during a move
 extern void Ros_Controller_Reset_PflDuringRosMove();
