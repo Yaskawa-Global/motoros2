@@ -1392,7 +1392,10 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         case MOTION_NOT_READY_NOT_REMOTE:
         case MOTION_NOT_READY_HOLD:
             return motion_readiness_code;
-        case MOTION_NOT_READY_ERROR:
+        case MOTION_NOT_READY_ERROR: 
+            //the responseMessage gets populated only in this case or for other MOTION_NOT_READY_ERROR
+            //returns because it has the most information about the error in this situtation. 
+            //in other cases, the responseMessage is populated upstream/with only the MotionNotReadyCode
             alarmcode = Ros_Controller_GetAlarmCode();
             snprintf(output, MOTION_START_ERROR_MESSAGE_LENGTH, "%s: '%s' (0x%04X)",
                 Ros_ErrorHandling_MotionNotReadyCode_ToString(MOTION_NOT_READY_ERROR),
