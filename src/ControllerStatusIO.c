@@ -315,6 +315,11 @@ BOOL Ros_Controller_IsAlarm()
         || (g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_ALARM_USER]!=0) );
 }
 
+BOOL Ros_Controller_IsMajorAlarm()
+{
+    return ((g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_ALARM_MAJOR] != 0));
+}
+
 BOOL Ros_Controller_IsError()
 {
     return ((g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_ERROR]!=0));
