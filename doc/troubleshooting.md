@@ -731,22 +731,8 @@ Include a verbatim copy of the alarm text as seen on the teach pendant (alarm nu
 
 ```text
 ALARM 8011
- Must enable ETHERNET function
-[64]
-```
-
-*Solution:*
-The ETHERNET function must be enabled for one (or both) LAN interface in the robot controller.
-Please contact your local Yaskawa representative to request this function.
-
-### Alarm: 8011[65]
-
-*Example:*
-
-```text
-ALARM 8011
  Enable LAN port 1 for debug
-[65]
+[64]
 ```
 
 *Solution:*

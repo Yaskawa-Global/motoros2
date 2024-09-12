@@ -343,19 +343,17 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                         *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN2;
                     else
                     {
-                        //Note: ideally, we'd disable user lan monitoring or user lan debug
-                        //broadcast here. However, we can't guarantee the 'userlan_monitor_enabled' 
+                        // Note: ideally, we'd disable user lan monitoring or set user lan debug
+                        // broadcast to all here. However, we can't guarantee that the 'userlan_monitor_enabled' 
                         // or the 'userlan_debug_broadcast_enabled' setting won't be parsed after
-                        //this one. If it were to be parsed after the corresponding port setting, we'd
-                        //be disabling it here, only to have it re-enabled later.
-                        //Set the config value to the 'disabled' sentinel value and let the
-                        //validation code below handle the fallout.
+                        // this one. If it were to be parsed after the corresponding port setting, we'd
+                        // be setting it here, only to have it re-set later. Set the config value to the 
+                        // 'malformed' sentinel value and let the validation code below handle the fallout.
                         Ros_Debug_BroadcastMsg(
-                            "Unrecognised value for '%s': '%s'. '%s' will be disabled",
+                            "Unrecognised value for '%s': '%s'.",
                             (char*)activeItem->yamlKey,
-                            (char*)event->data.scalar.value,
-                            (char*)activeItem->yamlKey);
-                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN_DISABLED;
+                            (char*)event->data.scalar.value);
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN_MALFORMED;
                     }
 #else
 #error Unsupported platform
@@ -723,9 +721,8 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
             mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Bad UserLan debug port in cfg",
                 SUBCODE_CONFIGURATION_INVALID_USERLAN_DEBUG_BROADCAST_PORT);
             Ros_Debug_BroadcastMsg(
-                "userlan_debug_broadcast_port value %d is invalid, disabling debug broadcast",
+                "userlan_debug_broadcast_port value %d is invalid, broadcasting to all enabled ports instead",
                 g_nodeConfigSettings.userlan_debug_broadcast_port);
-            g_nodeConfigSettings.userlan_debug_broadcast_enabled = FALSE;
         }
     }
 

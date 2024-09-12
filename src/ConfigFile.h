@@ -88,7 +88,7 @@ typedef enum
 
 typedef enum
 {
-    CFG_ROS_USER_LAN_DISABLED = -3,  //sentinel
+    CFG_ROS_USER_LAN_MALFORMED = -3,  //sentinel
     CFG_ROS_USER_LAN_ALL = -2,  //sentinel
     CFG_ROS_USER_LAN_AUTO = -1,  //sentinel
     CFG_ROS_USER_LAN1 = ROS_USER_LAN1,

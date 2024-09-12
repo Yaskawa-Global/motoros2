@@ -21,7 +21,7 @@ typedef struct
     struct sockaddr_in destAddr[MAX_NETWORK_PORTS];
 } userLanInfo;
 
-userLanInfo debugPorts = {0};
+userLanInfo ros_debugPorts = {0};
 
 void Ros_Debug_Init()
 {
@@ -32,32 +32,27 @@ void Ros_Debug_Init()
     UCHAR mac[6];
     STATUS status;
     int count = 0;
-    int* socket = debugPorts.debugSocket;
-    struct sockaddr_in* sin = debugPorts.destAddr;
+    int* socket = ros_debugPorts.debugSocket;
+    struct sockaddr_in* sin = ros_debugPorts.destAddr;
 
-    bzero(&debugPorts, sizeof(debugPorts));
+    bzero(&ros_debugPorts, sizeof(ros_debugPorts));
 
     for (int i = 1; i <= MAX_NETWORK_PORTS; i++)
     {
-        socket[count] = mpSocket(AF_INET, SOCK_DGRAM, 0);
-        Ros_setsockopt(socket[count], SOL_SOCKET, SO_BROADCAST, (char*)&broadcastVal, sizeof(broadcastVal));
 
         status = Ros_mpNICData(i, &ip_be, &subnetmask_be, mac, &gateway_be);
 
         if (status == OK)
         {
+            socket[count] = mpSocket(AF_INET, SOCK_DGRAM, 0);
+            Ros_setsockopt(socket[count], SOL_SOCKET, SO_BROADCAST, (char*)&broadcastVal, sizeof(broadcastVal));
             sin[count].sin_addr.s_addr = ip_be | (~subnetmask_be);
             sin[count].sin_family = AF_INET;
             sin[count].sin_port = mpHtons(DEBUG_UDP_PORT_NUMBER);
             count++;
         }
     }
-    debugPorts.enabledPortCount = count;
-    if (count < 1)
-    {
-        mpSetAlarm(ALARM_ASSERTION_FAIL, "Must enable ETHERNET function", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_ALL);
-        g_nodeConfigSettings.userlan_debug_broadcast_enabled = FALSE;
-    }
+    ros_debugPorts.enabledPortCount = count;
 }
 
 void Ros_Debug_SetFromConfig()
@@ -69,25 +64,23 @@ void Ros_Debug_SetFromConfig()
     UCHAR mac[6];
     STATUS status;
     char message[ERROR_MSG_MAX_SIZE];
-    int* socket = debugPorts.debugSocket;
-    struct sockaddr_in* sin = debugPorts.destAddr;
+    int* socket = ros_debugPorts.debugSocket;
+    struct sockaddr_in* sin = ros_debugPorts.destAddr;
 
-    bzero(&debugPorts, sizeof(debugPorts));
-
-    socket[0] = mpSocket(AF_INET, SOCK_DGRAM, 0);
-    Ros_setsockopt(socket[0], SOL_SOCKET, SO_BROADCAST, (char*)&broadcastVal, sizeof(broadcastVal));
+    bzero(&ros_debugPorts, sizeof(ros_debugPorts));
 
     status = Ros_mpNICData(g_nodeConfigSettings.userlan_debug_broadcast_port, &ip_be, &subnetmask_be, mac, &gateway_be);
 
     if (status == OK)
     {
+        socket[0] = mpSocket(AF_INET, SOCK_DGRAM, 0);
+        Ros_setsockopt(socket[0], SOL_SOCKET, SO_BROADCAST, (char*)&broadcastVal, sizeof(broadcastVal));
         sin[0].sin_addr.s_addr = ip_be | (~subnetmask_be);
         sin[0].sin_family = AF_INET;
         sin[0].sin_port = mpHtons(DEBUG_UDP_PORT_NUMBER);
-        debugPorts.enabledPortCount = 1;
+        ros_debugPorts.enabledPortCount = 1;
     }
-
-    if (debugPorts.enabledPortCount < 1)
+    else
     {
         int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.userlan_debug_broadcast_port);
         if (0 < ret && ret <= 32)
@@ -103,7 +96,7 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     char str[MAX_DEBUG_MESSAGE_SIZE];
     va_list va;
 
-    if (g_nodeConfigSettings.userlan_debug_broadcast_enabled && debugPorts.enabledPortCount == 0)
+    if (g_nodeConfigSettings.userlan_debug_broadcast_enabled && ros_debugPorts.enabledPortCount == 0)
         Ros_Debug_Init();
 
     if (!g_nodeConfigSettings.userlan_debug_broadcast_enabled && !g_nodeConfigSettings.log_to_stdout)
@@ -148,8 +141,8 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         memcpy(str, timestamp, timestamp_length);         
     }
 
-    for (int i = 0; i < debugPorts.enabledPortCount; i++)
-        mpSendTo(debugPorts.debugSocket[i], str, strlen(str), 0, (struct sockaddr*)&(debugPorts.destAddr[i]), sizeof(struct sockaddr_in));
+    for (int i = 0; i < ros_debugPorts.enabledPortCount; i++)
+        mpSendTo(ros_debugPorts.debugSocket[i], str, strlen(str), 0, (struct sockaddr*)&(ros_debugPorts.destAddr[i]), sizeof(struct sockaddr_in));
 
 
     if (g_nodeConfigSettings.log_to_stdout)
