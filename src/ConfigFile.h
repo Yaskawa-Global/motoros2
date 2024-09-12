@@ -145,8 +145,8 @@ typedef struct
 
     BOOL ignore_missing_calib_data;
 
-    BOOL userlan_debug_broadcast_enabled;
-    Ros_UserLan_Port_Setting userlan_debug_broadcast_port;
+    BOOL debug_broadcast_enabled;
+    Ros_UserLan_Port_Setting debug_broadcast_port;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;

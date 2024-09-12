@@ -1050,14 +1050,14 @@ ALARM 8013
 ```
 
 *Solution:*
-The `userlan_debug_broadcast_port` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
-Debug broadcasting will be disabled for this session.
+The `debug_broadcast_port` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
+Debug messages will be sent over all active network ports
 
 On YRC1000 and YRC1000u, this must be set to either `USER_LAN1` or `USER_LAN2`.
 
 No other values are supported.
 
-Example: `userlan_debug_broadcast_port: USER_LAN1`.
+Example: `debug_broadcast_port: USER_LAN1`.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 

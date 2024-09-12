@@ -69,7 +69,7 @@ void Ros_Debug_SetFromConfig()
 
     bzero(&ros_debugPorts, sizeof(ros_debugPorts));
 
-    status = Ros_mpNICData(g_nodeConfigSettings.userlan_debug_broadcast_port, &ip_be, &subnetmask_be, mac, &gateway_be);
+    status = Ros_mpNICData(g_nodeConfigSettings.debug_broadcast_port, &ip_be, &subnetmask_be, mac, &gateway_be);
 
     if (status == OK)
     {
@@ -82,12 +82,12 @@ void Ros_Debug_SetFromConfig()
     }
     else
     {
-        int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.userlan_debug_broadcast_port);
+        int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.debug_broadcast_port);
         if (0 < ret && ret <= 32)
-            mpSetAlarm(ALARM_ASSERTION_FAIL, message, SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_SPECIFIC);
+            mpSetAlarm(ALARM_ASSERTION_FAIL, message, SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
         else
-            mpSetAlarm(ALARM_ASSERTION_FAIL, "Enable debug LAN port from cfg", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_SPECIFIC);
-        g_nodeConfigSettings.userlan_debug_broadcast_enabled = FALSE;
+            mpSetAlarm(ALARM_ASSERTION_FAIL, "Enable debug LAN port from cfg", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
+        g_nodeConfigSettings.debug_broadcast_enabled = FALSE;
     }
 }
 
@@ -96,10 +96,10 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     char str[MAX_DEBUG_MESSAGE_SIZE];
     va_list va;
 
-    if (g_nodeConfigSettings.userlan_debug_broadcast_enabled && ros_debugPorts.enabledPortCount == 0)
+    if (g_nodeConfigSettings.debug_broadcast_enabled && ros_debugPorts.enabledPortCount == 0)
         Ros_Debug_Init();
 
-    if (!g_nodeConfigSettings.userlan_debug_broadcast_enabled && !g_nodeConfigSettings.log_to_stdout)
+    if (!g_nodeConfigSettings.debug_broadcast_enabled && !g_nodeConfigSettings.log_to_stdout)
         return;
 
     bzero(str, MAX_DEBUG_MESSAGE_SIZE);
@@ -141,8 +141,10 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         memcpy(str, timestamp, timestamp_length);         
     }
 
-    for (int i = 0; i < ros_debugPorts.enabledPortCount; i++)
+    for (int i = 0; i < ros_debugPorts.enabledPortCount; i++) 
+    {
         mpSendTo(ros_debugPorts.debugSocket[i], str, strlen(str), 0, (struct sockaddr*)&(ros_debugPorts.destAddr[i]), sizeof(struct sockaddr_in));
+    }
 
 
     if (g_nodeConfigSettings.log_to_stdout)
