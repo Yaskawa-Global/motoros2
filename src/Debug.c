@@ -55,7 +55,7 @@ void Ros_Debug_Init()
     debugPorts.enabledPortCount = count;
     if (count < 1)
     {
-        mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Must enable ETHERNET function", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_ALL);
+        mpSetAlarm(ALARM_ASSERTION_FAIL, "Must enable ETHERNET function", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_ALL);
         g_nodeConfigSettings.userlan_debug_broadcast_enabled = FALSE;
     }
 }
@@ -91,9 +91,9 @@ void Ros_Debug_SetFromConfig()
     {
         int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.userlan_debug_broadcast_port);
         if (0 < ret && ret <= 32)
-            mpSetAlarm(ALARM_CONFIGURATION_FAIL, message, SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_SPECIFIC);
+            mpSetAlarm(ALARM_ASSERTION_FAIL, message, SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_SPECIFIC);
         else
-            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Enable debug LAN port from cfg", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_SPECIFIC);
+            mpSetAlarm(ALARM_ASSERTION_FAIL, "Enable debug LAN port from cfg", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA_SPECIFIC);
         g_nodeConfigSettings.userlan_debug_broadcast_enabled = FALSE;
     }
 }

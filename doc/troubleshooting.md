@@ -725,6 +725,35 @@ Save a copy of the output of the [debug-listener script](#debug-log-client) and 
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
+### Alarm: 8011[64]
+
+*Example:*
+
+```text
+ALARM 8011
+ Must enable ETHERNET function
+[64]
+```
+
+*Solution:*
+The ETHERNET function must be enabled for one (or both) LAN interface in the robot controller.
+Please contact your local Yaskawa representative to request this function.
+
+### Alarm: 8011[65]
+
+*Example:*
+
+```text
+ALARM 8011
+ Enable LAN port 1 for debug
+[65]
+```
+
+*Solution:*
+The ETHERNET function must be enabled for the LAN interface that was specified in the config file.
+Either change the interface specified in the config file to a LAN interface that is enabled, or enable the corresponding LAN interface on the controller.
+Please contact your local Yaskawa representative to request the ETHERNET function if it is not enabled.
+
 ### Alarm: 8012[xx]
 
 *Example:*
@@ -1023,6 +1052,28 @@ In case of any updates to the configuration file, [changes will need to be propa
 In case the alarm is still raised after calibration was performed, TF broadcasting was disabled and/or the alarm was disabled, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` and `RBCALIB.DAT` files from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG`, `RBCALIB.DAT` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8013[17]
+
+*Example:*
+
+```text
+ALARM 8013
+ Bad UserLan debug port in cfg
+[17]
+```
+
+*Solution:*
+The `userlan_debug_broadcast_port` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
+Debug broadcasting will be disabled for this session.
+
+On YRC1000 and YRC1000u, this must be set to either `USER_LAN1` or `USER_LAN2`.
+
+No other values are supported.
+
+Example: `userlan_debug_broadcast_port: USER_LAN1`.
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
 ### Alarm: 8014[0]
 

@@ -286,13 +286,13 @@ publisher_qos:
 #ignore_missing_calib_data: false
 
 #-----------------------------------------------------------------------------
-# Should MotoROS2 broadcast debug messages? 
+# Should MotoROS2 broadcast debug messages?
 #
 # If enabled, this will broadcast log messages on the network on port UDP 21789.
-# the user can use the debug script provided in the distribution of MotoROS2 to 
+# the user can use the debug script provided in the distribution of MotoROS2 to
 # monitor the state of the robot, identify problems, and debug their code.
 #
-# The debug script is available under the Yaskawa-Global/motoros2 repository in 
+# The debug script is available under the Yaskawa-Global/motoros2 repository in
 # the tools directory
 # https://github.com/Yaskawa-Global/motoros2/tree/main/tools
 #
@@ -300,17 +300,17 @@ publisher_qos:
 #userlan_debug_broadcast_enabled: true
 
 #-----------------------------------------------------------------------------
-# Which network port should MotoROS2 broadcast the debug messages to, if 
+# Which network port should MotoROS2 broadcast the debug messages to, if
 # 'userlan_debug_broadcast_enabled' is 'true'?
 #
-# If not specified and 'userlan_debug_broadcast_enabled' is true, MotoROS2 will 
-# send the broadcast to all network ports which are enabled on the controller. 
+# If not specified and 'userlan_debug_broadcast_enabled' is true, MotoROS2 will
+# send the broadcast to all network ports which are enabled on the controller.
 #
-# To choose a specific port to broadcast debug messages, uncomment 
+# To choose a specific port to broadcast debug messages, uncomment
 # 'userlan_debug_broadcast_port' below and set it to the desired port.
 #
 # NOTE 1:   this setting only applies to YRC1000 and YRC1000u controllers.
-#         DX200 and FS100 controllers only have a single ethernet port, and will 
+#         DX200 and FS100 controllers only have a single ethernet port, and will
 #         always default to USER_LAN1
 #
 # OPTIONS: USER_LAN1, USER_LAN2
