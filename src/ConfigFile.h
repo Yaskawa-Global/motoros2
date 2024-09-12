@@ -88,17 +88,20 @@ typedef enum
 
 typedef enum
 {
-    CFG_ROS_USER_LAN_DISABLED = -2,  //sentinel
+    CFG_ROS_USER_LAN_DISABLED = -3,  //sentinel
+    CFG_ROS_USER_LAN_ALL = -2,  //sentinel
     CFG_ROS_USER_LAN_AUTO = -1,  //sentinel
     CFG_ROS_USER_LAN1 = ROS_USER_LAN1,
     CFG_ROS_USER_LAN2 = ROS_USER_LAN2,
 } Ros_UserLan_Port_Setting;
 
-#define DEFAULT_ULAN_MON_ENABLED        TRUE
-#define DEFAULT_ULAN_MON_LINK           CFG_ROS_USER_LAN_AUTO
+#define DEFAULT_ULAN_MON_ENABLED                TRUE
+#define DEFAULT_ULAN_MON_LINK                   CFG_ROS_USER_LAN_AUTO
 
-#define DEFAULT_IGNORE_MISSING_CALIB    FALSE
+#define DEFAULT_IGNORE_MISSING_CALIB            FALSE
 
+#define DEFAULT_ULAN_DEBUG_BROADCAST_ENABLED     TRUE
+#define DEFAULT_ULAN_DEBUG_BROADCAST_PORT        CFG_ROS_USER_LAN_ALL
 typedef struct
 {
     //TODO(gavanderhoorn): add support for unsigned types
@@ -141,6 +144,9 @@ typedef struct
     Ros_UserLan_Port_Setting userlan_monitor_port;
 
     BOOL ignore_missing_calib_data;
+
+    BOOL userlan_debug_broadcast_enabled;
+    Ros_UserLan_Port_Setting userlan_debug_broadcast_port;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;
