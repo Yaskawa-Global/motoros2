@@ -786,6 +786,8 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_enabled = %d", config->userlan_monitor_enabled);
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_port = %d", config->userlan_monitor_port);
     Ros_Debug_BroadcastMsg("Config: ignore_missing_calib_data = %d", config->ignore_missing_calib_data);
+    Ros_Debug_BroadcastMsg("Config: debug_broadcast_enabled = %d", config->debug_broadcast_enabled);
+    Ros_Debug_BroadcastMsg("Config: debug_broadcast_port = %d", config->debug_broadcast_port);
 }
 
 void Ros_ConfigFile_Parse()
