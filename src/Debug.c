@@ -84,9 +84,13 @@ void Ros_Debug_SetFromConfig()
     {
         int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.debug_broadcast_port);
         if (0 < ret && ret <= 32)
+        {
             mpSetAlarm(ALARM_ASSERTION_FAIL, message, SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
+        }
         else
+        {
             mpSetAlarm(ALARM_ASSERTION_FAIL, "Enable debug LAN port from cfg", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
+        }
         g_nodeConfigSettings.debug_broadcast_enabled = FALSE;
     }
 }
@@ -97,10 +101,14 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     va_list va;
 
     if (g_nodeConfigSettings.debug_broadcast_enabled && ros_debugPorts.enabledPortCount == 0)
+    {
         Ros_Debug_Init();
+    }
 
     if (!g_nodeConfigSettings.debug_broadcast_enabled && !g_nodeConfigSettings.log_to_stdout)
+    {
         return;
+    }
 
     bzero(str, MAX_DEBUG_MESSAGE_SIZE);
 
