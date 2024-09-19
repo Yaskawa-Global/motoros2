@@ -19,9 +19,9 @@ typedef struct
     UINT8 enabledPortCount;
     int debugSocket[MAX_NETWORK_PORTS];
     struct sockaddr_in destAddr[MAX_NETWORK_PORTS];
-} userLanInfo;
+} user_lan_info_t;
 
-userLanInfo ros_debugPorts = {0};
+user_lan_info_t ros_debugPorts = {0};
 
 void Ros_Debug_Init()
 {
