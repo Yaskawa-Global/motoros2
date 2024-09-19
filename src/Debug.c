@@ -83,7 +83,7 @@ void Ros_Debug_SetFromConfig()
     else
     {
         int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.debug_broadcast_port);
-        if (0 < ret && ret <= 32)
+        if (0 < ret && ret <= ERROR_MSG_MAX_SIZE)
         {
             mpSetAlarm(ALARM_ASSERTION_FAIL, message, SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
         }
