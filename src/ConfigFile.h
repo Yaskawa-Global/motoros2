@@ -151,6 +151,8 @@ typedef struct
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;
 
+extern void Ros_ConfigFile_SetAllDefaultValues();
+
 extern void Ros_ConfigFile_Parse();
 
 extern rmw_qos_profile_t const* const Ros_ConfigFile_To_Rmw_Qos_Profile(Ros_QoS_Profile_Setting val);

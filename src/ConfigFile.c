@@ -132,6 +132,10 @@ void Ros_ConfigFile_SetAllDefaultValues()
     //TODO(gavanderhoorn): make this an unsigned int
     g_nodeConfigSettings.ros_domain_id = DEFAULT_ROS_DOMAIN_ID;
 
+    //userlan debug broadcast
+    g_nodeConfigSettings.debug_broadcast_enabled = DEFAULT_ULAN_DEBUG_BROADCAST_ENABLED;
+    g_nodeConfigSettings.debug_broadcast_port = DEFAULT_ULAN_DEBUG_BROADCAST_PORT;
+
     //=========
     //node_name
     UCHAR macId[6];
@@ -243,10 +247,6 @@ void Ros_ConfigFile_SetAllDefaultValues()
 
     //ignore_missing_calib_data
     g_nodeConfigSettings.ignore_missing_calib_data = DEFAULT_IGNORE_MISSING_CALIB;
-
-    //userlan debug broadcast
-    g_nodeConfigSettings.debug_broadcast_enabled = DEFAULT_ULAN_DEBUG_BROADCAST_ENABLED;
-    g_nodeConfigSettings.debug_broadcast_port = DEFAULT_ULAN_DEBUG_BROADCAST_PORT;
 }
 
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
@@ -709,7 +709,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     if (g_nodeConfigSettings.debug_broadcast_enabled)
     {
         Ros_Debug_BroadcastMsg("UserLan debug broadcast enabled, checking port setting...");
-
+        //Check if the port setting is valid only if the debug broadcast is enabled
 #if defined (YRC1000) || defined (YRC1000u)
         if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1 &&
             g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN2 && 
@@ -794,8 +794,6 @@ void Ros_ConfigFile_Parse()
 {
     BOOL bAlarmOnce = TRUE;
     BOOL bOkToInit = TRUE;
-
-    Ros_ConfigFile_SetAllDefaultValues();
 
     do
     {
@@ -893,6 +891,8 @@ void Ros_ConfigFile_Parse()
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
 #if defined(YRC1000) || defined(YRC1000u)
+    // If the debug broadcast is enabled and the user chose a specific port, then 
+    // we can no longer broadcast over ALL, we have to change it to only broadcast over one port
     if (g_nodeConfigSettings.debug_broadcast_enabled &&
         (g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN1 ||
             g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN2)) 

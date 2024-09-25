@@ -23,6 +23,9 @@ typedef struct
 
 user_lan_info_t ros_debugPorts = {0};
 
+// This sets the host to broadcast the message on all ports. 
+// This behavior will only be overwritten if the user specifies otherwise
+// in the config file. 
 void Ros_Debug_Init()
 {
     ULONG ip_be;
@@ -55,6 +58,9 @@ void Ros_Debug_Init()
     ros_debugPorts.enabledPortCount = count;
 }
 
+// This sets the host to broadcast the message only to the one port specified in the cfg file. 
+// This overwrites the behavior from Ros_Debug_Init() so it will no longer broadcast
+// to all ports. 
 void Ros_Debug_SetFromConfig()
 {
     ULONG ip_be;
@@ -71,6 +77,8 @@ void Ros_Debug_SetFromConfig()
 
     status = Ros_mpNICData(g_nodeConfigSettings.debug_broadcast_port, &ip_be, &subnetmask_be, mac, &gateway_be);
 
+    // This function is only called if the user specifies which port the host should broadcast to. So
+    // only one socket needs to have its information populated in this case. 
     if (status == OK)
     {
         socket[0] = mpSocket(AF_INET, SOCK_DGRAM, 0);
@@ -82,6 +90,7 @@ void Ros_Debug_SetFromConfig()
     }
     else
     {
+        //If it fails, then disable debug broadcast and notify the user via an alarm. 
         int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.debug_broadcast_port);
         if (0 < ret && ret <= ERROR_MSG_MAX_SIZE)
         {
@@ -92,6 +101,7 @@ void Ros_Debug_SetFromConfig()
             mpSetAlarm(ALARM_ASSERTION_FAIL, "Enable debug LAN port from cfg", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
         }
         g_nodeConfigSettings.debug_broadcast_enabled = FALSE;
+        ros_debugPorts.enabledPortCount = 0;
     }
 }
 
@@ -105,6 +115,9 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         Ros_Debug_Init();
     }
 
+    //Only exit if the broadcast is not enabled and log_to_stdout is false. The message that is built
+    //for each of those is the same, so as long as it will either be broadcast or logged to stdout,
+    //the message should be built
     if (!g_nodeConfigSettings.debug_broadcast_enabled && !g_nodeConfigSettings.log_to_stdout)
     {
         return;
@@ -149,9 +162,13 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         memcpy(str, timestamp, timestamp_length);         
     }
 
-    for (int i = 0; i < ros_debugPorts.enabledPortCount; i++) 
+    
+    if (g_nodeConfigSettings.debug_broadcast_enabled) 
     {
-        mpSendTo(ros_debugPorts.debugSocket[i], str, strlen(str), 0, (struct sockaddr*)&(ros_debugPorts.destAddr[i]), sizeof(struct sockaddr_in));
+        for (int i = 0; i < ros_debugPorts.enabledPortCount; i++) 
+        {
+            mpSendTo(ros_debugPorts.debugSocket[i], str, strlen(str), 0, (struct sockaddr*)&(ros_debugPorts.destAddr[i]), sizeof(struct sockaddr_in));
+        }
     }
 
 
