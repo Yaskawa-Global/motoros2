@@ -231,8 +231,8 @@ typedef enum
 
 extern void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
 extern void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
-extern void motoRos_RCLAssertOK(rcl_ret_t code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
-extern void motoRos_RCLAssertOK_withMsg(rcl_ret_t code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
+extern void motoRos_RCLAssertOK(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
+extern void motoRos_RCLAssertOK_withMsg(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
 
 extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
 extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
