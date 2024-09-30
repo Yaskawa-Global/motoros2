@@ -18,7 +18,7 @@ void Ros_ServiceStopTrajMode_Initialize()
     const rosidl_service_type_support_t* type_support = ROSIDL_GET_SRV_TYPE_SUPPORT(std_srvs, srv, Trigger);
 
     rcl_ret_t ret = rclc_service_init_default(&g_serviceStopTrajMode, &g_microRosNodeInfo.node, type_support, SERVICE_NAME_STOP_TRAJ_MODE);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_STOP_TRAJ_MODE, "Failed to init service (%d)", (int)ret);
+    motoRos_ASSERT_EQ_INT_MESSAGE(ret, RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_STOP_TRAJ_MODE, "Failed to init service (%d)", (int)ret);
 
     rosidl_runtime_c__String__init(&g_messages_StopTrajMode.response.message);
 

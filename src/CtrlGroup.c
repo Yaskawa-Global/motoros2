@@ -804,7 +804,10 @@ void Ros_CtrlGroup_UpdateJointNamesInMotoOrder(CtrlGroup* ctrlGroup)
                     Ros_CtrlGroup_GRP_ID_String[ctrlGroup->groupId], axisIndex + 1);
                 mpSetAlarm(ALARM_CONFIGURATION_FAIL, errMsg,
                     SUBCODE_CONFIGURATION_INVALID_CUSTOM_JOINT_NAME);
-                motoRosAssert_withMsg(false, SUBCODE_CONFIGURATION_EMPTY_JOINT_NAME,
+                motoRos_ASSERT_NE_INT_MESSAGE(
+                    Ros_strnlen(g_nodeConfigSettings.joint_names[customNameIndex], MAX_JOINT_NAME_LENGTH), 
+                    0, 
+                    SUBCODE_CONFIGURATION_EMPTY_JOINT_NAME,
                     "Empty custom joint name");
             }
 

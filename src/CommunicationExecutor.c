@@ -57,7 +57,7 @@ void Ros_Communication_ConnectToAgent()
     motoRos_RCLAssertOK(ret, SUBCODE_FAIL_OPTIONS_INIT_DOMAIN_ID);
 
     rmw_connectionoptions = rcl_init_options_get_rmw_init_options(&g_microRosNodeInfo.initOptions);
-    motoRosAssert(rmw_connectionoptions != NULL, SUBCODE_FAIL_RMW_OPTIONS_INIT);
+    motoRos_ASSERT_NOT_NULL(rmw_connectionoptions, SUBCODE_FAIL_RMW_OPTIONS_INIT);
 
     //Construct the RMW Micro-XRCE-DDS client key to use
     //Use MAC last 4 bytes as client key (1 byte from the OUI, 3 bytes from NIC)
@@ -70,7 +70,7 @@ void Ros_Communication_ConnectToAgent()
     {
         Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
             __func__, ROS_USER_LAN1, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_FAIL_MP_NICDATA_INIT0,
+        motoRos_ASSERT_EQ_INT_MESSAGE(status, OK, SUBCODE_FAIL_MP_NICDATA_INIT0,
             "Must enable ETHERNET function");
     }
 
@@ -80,7 +80,7 @@ void Ros_Communication_ConnectToAgent()
     {
         Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
             __func__, ROS_USER_LAN2, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_FAIL_MP_NICDATA_INIT1,
+        motoRos_ASSERT_EQ_INT_MESSAGE(status, OK, SUBCODE_FAIL_MP_NICDATA_INIT1,
             "Must enable ETHERNET function");
     }
 #endif
