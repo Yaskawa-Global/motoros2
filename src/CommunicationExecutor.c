@@ -70,7 +70,7 @@ void Ros_Communication_ConnectToAgent()
     {
         Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
             __func__, ROS_USER_LAN1, status);
-        motoRos_ASSERT_EQ_INT_MESSAGE(status, OK, SUBCODE_FAIL_MP_NICDATA_INIT0,
+        motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_FAIL_MP_NICDATA_INIT0,
             "Must enable ETHERNET function");
     }
 
@@ -80,7 +80,7 @@ void Ros_Communication_ConnectToAgent()
     {
         Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
             __func__, ROS_USER_LAN2, status);
-        motoRos_ASSERT_EQ_INT_MESSAGE(status, OK, SUBCODE_FAIL_MP_NICDATA_INIT1,
+        motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_FAIL_MP_NICDATA_INIT1,
             "Must enable ETHERNET function");
     }
 #endif

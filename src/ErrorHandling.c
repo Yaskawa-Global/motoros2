@@ -154,12 +154,12 @@ void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, ch
     }
 }
 
-void motoRos_complete_ASSERT_TRUE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName)
+void _motoRos_ASSERT_TRUE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName)
 {
-    motoRos_complete_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse, actualName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse, actualName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -189,12 +189,12 @@ void motoRos_complete_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_
     }
 }
 
-void motoRos_complete_ASSERT_FALSE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfTrue, char* actualName)
+void _motoRos_ASSERT_FALSE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfTrue, char* actualName)
 {
-    motoRos_complete_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, actualName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, actualName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfTrue, char* actualName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfTrue, char* actualName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -224,12 +224,12 @@ void motoRos_complete_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAI
     }
 }
 
-void motoRos_complete_ASSERT_EQ_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
+void _motoRos_ASSERT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
 {
-    motoRos_complete_ASSERT_EQ_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_EQ_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -252,19 +252,19 @@ void motoRos_complete_ASSERT_EQ_INT_MESSAGE(int actual, int expected, ALARM_ASSE
 
     FOREVER
     {
-        Ros_Debug_BroadcastMsg("motoRos_ASSERT_EQ_INT: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_ASSERT_EQUAL_INT: %s (subcode: %d)", msg, subCodeIfFalse);
         Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, actual);
         Ros_Debug_BroadcastMsg("Expected: %s == %d (%s)", actualName, expected, expectedName);
         Ros_Sleep(5000);
     }
 }
 
-void motoRos_complete_ASSERT_NE_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
+void _motoRos_ASSERT_NOT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
 {
-    motoRos_complete_ASSERT_NE_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_NE_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -287,19 +287,19 @@ void motoRos_complete_ASSERT_NE_INT_MESSAGE(int actual, int expected, ALARM_ASSE
 
     FOREVER
     {
-        Ros_Debug_BroadcastMsg("motoRos_ASSERT_NE_INT: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_ASSERT_NOT_EQUAL_INT: %s (subcode: %d)", msg, subCodeIfFalse);
         Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, actual);
         Ros_Debug_BroadcastMsg("Expected: %s not equal to %d (%s)", actualName, expected, expectedName);
         Ros_Sleep(5000);
     }
 }
 
-void motoRos_complete_ASSERT_GE_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
+void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
 {
-    motoRos_complete_ASSERT_GE_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_GE_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -322,19 +322,19 @@ void motoRos_complete_ASSERT_GE_INT_MESSAGE(int actual, int expected, ALARM_ASSE
 
     FOREVER
     {
-        Ros_Debug_BroadcastMsg("motoRos_ASSERT_GE_INT: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT: %s (subcode: %d)", msg, subCodeIfFalse);
         Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, actual);
         Ros_Debug_BroadcastMsg("Expected: %s >= %d (%s)", actualName, expected, expectedName);
         Ros_Sleep(5000);
     }
 }
 
-void motoRos_complete_ASSERT_GT_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
+void _motoRos_ASSERT_GREATER_THAN_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
 {
-    motoRos_complete_ASSERT_GT_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_GT_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -357,19 +357,19 @@ void motoRos_complete_ASSERT_GT_INT_MESSAGE(int actual, int expected, ALARM_ASSE
 
     FOREVER
     {
-        Ros_Debug_BroadcastMsg("motoRos_ASSERT_GT_INT: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_ASSERT_GREATER_THAN_INT: %s (subcode: %d)", msg, subCodeIfFalse);
         Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, actual);
         Ros_Debug_BroadcastMsg("Expected: %s > %d (%s)", actualName, expected, expectedName);
         Ros_Sleep(5000);
     }
 }
 
-void motoRos_complete_ASSERT_LE_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
+void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
 {
-    motoRos_complete_ASSERT_LE_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_LE_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -392,19 +392,19 @@ void motoRos_complete_ASSERT_LE_INT_MESSAGE(int actual, int expected, ALARM_ASSE
 
     FOREVER
     {
-        Ros_Debug_BroadcastMsg("motoRos_ASSERT_LE_INT: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT: %s (subcode: %d)", msg, subCodeIfFalse);
         Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, actual);
         Ros_Debug_BroadcastMsg("Expected: %s <= %d (%s)", actualName, expected, expectedName);
         Ros_Sleep(5000);
     }
 }
 
-void motoRos_complete_ASSERT_LT_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
+void _motoRos_ASSERT_LESS_THAN_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName)
 {
-    motoRos_complete_ASSERT_LT_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, actualName, expectedName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_LT_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -427,19 +427,19 @@ void motoRos_complete_ASSERT_LT_INT_MESSAGE(int actual, int expected, ALARM_ASSE
 
     FOREVER
     {
-        Ros_Debug_BroadcastMsg("motoRos_ASSERT_LT_INT: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_ASSERT_LESS_THAN_INT: %s (subcode: %d)", msg, subCodeIfFalse);
         Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, actual);
         Ros_Debug_BroadcastMsg("Expected: %s < %d (%s)", actualName, expected, expectedName);
         Ros_Sleep(5000);
     }
 }
 
-void motoRos_complete_ASSERT_NULL(void *ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName)
+void _motoRos_ASSERT_NULL(void *ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName)
 {
-    motoRos_complete_ASSERT_NULL_MESSAGE(ptr, subCodeIfFalse, actualName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeIfFalse, actualName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
@@ -470,12 +470,12 @@ void motoRos_complete_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCOD
 }
 
 
-void motoRos_complete_ASSERT_NOT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName)
+void _motoRos_ASSERT_NOT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName)
 {
-    motoRos_complete_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfFalse, actualName, APPLICATION_NAME ": Fatal Error");
+    _motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfFalse, actualName, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_complete_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...)
+void _motoRos_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;

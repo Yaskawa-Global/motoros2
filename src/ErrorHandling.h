@@ -230,53 +230,93 @@ typedef enum
     SUBCODE_OPERATION_SET_CYCLE,
 } ALARM_OPERATION_FAIL_SUBCODE; //8016
 
-#define motoRos_ASSERT_TRUE(mustBeTrue,subCodeIfFalse) motoRos_complete_ASSERT_TRUE(mustBeTrue, subCodeIfFalse, #mustBeTrue)
-#define motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse,msgFmtIfFalse, ...) motoRos_complete_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse, #mustBeTrue, msgFmtIfFalse, ##__VA_ARGS__)
-#define motoRos_ASSERT_FALSE(mustBeFalse, subCodeIfTrue) motoRos_complete_ASSERT_FALSE(mustBeFalse, subCodeIfTrue, #mustBeFalse)
-#define motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, msgFmtIfTrue, ...) motoRos_complete_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, #mustBeFalse, msgFmtIfTrue, ##__VA_ARGS__)
-#define motoRos_ASSERT_EQ_INT(actual, expected, subCodeIfFalse) motoRos_complete_ASSERT_EQ_INT(actual, expected, subCodeIfFalse, #actual, #expected)
-#define motoRos_ASSERT_EQ_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) motoRos_complete_ASSERT_EQ_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
-#define motoRos_ASSERT_NE_INT(actual, expected, subCodeIfFalse) motoRos_complete_ASSERT_NE_INT(actual, expected, subCodeIfFalse, #actual, #expected)
-#define motoRos_ASSERT_NE_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) motoRos_complete_ASSERT_NE_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
-#define motoRos_ASSERT_GE_INT(actual, expected, subCodeIfFalse) motoRos_complete_ASSERT_GE_INT(actual, expected, subCodeIfFalse, #actual, #expected)
-#define motoRos_ASSERT_GE_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) motoRos_complete_ASSERT_GE_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
-#define motoRos_ASSERT_GT_INT(actual, expected, subCodeIfFalse) motoRos_complete_ASSERT_GT_INT(actual, expected, subCodeIfFalse, #actual, #expected)
-#define motoRos_ASSERT_GT_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) motoRos_complete_ASSERT_GT_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
-#define motoRos_ASSERT_LE_INT(actual, expected, subCodeIfFalse) motoRos_complete_ASSERT_LE_INT(actual, expected, subCodeIfFalse, #actual, #expected)
-#define motoRos_ASSERT_LE_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) motoRos_complete_ASSERT_LE_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
-#define motoRos_ASSERT_LT_INT(actual, expected, subCodeIfFalse) motoRos_complete_ASSERT_LT_INT(actual, expected, subCodeIfFalse, #actual, #expected)
-#define motoRos_ASSERT_LT_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) motoRos_complete_ASSERT_LT_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
-#define motoRos_ASSERT_NULL(ptr, subCodeIfNotNull) motoRos_complete_ASSERT_NULL(ptr, subCodeIfNotNull, #ptr)
-#define motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeIfNotNull, msgFmtIfNotNull, ...) motoRos_complete_ASSERT_NULL(ptr, subCodeIfNotNull, #ptr, msgFmtIfNotNull, ##__VA_ARGS__)
-#define motoRos_ASSERT_NOT_NULL(ptr, subCodeIfNull) motoRos_complete_ASSERT_NOT_NULL(ptr, subCodeIfNull, #ptr)
-#define motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfNull, msgFmtIfNull, ...) motoRos_complete_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfNull, #ptr, msgFmtIfNull, ##__VA_ARGS__)
-
-extern void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
-extern void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_TRUE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void motoRos_complete_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_FALSE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void motoRos_complete_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_EQ_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void motoRos_complete_ASSERT_EQ_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_NE_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void motoRos_complete_ASSERT_NE_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_GE_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void motoRos_complete_ASSERT_GE_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_GT_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void motoRos_complete_ASSERT_GT_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_LE_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void motoRos_complete_ASSERT_LE_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_LT_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void motoRos_complete_ASSERT_LT_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void motoRos_complete_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
-extern void motoRos_complete_ASSERT_NOT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void motoRos_complete_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
 typedef enum
 {
     SUBCODE_RCL_RCLC_API_ERROR,
 } ALARM_RCL_RCLC_FAIL_SUBCODE; //8017
+
+#define motoRos_ASSERT_TRUE(mustBeTrue,subCodeIfFalse) \
+    _motoRos_ASSERT_TRUE(mustBeTrue, subCodeIfFalse, #mustBeTrue)
+
+#define motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse,msgFmtIfFalse, ...) \
+    _motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse, #mustBeTrue, msgFmtIfFalse, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_FALSE(mustBeFalse, subCodeIfTrue) \
+    _motoRos_ASSERT_FALSE(mustBeFalse, subCodeIfTrue, #mustBeFalse)
+
+#define motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, msgFmtIfTrue, ...) \
+    _motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, #mustBeFalse, msgFmtIfTrue, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeIfFalse) \
+    _motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+
+#define motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
+    _motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_NOT_EQUAL_INT(actual, expected, subCodeIfFalse) \
+    _motoRos_ASSERT_NOT_EQUAL_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+
+#define motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
+    _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse) \
+    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+
+#define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
+    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_GREATER_THAN_INT(actual, expected, subCodeIfFalse) \
+    _motoRos_ASSERT_GREATER_THAN_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+
+#define motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
+    _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse) \
+    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+
+#define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
+    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_LESS_THAN_INT(actual, expected, subCodeIfFalse) \
+    _motoRos_ASSERT_LESS_THAN_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+
+#define motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
+    _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_NULL(ptr, subCodeIfNotNull) \
+    _motoRos_ASSERT_NULL(ptr, subCodeIfNotNull, #ptr)
+
+#define motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeIfNotNull, msgFmtIfNotNull, ...) \
+    _motoRos_ASSERT_NULL(ptr, subCodeIfNotNull, #ptr, msgFmtIfNotNull, ##__VA_ARGS__)
+
+#define motoRos_ASSERT_NOT_NULL(ptr, subCodeIfNull) \
+    _motoRos_ASSERT_NOT_NULL(ptr, subCodeIfNull, #ptr)
+
+#define motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfNull, msgFmtIfNull, ...) \
+    _motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfNull, #ptr, msgFmtIfNull, ##__VA_ARGS__)
+
+extern void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
+extern void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_TRUE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
+extern void _motoRos_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_FALSE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
+extern void _motoRos_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
+extern void _motoRos_ASSERT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_NOT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
+extern void _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
+extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_GREATER_THAN_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
+extern void _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
+extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_LESS_THAN_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
+extern void _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
+extern void _motoRos_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
+extern void _motoRos_ASSERT_NOT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
+extern void _motoRos_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
 
 /// <summary>
 /// Validate that an RCL return value is OK. If the return code is anything other than OK,
