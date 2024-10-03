@@ -65,6 +65,7 @@
 #include <motoros2_interfaces/srv/read_m_register.h>
 #include <motoros2_interfaces/srv/write_m_register.h>
 #include <motoros2_interfaces/msg/io_result_codes.h>
+#include <motoros2_interfaces/msg/init_traj_enum.h>
 #include <motoros2_interfaces/srv/reset_error.h>
 #include <motoros2_interfaces/srv/start_traj_mode.h>
 #include <motoros2_interfaces/srv/start_point_queue_mode.h>
