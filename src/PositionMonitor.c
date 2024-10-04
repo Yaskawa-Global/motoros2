@@ -10,11 +10,11 @@
 PositionMonitor_Publishers g_publishers_PositionMonitor;
 PositionMonitor_Messages g_messages_PositionMonitor;
 
-
 static void Ros_PositionMonitor_Initialize_GlobalJointStatePublisher(rmw_qos_profile_t const* const qos_profile);
 static void Ros_PositionMonitor_Initialize_PerGroupJointStatePublisher(rmw_qos_profile_t const* const qos_profile, CtrlGroup* const ctrlGroup, int grpIndex);
-static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* const qos_profile, int totalRobots);
+static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* const qos_profile);
 
+static int motoRos_PositionMonitor_totalRobots = 0;
 
 void Ros_PositionMonitor_Initialize()
 {
@@ -29,20 +29,27 @@ void Ros_PositionMonitor_Initialize()
 
     //==================================
     //create a JointState publisher for each group
-    int totalRobots = 0;
+    motoRos_PositionMonitor_totalRobots = 0;
     for (int grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex++)
     {
         CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
         Ros_PositionMonitor_Initialize_PerGroupJointStatePublisher(qos_profile_js, ctrlGroup, grpIndex);
         if (Ros_CtrlGroup_IsRobot(ctrlGroup))
-            totalRobots += 1;
+            motoRos_PositionMonitor_totalRobots += 1;
     }
 
     //==================================
     //Create publisher for cartesian transform
     //Rviz2 expects the QoS to be RELIABLE, but user could have configured something else
     const rmw_qos_profile_t* qos_profile_tf = Ros_ConfigFile_To_Rmw_Qos_Profile(g_nodeConfigSettings.qos_tf);
-    Ros_PositionMonitor_Initialize_TfPublisher(qos_profile_tf, totalRobots);
+    Ros_PositionMonitor_Initialize_TfPublisher(qos_profile_tf);
+
+    //==================================
+    //Create publisher for static cartesian transform (e.g. tool0 to flange)
+
+    Ros_StaticTransformBroadcaster_Init();
+
+    Ros_PositionMonitor_CalculateStaticTransforms();
 
     MOTOROS2_MEM_TRACE_REPORT(pos_mon_init);
 }
@@ -153,7 +160,7 @@ static void Ros_PositionMonitor_Initialize_PerGroupJointStatePublisher(rmw_qos_p
     rosidl_runtime_c__float64__Sequence__init(&ctrlGroup->msgJointState->effort, ctrlGroup->numAxes);
 }
 
-static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* const qos_profile, int totalRobots)
+static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* const qos_profile)
 {
     char formatBuffer[MAX_TF_FRAME_NAME_LENGTH];
 
@@ -185,34 +192,66 @@ static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* 
     //create message for cartesian transform
     g_messages_PositionMonitor.transform = tf2_msgs__msg__TFMessage__create();
 
-    motoRosAssert(geometry_msgs__msg__TransformStamped__Sequence__init(&g_messages_PositionMonitor.transform->transforms, totalRobots * NUMBER_TRANSFORM_LINKS_PER_ROBOT),
+    motoRosAssert(geometry_msgs__msg__TransformStamped__Sequence__init(&g_messages_PositionMonitor.transform->transforms, motoRos_PositionMonitor_totalRobots * PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT),
                   SUBCODE_FAIL_ALLOCATE_TRANSFORM);
 
     bzero(formatBuffer, MAX_TF_FRAME_NAME_LENGTH);
     int robotIterator = 0;
     const char* frame_prefix = g_nodeConfigSettings.tf_frame_prefix;
-    for (int i = 0; i < (totalRobots * NUMBER_TRANSFORM_LINKS_PER_ROBOT); i += NUMBER_TRANSFORM_LINKS_PER_ROBOT)
+    for (int i = 0; i < (motoRos_PositionMonitor_totalRobots * PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT); i += PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT)
     {
         snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sworld", frame_prefix);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_WorldToBase].header.frame_id, formatBuffer);
+        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + publishIndex_tfLink_WorldToBase].header.frame_id, formatBuffer);
 
         snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/base", frame_prefix, robotIterator + 1);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_WorldToBase].child_frame_id, formatBuffer);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_BaseToFlange].header.frame_id, formatBuffer);
+        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + publishIndex_tfLink_WorldToBase].child_frame_id, formatBuffer);
+        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + publishIndex_tfLink_BaseToFlange].header.frame_id, formatBuffer);
 
         snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/flange", frame_prefix, robotIterator + 1);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_BaseToFlange].child_frame_id, formatBuffer);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_FlangeToTool0].header.frame_id, formatBuffer);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_FlangeToTcp].header.frame_id, formatBuffer);
-
-        snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/tool0", frame_prefix, robotIterator + 1);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_FlangeToTool0].child_frame_id, formatBuffer);
+        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + publishIndex_tfLink_BaseToFlange].child_frame_id, formatBuffer);
+        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + publishIndex_tfLink_FlangeToTcp].header.frame_id, formatBuffer);
 
         snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/tcp_%d", frame_prefix, robotIterator + 1, g_Ros_Controller.ctrlGroups[robotIterator]->tool);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_FlangeToTcp].child_frame_id, formatBuffer);
+        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + publishIndex_tfLink_FlangeToTcp].child_frame_id, formatBuffer);
 
         robotIterator += 1;
     }
+}
+
+void Ros_PositionMonitor_CalculateStaticTransforms()
+{
+    MP_XYZ vectorOrg, vectorX, vectorY; //for mpMakeFrame
+    vectorOrg.x = 0;    vectorOrg.y = 0;    vectorOrg.z = 0;
+    vectorX.x = 0;      vectorX.y = 0;      vectorX.z = 1;
+    vectorY.x = 0;      vectorY.y = -1;     vectorY.z = 0;
+    mpMakeFrame(&vectorOrg, &vectorX, &vectorY, &g_TF_Static_Data.frameTool0ToFlange);
+    mpInvFrame(&g_TF_Static_Data.frameTool0ToFlange, &g_TF_Static_Data.frameFlangeToTool0);
+    mpFrameToZYXeuler(&g_TF_Static_Data.frameFlangeToTool0, &g_TF_Static_Data.coordFlangeToTool0);
+}
+
+bool Ros_PositionMonitor_Send_TF_Static() 
+{
+    //Timestamp
+    INT64 theTime = rmw_uros_epoch_nanos();
+    geometry_msgs__msg__TransformStamped__Sequence messages;
+    motoRosAssert(geometry_msgs__msg__TransformStamped__Sequence__init(&messages, motoRos_PositionMonitor_totalRobots),
+            SUBCODE_FAIL_ALLOCATE_FLANGE_TOOL0);
+    char formatBuffer[MAX_TF_FRAME_NAME_LENGTH];
+    bzero(formatBuffer, MAX_TF_FRAME_NAME_LENGTH);
+    const char* frame_prefix = g_nodeConfigSettings.tf_frame_prefix;
+    for (int i = 0; i < motoRos_PositionMonitor_totalRobots; i++)
+    {
+        snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/flange", frame_prefix, i + 1);
+        rosidl_runtime_c__String__assign(&messages.data[i].header.frame_id, formatBuffer);
+        snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/tool0", frame_prefix, i + 1);
+        rosidl_runtime_c__String__assign(&messages.data[i].child_frame_id, formatBuffer);
+        Ros_MpCoord_To_GeomMsgsTransform(&g_TF_Static_Data.coordFlangeToTool0, &messages.data[i].transform);
+        Ros_Nanos_To_Time_Msg(theTime, &messages.data[i].header.stamp);
+    }
+    messages.size = motoRos_PositionMonitor_totalRobots;
+    bool ret = Ros_StaticTransformBroadcaster_Send(messages.data, motoRos_PositionMonitor_totalRobots);
+    geometry_msgs__msg__TransformStamped__Sequence__fini(&messages);
+    return ret;
 }
 
 void Ros_PositionMonitor_Cleanup()
@@ -247,6 +286,8 @@ void Ros_PositionMonitor_Cleanup()
         Ros_Debug_BroadcastMsg("Failed cleaning up TF publisher: %d", ret);
     tf2_msgs__msg__TFMessage__destroy(g_messages_PositionMonitor.transform);
 
+    Ros_StaticTransformBroadcaster_Cleanup();
+
     MOTOROS2_MEM_TRACE_REPORT(pos_mon_fini);
 }
 
@@ -266,9 +307,9 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     //this CtrlGroup's pose can be converted, so update ROS transforms
 
     //first update stamp of this group's transforms
-    for (int i = 0; i < NUMBER_TRANSFORM_LINKS_PER_ROBOT; i += 1)
+    for (int i = 0; i < PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT; i += 1)
     {
-        Ros_Nanos_To_Time_Msg(timestamp, &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + i].header.stamp);
+        Ros_Nanos_To_Time_Msg(timestamp, &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT) + i].header.stamp);
     }
 
     //=======================
@@ -325,7 +366,7 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
         mpFrameToZYXeuler(&frameWorldToRobot, &coordWorldToBase);
     }
 
-    geometry_msgs__msg__Transform* transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_WorldToBase].transform;
+    geometry_msgs__msg__Transform* transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT) + publishIndex_tfLink_WorldToBase].transform;
     Ros_MpCoord_To_GeomMsgsTransform(&coordWorldToBase, transform);
 
     //============================
@@ -343,10 +384,9 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     // <image url="$(ProjectDir)image_comments\tf_diagram.png" />
     //
     MP_FRAME frameBaseToTcp, frameBaseToTool0, frameBaseToFlange, frameTool0ToTcp, frameTcpToTool0;
-    MP_FRAME frameTool0ToFlange, frameFlangeToTool0, frameFlangeToTcp;
+    MP_FRAME frameFlangeToTcp;
     MP_TOOL_RSP_DATA retToolData;
-    MP_COORD coordToolData, coordBaseToFlange, coordFlangeToTool0;
-    MP_XYZ vectorOrg, vectorX, vectorY; //for mpMakeFrame
+    MP_COORD coordToolData, coordBaseToFlange;
 
     long anglePos_moto[MAX_PULSE_AXES];
     mpConvPulseToAngle(groupIndex, pulsePos_moto, anglePos_moto);
@@ -366,29 +406,18 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
 
     mpMulFrame(&frameBaseToTcp, &frameTcpToTool0, &frameBaseToTool0);
 
-    //Make rotational frames
-    vectorOrg.x = 0;    vectorOrg.y = 0;    vectorOrg.z = 0;
-    vectorX.x = 0;      vectorX.y = 0;      vectorX.z = 1;
-    vectorY.x = 0;      vectorY.y = -1;     vectorY.z = 0;
-    mpMakeFrame(&vectorOrg, &vectorX, &vectorY, &frameTool0ToFlange);
-    mpInvFrame(&frameTool0ToFlange, &frameFlangeToTool0);
-    mpFrameToZYXeuler(&frameFlangeToTool0, &coordFlangeToTool0);
-
-    mpMulFrame(&frameBaseToTool0, &frameTool0ToFlange, &frameBaseToFlange);
+    mpMulFrame(&frameBaseToTool0, &g_TF_Static_Data.frameTool0ToFlange, &frameBaseToFlange);
     mpFrameToZYXeuler(&frameBaseToFlange, &coordBaseToFlange);
 
-    mpMulFrame(&frameFlangeToTool0, &frameTool0ToTcp, &frameFlangeToTcp);
+    mpMulFrame(&g_TF_Static_Data.frameFlangeToTool0, &frameTool0ToTcp, &frameFlangeToTcp);
     mpFrameToZYXeuler(&frameFlangeToTcp, &coordToolData);
 
     //=======================
 
-    transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_BaseToFlange].transform;
+    transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT) + publishIndex_tfLink_BaseToFlange].transform;
     Ros_MpCoord_To_GeomMsgsTransform(&coordBaseToFlange, transform);
 
-    transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTool0].transform;
-    Ros_MpCoord_To_GeomMsgsTransform(&coordFlangeToTool0, transform);
-
-    transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTcp].transform;
+    transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * PUBLISHED_NUMBER_TRANSFORM_LINKS_PER_ROBOT) + publishIndex_tfLink_FlangeToTcp].transform;
     Ros_MpCoord_To_GeomMsgsTransform(&coordToolData, transform);
 }
 

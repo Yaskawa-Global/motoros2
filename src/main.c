@@ -148,9 +148,13 @@ void RosInitTask()
 
         //==================================
         ULONG tickBefore = 0;
-
+        bool static_has_sent = false;
         while(g_Ros_Communication_AgentIsConnected)
         {
+            if(!static_has_sent)
+            {
+                static_has_sent = Ros_PositionMonitor_Send_TF_Static();
+            }
             //figure out how long to sleep to achieve the user-configured rate
             ULONG tickNow = tickGet();
 
