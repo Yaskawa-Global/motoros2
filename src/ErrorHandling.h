@@ -37,22 +37,23 @@ typedef enum
 
 typedef enum
 {
-    INIT_TRAJ_OK = 0,
-    INIT_TRAJ_TOO_SMALL = 200,
-    INIT_TRAJ_TOO_BIG,
-    INIT_TRAJ_ALREADY_IN_MOTION,
-    INIT_TRAJ_INVALID_STARTING_POS,
-    INIT_TRAJ_INVALID_VELOCITY,
-    INIT_TRAJ_INVALID_JOINTNAME,
-    INIT_TRAJ_INCOMPLETE_JOINTLIST,
-    INIT_TRAJ_INVALID_TIME,
-    INIT_TRAJ_WRONG_MODE,
-    INIT_TRAJ_BACKWARD_TIME,
-    INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS,
-    INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES,
-    INIT_TRAJ_INVALID_ENDING_VELOCITY,
-    INIT_TRAJ_INVALID_ENDING_ACCELERATION,
-    INIT_TRAJ_DUPLICATE_JOINT_NAME,
+    INIT_TRAJ_OK = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_OK,
+    INIT_TRAJ_UNSPECIFIED = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_UNSPECIFIED,
+    INIT_TRAJ_TOO_SMALL = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_TOO_SMALL,
+    INIT_TRAJ_TOO_BIG = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_TOO_BIG,
+    INIT_TRAJ_ALREADY_IN_MOTION = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_ALREADY_IN_MOTION,
+    INIT_TRAJ_INVALID_STARTING_POS = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_STARTING_POS,
+    INIT_TRAJ_INVALID_VELOCITY = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_VELOCITY,
+    INIT_TRAJ_INVALID_JOINTNAME = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_JOINTNAME,
+    INIT_TRAJ_INCOMPLETE_JOINTLIST = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INCOMPLETE_JOINTLIST,
+    INIT_TRAJ_INVALID_TIME = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_TIME,
+    INIT_TRAJ_WRONG_MODE = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_MODE,
+    INIT_TRAJ_BACKWARD_TIME = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_BACKWARD_TIME,
+    INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS,
+    INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES,
+    INIT_TRAJ_INVALID_ENDING_VELOCITY = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_ENDING_VELOCITY,
+    INIT_TRAJ_INVALID_ENDING_ACCELERATION = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_ENDING_ACCELERATION,
+    INIT_TRAJ_DUPLICATE_JOINT_NAME = motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_DUPLICATE_JOINT_NAME,
 } Init_Trajectory_Status;
 
 typedef enum
@@ -229,5 +230,6 @@ extern void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE 
 
 extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
 extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
+extern const char* const Ros_ErrorHandling_Init_Trajectory_Status_ToString(Init_Trajectory_Status code);
 
 #endif  // MOTOROS2_ERROR_HANDLING_H
