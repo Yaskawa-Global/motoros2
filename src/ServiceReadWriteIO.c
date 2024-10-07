@@ -270,17 +270,17 @@ void Ros_ServiceReadWriteIO_Initialize()
     const rosidl_service_type_support_t* t_supp_write_mreg      = ROSIDL_GET_SRV_TYPE_SUPPORT(motoros2_interfaces, srv, WriteMRegister);
 
     ret = rclc_service_init_default(&g_serviceReadSingleIO  , &g_microRosNodeInfo.node, t_supp_read_single_io , SERVICE_NAME_READ_SINGLE_IO);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_READ_SINGLE_IO, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_READ_SINGLE_IO, "Failed to init service (%d)", (int)ret);
     ret = rclc_service_init_default(&g_serviceReadGroupIO   , &g_microRosNodeInfo.node, t_supp_read_group_io  , SERVICE_NAME_READ_GROUP_IO);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_READ_GROUP_IO, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_READ_GROUP_IO, "Failed to init service (%d)", (int)ret);
     ret = rclc_service_init_default(&g_serviceWriteSingleIO , &g_microRosNodeInfo.node, t_supp_write_single_io, SERVICE_NAME_WRITE_SINGLE_IO);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_WRITE_SINGLE_IO, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_WRITE_SINGLE_IO, "Failed to init service (%d)", (int)ret);
     ret = rclc_service_init_default(&g_serviceWriteGroupIO  , &g_microRosNodeInfo.node, t_supp_write_group_io , SERVICE_NAME_WRITE_GROUP_IO);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_WRITE_GROUP_IO, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_WRITE_GROUP_IO, "Failed to init service (%d)", (int)ret);
     ret = rclc_service_init_default(&g_serviceReadMRegister , &g_microRosNodeInfo.node, t_supp_read_mreg      , SERVICE_NAME_READ_MREGISTER);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_READ_M_REG, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_READ_M_REG, "Failed to init service (%d)", (int)ret);
     ret = rclc_service_init_default(&g_serviceWriteMRegister, &g_microRosNodeInfo.node, t_supp_write_mreg     , SERVICE_NAME_WRITE_MREGISTER);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_WRITE_M_REG, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_WRITE_M_REG, "Failed to init service (%d)", (int)ret);
 
     rosidl_runtime_c__String__init(&g_messages_ReadWriteIO.resp_single_io_read.message);
     rosidl_runtime_c__String__init(&g_messages_ReadWriteIO.resp_group_io_read.message);

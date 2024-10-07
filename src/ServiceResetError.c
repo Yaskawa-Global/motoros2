@@ -24,7 +24,7 @@ void Ros_ServiceResetError_Initialize()
     const rosidl_service_type_support_t* type_support = ROSIDL_GET_SRV_TYPE_SUPPORT(motoros2_interfaces, srv, ResetError);
     
     rcl_ret_t ret = rclc_service_init_default(&g_serviceResetError, &g_microRosNodeInfo.node, type_support, SERVICE_NAME_RESET_ERROR);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_RESET_ERROR, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_RESET_ERROR, "Failed to init service (%d)", (int)ret);
 
     rosidl_runtime_c__String__init(&g_messages_ResetError.response.message);
 

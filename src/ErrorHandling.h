@@ -71,7 +71,7 @@ typedef enum
 //**********************************************************************
 
 #define ERROR_MSG_MAX_SIZE 32
-
+#define DEBUG_MSG_MAX_SIZE 256
 //===================================
 //Main Codes
 //===================================
@@ -84,6 +84,7 @@ typedef enum
     ALARM_INFORM_JOB_FAIL,
     ALARM_DAT_FILE_PARSE_FAIL,
     ALARM_OPERATION_FAIL,
+    ALARM_RCL_RCLC_FAIL
 } ALARM_MAIN_CODE;
 
 
@@ -224,8 +225,15 @@ typedef enum
     SUBCODE_OPERATION_SET_CYCLE,
 } ALARM_OPERATION_FAIL_SUBCODE; //8016
 
+typedef enum
+{
+    SUBCODE_RCL_RCLC_API_ERROR,
+} ALARM_RCL_RCLC_FAIL_SUBCODE; //8017
+
 extern void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
 extern void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
+extern void motoRos_RCLAssertOK(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
+extern void motoRos_RCLAssertOK_withMsg(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
 
 extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
 extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
