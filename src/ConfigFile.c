@@ -121,6 +121,8 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "userlan_monitor_enabled", &g_nodeConfigSettings.userlan_monitor_enabled, Value_Bool },
     { "userlan_monitor_port", &g_nodeConfigSettings.userlan_monitor_port, Value_UserLanPort },
     { "ignore_missing_calib_data", &g_nodeConfigSettings.ignore_missing_calib_data, Value_Bool },
+    { "debug_broadcast_enabled", &g_nodeConfigSettings.debug_broadcast_enabled, Value_Bool },
+    { "debug_broadcast_port", &g_nodeConfigSettings.debug_broadcast_port, Value_UserLanPort },
 };
 
 void Ros_ConfigFile_SetAllDefaultValues()
@@ -129,6 +131,10 @@ void Ros_ConfigFile_SetAllDefaultValues()
     //ros_domain_id
     //TODO(gavanderhoorn): make this an unsigned int
     g_nodeConfigSettings.ros_domain_id = DEFAULT_ROS_DOMAIN_ID;
+
+    //userlan debug broadcast
+    g_nodeConfigSettings.debug_broadcast_enabled = DEFAULT_ULAN_DEBUG_BROADCAST_ENABLED;
+    g_nodeConfigSettings.debug_broadcast_port = DEFAULT_ULAN_DEBUG_BROADCAST_PORT;
 
     //=========
     //node_name
@@ -327,7 +333,7 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                 case Value_UserLanPort:
 #if defined (FS100) || defined (DX200)
                     // single port, override whatever was configured
-                    *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
+                    * (Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
                     Ros_Debug_BroadcastMsg("DX200 or FS100: override to 'USER_LAN1'");
 
 #elif defined (YRC1000) || defined (YRC1000u)
@@ -337,20 +343,20 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                         *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN2;
                     else
                     {
-                        //Note: ideally, we'd disable user lan monitoring here. However, we can't
-                        //guarantee the 'userlan_monitor_enabled' setting won't be parsed after
-                        //this one. If it were to be parsed after 'userlan_monitor_port', we'd
-                        //be disabling it here, only to have it re-enabled later.
-                        //Set the config value to the 'disabled' sentinel value and let the
-                        //validation code below handle the fallout.
+                        // Note: ideally, we'd disable user lan monitoring or set user lan debug
+                        // broadcast to all here. However, we can't guarantee that the 'userlan_monitor_enabled' 
+                        // or the 'debug_broadcast_enabled' setting won't be parsed after
+                        // this one. If it were to be parsed after the corresponding port setting, we'd
+                        // be setting it here, only to have it re-set later. Set the config value to the 
+                        // 'malformed' sentinel value and let the validation code below handle the fallout.
                         Ros_Debug_BroadcastMsg(
-                            "Unrecognised value for '%s': '%s'. Port monitoring will be disabled",
-                            (char*)event->data.scalar.value,
-                            (char*)activeItem->yamlKey);
-                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN_DISABLED;
+                            "Unrecognised value for '%s': '%s'.",
+                            (char*)activeItem->yamlKey,
+                            (char*)event->data.scalar.value);
+                        *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN_MALFORMED;
                     }
 #else
-    #error Unsupported platform
+#error Unsupported platform
 #endif
                     //Note: this logs whatever was in the .yaml, NOT the verified/parsed value above
                     Ros_Debug_BroadcastMsg("Config: %s = %s", (char*)activeItem->yamlKey,
@@ -690,7 +696,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
             if (g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN1)
 #endif
             {
-                mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid UserLan port in cfg",
+                mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Bad UserLan monitor port in cfg",
                     SUBCODE_CONFIGURATION_INVALID_USERLAN_MONITOR_PORT);
                 g_nodeConfigSettings.userlan_monitor_enabled = FALSE;
                 Ros_Debug_BroadcastMsg(
@@ -699,6 +705,28 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
             }
         }
     }
+
+    if (g_nodeConfigSettings.debug_broadcast_enabled)
+    {
+        Ros_Debug_BroadcastMsg("UserLan debug broadcast enabled, checking port setting...");
+        //Check if the port setting is valid only if the debug broadcast is enabled
+#if defined (YRC1000) || defined (YRC1000u)
+        if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1 &&
+            g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN2 && 
+            g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN_ALL)
+#elif defined (FS100) || defined (DX200)
+        if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1)
+#endif
+        {
+            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Bad UserLan debug port in cfg",
+                SUBCODE_CONFIGURATION_INVALID_DEBUG_BROADCAST_PORT);
+            Ros_Debug_BroadcastMsg(
+                "debug_broadcast_port value %d is invalid, broadcasting to all enabled ports instead",
+                g_nodeConfigSettings.debug_broadcast_port);
+        }
+    }
+
+
 }
 
 const char* const Ros_ConfigFile_Rmw_Qos_ProfileSetting_ToString(Ros_QoS_Profile_Setting val)
@@ -758,14 +786,14 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_enabled = %d", config->userlan_monitor_enabled);
     Ros_Debug_BroadcastMsg("Config: userlan_monitor_port = %d", config->userlan_monitor_port);
     Ros_Debug_BroadcastMsg("Config: ignore_missing_calib_data = %d", config->ignore_missing_calib_data);
+    Ros_Debug_BroadcastMsg("Config: debug_broadcast_enabled = %d", config->debug_broadcast_enabled);
+    Ros_Debug_BroadcastMsg("Config: debug_broadcast_port = %d", config->debug_broadcast_port);
 }
 
 void Ros_ConfigFile_Parse()
 {
     BOOL bAlarmOnce = TRUE;
     BOOL bOkToInit = TRUE;
-
-    Ros_ConfigFile_SetAllDefaultValues();
 
     do
     {
@@ -862,6 +890,16 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
+#if defined(YRC1000) || defined(YRC1000u)
+    // If the debug broadcast is enabled and the user chose a specific port, then 
+    // we can no longer broadcast over ALL, we have to change it to only broadcast over one port
+    if (g_nodeConfigSettings.debug_broadcast_enabled &&
+        (g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN1 ||
+            g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN2)) 
+    {
+        Ros_Debug_SetFromConfig();
+    }
+#endif
     Ros_ConfigFile_PrintActiveConfiguration(&g_nodeConfigSettings);
 }
 

@@ -14,9 +14,18 @@
 
 #define FORMATTED_TIME_SIZE  1024
 
-int ros_DebugSocket = -1;
-struct sockaddr_in ros_debug_destAddr1;
+typedef struct
+{
+    UINT8 enabledPortCount;
+    int debugSocket[MAX_NETWORK_PORTS];
+    struct sockaddr_in destAddr[MAX_NETWORK_PORTS];
+} user_lan_info_t;
 
+user_lan_info_t ros_debugPorts = {0};
+
+// This sets the host to broadcast the message on all ports. 
+// This behavior will only be overwritten if the user specifies otherwise
+// in the config file. 
 void Ros_Debug_Init()
 {
     ULONG ip_be;
@@ -24,15 +33,76 @@ void Ros_Debug_Init()
     ULONG gateway_be;
     int broadcastVal = 1;
     UCHAR mac[6];
+    STATUS status;
+    int count = 0;
+    int* socket = ros_debugPorts.debugSocket;
+    struct sockaddr_in* sin = ros_debugPorts.destAddr;
 
-    ros_DebugSocket = mpSocket(AF_INET, SOCK_DGRAM, 0);
-    Ros_setsockopt(ros_DebugSocket, SOL_SOCKET, SO_BROADCAST, (char*)&broadcastVal, sizeof(broadcastVal));
+    bzero(&ros_debugPorts, sizeof(ros_debugPorts));
 
-    Ros_mpNICData(ROS_USER_LAN1, &ip_be, &subnetmask_be, mac, &gateway_be);
+    for (int i = 1; i <= MAX_NETWORK_PORTS; i++)
+    {
 
-    ros_debug_destAddr1.sin_addr.s_addr = ip_be | (~subnetmask_be);
-    ros_debug_destAddr1.sin_family = AF_INET;
-    ros_debug_destAddr1.sin_port = mpHtons(DEBUG_UDP_PORT_NUMBER);
+        status = Ros_mpNICData(i, &ip_be, &subnetmask_be, mac, &gateway_be);
+
+        if (status == OK)
+        {
+            socket[count] = mpSocket(AF_INET, SOCK_DGRAM, 0);
+            Ros_setsockopt(socket[count], SOL_SOCKET, SO_BROADCAST, (char*)&broadcastVal, sizeof(broadcastVal));
+            sin[count].sin_addr.s_addr = ip_be | (~subnetmask_be);
+            sin[count].sin_family = AF_INET;
+            sin[count].sin_port = mpHtons(DEBUG_UDP_PORT_NUMBER);
+            count++;
+        }
+    }
+    ros_debugPorts.enabledPortCount = count;
+}
+
+// This sets the host to broadcast the message only to the one port specified in the cfg file. 
+// This overwrites the behavior from Ros_Debug_Init() so it will no longer broadcast
+// to all ports. 
+void Ros_Debug_SetFromConfig()
+{
+    ULONG ip_be;
+    ULONG subnetmask_be;
+    ULONG gateway_be;
+    int broadcastVal = 1;
+    UCHAR mac[6];
+    STATUS status;
+    char message[ERROR_MSG_MAX_SIZE];
+    int* socket = ros_debugPorts.debugSocket;
+    struct sockaddr_in* sin = ros_debugPorts.destAddr;
+
+    bzero(&ros_debugPorts, sizeof(ros_debugPorts));
+
+    status = Ros_mpNICData(g_nodeConfigSettings.debug_broadcast_port, &ip_be, &subnetmask_be, mac, &gateway_be);
+
+    // This function is only called if the user specifies which port the host should broadcast to. So
+    // only one socket needs to have its information populated in this case. 
+    if (status == OK)
+    {
+        socket[0] = mpSocket(AF_INET, SOCK_DGRAM, 0);
+        Ros_setsockopt(socket[0], SOL_SOCKET, SO_BROADCAST, (char*)&broadcastVal, sizeof(broadcastVal));
+        sin[0].sin_addr.s_addr = ip_be | (~subnetmask_be);
+        sin[0].sin_family = AF_INET;
+        sin[0].sin_port = mpHtons(DEBUG_UDP_PORT_NUMBER);
+        ros_debugPorts.enabledPortCount = 1;
+    }
+    else
+    {
+        //If it fails, then disable debug broadcast and notify the user via an alarm. 
+        int ret = snprintf(message, ERROR_MSG_MAX_SIZE, "Enable LAN port %d for debug", g_nodeConfigSettings.debug_broadcast_port);
+        if (0 < ret && ret <= ERROR_MSG_MAX_SIZE)
+        {
+            mpSetAlarm(ALARM_ASSERTION_FAIL, message, SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
+        }
+        else
+        {
+            mpSetAlarm(ALARM_ASSERTION_FAIL, "Enable debug LAN port from cfg", SUBCODE_DEBUG_INIT_FAIL_MP_NICDATA);
+        }
+        g_nodeConfigSettings.debug_broadcast_enabled = FALSE;
+        ros_debugPorts.enabledPortCount = 0;
+    }
 }
 
 void Ros_Debug_BroadcastMsg(char* fmt, ...)
@@ -40,14 +110,24 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
     char str[MAX_DEBUG_MESSAGE_SIZE];
     va_list va;
 
+    if (g_nodeConfigSettings.debug_broadcast_enabled && ros_debugPorts.enabledPortCount == 0)
+    {
+        Ros_Debug_Init();
+    }
+
+    //Only exit if the broadcast is not enabled and log_to_stdout is false. The message that is built
+    //for each of those is the same, so as long as it will either be broadcast or logged to stdout,
+    //the message should be built
+    if (!g_nodeConfigSettings.debug_broadcast_enabled && !g_nodeConfigSettings.log_to_stdout)
+    {
+        return;
+    }
+
     bzero(str, MAX_DEBUG_MESSAGE_SIZE);
 
     va_start(va, fmt);
     vsnprintf(str, MAX_DEBUG_MESSAGE_SIZE, fmt, va);
     va_end(va);
-
-    if (ros_DebugSocket == -1)
-        Ros_Debug_Init();
 
     // Timestamp
     //The timestamp for the message "Found Micro-Ros PC Agent" will be the epoch time (THU 1970-01-01 00:00:00.000) as the global flags 
@@ -82,7 +162,15 @@ void Ros_Debug_BroadcastMsg(char* fmt, ...)
         memcpy(str, timestamp, timestamp_length);         
     }
 
-    mpSendTo(ros_DebugSocket, str, strlen(str), 0, (struct sockaddr*) &ros_debug_destAddr1, sizeof(struct sockaddr_in));
+    
+    if (g_nodeConfigSettings.debug_broadcast_enabled) 
+    {
+        for (int i = 0; i < ros_debugPorts.enabledPortCount; i++) 
+        {
+            mpSendTo(ros_debugPorts.debugSocket[i], str, strlen(str), 0, (struct sockaddr*)&(ros_debugPorts.destAddr[i]), sizeof(struct sockaddr_in));
+        }
+    }
+
 
     if (g_nodeConfigSettings.log_to_stdout)
         puts(str);
