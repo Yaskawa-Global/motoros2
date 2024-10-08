@@ -12,6 +12,7 @@
 
 #define MOTION_START_TIMEOUT                5000  // in milliseconds
 #define MOTION_START_CHECK_PERIOD           50  // in millisecond
+#define MOTION_START_ERROR_MESSAGE_LENGTH  256
 #define MOTION_STOP_TIMEOUT                 20
 
 typedef enum
@@ -32,7 +33,7 @@ extern BOOL Ros_MotionControl_IsRosControllingMotion();
 extern int Ros_MotionControl_GetQueueCnt(int groupNo);
 extern BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning);
 extern BOOL Ros_MotionControl_ClearQ_All();
-extern BOOL Ros_MotionControl_StartMotionMode(MOTION_MODE mode);
+extern MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_runtime_c__String* responseMessage);
 extern void Ros_MotionControl_StopTrajMode();
 
 extern BOOL Ros_MotionControl_IsMotionMode_Trajectory();
