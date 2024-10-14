@@ -1161,6 +1161,7 @@ The actual `rcl` return value is given in the text of the alarm (represented by 
 
 Info about the return value indicating an error can be found [here](https://docs.ros2.org/latest/api/rcl/types_8h_source.html).
 Some problems are user-serviceable based on the diagnoses, and others are indicative of an error within MotoROS2.
+Please reference the troubleshooting steps of the secondary alarm code for more information.
 
 If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
