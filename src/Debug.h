@@ -7,7 +7,13 @@
 
 #ifndef MOTOROS2_DEBUG_H
 #define MOTOROS2_DEBUG_H
+#if defined (YRC1000) || defined (YRC1000u)
+#define MAX_NETWORK_PORTS 2
+#else
+#define MAX_NETWORK_PORTS 1
+#endif
 
+extern void Ros_Debug_SetFromConfig();
 extern void Ros_Debug_BroadcastMsg(char* fmt, ...);
 extern void Ros_Debug_LogToConsole(char* fmt, ...);
 
