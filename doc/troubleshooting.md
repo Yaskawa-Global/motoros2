@@ -1159,7 +1159,7 @@ This alarm occurs because some call to the `rcl` or `rclc` API failed.
 The return value of type `rcl_ret_t` for some `rcl` or `rclc` API call was expected to be `RCL_RET_OK`, but the return value was instead indicative of some error.
 The actual `rcl` return value is given in the text of the alarm (represented by `xx` in the example).
 
-Info about the return value indicating an error can be found [here](https://github.com/Yaskawa-Global/micro_ros_rcl/blob/humble-motoplus1-candidate-20230624/rcl/include/rcl/types.h).
+Info about the return value indicating an error can be found [here](https://docs.ros2.org/latest/api/rcl/types_8h_source.html).
 Some problems are user-serviceable based on the diagnoses, and others are indicative of an error within MotoROS2.
 
 If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
