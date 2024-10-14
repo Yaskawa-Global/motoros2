@@ -229,10 +229,41 @@ typedef enum
     SUBCODE_RCL_RCLC_API_ERROR,
 } ALARM_RCL_RCLC_FAIL_SUBCODE; //8017
 
+/// <summary>
+/// If the condition is TRUE, raise a fatal alarm on the pendant and block further execution.
+/// </summary>
+/// <param name="mustBeTrue">Condition to validate. Assertion will occur if FALSE.</param>
+/// <param name="subCodeIfFalse">Context-specific alarm [subcode] to display on the pendant.</param>
 extern void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
+
+/// <summary>
+/// If the condition is TRUE, raise a fatal alarm on the pendant and block further execution.
+/// A context-specific message is included to help the user understand the error.
+/// </summary>
+/// <param name="mustBeTrue">Condition to validate. Assertion will occur if FALSE.</param>
+/// <param name="subCodeIfFalse">Context-specific alarm [subcode] to display on the pendant.</param>
+/// <param name="msgFmtIfFalse">Format-string msge to display to the user.</param>
 extern void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
-extern void motoRos_RCLAssertOK(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
-extern void motoRos_RCLAssertOK_withMsg(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
+
+/// <summary>
+/// Validate that an RCL return value is OK. If the return code is anything other than OK,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will
+/// indicate both a context-specific MotoROS2 code and also the RCL return code.
+/// </summary>
+/// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
+/// <param name="subCodeIfFalse">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
+extern void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
+
+/// <summary>
+/// Validate that an RCL return value is OK. If the return code is anything other than OK,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will
+/// indicate both a context-specific MotoROS2 code and also the RCL return code. An additional
+/// message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
+/// <param name="subCodeIfFalse">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
+/// <param name="msgFmtIfFalse">Format-string msge to display to the user.</param>
+extern void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
 
 extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
 extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);

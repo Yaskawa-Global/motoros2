@@ -109,24 +109,24 @@ void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCode
     }
 }
 
-void motoRos_RCLAssertOK(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
+void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
 {
-    motoRos_RCLAssertOK_withMsg(code, subCodeIfFalse, APPLICATION_NAME ": Fatal Error");
+    motoRos_RCLAssertOK_withMsg(rcl_return_code, subCodeIfFalse, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_RCLAssertOK_withMsg(int code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
+void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
 {
     char rcl_api_msg[ERROR_MSG_MAX_SIZE];
     char assert_msg[ERROR_MSG_MAX_SIZE];
 
     va_list va;
-    if (code == RCL_RET_OK)
+    if (rcl_return_code == RCL_RET_OK)
         return;
 
     bzero(rcl_api_msg, ERROR_MSG_MAX_SIZE);
     bzero(assert_msg, ERROR_MSG_MAX_SIZE);
 
-    snprintf(rcl_api_msg, ERROR_MSG_MAX_SIZE, "RCL(C) API error: %d", code);
+    snprintf(rcl_api_msg, ERROR_MSG_MAX_SIZE, "RCL(C) API error: %d", rcl_return_code);
 
     va_start(va, msgFmtIfFalse);
     vsnprintf(assert_msg, ERROR_MSG_MAX_SIZE, msgFmtIfFalse, va);
