@@ -383,7 +383,7 @@ BOOL Ros_Controller_IsMotionReady()
     BOOL bMotionReady;
 
 #ifndef DUMMY_SERVO_MODE
-    bMotionReady = Ros_Controller_GetNotReadySubcode() == MOTION_READY;
+    bMotionReady = Ros_Controller_GetNotReadySubcode(false) == MOTION_READY;
 #else
     bMotionReady = Ros_Controller_IsOperating();
 #endif
@@ -423,16 +423,8 @@ BOOL Ros_Controller_IsAnyFaultActive()
 }
 
 
-MotionNotReadyCode Ros_Controller_GetNotReadySubcode()
+MotionNotReadyCode Ros_Controller_GetNotReadySubcode(bool ignoreTractableProblems)
 {
-    // Check alarm
-    if(Ros_Controller_IsAlarm())
-        return MOTION_NOT_READY_ALARM;
-
-    // Check error
-    if(Ros_Controller_IsError())
-        return MOTION_NOT_READY_ERROR;
-
     // Check e-stop
     if(Ros_Controller_IsEStop())
         return MOTION_NOT_READY_ESTOP;
@@ -441,23 +433,19 @@ MotionNotReadyCode Ros_Controller_GetNotReadySubcode()
     if(!Ros_Controller_IsPlay())
         return MOTION_NOT_READY_NOT_PLAY;
 
-    // Check if in continuous cycle mode (Here due to being checked before starting servor power)
-    if (!Ros_Controller_IsContinuousCycle())
-        return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
-
 #ifndef DUMMY_SERVO_MODE
     // Check remote
     if(!Ros_Controller_IsRemote())
         return MOTION_NOT_READY_NOT_REMOTE;
-
-    // Check servo power
-    if(!Ros_Controller_IsServoOn())
-        return MOTION_NOT_READY_SERVO_OFF;
 #endif
 
     // Check hold
     if(Ros_Controller_IsHold())
         return MOTION_NOT_READY_HOLD;
+
+    // Check alarm
+    if (Ros_Controller_IsAlarm())
+        return MOTION_NOT_READY_ALARM;
 
     // Check PFL active
     if (Ros_Controller_IsPflActive())
@@ -467,16 +455,34 @@ MotionNotReadyCode Ros_Controller_GetNotReadySubcode()
     if (Ros_Controller_IsMpIncMoveErrorActive())
         return MOTION_NOT_READY_INC_MOVE_ERROR;
 
-    // Check operating
-    if(!Ros_Controller_IsOperating())
-        return MOTION_NOT_READY_NOT_STARTED;
+    // Check error
+    if (Ros_Controller_IsError())
+        return MOTION_NOT_READY_ERROR;
 
-    if(!Ros_Controller_MasterTaskIsJobName(g_nodeConfigSettings.inform_job_name))
+    if (Ros_Controller_IsOperating() && !Ros_Controller_MasterTaskIsJobName(g_nodeConfigSettings.inform_job_name))
         return MOTION_NOT_READY_OTHER_PROGRAM_RUNNING;
 
-    // Check ready I/O signal (should confirm wait)
-    if(!Ros_Controller_IsWaitingRos())
-        return MOTION_NOT_READY_WAITING_ROS;
+    if (!ignoreTractableProblems)
+    {
+
+        // Check if in continuous cycle mode (Here due to being checked before starting servo power)
+        if (!Ros_Controller_IsContinuousCycle())
+            return MOTION_NOT_READY_NOT_CONT_CYCLE_MODE;
+#ifndef DUMMY_SERVO_MODE
+
+        // Check servo power
+        if (!Ros_Controller_IsServoOn())
+            return MOTION_NOT_READY_SERVO_OFF;
+#endif
+
+        // Check operating
+        if (!Ros_Controller_IsOperating())
+            return MOTION_NOT_READY_NOT_STARTED;
+
+        // Check ready I/O signal (should confirm wait)
+        if (!Ros_Controller_IsWaitingRos())
+            return MOTION_NOT_READY_WAITING_ROS;
+    }
 
     return MOTION_READY;
 }

@@ -252,7 +252,7 @@ rcl_ret_t Ros_ActionServer_FJT_Goal_Received(rclc_action_goal_handle_t* goal_han
         }
         else if (!bMotionReady)
         {
-            motomanErrorCode = Ros_Controller_GetNotReadySubcode();
+            motomanErrorCode = Ros_Controller_GetNotReadySubcode(false);
             rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
                 Ros_ErrorHandling_MotionNotReadyCode_ToString((MotionNotReadyCode)motomanErrorCode));
         }
