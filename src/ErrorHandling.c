@@ -78,6 +78,50 @@ const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCo
     }
 }
 
+const char* const Ros_ErrorHandling_Init_Trajectory_Status_ToString(Init_Trajectory_Status code)
+{
+    //messages defined in motoros2_interfaces/msg/InitTrajEnum.msg
+    switch (code)
+    {
+    case INIT_TRAJ_OK:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_OK_STR;
+    case INIT_TRAJ_UNSPECIFIED:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_UNSPECIFIED_STR;
+    case INIT_TRAJ_TOO_SMALL:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_TOO_SMALL_STR;
+    case INIT_TRAJ_TOO_BIG:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_TOO_BIG_STR;
+    case INIT_TRAJ_ALREADY_IN_MOTION:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_ALREADY_IN_MOTION_STR;
+    case INIT_TRAJ_INVALID_STARTING_POS:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_STARTING_POS_STR;
+    case INIT_TRAJ_INVALID_VELOCITY:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_VELOCITY_STR;
+    case INIT_TRAJ_INVALID_JOINTNAME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_JOINTNAME_STR;
+    case INIT_TRAJ_INCOMPLETE_JOINTLIST:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INCOMPLETE_JOINTLIST_STR;
+    case INIT_TRAJ_INVALID_TIME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_TIME_STR;
+    case INIT_TRAJ_WRONG_MODE:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_MODE_STR;
+    case INIT_TRAJ_BACKWARD_TIME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_BACKWARD_TIME_STR;
+    case INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS_STR;
+    case INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES_STR;
+    case INIT_TRAJ_INVALID_ENDING_VELOCITY:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_ENDING_VELOCITY_STR;
+    case INIT_TRAJ_INVALID_ENDING_ACCELERATION:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_ENDING_ACCELERATION_STR;
+    case INIT_TRAJ_DUPLICATE_JOINT_NAME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_DUPLICATE_JOINT_NAME_STR;
+    default:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_UNSPECIFIED_STR;
+    }
+}
+
 void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
 {
     motoRosAssert_withMsg(mustBeTrue, subCodeIfFalse, APPLICATION_NAME ": Fatal Error");
