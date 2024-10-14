@@ -7,7 +7,7 @@
 
 #ifndef MOTOROS2_DEBUG_H
 #define MOTOROS2_DEBUG_H
-#if defined (YRC1000) || defined (YRC1000u)
+#if defined (YRC1000) 
 #define MAX_NETWORK_PORTS 2
 #else
 #define MAX_NETWORK_PORTS 1

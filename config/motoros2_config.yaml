@@ -102,8 +102,8 @@ sync_timeclock_with_agent: true
 # To disable auto-detection, uncomment 'userlan_monitor_port' below and set
 # it to the desired port.
 #
-# NOTE:   this setting only applies to YRC1000 and YRC1000u controllers.
-#         DX200 and FS100 controllers only have a single ethernet port, and any
+# NOTE:   this setting only applies to YRC1000 controllers. YRC1000u, DX200,
+#         and FS100 controllers only have a single ethernet port, and any
 #         value other than 1 will be ignored.
 #
 # NOTE 2: auto-detection is not perfect. It can't determine whether the Agent
@@ -309,9 +309,9 @@ publisher_qos:
 # To choose a specific port to broadcast debug messages, uncomment
 # 'debug_broadcast_port' below and set it to the desired port.
 #
-# NOTE 1:   this setting only applies to YRC1000 and YRC1000u controllers.
-#         DX200 and FS100 controllers only have a single ethernet port, and will
-#         always default to USER_LAN1
+# NOTE 1:   this setting only applies to YRC1000 controllers. YRC1000u,
+#         DX200, and FS100 controllers only have a single ethernet port,
+#         and will always default to USER_LAN1
 #
 # OPTIONS: USER_LAN1, USER_LAN2
 # DEFAULT: (all available network ports)

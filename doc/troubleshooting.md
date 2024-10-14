@@ -947,7 +947,7 @@ ALARM 8013
 The `userlan_monitor_port` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
 LAN port monitoring will be disabled for this session.
 
-On YRC1000 and YRC1000u, this must be set to either `USER_LAN1` or `USER_LAN2`.
+On YRC1000, this must be set to either `USER_LAN1` or `USER_LAN2`.
 
 No other values are supported.
 
@@ -973,7 +973,7 @@ To rule out a transient failure, reboot the controller.
 
 If the alarm is raised again, and if auto-detection is not needed or desired, make sure `userlan_monitor_port` is not commented out (ie: does not have a `#` at the start of the line) and set it to an appropriate value.
 
-On YRC1000 and YRC1000u, set it to either `USER_LAN1` or `USER_LAN2`, depending on which LAN port is used to connect the controller to the PC running the micro-ROS Agent application.
+On YRC1000, set it to either `USER_LAN1` or `USER_LAN2`, depending on which LAN port is used to connect the controller to the PC running the micro-ROS Agent application.
 
 If auto-detection is to be used, verify `agent_ip_address` is set to an IP that can be reached by MotoROS2 over the LAN port which is connected to the PC running the micro-ROS Agent application (either directly, or via a default gateway configured on the controller).
 
@@ -1053,7 +1053,7 @@ ALARM 8013
 The `debug_broadcast_port` key in the `motoros2_config.yaml` configuration file is set to an invalid value.
 Debug messages will be sent over all active network ports
 
-On YRC1000 and YRC1000u, this must be set to either `USER_LAN1` or `USER_LAN2`.
+On YRC1000, this must be set to either `USER_LAN1` or `USER_LAN2`.
 
 No other values are supported.
 
