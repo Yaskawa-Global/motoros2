@@ -101,7 +101,12 @@ typedef enum
 #define DEFAULT_IGNORE_MISSING_CALIB            FALSE
 
 #define DEFAULT_ULAN_DEBUG_BROADCAST_ENABLED     TRUE
+
+#if defined (YRC1000)
 #define DEFAULT_ULAN_DEBUG_BROADCAST_PORT        CFG_ROS_USER_LAN_ALL
+#else
+#define DEFAULT_ULAN_DEBUG_BROADCAST_PORT        CFG_ROS_USER_LAN1
+#endif
 typedef struct
 {
     //TODO(gavanderhoorn): add support for unsigned types
