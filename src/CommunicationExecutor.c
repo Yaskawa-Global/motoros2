@@ -74,7 +74,7 @@ void Ros_Communication_ConnectToAgent()
             "Must enable ETHERNET function");
     }
 
-#if defined (YRC1000) || defined (YRC1000u)
+#if defined (YRC1000)
     //Try second interface if first one didn't succeed
     if (status != OK && (status = Ros_GetMacAddress(ROS_USER_LAN2, macId)) != OK)
     {

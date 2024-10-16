@@ -151,7 +151,7 @@ void Ros_ConfigFile_SetAllDefaultValues()
             "Must enable ETHERNET function");
     }
 
-#if defined (YRC1000) || defined (YRC1000u)
+#if defined (YRC1000)
     //Try second interface if first one didn't succeed
     if (status != OK && (status = Ros_GetMacAddress(ROS_USER_LAN2, macId)) != OK)
     {
@@ -331,12 +331,12 @@ void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
                     break;
 
                 case Value_UserLanPort:
-#if defined (FS100) || defined (DX200)
+#if defined (FS100) || defined (DX200) || defined (YRC1000u)
                     // single port, override whatever was configured
                     * (Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
-                    Ros_Debug_BroadcastMsg("DX200 or FS100: override to 'USER_LAN1'");
+                    Ros_Debug_BroadcastMsg("DX200, YRC1000u, or FS100: override to 'USER_LAN1'");
 
-#elif defined (YRC1000) || defined (YRC1000u)
+#elif defined (YRC1000)
                     if (strncmp((char*)event->data.scalar.value, "USER_LAN1", 9) == 0)
                         *(Ros_UserLan_Port_Setting*)activeItem->valueToSet = CFG_ROS_USER_LAN1;
                     else if (strncmp((char*)event->data.scalar.value, "USER_LAN2", 9) == 0)
@@ -557,7 +557,7 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
         "Host on NIC check 1");
 
-#if defined (YRC1000) || defined (YRC1000u)
+#if defined (YRC1000)
     if (!bAgentOnMySubnet)
     {
         //check second lan port
@@ -652,7 +652,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
             }
         }
 
-#if defined (YRC1000) || defined (YRC1000u)
+#if defined (YRC1000)
         //on these controllers we can try the second interface, if we haven't
         //already determined we should monitor the first
         if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
@@ -688,11 +688,11 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
         //In both cases, verify it's an acceptable value.
         else
         {
-#if defined (YRC1000) || defined (YRC1000u)
+#if defined (YRC1000)
             if (g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN1 &&
                 g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN2)
 
-#elif defined (FS100) || defined (DX200)
+#elif defined (FS100) || defined (DX200)  || defined (YRC1000u)
             if (g_nodeConfigSettings.userlan_monitor_port != CFG_ROS_USER_LAN1)
 #endif
             {
@@ -710,11 +710,11 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     {
         Ros_Debug_BroadcastMsg("UserLan debug broadcast enabled, checking port setting...");
         //Check if the port setting is valid only if the debug broadcast is enabled
-#if defined (YRC1000) || defined (YRC1000u)
+#if defined (YRC1000)
         if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1 &&
             g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN2 && 
             g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN_ALL)
-#elif defined (FS100) || defined (DX200)
+#elif defined (FS100) || defined (DX200)  || defined (YRC1000u)
         if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1)
 #endif
         {
@@ -890,7 +890,7 @@ void Ros_ConfigFile_Parse()
 
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
-#if defined(YRC1000) || defined(YRC1000u)
+#if defined(YRC1000)
     // If the debug broadcast is enabled and the user chose a specific port, then 
     // we can no longer broadcast over ALL, we have to change it to only broadcast over one port
     if (g_nodeConfigSettings.debug_broadcast_enabled &&
