@@ -13,6 +13,7 @@
 // Topic, service and action server names
 //============================================
 #define TOPIC_NAME_TF "tf"
+#define TOPIC_NAME_TF_STATIC "tf_static"
 #define TOPIC_NAME_ROBOT_STATUS "robot_status"
 #define TOPIC_NAME_JOINT_STATES "joint_states"
 
