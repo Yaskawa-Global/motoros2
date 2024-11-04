@@ -168,7 +168,7 @@
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_dx200_iron\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_dx200_iron\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
@@ -216,7 +216,7 @@
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000_iron\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000_iron\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
@@ -264,7 +264,7 @@
     <NMakeForcedIncludes />
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
-    <IncludePath>$(ProjectDir)..\libmicroros_yrc1000u_iron\include;</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000u_iron\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
@@ -404,18 +404,24 @@
     <None Include="..\robot_jobs\two_arms\IONAME.DAT" />
     <None Include="DX200_humbleCompilerArguments.mps" />
     <None Include="DX200_humbleLinkerArguments.mps" />
+    <None Include="DX200_ironCompilerArguments.mps" />
+    <None Include="DX200_ironLinkerArguments.mps" />
     <None Include="YRC1000u_foxyCompilerArguments.mps" />
     <None Include="YRC1000u_foxyLinkerArguments.mps" />
     <None Include="YRC1000u_galacticCompilerArguments.mps" />
     <None Include="YRC1000u_galacticLinkerArguments.mps" />
     <None Include="YRC1000u_humbleCompilerArguments.mps" />
     <None Include="YRC1000u_humbleLinkerArguments.mps" />
+    <None Include="YRC1000u_ironCompilerArguments.mps" />
+    <None Include="YRC1000u_ironLinkerArguments.mps" />
     <None Include="YRC1000_foxyCompilerArguments.mps" />
     <None Include="YRC1000_foxyLinkerArguments.mps" />
     <None Include="YRC1000_galacticCompilerArguments.mps" />
     <None Include="YRC1000_galacticLinkerArguments.mps" />
     <None Include="YRC1000_humbleCompilerArguments.mps" />
     <None Include="YRC1000_humbleLinkerArguments.mps" />
+    <None Include="YRC1000_ironCompilerArguments.mps" />
+    <None Include="YRC1000_ironLinkerArguments.mps" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommunicationExecutor.c" />
