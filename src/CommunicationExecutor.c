@@ -180,6 +180,10 @@ void Ros_Communication_Initialize()
     Ros_Debug_BroadcastMsg("rclc_node_init_with_options = %d", (int)ret);
     motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_NODE_INIT);
 
+#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_IRON
+    ret = rcl_node_type_cache_init(&g_microRosNodeInfo.node);
+    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_NODE_TYPE_CACHE_INIT);
+#endif // MOTOPLUS_LIBMICROROS_ROS2_IS_IRON
     //we're done with it
     ret = rcl_node_options_fini(&node_options); RCL_UNUSED(ret);
     Ros_CleanupFauxArgv(faux_argv, faux_argc);
@@ -191,6 +195,12 @@ void Ros_Communication_Cleanup()
 {
     MOTOROS2_MEM_TRACE_START(comm_exec_fini);
     rcl_ret_t ret;
+
+#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_IRON
+    ret = rcl_node_type_cache_fini(&g_microRosNodeInfo.node);
+    if (ret != RCL_RET_OK)
+        Ros_Debug_BroadcastMsg("Failed cleaning up node type cache: %d", ret);
+#endif
 
     Ros_Debug_BroadcastMsg("Cleanup node");
     ret = rcl_node_fini(&g_microRosNodeInfo.node);

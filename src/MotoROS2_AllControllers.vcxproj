@@ -439,6 +439,7 @@
     <ClCompile Include="ServiceStopTrajMode.c" />
     <ClCompile Include="ServiceStartTrajMode.c" />
     <ClCompile Include="ServiceSelectMotionTool.c" />
+    <ClCompile Include="StringConversionUtilities.c" />
     <ClCompile Include="Tests_ActionServer_FJT.c" />
     <ClCompile Include="Tests_ControllerStatusIO.c" />
     <ClCompile Include="Tests_CtrlGroup.c" />
@@ -473,6 +474,7 @@
     <ClInclude Include="ServiceStopTrajMode.h" />
     <ClInclude Include="ServiceStartTrajMode.h" />
     <ClInclude Include="ServiceSelectMotionTool.h" />
+    <ClInclude Include="StringConversionUtils.h" />
     <ClInclude Include="Tests_ActionServer_FJT.h" />
     <ClInclude Include="Tests_ControllerStatusIO.h" />
     <ClInclude Include="Tests_CtrlGroup.h" />

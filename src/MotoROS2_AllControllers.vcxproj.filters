@@ -357,6 +357,9 @@
     <ClCompile Include="Tests_ActionServer_FJT.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StringConversionUtilities.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
@@ -469,6 +472,9 @@
     </ClInclude>
     <ClInclude Include="Tests_ActionServer_FJT.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringConversionUtils.h">
+      <Filter>Header Files\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -613,7 +613,7 @@ ALARM 8011
 [xx]
 ```
 
-Where `[xx]` is a subcode in the ranges `[23 - 54]` or `[56 - 58]`.
+Where `[xx]` is a subcode in the ranges `[23 - 54]`, `[56 - 58]`, or `[64]`.
 
 *Solution:*
 These alarms are often caused by version incompatibilities between ROS 2 (on the client PC), micro-ROS (as part of MotoROS2) and/or the micro-ROS Agent.
