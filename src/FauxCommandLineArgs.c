@@ -9,8 +9,6 @@
 #include <string.h>
 #include <rcutils/strdup.h>
 
-#ifndef MOTOPLUS_LIBMICROROS_ROS2_IS_IRON
-
 //TODO: Once https://github.com/ros2/rcl/issues/998 is addressed, this would no longer
 //      be necessary. We could construct rcl_remap_t instances directly without having
 //      to construct a fake argv and go through rcl_parse_arguments(..).
@@ -109,4 +107,3 @@ void Ros_CleanupFauxArgv(char** arr, size_t arr_len)
     }
 }
 
-#endif  // MOTOPLUS_LIBMICROROS_ROS2_IS_IRON
