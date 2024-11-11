@@ -1,3 +1,10 @@
+//StringConversionUtilities.c
+
+// SPDX-FileCopyrightText: 2024, Yaskawa America, Inc.
+// SPDX-FileCopyrightText: 2024, Delft University of Technology
+//
+// SPDX-License-Identifier: Apache-2.0
+
 #include "MotoROS.h"
 
 //Implementation taken from https://github.com/gcc-mirror/gcc/blob/master/libiberty/strtoll.c 
