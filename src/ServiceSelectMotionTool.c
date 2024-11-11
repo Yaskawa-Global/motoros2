@@ -83,7 +83,7 @@ void Ros_ServiceSelectMotionTool_Trigger(const void* request_msg, void* response
     }
 
     //make sure a valid tool is specified (tool_number is unsigned, so cannot be < 0)
-    if (request->tool_number >= MAX_VALID_TOOL_INDEX)
+    if (request->tool_number > MAX_VALID_TOOL_INDEX)
     {
         rosidl_runtime_c__String__assign(&response->message, motoros2_interfaces__msg__SelectionResultCodes__INVALID_SELECTION_INDEX_STR);
         response->result_code.value = motoros2_interfaces__msg__SelectionResultCodes__INVALID_SELECTION_INDEX;

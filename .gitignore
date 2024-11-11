@@ -364,3 +364,4 @@ libmicroros_yrc1000u_iron/
 
 # M+ build output
 *.out
+/libmicroros_yrc1000_iron

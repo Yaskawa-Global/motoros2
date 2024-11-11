@@ -247,12 +247,12 @@ rcl_ret_t Ros_ActionServer_FJT_Goal_Received(rclc_action_goal_handle_t* goal_han
         if (!bSizeOk)
         {
             motomanErrorCode = INIT_TRAJ_TOO_BIG;
-            rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                "Trajectory contains too many points (Not enough memory).");
+            rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, 
+                Ros_ErrorHandling_Init_Trajectory_Status_ToString((Init_Trajectory_Status) motomanErrorCode));
         }
         else if (!bMotionReady)
         {
-            motomanErrorCode = Ros_Controller_GetNotReadySubcode();
+            motomanErrorCode = Ros_Controller_GetNotReadySubcode(false);
             rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
                 Ros_ErrorHandling_MotionNotReadyCode_ToString((MotionNotReadyCode)motomanErrorCode));
         }
@@ -260,69 +260,13 @@ rcl_ret_t Ros_ActionServer_FJT_Goal_Received(rclc_action_goal_handle_t* goal_han
         {
             motomanErrorCode = INIT_TRAJ_WRONG_MODE;
             rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, 
-                "Must call " SERVICE_NAME_START_TRAJ_MODE " service.");
+                Ros_ErrorHandling_Init_Trajectory_Status_ToString((Init_Trajectory_Status) motomanErrorCode));
         }
         else if (!bInitOk)
         {
             motomanErrorCode = trajStatus;
-            switch (motomanErrorCode)
-            {
-            case INIT_TRAJ_TOO_SMALL:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Trajectory must contain at least two points.");
-                break;
-            case INIT_TRAJ_INVALID_STARTING_POS:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "The first point must match the robot's current position.");
-                break;
-            case INIT_TRAJ_INVALID_VELOCITY:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "The commanded velocity is too high.");
-                break;
-            case INIT_TRAJ_ALREADY_IN_MOTION:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Already running a trajectory.");
-                break;
-            case INIT_TRAJ_INVALID_JOINTNAME:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Invalid joint name specified. Check motoros2_config.yaml.");
-                break;
-            case INIT_TRAJ_INCOMPLETE_JOINTLIST:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Trajectory must contain data for all joints.");
-                break;
-            case INIT_TRAJ_INVALID_TIME:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Invalid time in trajectory.");
-                break;
-            case INIT_TRAJ_BACKWARD_TIME:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Trajectory message contains waypoints that are not strictly increasing in time.");
-                break;
-            case INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Trajectory did not contain position data for all axes.");
-                break;
-            case INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Trajectory did not contain velocity data for all axes.");
-                break;
-            case INIT_TRAJ_INVALID_ENDING_VELOCITY:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "The final point in the trajectory must have zero velocity.");
-                break;
-            case INIT_TRAJ_INVALID_ENDING_ACCELERATION:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "The final point in the trajectory must have zero acceleration.");
-                break;
-            case INIT_TRAJ_DUPLICATE_JOINT_NAME:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "The trajectory contains duplicate joint names.");
-                break;
-            default:
-                rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string,
-                    "Trajectory initialization failed. Generic failure.");
-            }
+            rosidl_runtime_c__String__assign(&fjt_result_response.result.error_string, 
+                Ros_ErrorHandling_Init_Trajectory_Status_ToString(trajStatus));
         }
 
         fjt_result_response.result.error_code = RESULT_REPONSE_ERROR_CODE(control_msgs__action__FollowJointTrajectory_Result__INVALID_GOAL, motomanErrorCode);

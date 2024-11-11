@@ -28,6 +28,7 @@ const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo)
     case 0x3050: return "Out of range (ABSO data)";
     case 0x3400: return "Cannot operate MASTER JOB";
     case 0x3410: return "The JOB name is already registered in another task";
+    case 0x3450: return "Servo power cannot be turned on";
     case 0x4040: return "Specified JOB not found";
     case 0x5200: return "Over data range";
     default:     return "Unspecified reason";
@@ -71,8 +72,58 @@ const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCo
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_OTHER_TRAJ_MODE_ACTIVE_STR;
     case MOTION_NOT_READY_NOT_CONT_CYCLE_MODE:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_NOT_CONT_CYCLE_MODE_STR;
+    case MOTION_NOT_READY_MAJOR_ALARM:
+        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_MAJOR_ALARM_STR;
+    case MOTION_NOT_READY_ECO_MODE:
+        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_ECO_MODE_STR;
+    case MOTION_NOT_READY_SERVO_ON_TIMEOUT:
+        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_SERVO_ON_TIMEOUT_STR;
     default:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_UNSPECIFIED_STR;
+    }
+}
+
+const char* const Ros_ErrorHandling_Init_Trajectory_Status_ToString(Init_Trajectory_Status code)
+{
+    //messages defined in motoros2_interfaces/msg/InitTrajEnum.msg
+    switch (code)
+    {
+    case INIT_TRAJ_OK:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_OK_STR;
+    case INIT_TRAJ_UNSPECIFIED:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_UNSPECIFIED_STR;
+    case INIT_TRAJ_TOO_SMALL:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_TOO_SMALL_STR;
+    case INIT_TRAJ_TOO_BIG:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_TOO_BIG_STR;
+    case INIT_TRAJ_ALREADY_IN_MOTION:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_ALREADY_IN_MOTION_STR;
+    case INIT_TRAJ_INVALID_STARTING_POS:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_STARTING_POS_STR;
+    case INIT_TRAJ_INVALID_VELOCITY:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_VELOCITY_STR;
+    case INIT_TRAJ_INVALID_JOINTNAME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_JOINTNAME_STR;
+    case INIT_TRAJ_INCOMPLETE_JOINTLIST:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INCOMPLETE_JOINTLIST_STR;
+    case INIT_TRAJ_INVALID_TIME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_TIME_STR;
+    case INIT_TRAJ_WRONG_MODE:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_MODE_STR;
+    case INIT_TRAJ_BACKWARD_TIME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_BACKWARD_TIME_STR;
+    case INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_NUMBER_OF_POSITIONS_STR;
+    case INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_WRONG_NUMBER_OF_VELOCITIES_STR;
+    case INIT_TRAJ_INVALID_ENDING_VELOCITY:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_ENDING_VELOCITY_STR;
+    case INIT_TRAJ_INVALID_ENDING_ACCELERATION:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_INVALID_ENDING_ACCELERATION_STR;
+    case INIT_TRAJ_DUPLICATE_JOINT_NAME:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_DUPLICATE_JOINT_NAME_STR;
+    default:
+        return motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_UNSPECIFIED_STR;
     }
 }
 
