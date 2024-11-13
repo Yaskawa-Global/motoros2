@@ -46,7 +46,6 @@ void Ros_ServiceQueueTrajPoint_Initialize()
     
     //--------------
     g_messages_QueueTrajPoint.response = motoros2_interfaces__srv__QueueTrajPoint_Response__create();
-    rosidl_runtime_c__String__init(&g_messages_QueueTrajPoint.response->message);
 
     //--------------
     MOTOROS2_MEM_TRACE_REPORT(svc_queue_point_init);
