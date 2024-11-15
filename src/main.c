@@ -144,8 +144,7 @@ void RosInitTask()
         if (tid == ERROR)
             mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_EXECUTOR);
 
-        Ros_Debug_BroadcastMsg("Initialization complete. Memory available: (%d) bytes. Memory in use: (%d) bytes",
-                       mpNumBytesFree(), MP_MEM_PART_SIZE - mpNumBytesFree());
+        Ros_Debug_BroadcastMsg("Initialization complete.");
 
         //==================================
         ULONG tickBefore = 0;
