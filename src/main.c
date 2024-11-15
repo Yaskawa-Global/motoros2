@@ -105,6 +105,7 @@ void RosInitTask()
     //==================================
     FOREVER
     {
+        MOTOROS2_MEM_TRACE_START(full_connection_cycle);
         Ros_Controller_StatusInit();
 
         Ros_Allocation_Initialize(&g_motoros2_Allocator);
@@ -143,8 +144,7 @@ void RosInitTask()
         if (tid == ERROR)
             mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_EXECUTOR);
 
-        Ros_Debug_BroadcastMsg("Initialization complete. Memory available: (%d) bytes. Memory in use: (%d) bytes",
-                       mpNumBytesFree(), MP_MEM_PART_SIZE - mpNumBytesFree());
+        Ros_Debug_BroadcastMsg("Initialization complete.");
 
         //==================================
         ULONG tickBefore = 0;
@@ -224,6 +224,7 @@ void RosInitTask()
         Ros_Sleep(2500);
 
         Ros_Debug_BroadcastMsg("Shutdown complete. Available memory: (%d) bytes", mpNumBytesFree());
+        MOTOROS2_MEM_TRACE_REPORT(full_connection_cycle);
     }
 }
 
