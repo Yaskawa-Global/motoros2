@@ -43,7 +43,11 @@
 #include <rmw_microros/init_options.h>
 #include <rmw_microros/timing.h>
 
+#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_JAZZY
+#include  <yaml.h>
+#else
 #include <libyaml_vendor/yaml.h>
+#endif
 
 //============================================
 // Data types for communication
