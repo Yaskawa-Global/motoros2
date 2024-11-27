@@ -177,9 +177,11 @@ namespace_tf: true
 # When using a 7 axis robot arm with an elbow joint (E) in the middle of the
 # arm, the elbow axis should be listed last (SLURBTE).
 #
-# DEFAULT: "group_x/joint_y"
+# DEFAULT:
+# - Single-group: "joint_y"
+# - Multi-group: "group_x/joint_y"
 #joint_names:
-#- [group_1/joint_1, group_1/joint_2, group_1/joint_3, group_1/joint_4, group_1/joint_5, group_1/joint_6]
+#- [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6]
 
 #-----------------------------------------------------------------------------
 # Logging settings
