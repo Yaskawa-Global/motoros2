@@ -342,6 +342,7 @@ BOOL Ros_CtrlGroup_GetFBPulsePos(CtrlGroup* ctrlGroup, long pulsePos[MAX_PULSE_A
     //      coupling. We're already (manually) applying those corrections, so we don't
     //      need the `ex` version. But if the next controller generation adds some new
     //      feature, then we should transition so that we don't have to worry about it.
+    //      See also yaskawa-global/motoros2#199.
 
     if (0 != status)
     {
