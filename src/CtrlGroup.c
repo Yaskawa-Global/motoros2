@@ -336,6 +336,14 @@ BOOL Ros_CtrlGroup_GetFBPulsePos(CtrlGroup* ctrlGroup, long pulsePos[MAX_PULSE_A
 #ifndef DUMMY_SERVO_MODE
     // get raw (uncorrected/unscaled) joint positions
     LONG status = mpGetFBPulsePos (&sData,&pulse_data);
+
+    //TODO: Consider using mpGetFBPulsePosEx. The `ex` version automatically applies
+    //      any needed corrections, such as gravity compensation and cross-axis
+    //      coupling. We're already (manually) applying those corrections, so we don't
+    //      need the `ex` version. But if the next controller generation adds some new
+    //      feature, then we should transition so that we don't have to worry about it.
+    //      See also yaskawa-global/motoros2#199.
+
     if (0 != status)
     {
         Ros_Debug_BroadcastMsg("Failed to get pulse feedback position: %u", status);
