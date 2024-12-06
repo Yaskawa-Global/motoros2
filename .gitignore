@@ -349,6 +349,9 @@ healthchecksdb
 .vscode/
 
 # M+ libmicroros distribution directories
+libmicroros_yrc1000_jazzy/
+libmicroros_yrc1000u_jazzy/
+libmicroros_dx200_jazzy/
 libmicroros_yrc1000_humble/
 libmicroros_yrc1000u_humble/
 libmicroros_dx200_humble/
@@ -361,4 +364,3 @@ libmicroros_dx200_foxy/
 
 # M+ build output
 *.out
-/libmicroros_yrc1000_iron
