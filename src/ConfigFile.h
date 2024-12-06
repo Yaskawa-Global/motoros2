@@ -33,7 +33,8 @@
 
 // NOTE: We do not prefix joints by the "motoman Grp ID" here, but use the generic
 // group & joint names instead to avoid the OEM-specific names.
-#define DEFAULT_JOINT_NAME_FMT          "group_%d/joint_%d"
+#define DEFAULT_JOINT_NAME_FMT_SINGLE  "joint_%d"
+#define DEFAULT_JOINT_NAME_FMT_MULTI   "group_%d/joint_%d"
 
 #define DEFAULT_LOG_TO_STDOUT           FALSE
 

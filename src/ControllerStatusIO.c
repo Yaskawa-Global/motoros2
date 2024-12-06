@@ -99,7 +99,14 @@ BOOL Ros_Controller_Initialize()
                 {
                     for (int jointIndex = 0; jointIndex < g_Ros_Controller.ctrlGroups[groupIndex]->numAxes; jointIndex += 1)
                     {
-                        sprintf(g_nodeConfigSettings.joint_names[(groupIndex * MP_GRP_AXES_NUM) + jointIndex], DEFAULT_JOINT_NAME_FMT, groupIndex + 1, jointIndex + 1);
+                        if (g_Ros_Controller.numGroup == 1)
+                        {
+                            sprintf(g_nodeConfigSettings.joint_names[(groupIndex * MP_GRP_AXES_NUM) + jointIndex], DEFAULT_JOINT_NAME_FMT_SINGLE, jointIndex + 1);
+                        }
+                        else
+                        {
+                            sprintf(g_nodeConfigSettings.joint_names[(groupIndex * MP_GRP_AXES_NUM) + jointIndex], DEFAULT_JOINT_NAME_FMT_MULTI, groupIndex + 1, jointIndex + 1);
+                        }
                     }
                 }
 

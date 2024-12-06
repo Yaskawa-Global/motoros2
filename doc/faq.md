@@ -135,7 +135,7 @@ Refer to [No support for asynchronous motion](../README.md#no-support-for-asynch
 
 ## Can names of joints be changed?
 
-The names used by MotoROS2 for joints (in `JointState` messages for instance) by default follow a generic naming scheme: `group_N/joint_M` (with `N` and `M` ∈ ℕ⁺: 1, 2, 3, 4, ...).
+The names used by MotoROS2 for joints (in `JointState` messages for instance) by default follow the naming scheme `joint_M` for single-group and `group_N/joint_M` for multi-group (with `N` and `M` ∈ ℕ⁺: 1, 2, 3, 4, ...).
 
 Custom joint names can be configured through the configuration file, specifically the `joint_names` key.
 This key is a list-of-lists, with each top-level list corresponding to a group, and each entry inside each list corresponding to the joint in that group.
