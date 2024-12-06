@@ -1179,3 +1179,35 @@ This will prevent the `INIT_ROS` from operating continuously and will prevent th
 
 If the problem persists, verify that the `CIOPRG.LST` ladder program is not writing to `#40050 - #40052`.
 Please contact Yaskawa Technical Support for assistance if you are not familiar with the Concurrent I/O Ladder Program.
+
+### Alarm: 8017[0]
+
+*Example:*
+
+```text
+ALARM 8017
+ RCL(C) API error: xx
+[0]
+```
+
+*Solution:*
+This alarm should always be accompanied by another alarm that specifies where the alarm occurred.
+This alarm occurs because some call to the `rcl` or `rclc` API failed.
+The return value of type `rcl_ret_t` for some `rcl` or `rclc` API call was expected to be `RCL_RET_OK`, but the return value was instead indicative of some error.
+The actual `rcl` return value is given in the text of the alarm (represented by `xx` in the example).
+
+Info about the return value indicating an error can be found [here](https://docs.ros2.org/latest/api/rcl/types_8h_source.html).
+Some problems are user-serviceable based on the diagnoses, and others are indicative of an error within MotoROS2.
+Please reference the troubleshooting steps of the secondary alarm code for more information.
+
+If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
+Describe the problem and include the following items:
+
+- `PANELBOX.LOG`
+- output from [debug-listener script](#debug-log-client) (complete and unedited)
+- version of MotoROS2
+- version of micro-ROS Agent
+- version of ROS 2 on client PC
+- copy of `motoros2_config.yaml` copied from the robot controller
+- verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).

@@ -156,7 +156,7 @@ BOOL Ros_Controller_Initialize()
         ROSIDL_GET_MSG_TYPE_SUPPORT(industrial_msgs, msg, RobotStatus),
         TOPIC_NAME_ROBOT_STATUS,
         qos_profile);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_CREATE_PUBLISHER_ROBOT_STATUS);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_CREATE_PUBLISHER_ROBOT_STATUS);
 
     //==================================
     //create message for robot status

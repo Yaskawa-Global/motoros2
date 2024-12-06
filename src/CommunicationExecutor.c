@@ -50,11 +50,11 @@ void Ros_Communication_ConnectToAgent()
     g_microRosNodeInfo.initOptions = rcl_get_zero_initialized_init_options();
 
     ret = rcl_init_options_init(&g_microRosNodeInfo.initOptions, g_motoros2_Allocator);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_OPTIONS_INIT);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_OPTIONS_INIT);
 
     Ros_Debug_BroadcastMsg("Using ROS domain ID: %d", g_nodeConfigSettings.ros_domain_id);
     ret = rcl_init_options_set_domain_id(&g_microRosNodeInfo.initOptions, g_nodeConfigSettings.ros_domain_id);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_OPTIONS_INIT_DOMAIN_ID);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_OPTIONS_INIT_DOMAIN_ID);
 
     rmw_connectionoptions = rcl_init_options_get_rmw_init_options(&g_microRosNodeInfo.initOptions);
     motoRosAssert(rmw_connectionoptions != NULL, SUBCODE_FAIL_RMW_OPTIONS_INIT);
@@ -140,7 +140,7 @@ void Ros_Communication_Initialize()
     rcl_ret_t ret = rclc_support_init_with_options(&g_microRosNodeInfo.support,
         0, NULL, &g_microRosNodeInfo.initOptions, &g_motoros2_Allocator);
     Ros_Debug_BroadcastMsg("rclc_support_init_with_options = %d", (int)ret);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_SUPPORT_INIT);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_SUPPORT_INIT);
 
     //construct a faux command line to pass to rcl_parse_arguments(..)
     char* faux_argv[MAX_REMAP_RULE_NUM];
@@ -178,7 +178,7 @@ void Ros_Communication_Initialize()
         g_nodeConfigSettings.node_namespace, &g_microRosNodeInfo.support,
         &node_options);
     Ros_Debug_BroadcastMsg("rclc_node_init_with_options = %d", (int)ret);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_NODE_INIT);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_NODE_INIT);
 
     //we're done with it
     ret = rcl_node_options_fini(&node_options); RCL_UNUSED(ret);
@@ -311,15 +311,15 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     //---------------------------------
     //Create timers
     rc = rclc_timer_init_default(&timerPingAgent, &g_microRosNodeInfo.support, RCL_MS_TO_NS(PERIOD_COMMUNICATION_PING_AGENT_MS), Ros_Communication_PingAgentConnection);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_PING, "Failed creating rclc timer (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_INIT_PING, "Failed creating rclc timer (%d)", (int)rc);
 
     rc = rclc_timer_init_default(&timerPublishActionFeedback, &g_microRosNodeInfo.support, RCL_MS_TO_NS(g_nodeConfigSettings.action_feedback_publisher_period), Ros_Communication_PublishActionFeedback);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_ACTION_FB, "Failed creating rclc timer (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_INIT_ACTION_FB, "Failed creating rclc timer (%d)", (int)rc);
 
     rc = rclc_timer_init_default(&timerMonitorUserLanState, &g_microRosNodeInfo.support,
         RCL_MS_TO_NS(PERIOD_COMMUNICATION_USERLAN_LINK_CHECK_MS),
         Ros_Communication_MonitorUserLanState);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_USERLAN_MONITOR,
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_INIT_USERLAN_MONITOR,
         "Failed creating rclc timer (%d)", (int)rc);
 
     //---------------------------------
@@ -328,13 +328,13 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     executor_motion_control = rclc_executor_get_zero_initialized_executor();
 
     rc = rclc_executor_init(&executor_motion_control, &g_microRosNodeInfo.support.context, QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR, &g_motoros2_Allocator);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_CREATE_MOTION_EXECUTOR, "Failed creating motion control executor (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_CREATE_MOTION_EXECUTOR, "Failed creating motion control executor (%d)", (int)rc);
 
     rclc_executor_t executor_io_control;
     executor_io_control = rclc_executor_get_zero_initialized_executor();
 
     rc = rclc_executor_init(&executor_io_control, &g_microRosNodeInfo.support.context, QUANTITY_OF_HANDLES_FOR_IO_EXECUTOR, &g_motoros2_Allocator);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_CREATE_IO_EXECUTOR, "Failed creating I/O control executor (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_CREATE_IO_EXECUTOR, "Failed creating I/O control executor (%d)", (int)rc);
 
     //==========================================================
     //Add entities to motion executor
@@ -342,15 +342,15 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     // WARNING: Be sure to update QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR
     //
     rc = rclc_executor_add_timer(&executor_motion_control, &timerPingAgent);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_ADD_PING, "Failed adding timer (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_ADD_PING, "Failed adding timer (%d)", (int)rc);
 
     rc = rclc_executor_add_timer(&executor_motion_control, &timerPublishActionFeedback);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_ADD_ACTION_FB, "Failed adding timer (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_ADD_ACTION_FB, "Failed adding timer (%d)", (int)rc);
 
     //NOTE: add userlan monitor timer to the io executor, to prevent timerPingAgent
     //from blocking it in case agent connection is lost (ie: ping needs to time out)
     rc = rclc_executor_add_timer(&executor_io_control, &timerMonitorUserLanState);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_ADD_USERLAN_MONITOR,
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_ADD_USERLAN_MONITOR,
         "Failed adding timer (%d)", (int)rc);
 
     rc = rclc_executor_add_action_server(&executor_motion_control,
@@ -361,37 +361,37 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
         Ros_ActionServer_FJT_Goal_Received,
         Ros_ActionServer_FJT_Goal_Cancel,
         &g_actionServerFollowJointTrajectory);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_FJT_SERVER, "Failed adding FJT server (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_FJT_SERVER, "Failed adding FJT server (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_motion_control, &g_serviceStopTrajMode, &g_messages_StopTrajMode.request,
         &g_messages_StopTrajMode.response, Ros_ServiceStopTrajMode_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_STOP_TRAJ, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_STOP_TRAJ, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_motion_control, &g_serviceResetError, &g_messages_ResetError.request,
         &g_messages_ResetError.response, Ros_ServiceResetError_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_RESET_ERROR, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_RESET_ERROR, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_motion_control, &g_serviceStartTrajMode, &g_messages_StartTrajMode.request,
         &g_messages_StartTrajMode.response, Ros_ServiceStartTrajMode_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_START_TRAJ_MODE, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_START_TRAJ_MODE, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_motion_control, &g_serviceStartPointQueueMode, &g_messages_StartPointQueueMode.request,
         &g_messages_StartPointQueueMode.response, Ros_ServiceStartPointQueueMode_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_START_QUEUE_MODE, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_START_QUEUE_MODE, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_motion_control, &g_serviceQueueTrajPoint, g_messages_QueueTrajPoint.request,
         g_messages_QueueTrajPoint.response, Ros_ServiceQueueTrajPoint_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_QUEUE_POINT, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_QUEUE_POINT, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_motion_control, &g_serviceSelectMotionTool, &g_messages_SelectMotionTool.request,
         &g_messages_SelectMotionTool.response, Ros_ServiceSelectMotionTool_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_SELECT_MOTION_TOOL, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_SELECT_MOTION_TOOL, "Failed adding service (%d)", (int)rc);
 
     //==========================================================
     //Add entities to I/O executor
@@ -402,32 +402,32 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     rc = rclc_executor_add_service(
         &executor_io_control, &g_serviceReadSingleIO, &g_messages_ReadWriteIO.req_single_io_read,
         &g_messages_ReadWriteIO.resp_single_io_read, Ros_ServiceReadSingleIO_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_READ_SINGLE_IO, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_READ_SINGLE_IO, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_io_control, &g_serviceReadGroupIO, &g_messages_ReadWriteIO.req_group_io_read,
         &g_messages_ReadWriteIO.resp_group_io_read, Ros_ServiceReadGroupIO_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_READ_GROUP_IO, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_READ_GROUP_IO, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_io_control, &g_serviceWriteSingleIO, &g_messages_ReadWriteIO.req_single_io_write,
         &g_messages_ReadWriteIO.resp_single_io_write, Ros_ServiceWriteSingleIO_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_WRITE_SINGLE_IO, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_WRITE_SINGLE_IO, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_io_control, &g_serviceWriteGroupIO, &g_messages_ReadWriteIO.req_group_io_write,
         &g_messages_ReadWriteIO.resp_group_io_write, Ros_ServiceWriteGroupIO_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_WRITE_GROUP_IO, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_WRITE_GROUP_IO, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_io_control, &g_serviceReadMRegister, &g_messages_ReadWriteIO.req_mreg_read,
         &g_messages_ReadWriteIO.resp_mreg_read, Ros_ServiceReadMRegister_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_READ_M_REG, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_READ_M_REG, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
         &executor_io_control, &g_serviceWriteMRegister, &g_messages_ReadWriteIO.req_mreg_write,
         &g_messages_ReadWriteIO.resp_mreg_write, Ros_ServiceWriteMRegister_Trigger);
-    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_ADD_SERVICE_WRITE_M_REG, "Failed adding service (%d)", (int)rc);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_WRITE_M_REG, "Failed adding service (%d)", (int)rc);
 
     //===========================================================
 

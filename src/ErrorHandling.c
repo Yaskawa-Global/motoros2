@@ -134,8 +134,7 @@ void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
 
 void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
 {
-    const int MAX_MSG_LEN = 32;
-    char msg[MAX_MSG_LEN];
+    char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
 
     if (mustBeTrue)
@@ -143,10 +142,10 @@ void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCode
         return;
     }
 
-    bzero(msg, MAX_MSG_LEN);
+    bzero(msg, ERROR_MSG_MAX_SIZE);
 
     va_start(va, msgFmtIfFalse);
-    vsnprintf(msg, MAX_MSG_LEN, msgFmtIfFalse, va);
+    vsnprintf(msg, ERROR_MSG_MAX_SIZE, msgFmtIfFalse, va);
     va_end(va);
 
     Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
@@ -157,6 +156,43 @@ void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCode
     FOREVER
     {
         Ros_Debug_BroadcastMsg("motoRosAssert: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Sleep(5000);
+    }
+}
+
+void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
+{
+    motoRos_RCLAssertOK_withMsg(rcl_return_code, subCodeIfFalse, APPLICATION_NAME ": Fatal Error");
+}
+
+void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
+{
+    char rcl_api_msg[ERROR_MSG_MAX_SIZE];
+    char assert_msg[ERROR_MSG_MAX_SIZE];
+
+    va_list va;
+    if (rcl_return_code == RCL_RET_OK)
+        return;
+
+    bzero(rcl_api_msg, ERROR_MSG_MAX_SIZE);
+    bzero(assert_msg, ERROR_MSG_MAX_SIZE);
+
+    snprintf(rcl_api_msg, ERROR_MSG_MAX_SIZE, "RCL(C) API error: %d", rcl_return_code);
+
+    va_start(va, msgFmtIfFalse);
+    vsnprintf(assert_msg, ERROR_MSG_MAX_SIZE, msgFmtIfFalse, va);
+    va_end(va);
+
+    Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
+    Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE);
+
+    mpSetAlarm(ALARM_RCL_RCLC_FAIL, rcl_api_msg, SUBCODE_RCL_RCLC_API_ERROR);
+    mpSetAlarm(ALARM_ASSERTION_FAIL, assert_msg, subCodeIfFalse);
+
+    FOREVER
+    {
+        Ros_Debug_BroadcastMsg("motoRos_RCLAssertOK: %s (alarm code: %d) (subcode: %d)", rcl_api_msg, ALARM_RCL_RCLC_FAIL, SUBCODE_RCL_RCLC_API_ERROR);
+        Ros_Debug_BroadcastMsg("motoRos_RCLAssertOK: %s (alarm code: %d) (subcode: %d)", assert_msg, ALARM_ASSERTION_FAIL, subCodeIfFalse);
         Ros_Sleep(5000);
     }
 }

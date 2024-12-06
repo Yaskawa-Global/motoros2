@@ -21,7 +21,7 @@ void Ros_ServiceStartPointQueueMode_Initialize()
     rcl_ret_t ret = rclc_service_init_default(&g_serviceStartPointQueueMode, &g_microRosNodeInfo.node,
         ROSIDL_GET_SRV_TYPE_SUPPORT(motoros2_interfaces, srv, StartPointQueueMode),
         SERVICE_NAME_START_POINT_QUEUE_MODE);
-    motoRosAssert_withMsg(ret == RCL_RET_OK, SUBCODE_FAIL_INIT_SERVICE_START_QUEUE_MODE, "Failed to init service (%d)", (int)ret);
+    motoRos_RCLAssertOK_withMsg(ret, SUBCODE_FAIL_INIT_SERVICE_START_QUEUE_MODE, "Failed to init service (%d)", (int)ret);
 
     rosidl_runtime_c__String__init(&g_messages_StartPointQueueMode.response.message);
 

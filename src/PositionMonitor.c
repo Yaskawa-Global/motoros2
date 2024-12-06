@@ -59,7 +59,7 @@ static void Ros_PositionMonitor_Initialize_GlobalJointStatePublisher(rmw_qos_pro
         ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
         TOPIC_NAME_JOINT_STATES,
         qos_profile);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_CREATE_PUBLISHER_JOINT_STATE_ALL);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_CREATE_PUBLISHER_JOINT_STATE_ALL);
 
     //create message for aggregate joint state of all groups
     g_messages_PositionMonitor.jointStateAllGroups = sensor_msgs__msg__JointState__create();
@@ -115,7 +115,7 @@ static void Ros_PositionMonitor_Initialize_PerGroupJointStatePublisher(rmw_qos_p
         ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
         formatBuffer,
         qos_profile);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_CREATE_PUBLISHER_JOINT_STATE);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_CREATE_PUBLISHER_JOINT_STATE);
 
     //create message for per-group joint states
     ctrlGroup->msgJointState = sensor_msgs__msg__JointState__create();
@@ -179,7 +179,7 @@ static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* 
         ROSIDL_GET_MSG_TYPE_SUPPORT(tf2_msgs, msg, TFMessage),
         formatBuffer,
         qos_profile);
-    motoRosAssert(ret == RCL_RET_OK, SUBCODE_FAIL_CREATE_PUBLISHER_TRANSFORM);
+    motoRos_RCLAssertOK(ret, SUBCODE_FAIL_CREATE_PUBLISHER_TRANSFORM);
 
     //--------------
     //create message for cartesian transform
