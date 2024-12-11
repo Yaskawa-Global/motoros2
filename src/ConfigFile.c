@@ -527,7 +527,7 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     //-----------------------------------------
     //Verify domain ID is legal
     //
-    //See also https://docs.ros.org/en/humble/Concepts/About-Domain-ID.html
+    //See also https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Domain-ID.html
     //
     //NOTE: the ROS 2 documentation explains different OS have different
     //      sets of legal values. We'll assume the same as the

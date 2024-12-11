@@ -159,8 +159,8 @@ To calculate the MD5 hash on Debian/Ubuntu for the main MotoROS2 binary, run the
 
 ```shell
 $ cd /path/to/where/the/binary/was/saved
-$ md5sum -b mr2_yrc1_h.out
-e2d088b765a0bfed501aa213a1be1de0  mr2_yrc1_h.out
+$ md5sum -b mr2_yrc1_j.out
+[TODO]  mr2_yrc1_j.out
 ```
 
 Compare the output of `md5sum` when run against the binary downloaded in the previous section ([Downloading the files](#downloading-the-files)) with the values listed in the following table.
@@ -171,12 +171,15 @@ The values must match *exactly*.
 | DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.3`    | `a9a9e10403f726062c25d97654fad316` |
 | DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.3`    | `e8db7512215da240b28b985f2f2af98b` |
 | DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.3`    | `611bda537655cf8a60d85600da6043f4` |
+| DX200         | Jazzy            | `mr2_dx2_j.out`   | `TODO`     | `TODO`                             |
 | YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.3`    | `84bfb44e2043372127d9dfc1157a79b5` |
 | YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.3`    | `866e090b6c724429ce03117712c951f4` |
 | YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.3`    | `e2d088b765a0bfed501aa213a1be1de0` |
+| YRC1000       | Jazzy            | `mr2_yrc1_j.out`  | `TODO`     | `TODO`                             |
 | YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.3`    | `027e77b427a212aa63e5d7962d48ad92` |
 | YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.3`    | `042d753a7729784fec8c5c23bef3e685` |
 | YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.3`    | `c0e61adbf5bf6fd6a734211f15bb0f0a` |
+| YRC1000micro  | Jazzy            | `mr2_yrc1m_j.out` | `TODO`     | `TODO`                             |
 
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
@@ -452,7 +455,6 @@ This procedure is rather involved, so only do this if the pre-configured Docker 
 The following sections show how to build the Jazzy version of the Agent in a dedicated workspace (adapt the paths used below if a different workspace should be used instead).
 
 Note: always make sure to use a version of the Agent which corresponds to the version of ROS 2 that is being used.
-For ROS 2 Foxy, checkout the `foxy` branch.
 For ROS 2 Humble, checkout the `humble` branch.
 For ROS 2 Jazzy, checkout the `jazzy` branch.
 
@@ -487,7 +489,7 @@ The Agent application will only need to be built *once*, unless it needs to be u
 Finally, to run the Agent:
 
 ```shell
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 source $HOME/micro_ros_agent_ws/install/local_setup.bash
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 ```
