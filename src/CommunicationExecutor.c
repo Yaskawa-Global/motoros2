@@ -310,6 +310,9 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
 
     //---------------------------------
     //Create timers
+    // rclc_timer_init_default(..) was replaced with rclc_timer_init_default2(..)
+    // in Jazzy, which has a different set of parameters. Call the correct version
+    // based on what this is being compiled for
 #ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_JAZZY
     rc = rclc_timer_init_default2(&timerPingAgent, &g_microRosNodeInfo.support, RCL_MS_TO_NS(PERIOD_COMMUNICATION_PING_AGENT_MS), Ros_Communication_PingAgentConnection, true);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_PING, "Failed creating rclc timer (%d)", (int)rc);
