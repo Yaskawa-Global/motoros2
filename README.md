@@ -429,6 +429,7 @@ Choose one or the other.
 The command shown here starts the `jazzy` version of the `micro-ros-agent` Docker image.
 However, always make sure to use a version of the Agent image which corresponds to the version of ROS 2 that is being used.
 
+With ROS 2 Foxy, use `microros/micro-ros-agent:foxy`.
 With ROS 2 Humble, use `microros/micro-ros-agent:humble`.
 With ROS 2 Jazzy, use `microros/micro-ros-agent:jazzy`.
 
@@ -455,6 +456,7 @@ This procedure is rather involved, so only do this if the pre-configured Docker 
 The following sections show how to build the Jazzy version of the Agent in a dedicated workspace (adapt the paths used below if a different workspace should be used instead).
 
 Note: always make sure to use a version of the Agent which corresponds to the version of ROS 2 that is being used.
+For ROS 2 Foxy, checkout the `foxy` branch.
 For ROS 2 Humble, checkout the `humble` branch.
 For ROS 2 Jazzy, checkout the `jazzy` branch.
 
