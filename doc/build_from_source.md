@@ -39,7 +39,7 @@ E.g. `libmicroros_yrc1000_jazzy`.
 
 Move the folder containing `libmicroros` and the headers inside the folder with the Visual Studio solution (ie: `MotoROS2.sln`).
 
-Example showing where `libmicroros_yrc1000_jazzy` should be moved for a Jazzy build of MotoROS2 targeting a YRC1000 controller:
+Example showing where `libmicroros_yrc1000_jazzy` should be moved for a Jazzy build of MotoROS2 targetting a YRC1000 controller:
 
 ```text
 motoros2
