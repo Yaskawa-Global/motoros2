@@ -703,7 +703,7 @@ goal_complete_skip_tolerance_comparison: ;
                     if (violators[axis])
                     {
                         char formatBuffer[64] = { 0 };
-                        snprintf(formatBuffer, 64, " [%s: %d deviation]",
+                        snprintf(formatBuffer, 64, " [%s: %.5f deviation]",
                             feedback_FollowJointTrajectory.feedback.joint_names.data[axis].data,
                             violators[axis]);
                         strcat(msgBuffer, formatBuffer);
