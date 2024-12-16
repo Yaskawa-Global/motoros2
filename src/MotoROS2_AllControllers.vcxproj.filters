@@ -333,6 +333,12 @@
     <ClCompile Include="RosMotoPlusConversionUtils.c">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_ActionServer_FJT.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticTransformBroadcaster.c">
+      <Filter>Source Files\Topics and Publishers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
@@ -425,9 +431,6 @@
     <ClInclude Include="RosMotoPlusConversionUtils.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="MotoPlusExterns.h">
-      <Filter>Header Files\Robot Controller</Filter>
-    </ClInclude>
     <ClInclude Include="InformCheckerAndGenerator.h">
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
@@ -442,6 +445,15 @@
     </ClInclude>
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h">
       <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\MotoPlusExterns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_ActionServer_FJT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticTransformBroadcaster.h">
+      <Filter>Header Files\Topics and Publishers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

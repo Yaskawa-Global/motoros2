@@ -88,6 +88,7 @@
 #include "CtrlGroup.h"
 #include "ControllerStatusIO.h"
 #include "PositionMonitor.h"
+#include "StaticTransformBroadcaster.h"
 #include "ServiceQueueTrajPoint.h"
 #include "ServiceReadWriteIO.h"
 #include "ServiceResetError.h"
