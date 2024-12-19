@@ -30,7 +30,6 @@ BOOL Ros_MotionControl_MustInitializePointQueue = TRUE; //first point of streami
 Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence* sequenceGoalJointNames, trajectory_msgs__msg__JointTrajectoryPoint__Sequence* sequenceOfPoints)
 {
     long pulsePos[MAX_PULSE_AXES];
-    long curPos[MAX_PULSE_AXES];
     int grpIndex, jointIndexInTraj, pointIndex, checkForDupIndex;
 
     //Verify we're not already running a trajectory
@@ -186,7 +185,6 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
         //Convert start position to pulse format
         // ctrlGroup->prevTrajectoryIterator->pos is already in moto joint order
         Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, ctrlGroup->prevTrajectoryIterator->pos, pulsePos);
-        Ros_CtrlGroup_GetPulsePosCmd(ctrlGroup, curPos);
 
         // Initialize prevPulsePos to the current position
         Ros_CtrlGroup_GetPulsePosCmd(ctrlGroup, ctrlGroup->prevPulsePos);
@@ -195,18 +193,14 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
         for (int i = 0; i < MAX_PULSE_AXES; i++)
         {
             // Check if position matches current command position
-            if (abs(pulsePos[i] - curPos[i]) > START_MAX_PULSE_DEVIATION)
+            if (abs(pulsePos[i] - ctrlGroup->prevPulsePos[i]) > START_MAX_PULSE_DEVIATION)
             {
                 Ros_Debug_BroadcastMsg("ERROR: Trajectory start position doesn't match current position (MOTO joint order).");
                 Ros_Debug_BroadcastMsg(" - Requested start: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
                     pulsePos[0], pulsePos[1], pulsePos[2],
                     pulsePos[3], pulsePos[4], pulsePos[5],
                     pulsePos[6], pulsePos[7]);
-                Ros_Debug_BroadcastMsg(" - Current pos: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
-                    curPos[0], curPos[1], curPos[2],
-                    curPos[3], curPos[4], curPos[5],
-                    curPos[6], curPos[7]);
-                Ros_Debug_BroadcastMsg(" - ctrlGroup->prevPulsePos: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
+                Ros_Debug_BroadcastMsg(" - Current position: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
                     ctrlGroup->prevPulsePos[0], ctrlGroup->prevPulsePos[1], ctrlGroup->prevPulsePos[2],
                     ctrlGroup->prevPulsePos[3], ctrlGroup->prevPulsePos[4], ctrlGroup->prevPulsePos[5],
                     ctrlGroup->prevPulsePos[6], ctrlGroup->prevPulsePos[7]);
