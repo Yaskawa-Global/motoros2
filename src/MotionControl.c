@@ -1219,14 +1219,7 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
     // Check that background processing of message has been stopped
     for (checkCnt = 0; checkCnt < MOTION_STOP_TIMEOUT; checkCnt++)
     {
-        BOOL bAtLeastOne = FALSE;
-        for (int i = 0; i < g_Ros_Controller.numGroup; i += 1)
-        {
-            if (g_Ros_Controller.ctrlGroups[i]->hasDataToProcess)
-                bAtLeastOne = TRUE;
-        }
-
-        if (!bAtLeastOne)
+        if (!Ros_MotionControl_HasDataToProcess())
         {
             bStopped = TRUE;
             break;
