@@ -1254,8 +1254,6 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
 //-------------------------------------------------------------------
 BOOL Ros_MotionControl_ClearQ_All()
 {
-    BOOL bRet = TRUE;
-
     for (int groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo++)
     {
         // Stop addtional items from being added to the queue
@@ -1273,9 +1271,14 @@ BOOL Ros_MotionControl_ClearQ_All()
             // Unlock the q
             mpSemGive(q->q_lock);
         }
+        else
+        {
+            Ros_Debug_BroadcastMsg("ERROR: Unable to clear queue.  Queue is locked up! (Group #%d)", groupNo);
+            return FALSE;
+        }
     }
 
-    return bRet;
+    return TRUE;
 }
 
 // only for this compilation unit for now
@@ -1507,10 +1510,11 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
     if (Ros_MotionControl_HasDataInQueue())
     {
         Ros_Debug_BroadcastMsg("%s: clearing leftover data in queue", __func__);
-        Ros_MotionControl_ClearQ_All();
 
-        if (Ros_MotionControl_HasDataInQueue())
+        if (Ros_MotionControl_ClearQ_All())
+        {
             Ros_Debug_BroadcastMsg("%s: WARNING: still data in queue", __func__);
+        }
     }
 
     // have to initialize the prevPulsePos that will be used when interpolating the traj
