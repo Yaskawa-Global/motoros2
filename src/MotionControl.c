@@ -360,14 +360,8 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
         if (Ros_MotionControl_AllGroupsInitComplete)
         {
             // if there is no message to process, delay and try again
-            if (ctrlGroup->hasDataToProcess && ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
+            if (!g_Ros_Controller.bStopMotion && ctrlGroup->hasDataToProcess && ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
             {
-                if (g_Ros_Controller.bStopMotion)
-                {
-                    bzero(ctrlGroup->trajectoryToProcess, sizeof(ctrlGroup->trajectoryToProcess));
-                    ctrlGroup->hasDataToProcess = FALSE;
-                    continue;
-                }
 
                 Ros_Debug_BroadcastMsg("Processing next point in trajectory [Group #%d - T=%.3f: (%7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f)]",
                     ctrlGroup->groupNo, (double)ctrlGroup->trajectoryIterator->time * 0.001,
@@ -559,7 +553,7 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
             } // IF this group has a point to process
             else
             {
-                if (Ros_MotionControl_IsMotionMode_Trajectory())
+                if (g_Ros_Controller.bStopMotion || Ros_MotionControl_IsMotionMode_Trajectory())
                 {
                     bzero(ctrlGroup->trajectoryToProcess, sizeof(ctrlGroup->trajectoryToProcess));
                     ctrlGroup->hasDataToProcess = FALSE;
@@ -1045,7 +1039,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
 
                 Ros_ActionServer_FJT_UpdateProgressTracker(&moveData);
             }
-            else
+            else 
                 ret = 0;
 
             if (ret != 0)
@@ -1224,7 +1218,7 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
             bStopped = TRUE;
             break;
         }
-        else
+        else 
             Ros_Sleep(1);
     }
 
