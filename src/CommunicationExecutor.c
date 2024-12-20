@@ -310,6 +310,22 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
 
     //---------------------------------
     //Create timers
+    // rclc_timer_init_default(..) was replaced with rclc_timer_init_default2(..)
+    // in Jazzy, which has a different set of parameters. Call the correct version
+    // based on what this is being compiled for
+#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_JAZZY
+    rc = rclc_timer_init_default2(&timerPingAgent, &g_microRosNodeInfo.support, RCL_MS_TO_NS(PERIOD_COMMUNICATION_PING_AGENT_MS), Ros_Communication_PingAgentConnection, true);
+    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_PING, "Failed creating rclc timer (%d)", (int)rc);
+
+    rc = rclc_timer_init_default2(&timerPublishActionFeedback, &g_microRosNodeInfo.support, RCL_MS_TO_NS(g_nodeConfigSettings.action_feedback_publisher_period), Ros_Communication_PublishActionFeedback, true);
+    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_ACTION_FB, "Failed creating rclc timer (%d)", (int)rc);
+
+    rc = rclc_timer_init_default2(&timerMonitorUserLanState, &g_microRosNodeInfo.support,
+        RCL_MS_TO_NS(PERIOD_COMMUNICATION_USERLAN_LINK_CHECK_MS),
+        Ros_Communication_MonitorUserLanState, true);
+    motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_USERLAN_MONITOR,
+        "Failed creating rclc timer (%d)", (int)rc);
+#else
     rc = rclc_timer_init_default(&timerPingAgent, &g_microRosNodeInfo.support, RCL_MS_TO_NS(PERIOD_COMMUNICATION_PING_AGENT_MS), Ros_Communication_PingAgentConnection);
     motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_INIT_PING, "Failed creating rclc timer (%d)", (int)rc);
 
@@ -321,7 +337,7 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
         Ros_Communication_MonitorUserLanState);
     motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_TIMER_INIT_USERLAN_MONITOR,
         "Failed creating rclc timer (%d)", (int)rc);
-
+#endif
     //---------------------------------
     //Create executors
     rclc_executor_t executor_motion_control;
