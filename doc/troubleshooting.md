@@ -466,19 +466,15 @@ Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoro
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
 ### Alarm: 8011[15]
-
 *Example:*
-
 ```text
 ALARM 8011
  Domain ID (x) invalid
 [15]
 ```
-
 *Solution:*
 The `ros_domain_id` key must be configured in the `motoros2_config.yaml` configuration file.
 The value must be between `0` and `101`.
-
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
 ### Alarm: 8011[16]

@@ -235,88 +235,265 @@ typedef enum
     SUBCODE_RCL_RCLC_API_ERROR,
 } ALARM_RCL_RCLC_FAIL_SUBCODE; //8017
 
-#define motoRos_ASSERT_TRUE(mustBeTrue,subCodeIfFalse) \
-    _motoRos_ASSERT_TRUE(mustBeTrue, subCodeIfFalse, #mustBeTrue)
+/// <summary>
+/// Validate that a value is truthy. If the value is falsy, then raise a fatal alarm on the pendant 
+/// and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="mustBeTrue">Value to verify is truthy. Alarm will occur if not truthy.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_TRUE(mustBeTrue,subCodeOnFailure) \
+    _motoRos_ASSERT_TRUE(mustBeTrue, subCodeOnFailure, #mustBeTrue)
 
-#define motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse,msgFmtIfFalse, ...) \
-    _motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeIfFalse, #mustBeTrue, msgFmtIfFalse, ##__VA_ARGS__)
+/// <summary>
+/// Validate that a value is truthy. If the value is falsy, then raise a fatal alarm on the pendant 
+/// and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="mustBeTrue">Value to verify is truthy. Alarm will occur if not truthy.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
+#define motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeOnFailure,msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeOnFailure, #mustBeTrue, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_FALSE(mustBeFalse, subCodeIfTrue) \
-    _motoRos_ASSERT_FALSE(mustBeFalse, subCodeIfTrue, #mustBeFalse)
+/// <summary>
+/// Validate that a value is falsy. If the value is truthy, then raise a fatal alarm on the pendant 
+/// and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="mustBeFalse">Value to verify is falsy. Alarm will occur if not falsy.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_FALSE(mustBeFalse, subCodeOnFailure) \
+    _motoRos_ASSERT_FALSE(mustBeFalse, subCodeOnFailure, #mustBeFalse)
 
-#define motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, msgFmtIfTrue, ...) \
-    _motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeIfTrue, #mustBeFalse, msgFmtIfTrue, ##__VA_ARGS__)
+/// <summary>
+/// Validate that a value is falsy. If the value is truthy, then raise a fatal alarm on the pendant 
+/// and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="mustBeFalse">Value to verify is falsy. Alarm will occur if not falsy.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
+#define motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeOnFailure, #mustBeFalse, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeIfFalse) \
-    _motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+/// <summary>
+/// Validate that a value is equal to the expected value. If the value is not equal to the expected value,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will indicate a 
+/// context-specific MotoROS2 code.
+/// </summary>
+/// <param name="actual">Value to check for equality with "expected".</param>
+/// <param name="expected">Expected value that is being checked for equality with "actual" value.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeOnFailure) \
+    _motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeOnFailure, #actual, #expected)
 
-#define motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
-    _motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+/// <summary>
+/// Validate that a value is equal to the expected value. If the value is not equal to the expected value,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will indicate a 
+/// context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="actual">Value to check for equality with "expected".</param>
+/// <param name="expected">Expected value that is being checked for equality with "actual" value.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
+#define motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeOnFailure, #actual, #expected, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_NOT_EQUAL_INT(actual, expected, subCodeIfFalse) \
-    _motoRos_ASSERT_NOT_EQUAL_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+/// <summary>
+/// Validate that a value is NOT equal to a given invalid value. If the value is equal to the invalid value,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will indicate a 
+/// context-specific MotoROS2 code.
+/// </summary>
+/// <param name="actual">Value to validate is not equal to "invalid" value.</param>
+/// <param name="invalid">Invalid value that is being checked against "actual" value.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_NOT_EQUAL_INT(actual, invalid, subCodeOnFailure) \
+    _motoRos_ASSERT_NOT_EQUAL_INT(actual, invalid, subCodeOnFailure, #actual, #invalid)
 
-#define motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
-    _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+/// <summary>
+/// Validate that a value is NOT equal to a given invalid value. If the value is equal to the invalid value,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will indicate a 
+/// context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="actual">Value to validate is not equal to "invalid" value.</param>
+/// <param name="invalid">Invalid value that is being checked against "actual" value.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display to display if the assertion fails".</param>
+#define motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, invalid, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, invalid, subCodeOnFailure, #actual, #invalid, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse) \
-    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse, #actual, #expected)
 
-#define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
-    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+/// <summary>
+/// Validate that an integer value is greater than or equal to a given threshold value. If the value is not 
+/// greater than or equal to the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is greater than or equal to "threshold".</param>
+/// <param name="threshold">Minimum value that "actual" must be equal to or greater than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure) \
+    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
 
-#define motoRos_ASSERT_GREATER_THAN_INT(actual, expected, subCodeIfFalse) \
-    _motoRos_ASSERT_GREATER_THAN_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+/// <summary>
+/// Validate that an integer value is greater than or equal to a given threshold value. If the value is not 
+/// greater than or equal to the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is greater than or equal to "threshold".</param>
+/// <param name="threshold">Minimum value that "actual" must be equal to or greater than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
+#define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
-    _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+/// <summary>
+/// Validate that an integer value is greater than a given threshold value. If the value is not 
+/// greater than the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is greater than "threshold".</param>
+/// <param name="threshold">Minimum value that "actual" must be greater than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_GREATER_THAN_INT(actual, threshold, subCodeOnFailure) \
+    _motoRos_ASSERT_GREATER_THAN_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
 
-#define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse) \
-    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+/// <summary>
+/// Validate that an integer value is greater than a given threshold value. If the value is not 
+/// greater than the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is greater than "threshold".</param>
+/// <param name="threshold">Minimum value that "actual" must be greater than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
+#define motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
-    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+/// <summary>
+/// Validate that an integer value is less than or equal to a given threshold value. If the value is not 
+/// less than or equal to the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is less than or equal to "threshold".</param>
+/// <param name="threshold">Maximum value that "actual" must be equal to or less than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure) \
+    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
 
-#define motoRos_ASSERT_LESS_THAN_INT(actual, expected, subCodeIfFalse) \
-    _motoRos_ASSERT_LESS_THAN_INT(actual, expected, subCodeIfFalse, #actual, #expected)
+/// <summary>
+/// Validate that an integer value is less than or equal to a given threshold value. If the value is not 
+/// less than or equal to the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is less than or equal to "threshold".</param>
+/// <param name="threshold">Maximum value that "actual" must be equal to or less than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
+#define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, msgFmtIfFalse, ...) \
-    _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, expected, subCodeIfFalse, #actual, #expected, msgFmtIfFalse, ##__VA_ARGS__)
+/// <summary>
+/// Validate that an integer value is less than a given threshold value. If the value is not 
+/// less than the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is less than "threshold".</param>
+/// <param name="threshold">Maximum value that "actual" must be less than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if if the assertion fails.</param>
+#define motoRos_ASSERT_LESS_THAN_INT(actual, threshold, subCodeOnFailure) \
+    _motoRos_ASSERT_LESS_THAN_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
 
-#define motoRos_ASSERT_NULL(ptr, subCodeIfNotNull) \
-    _motoRos_ASSERT_NULL(ptr, subCodeIfNotNull, #ptr)
+/// <summary>
+/// Validate that an integer value is less than a given threshold value. If the value is not 
+/// less than the threshold value, then raise a fatal alarm on the pendant and 
+/// block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="actual">Value being evaluated to check if it is less than "threshold".</param>
+/// <param name="threshold">Maximum value that "actual" must be less than.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
+#define motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeIfNotNull, msgFmtIfNotNull, ...) \
-    _motoRos_ASSERT_NULL(ptr, subCodeIfNotNull, #ptr, msgFmtIfNotNull, ##__VA_ARGS__)
+/// <summary>
+/// Validate that a value is NULL. If the value is not NULL then raise a fatal alarm on the 
+/// pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="ptr">Value to confirm is NULL.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_NULL(ptr, subCodeOnFailure) \
+    _motoRos_ASSERT_NULL(ptr, subCodeOnFailure, #ptr)
 
-#define motoRos_ASSERT_NOT_NULL(ptr, subCodeIfNull) \
-    _motoRos_ASSERT_NOT_NULL(ptr, subCodeIfNull, #ptr)
+/// <summary>
+/// Validate that a value is NULL. If the value is not NULL then raise a fatal alarm on the 
+/// pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="ptr">Value to confirm is NULL.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
+#define motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeOnFailure, #ptr, msgFmtOnFailure, ##__VA_ARGS__)
 
-#define motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfNull, msgFmtIfNull, ...) \
-    _motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeIfNull, #ptr, msgFmtIfNull, ##__VA_ARGS__)
+/// <summary>
+/// Validate that a value is not NULL. If the value is NULL then raise a fatal alarm on the 
+/// pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="ptr">Value to confirm is not NULL.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+#define motoRos_ASSERT_NOT_NULL(ptr, subCodeOnFailure) \
+    _motoRos_ASSERT_NOT_NULL(ptr, subCodeOnFailure, #ptr)
 
-extern void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
-extern void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_TRUE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void _motoRos_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_FALSE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void _motoRos_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void _motoRos_ASSERT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_NOT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_GREATER_THAN_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_LESS_THAN_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName);
-extern void _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* expectedName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void _motoRos_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
-extern void _motoRos_ASSERT_NOT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName);
-extern void _motoRos_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* actualName, char* msgFmtIfFalse, ...);
+/// <summary>
+/// Validate that a value is not NULL. If the value is NULL then raise a fatal alarm on the 
+/// pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="ptr">Value to confirm is not NULL.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
+#define motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeOnFailure, msgFmtOnFailure, ...) \
+    _motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeOnFailure, #ptr, msgFmtOnFailure, ##__VA_ARGS__)
+
+/// <summary>
+/// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
+extern void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure);
+
+/// <summary>
+/// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display.</param>
+extern void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...);
+
+extern void _motoRos_ASSERT_TRUE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
+extern void _motoRos_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_FALSE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
+extern void _motoRos_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* expectedName);
+extern void _motoRos_ASSERT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* expectedName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_NOT_EQUAL_INT(int actual, int invalid, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* invalidName);
+extern void _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(int actual, int invalid, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* invalidName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
+extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_GREATER_THAN_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
+extern void _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
+extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_LESS_THAN_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
+extern void _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
+extern void _motoRos_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
+extern void _motoRos_ASSERT_NOT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
+extern void _motoRos_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
 
 /// <summary>
 /// Validate that an RCL return value is OK. If the return code is anything other than OK,
@@ -324,8 +501,8 @@ extern void _motoRos_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUB
 /// indicate both a context-specific MotoROS2 code and also the RCL return code.
 /// </summary>
 /// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
-/// <param name="subCodeIfFalse">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
-extern void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse);
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
+extern void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure);
 
 /// <summary>
 /// Validate that an RCL return value is OK. If the return code is anything other than OK,
@@ -334,9 +511,9 @@ extern void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCOD
 /// message will be displayed to help the user understand the error.
 /// </summary>
 /// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
-/// <param name="subCodeIfFalse">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
-/// <param name="msgFmtIfFalse">Format-string msge to display to the user.</param>
-extern void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...);
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
+/// <param name="msgFmtOnFailure">Format-string msge to display to the user.</param>
+extern void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...);
 
 extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
 extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
