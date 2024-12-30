@@ -538,13 +538,13 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     //        DDS domain.
     motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(g_nodeConfigSettings.ros_domain_id, 
         MIN_ROS_DOMAIN_ID_LINUX,
-        SUBCODE_CONFIGURATION_INVALID_DOMAIN_ID,
+        SUBCODE_FAIL_OPTIONS_INIT_DOMAIN_ID_TOO_SMALL,
         "Domain ID (%d) invalid",
         g_nodeConfigSettings.ros_domain_id);
 
     motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(g_nodeConfigSettings.ros_domain_id, 
         MAX_ROS_DOMAIN_ID_LINUX,
-        SUBCODE_CONFIGURATION_INVALID_DOMAIN_ID,
+        SUBCODE_FAIL_OPTIONS_INIT_DOMAIN_ID_TOO_LARGE,
         "Domain ID (%d) invalid",
         g_nodeConfigSettings.ros_domain_id);
 
@@ -557,7 +557,7 @@ void Ros_ConfigFile_ValidateCriticalSettings()
 
     motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(strlen(g_nodeConfigSettings.agent_port_number),
         0,
-        SUBCODE_CONFIGURATION_MISSING_AGENT_IP,
+        SUBCODE_CONFIGURATION_MISSING_AGENT_PORT,
         "Missing Agent Port");
 
     //-----------------------------------------

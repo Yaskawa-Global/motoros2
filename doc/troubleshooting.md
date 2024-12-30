@@ -465,17 +465,6 @@ If the behavior persists, save a copy of the output of the [debug-listener scrip
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
-### Alarm: 8011[15]
-*Example:*
-```text
-ALARM 8011
- Domain ID (x) invalid
-[15]
-```
-*Solution:*
-The `ros_domain_id` key must be configured in the `motoros2_config.yaml` configuration file.
-The value must be between `0` and `101`.
-After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
 ### Alarm: 8011[16]
 
@@ -483,17 +472,15 @@ After correcting the configuration, the [changes will need to be propagated to t
 
 ```text
 ALARM 8011
- Missing Agent IP/Port
+ Missing Agent IP
 [16]
 ```
 
 *Solution:*
-The `agent_ip_address` and `agent_port_number` keys must be configured in the `motoros2_config.yaml` configuration file.
+The `agent_ip_address` key must be configured in the `motoros2_config.yaml` configuration file.
 This must be the IP address of the PC that runs the micro-ROS Agent application.
-The port must match the number that was used when [starting the agent](../README.md#the-micro-ros-agent) (default is `8888`).
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
-
 ### Alarm: 8011[17]
 
 *Example:*
@@ -735,6 +722,38 @@ ALARM 8011
 The ETHERNET function must be enabled for the LAN interface that was specified in the config file.
 Either change the interface specified in the config file to a LAN interface that is enabled, or enable the corresponding LAN interface on the controller.
 Please contact your local Yaskawa representative to request the ETHERNET function if it is not enabled.
+
+### Alarm: 8011[65]
+
+*Example:*
+
+```text
+ALARM 8011
+ Missing Agent Port
+[65]
+```
+
+*Solution:*
+The `agent_port_number` key must be configured in the `motoros2_config.yaml` configuration file.
+The port must match the number that was used when [starting the agent](../README.md#the-micro-ros-agent) (default is `8888`).
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+### Alarm: 8011[66-67]
+
+*Example:*
+
+```text
+ALARM 8011
+ Domain ID (x) invalid
+[xx]
+```
+
+*Solution:*
+The `ros_domain_id` key must be configured in the `motoros2_config.yaml` configuration file.
+The value must be between `0` and `101`.
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
 ### Alarm: 8012[xx]
 
