@@ -238,6 +238,45 @@ typedef enum
     SUBCODE_RCL_RCLC_API_ERROR,
 } ALARM_RCL_RCLC_FAIL_SUBCODE; //8017
 
+
+#define motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, benchmark, subCodeOnFailure, actualName, benchmarkName, op, msgFmtOnFailure, ...) \
+    do { \
+        if (!((actual) op (benchmark))) \
+        { \
+            char motoRos_error_handling_assert_msg[ERROR_MSG_MAX_SIZE] = {0}; \
+            snprintf(motoRos_error_handling_assert_msg, ERROR_MSG_MAX_SIZE, msgFmtOnFailure, ##__VA_ARGS__); \
+            Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE); \
+            Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE); \
+            mpSetAlarm(ALARM_ASSERTION_FAIL, motoRos_error_handling_assert_msg, subCodeOnFailure); \
+            FOREVER \
+            { \
+                Ros_Debug_BroadcastMsg("MotoROS2 Assertion Failure: %s (subcode: %d)", motoRos_error_handling_assert_msg, subCodeOnFailure); \
+                Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, (actual)); \
+                Ros_Debug_BroadcastMsg("Expected: %s %s %d (%s)", actualName, #op, (benchmark), benchmarkName); \
+                Ros_Sleep(5000); \
+            } \
+        } \
+    } while (0)
+
+#define motoRos_ASSERT_GENERIC_COMPARISON_POINTER_MESSAGE(actual, benchmark, subCodeOnFailure, actualName, benchmarkName, op, msgFmtOnFailure, ...) \
+    do { \
+        if (!((actual) op (benchmark))) \
+        { \
+            char motoRos_error_handling_assert_msg[ERROR_MSG_MAX_SIZE] = {0}; \
+            snprintf(motoRos_error_handling_assert_msg, ERROR_MSG_MAX_SIZE, msgFmtOnFailure, ##__VA_ARGS__); \
+            Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE); \
+            Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE); \
+            mpSetAlarm(ALARM_ASSERTION_FAIL, motoRos_error_handling_assert_msg, subCodeOnFailure); \
+            FOREVER \
+            { \
+                Ros_Debug_BroadcastMsg("MotoROS2 Assertion Failure: %s (subcode: %d)", motoRos_error_handling_assert_msg, subCodeOnFailure); \
+                Ros_Debug_BroadcastMsg("Actual: %s == %p", actualName, (actual)); \
+                Ros_Debug_BroadcastMsg("Expected: %s %s %p (%s)", actualName, #op, (benchmark), benchmarkName); \
+                Ros_Sleep(5000); \
+            } \
+        } \
+    } while (0)
+
 /// <summary>
 /// Validate that a value is truthy. If the value is falsy, then raise a fatal alarm on the pendant 
 /// and block further execution. The alarm will indicate a context-specific MotoROS2 code.
@@ -245,7 +284,7 @@ typedef enum
 /// <param name="mustBeTrue">Value to verify is truthy. Alarm will occur if not truthy.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_TRUE(mustBeTrue,subCodeOnFailure) \
-    _motoRos_ASSERT_TRUE(mustBeTrue, subCodeOnFailure, #mustBeTrue)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(mustBeTrue, TRUE, subCodeOnFailure, #mustBeTrue, "TRUE", ==, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that a value is truthy. If the value is falsy, then raise a fatal alarm on the pendant 
@@ -255,8 +294,8 @@ typedef enum
 /// <param name="mustBeTrue">Value to verify is truthy. Alarm will occur if not truthy.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
-#define motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeOnFailure,msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeOnFailure, #mustBeTrue, msgFmtOnFailure, ##__VA_ARGS__)
+#define motoRos_ASSERT_TRUE_MESSAGE(mustBeTrue, subCodeOnFailure, msgFmtOnFailure, ...) \
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(mustBeTrue, TRUE, subCodeOnFailure, #mustBeTrue, "TRUE", ==, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that a value is falsy. If the value is truthy, then raise a fatal alarm on the pendant 
@@ -265,7 +304,7 @@ typedef enum
 /// <param name="mustBeFalse">Value to verify is falsy. Alarm will occur if not falsy.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_FALSE(mustBeFalse, subCodeOnFailure) \
-    _motoRos_ASSERT_FALSE(mustBeFalse, subCodeOnFailure, #mustBeFalse)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(mustBeFalse, FALSE, subCodeOnFailure, #mustBeFalse, "FALSE", ==, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that a value is falsy. If the value is truthy, then raise a fatal alarm on the pendant 
@@ -276,7 +315,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
 #define motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_FALSE_MESSAGE(mustBeFalse, subCodeOnFailure, #mustBeFalse, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(mustBeFalse, FALSE, subCodeOnFailure, #mustBeFalse, "FALSE", ==, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that a value is equal to the expected value. If the value is not equal to the expected value,
@@ -287,7 +326,7 @@ typedef enum
 /// <param name="expected">Expected value that is being checked for equality with "actual" value.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeOnFailure) \
-    _motoRos_ASSERT_EQUAL_INT(actual, expected, subCodeOnFailure, #actual, #expected)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, expected, subCodeOnFailure, #actual, #expected, ==, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that a value is equal to the expected value. If the value is not equal to the expected value,
@@ -300,7 +339,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
 #define motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_EQUAL_INT_MESSAGE(actual, expected, subCodeOnFailure, #actual, #expected, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, expected, subCodeOnFailure, #actual, #expected, ==, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that a value is NOT equal to a given invalid value. If the value is equal to the invalid value,
@@ -311,7 +350,7 @@ typedef enum
 /// <param name="invalid">Invalid value that is being checked against "actual" value.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_NOT_EQUAL_INT(actual, invalid, subCodeOnFailure) \
-    _motoRos_ASSERT_NOT_EQUAL_INT(actual, invalid, subCodeOnFailure, #actual, #invalid)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, invalid, subCodeOnFailure, #actual, #invalid, !=, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that a value is NOT equal to a given invalid value. If the value is equal to the invalid value,
@@ -324,7 +363,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display to display if the assertion fails".</param>
 #define motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, invalid, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(actual, invalid, subCodeOnFailure, #actual, #invalid, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, invalid, subCodeOnFailure, #actual, #invalid, !=, msgFmtOnFailure, ##__VA_ARGS__)
 
 
 /// <summary>
@@ -336,7 +375,7 @@ typedef enum
 /// <param name="threshold">Minimum value that "actual" must be equal to or greater than.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure) \
-    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, >=, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that an integer value is greater than or equal to a given threshold value. If the value is not 
@@ -349,7 +388,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
 #define motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, >=, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that an integer value is greater than a given threshold value. If the value is not 
@@ -360,7 +399,7 @@ typedef enum
 /// <param name="threshold">Minimum value that "actual" must be greater than.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_GREATER_THAN_INT(actual, threshold, subCodeOnFailure) \
-    _motoRos_ASSERT_GREATER_THAN_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, >, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that an integer value is greater than a given threshold value. If the value is not 
@@ -373,7 +412,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
 #define motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, >, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that an integer value is less than or equal to a given threshold value. If the value is not 
@@ -384,7 +423,7 @@ typedef enum
 /// <param name="threshold">Maximum value that "actual" must be equal to or less than.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure) \
-    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, <=, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that an integer value is less than or equal to a given threshold value. If the value is not 
@@ -397,7 +436,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
 #define motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, <=, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that an integer value is less than a given threshold value. If the value is not 
@@ -408,7 +447,7 @@ typedef enum
 /// <param name="threshold">Maximum value that "actual" must be less than.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if if the assertion fails.</param>
 #define motoRos_ASSERT_LESS_THAN_INT(actual, threshold, subCodeOnFailure) \
-    _motoRos_ASSERT_LESS_THAN_INT(actual, threshold, subCodeOnFailure, #actual, #threshold)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, <, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that an integer value is less than a given threshold value. If the value is not 
@@ -421,7 +460,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display if the assertion fails.</param>
 #define motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, threshold, subCodeOnFailure, #actual, #threshold, <, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that a value is NULL. If the value is not NULL then raise a fatal alarm on the 
@@ -430,7 +469,7 @@ typedef enum
 /// <param name="ptr">Value to confirm is NULL.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_NULL(ptr, subCodeOnFailure) \
-    _motoRos_ASSERT_NULL(ptr, subCodeOnFailure, #ptr)
+    motoRos_ASSERT_GENERIC_COMPARISON_POINTER_MESSAGE(ptr, NULL, subCodeOnFailure, #ptr, "NULL", ==, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that a value is NULL. If the value is not NULL then raise a fatal alarm on the 
@@ -441,7 +480,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
 #define motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_NULL_MESSAGE(ptr, subCodeOnFailure, #ptr, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_POINTER_MESSAGE(ptr, NULL, subCodeOnFailure,  #ptr, "NULL", ==, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Validate that a value is not NULL. If the value is NULL then raise a fatal alarm on the 
@@ -450,7 +489,7 @@ typedef enum
 /// <param name="ptr">Value to confirm is not NULL.</param>
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 #define motoRos_ASSERT_NOT_NULL(ptr, subCodeOnFailure) \
-    _motoRos_ASSERT_NOT_NULL(ptr, subCodeOnFailure, #ptr)
+    motoRos_ASSERT_GENERIC_COMPARISON_POINTER_MESSAGE(ptr, NULL, subCodeOnFailure,  #ptr, "NULL", !=, APPLICATION_NAME ": Fatal Error")
 
 /// <summary>
 /// Validate that a value is not NULL. If the value is NULL then raise a fatal alarm on the 
@@ -461,7 +500,7 @@ typedef enum
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display if the assertion fails.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
 #define motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeOnFailure, msgFmtOnFailure, ...) \
-    _motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeOnFailure, #ptr, msgFmtOnFailure, ##__VA_ARGS__)
+    motoRos_ASSERT_GENERIC_COMPARISON_POINTER_MESSAGE(ptr, NULL, subCodeOnFailure,  #ptr, "NULL", !=, msgFmtOnFailure, ##__VA_ARGS__)
 
 /// <summary>
 /// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
@@ -476,27 +515,6 @@ extern void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure);
 /// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
 /// <param name="msgFmtOnFailure">Format-string msg to display.</param>
 extern void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...);
-
-extern void _motoRos_ASSERT_TRUE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
-extern void _motoRos_ASSERT_TRUE_MESSAGE(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_FALSE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
-extern void _motoRos_ASSERT_FALSE_MESSAGE(BOOL mustBeFalse, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_EQUAL_INT(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* expectedName);
-extern void _motoRos_ASSERT_EQUAL_INT_MESSAGE(int actual, int expected, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* expectedName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_NOT_EQUAL_INT(int actual, int invalid, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* invalidName);
-extern void _motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(int actual, int invalid, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* invalidName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
-extern void _motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_GREATER_THAN_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
-extern void _motoRos_ASSERT_GREATER_THAN_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
-extern void _motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_LESS_THAN_INT(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName);
-extern void _motoRos_ASSERT_LESS_THAN_INT_MESSAGE(int actual, int threshold, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* thresholdName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
-extern void _motoRos_ASSERT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
-extern void _motoRos_ASSERT_NOT_NULL(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName);
-extern void _motoRos_ASSERT_NOT_NULL_MESSAGE(void* ptr, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actualName, char* msgFmtOnFailure, ...);
 
 /// <summary>
 /// Validate that an RCL return value is OK. If the return code is anything other than OK,

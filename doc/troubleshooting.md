@@ -465,7 +465,6 @@ If the behavior persists, save a copy of the output of the [debug-listener scrip
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
 Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
-
 ### Alarm: 8011[16]
 
 *Example:*
@@ -481,6 +480,7 @@ The `agent_ip_address` key must be configured in the `motoros2_config.yaml` conf
 This must be the IP address of the PC that runs the micro-ROS Agent application.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
 ### Alarm: 8011[17]
 
 *Example:*
