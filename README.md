@@ -262,6 +262,17 @@ Use the following steps to verify MotoPlus has been correctly configured for Mot
  1. move to `MotoPlus FUNC.`, make sure it is set to `USED`. If it isn't, set it to `USED`
  1. move cursor down to `MOTOMAN DRIVER` and make sure it is set to `USED`. If it isn't, set it to `USED`
 
+#### Checking network configuration
+
+While still in *Maintenance* mode and *MANAGEMENT* security level, check the following network settings:
+
+ 1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
+ 1. move to `LAN INTERFACE SETTING`, make sure `IP ADDRESS SETTING(LAN[X])` for the NIC you are using is set to `MANUAL SETTING`. If it isn't, set it to `MANUAL SETTING`
+ 1. Before leaving this screen, make sure that the robot controller's IP address is on the subnet of the PC running the micro-ROS agent application, and that the PC is on the subnet of the robot controller. To do this, choose one of the following options:
+    - Modify the `agent_ip_address` key in the `motoros2_config.yaml` file and specify an IP address that is on the robot's subnet. Then [propagate the changes to the Yaskawa controller](#updating-the-configuration). You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller.
+    - Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
+    - Modify the robot controller's network settings to add a gateway which can reach the IP address of the subnet of the PC running the micro-ROS agent.
+
 ### DX200, YRC1000, and YRC1000micro
 
 Place the `.out` (main binary), `.yaml` (configuration), and `.dat` (I/O names) files on an external storage device: Compact Flash (CF), Secure Digital (SD), and USB sticks can be used depending on the controller model.
