@@ -29,8 +29,8 @@ BOOL Ros_MotionControl_MustInitializePointQueue = TRUE; //first point of streami
 
 Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence* sequenceGoalJointNames, trajectory_msgs__msg__JointTrajectoryPoint__Sequence* sequenceOfPoints)
 {
-    long pulsePos[MAX_PULSE_AXES];
-    long curPos[MAX_PULSE_AXES];
+    long requestPulsePos[MAX_PULSE_AXES];
+    long currentPulsePos[MAX_PULSE_AXES];
     int grpIndex, jointIndexInTraj, pointIndex, checkForDupIndex;
 
     //Verify we're not already running a trajectory
@@ -91,7 +91,7 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
     //for each joint/axis in a single trajectory point
     for (jointIndexInTraj = 0; jointIndexInTraj < sequenceGoalJointNames->size; jointIndexInTraj += 1)
     {
-        int  jointIndexInCtrlGroup;
+        int jointIndexInCtrlGroup;
         CtrlGroup* ctrlGroup;
 
         //check to ensure there are no duplicate joint names in the list
@@ -177,39 +177,30 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
             }
         }
 
-        ctrlGroup->prevTrajectoryIterator = ctrlGroup->trajectoryToProcess; //reset iterator
-
         // Assign start position
         ctrlGroup->timeLeftover_ms = 0;
-        ctrlGroup->q_time = ctrlGroup->prevTrajectoryIterator->time;
+        ctrlGroup->q_time = ctrlGroup->trajectoryToProcess->time;
 
         //Convert start position to pulse format
-        // ctrlGroup->prevTrajectoryIterator->pos is already in moto joint order
-        Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, ctrlGroup->prevTrajectoryIterator->pos, pulsePos);
-        Ros_CtrlGroup_GetPulsePosCmd(ctrlGroup, curPos);
-
-        // Initialize prevPulsePos to the current position
-        Ros_CtrlGroup_GetPulsePosCmd(ctrlGroup, ctrlGroup->prevPulsePos);
+        // ctrlGroup->trajectoryToProcess->pos is already in moto joint order
+        Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, ctrlGroup->trajectoryToProcess->pos, requestPulsePos);
+        Ros_CtrlGroup_GetPulsePosCmd(ctrlGroup, currentPulsePos);
 
         // Check for each axis
         for (int i = 0; i < MAX_PULSE_AXES; i++)
         {
             // Check if position matches current command position
-            if (abs(pulsePos[i] - curPos[i]) > START_MAX_PULSE_DEVIATION)
+            if (abs(requestPulsePos[i] - currentPulsePos[i]) > START_MAX_PULSE_DEVIATION)
             {
                 Ros_Debug_BroadcastMsg("ERROR: Trajectory start position doesn't match current position (MOTO joint order).");
                 Ros_Debug_BroadcastMsg(" - Requested start: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
-                    pulsePos[0], pulsePos[1], pulsePos[2],
-                    pulsePos[3], pulsePos[4], pulsePos[5],
-                    pulsePos[6], pulsePos[7]);
+                    requestPulsePos[0], requestPulsePos[1], requestPulsePos[2],
+                    requestPulsePos[3], requestPulsePos[4], requestPulsePos[5],
+                    requestPulsePos[6], requestPulsePos[7]);
                 Ros_Debug_BroadcastMsg(" - Current pos: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
-                    curPos[0], curPos[1], curPos[2],
-                    curPos[3], curPos[4], curPos[5],
-                    curPos[6], curPos[7]);
-                Ros_Debug_BroadcastMsg(" - ctrlGroup->prevPulsePos: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
-                    ctrlGroup->prevPulsePos[0], ctrlGroup->prevPulsePos[1], ctrlGroup->prevPulsePos[2],
-                    ctrlGroup->prevPulsePos[3], ctrlGroup->prevPulsePos[4], ctrlGroup->prevPulsePos[5],
-                    ctrlGroup->prevPulsePos[6], ctrlGroup->prevPulsePos[7]);
+                    currentPulsePos[0], currentPulsePos[1], currentPulsePos[2],
+                    currentPulsePos[3], currentPulsePos[4], currentPulsePos[5],
+                    currentPulsePos[6], currentPulsePos[7]);
 
                 for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
                 {
@@ -222,9 +213,9 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
             }
 
             // Check maximum velocity limit
-            if (abs(ctrlGroup->prevTrajectoryIterator->vel[i]) > ctrlGroup->maxSpeed[i])
+            if (abs(ctrlGroup->trajectoryToProcess->vel[i]) > ctrlGroup->maxSpeed[i])
             {
-                Ros_Debug_BroadcastMsg("ERROR: Command of (%.4f) exceeds the speed limit of (%.4f) for axis %d", ctrlGroup->prevTrajectoryIterator->vel[i], ctrlGroup->maxSpeed[i], i);
+                Ros_Debug_BroadcastMsg("ERROR: Command of (%.4f) exceeds the speed limit of (%.4f) for axis %d", ctrlGroup->trajectoryToProcess->vel[i], ctrlGroup->maxSpeed[i], i);
 
                 for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
                 {
@@ -246,6 +237,8 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
             ctrlGroup->trajectoryToProcess[i].valid = TRUE;
         }
 
+        memcpy(ctrlGroup->prevPulsePos, currentPulsePos, sizeof(currentPulsePos));
+        ctrlGroup->prevTrajectoryIterator = &ctrlGroup->trajectoryToProcess[0];
         ctrlGroup->trajectoryIterator = &ctrlGroup->trajectoryToProcess[1];
         ctrlGroup->hasDataToProcess = TRUE;
         Ros_Debug_BroadcastMsg("Group #%d - Trajectory is ready for processing", ctrlGroup->groupNo);
