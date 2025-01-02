@@ -73,7 +73,7 @@ BOOL Ros_Controller_Initialize()
         bInitOk = FALSE;
 
     // but too many is also not OK
-    motoRosAssert(g_Ros_Controller.numGroup <= MAX_CONTROLLABLE_GROUPS,
+    motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT(g_Ros_Controller.numGroup, MAX_CONTROLLABLE_GROUPS,
         SUBCODE_FAIL_ROS_CONTROLLER_INIT_TOO_MANY_GROUPS);
 
     BOOL bShouldSetJointNamesToDefaultValues = (strlen(g_nodeConfigSettings.joint_names[0]) == 0);

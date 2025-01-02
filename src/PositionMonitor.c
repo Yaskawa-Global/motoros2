@@ -185,7 +185,7 @@ static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* 
     //create message for cartesian transform
     g_messages_PositionMonitor.transform = tf2_msgs__msg__TFMessage__create();
 
-    motoRosAssert(geometry_msgs__msg__TransformStamped__Sequence__init(&g_messages_PositionMonitor.transform->transforms, totalRobots * NUMBER_TRANSFORM_LINKS_PER_ROBOT),
+    motoRos_ASSERT_TRUE(geometry_msgs__msg__TransformStamped__Sequence__init(&g_messages_PositionMonitor.transform->transforms, totalRobots * NUMBER_TRANSFORM_LINKS_PER_ROBOT),
                   SUBCODE_FAIL_ALLOCATE_TRANSFORM);
 
     bzero(formatBuffer, MAX_TF_FRAME_NAME_LENGTH);
@@ -312,7 +312,7 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
                 snprintf(alarm_msg_buf, ERROR_MSG_MAX_SIZE, "Inv. motion type: %d (axis: %d)",
                     group->baseTrackInfo.motionType[i], i);
                 Ros_Debug_BroadcastMsg("%s: %s", __func__, alarm_msg_buf);
-                motoRosAssert_withMsg(false, SUBCODE_FAIL_INVALID_BASE_TRACK_MOTION_TYPE, alarm_msg_buf);
+                motoRos_ASSERT_FAIL_MESSAGE(SUBCODE_FAIL_INVALID_BASE_TRACK_MOTION_TYPE, alarm_msg_buf);
             }
         }
         mpZYXeulerToFrame(&coordWorldToBase, &frameWorldToTrack);
