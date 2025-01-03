@@ -43,7 +43,12 @@
 #include <rmw_microros/init_options.h>
 #include <rmw_microros/timing.h>
 
+// TODO: remove when Foxy, Galactic and Humble are no longer supported
+#if defined(MOTOPLUS_LIBMICROROS_ROS2_IS_FOXY) || defined(MOTOPLUS_LIBMICROROS_ROS2_IS_GALACTIC) || defined(MOTOPLUS_LIBMICROROS_ROS2_IS_HUMBLE)
 #include <libyaml_vendor/yaml.h>
+#else
+#include <yaml.h>
+#endif
 
 //============================================
 // Data types for communication

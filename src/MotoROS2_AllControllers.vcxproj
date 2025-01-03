@@ -13,6 +13,10 @@
       <Configuration>DX200_humble</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="DX200_jazzy|Win32">
+      <Configuration>DX200_jazzy</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="YRC1000u_foxy|Win32">
       <Configuration>YRC1000u_foxy</Configuration>
       <Platform>Win32</Platform>
@@ -23,6 +27,10 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="YRC1000u_humble|Win32">
       <Configuration>YRC1000u_humble</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="YRC1000u_jazzy|Win32">
+      <Configuration>YRC1000u_jazzy</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="YRC1000_foxy|Win32">
@@ -37,6 +45,10 @@
       <Configuration>YRC1000_humble</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="YRC1000_jazzy|Win32">
+      <Configuration>YRC1000_jazzy</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{64C31524-A3C4-49D4-AD04-955D44202226}</ProjectGuid>
@@ -46,6 +58,11 @@
     <ProjectName>MotoROS2</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_jazzy|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -61,6 +78,11 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_jazzy|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -72,6 +94,11 @@
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_jazzy|Win32'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -94,6 +121,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DX200_jazzy|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -103,6 +133,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DX200_foxy|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_jazzy|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -110,6 +143,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_jazzy|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'" Label="PropertySheets">
@@ -122,6 +158,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_jazzy|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_j" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DX200;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)DX200\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)DX200\inc;$(SolutionDir)libmicroros_dx200_jazzy\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_j" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_j" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_dx200_jazzy\include;</IncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_dx2_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)DX200\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
@@ -157,6 +205,18 @@
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir />
     <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_dx200_foxy\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_jazzy|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_j" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000\inc;$(SolutionDir)libmicroros_yrc1000_jazzy\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_j" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_j" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000_jazzy\include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000\inc"</NMakeBuildCommandLine>
@@ -194,6 +254,18 @@
     <IntDir />
     <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000_foxy\include;</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_jazzy|Win32'">
+    <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_j" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
+    <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);YRC1000u;MOTOROS2_MEM_TRACE_ENABLE</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(MP_VS_Install)YRC1000u\gnu\4.3.3-vxworks-6.9\lib\gcc\i586-wrs-vxworks\4.3.3\include;$(MP_VS_Install)YRC1000u\inc;$(SolutionDir)libmicroros_yrc1000u_jazzy\include;</NMakeIncludeSearchPath>
+    <NMakeReBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_j" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_j" -b "$(OutDir)\" -o clean</NMakeCleanCommandLine>
+    <NMakeForcedIncludes />
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir />
+    <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000u_jazzy\include;</IncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_humble|Win32'">
     <NMakeBuildCommandLine>"$(MP_VS_Install)mpBuilder.exe" -c $(Configuration) -p "$(ProjectDir)\" -n "mr2_yrc1m_h" -b "$(SolutionDir)bin\$(Configuration)" -o build -i "$(MP_VS_Install)YRC1000u\inc"</NMakeBuildCommandLine>
     <NMakeOutput>$(MP_VS_Install)DevTools\OnlineDownload.exe</NMakeOutput>
@@ -230,6 +302,11 @@
     <IntDir />
     <IncludePath>$(ProjectDir)..\lib;$(ProjectDir)..\libmicroros_yrc1000u_foxy\include;</IncludePath>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX200_jazzy|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DX200_humble|Win32'">
     <BuildLog>
       <Path>_buildLog\MotoROS2$(Configuration).log</Path>
@@ -245,6 +322,11 @@
       <Path>_buildLog\MotoROS2$(Configuration).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_jazzy|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_humble|Win32'">
     <BuildLog>
       <Path>_buildLog\MotoROS2$(Configuration).log</Path>
@@ -256,6 +338,11 @@
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000_foxy|Win32'">
+    <BuildLog>
+      <Path>_buildLog\MotoROS2$(Configuration).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='YRC1000u_jazzy|Win32'">
     <BuildLog>
       <Path>_buildLog\MotoROS2$(Configuration).log</Path>
     </BuildLog>
@@ -290,6 +377,7 @@
     <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic" />
     <None Include="..\libmicroros_yrc1000_humble\libmicroros.yrcLib_humble" />
     <None Include="..\config\motoros2_config.yaml" />
+    <None Include="..\libmicroros_yrc1000_jazzy\libmicroros.yrcLib_jazzy" />
     <None Include="DX200_foxyCompilerArguments.mps" />
     <None Include="DX200_foxyLinkerArguments.mps" />
     <None Include="DX200_galacticCompilerArguments.mps" />
@@ -314,18 +402,24 @@
     <None Include="..\robot_jobs\two_arms\IONAME.DAT" />
     <None Include="DX200_humbleCompilerArguments.mps" />
     <None Include="DX200_humbleLinkerArguments.mps" />
+    <None Include="DX200_jazzyCompilerArguments.mps" />
+    <None Include="DX200_jazzyLinkerArguments.mps" />
     <None Include="YRC1000u_foxyCompilerArguments.mps" />
     <None Include="YRC1000u_foxyLinkerArguments.mps" />
     <None Include="YRC1000u_galacticCompilerArguments.mps" />
     <None Include="YRC1000u_galacticLinkerArguments.mps" />
     <None Include="YRC1000u_humbleCompilerArguments.mps" />
     <None Include="YRC1000u_humbleLinkerArguments.mps" />
+    <None Include="YRC1000u_jazzyCompilerArguments.mps" />
+    <None Include="YRC1000u_jazzyLinkerArguments.mps" />
     <None Include="YRC1000_foxyCompilerArguments.mps" />
     <None Include="YRC1000_foxyLinkerArguments.mps" />
     <None Include="YRC1000_galacticCompilerArguments.mps" />
     <None Include="YRC1000_galacticLinkerArguments.mps" />
     <None Include="YRC1000_humbleCompilerArguments.mps" />
     <None Include="YRC1000_humbleLinkerArguments.mps" />
+    <None Include="YRC1000_jazzyCompilerArguments.mps" />
+    <None Include="YRC1000_jazzyLinkerArguments.mps" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommunicationExecutor.c" />
