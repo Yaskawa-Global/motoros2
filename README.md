@@ -688,7 +688,7 @@ If needed, update [the configuration](#configuration) by changing the `publisher
 Follow [Updating the configuration](#updating-the-configuration) to propagate this change to MotoROS2.
 
 Note: a default QoS profile for topics like `joint_states` is a topic for discussion in the ROS 2 community.
-Relevant link: [ros-planning/moveit2#1190](https://github.com/ros-planning/moveit2/issues/1190).
+Some relevant discussions and issues: [QoS settings for /joint_states in Humble](https://answers.ros.org/question/399325) (ROS Answers) and [ros-planning/moveit2#1190](https://github.com/ros-planning/moveit2/issues/1190).
 
 ### Service server QoS
 
