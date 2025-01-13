@@ -63,6 +63,7 @@ jobs:
           { release: 20241211, codename: foxy     },
           { release: 20241211, codename: galactic },
           { release: 20241211, codename: humble   },
+          { release: 20250113, codename: jazzy, prerelease: true},
         ]
 
     steps:
