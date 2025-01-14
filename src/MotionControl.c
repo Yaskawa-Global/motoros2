@@ -53,10 +53,6 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
         bzero(g_Ros_Controller.ctrlGroups[grpIndex]->trajectoryToProcess, sizeof(JointMotionData) * MAX_NUMBER_OF_POINTS_PER_TRAJECTORY);
     }
 
-    //------------------------------------------------------------
-    //The trajectory contains information for all groups. Determine which groups are used by looking at the 'joint names'.
-    BOOL bGroupIsUsed[MAX_CONTROLLABLE_GROUPS];
-    bzero(bGroupIsUsed, sizeof(bGroupIsUsed));
     
     if (g_Ros_Controller.totalAxesCount != sequenceGoalJointNames->size)
     {
@@ -153,13 +149,10 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
         if (convertStatus != INIT_TRAJ_OK)
             return convertStatus;
 
-        bGroupIsUsed[grpIndex] = TRUE;
     } //for each joint in a single trajectory point
 
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
-        if (!bGroupIsUsed[grpIndex])
-            continue;
 
         CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
         Ros_Debug_BroadcastMsg("Initializing trajectory for group #%d", ctrlGroup->groupNo);
