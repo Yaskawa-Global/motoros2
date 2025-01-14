@@ -31,6 +31,14 @@ Init_Trajectory_Status Ros_MotionControl_ConvertTrajectoryToJointMotionData(traj
 /// <returns>TRUE for success, FALSE for failure</returns>
 BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String jointName, int* group_idx, int* joint_idx);
 
+
+/// <summary>
+/// Go through a list of joint names and see if there are any duplicates. 
+/// </summary>
+/// <param name="jointNames">A pointer to the structure containing all of the request joint names</param>
+/// <returns>TRUE if there are duplicate names, FALSE if there are no duplicate names</returns>
+BOOL Ros_MotionControl_HasDuplicateNames(rosidl_runtime_c__String__Sequence* jointNames);
+
 BOOL Ros_MotionControl_AllGroupsInitComplete = FALSE;
 
 MOTION_MODE Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
@@ -41,7 +49,7 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
 {
     long requestPulsePos[MAX_PULSE_AXES];
     long currentPulsePos[MAX_PULSE_AXES];
-    int grpIndex, jointIndexInTraj, pointIndex, checkForDupIndex;
+    int grpIndex, jointIndexInTraj, pointIndex;
 
     //Verify we're not already running a trajectory
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
@@ -94,33 +102,26 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
     //This allows it to find the correct CtrlGroup object and the joint index (in moto order) in the JointMotionData array.
     //===================================
 
+    if (Ros_MotionControl_HasDuplicateNames(sequenceGoalJointNames))
+    {
+        return INIT_TRAJ_DUPLICATE_JOINT_NAME;
+    }
+
     //for each joint/axis in a single trajectory point
     for (jointIndexInTraj = 0; jointIndexInTraj < sequenceGoalJointNames->size; jointIndexInTraj += 1)
     {
         int jointIndexInCtrlGroup;
         CtrlGroup* ctrlGroup;
 
-        //check to ensure there are no duplicate joint names in the list
-        for (checkForDupIndex = (jointIndexInTraj + 1); checkForDupIndex < sequenceGoalJointNames->size; checkForDupIndex += 1)
+        if (!Ros_MotionControl_FindCtrlGroupAndIndex(sequenceGoalJointNames->data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
         {
-            if (strncmp(sequenceGoalJointNames->data[jointIndexInTraj].data,
-                sequenceGoalJointNames->data[checkForDupIndex].data,
-                MAX_JOINT_NAME_LENGTH) == 0)
-            {
-                Ros_Debug_BroadcastMsg("Joint name [%s] is used for multiple joints in the trajectory (indices: %d and %d).", sequenceGoalJointNames->data[jointIndexInTraj].data, jointIndexInTraj, checkForDupIndex);
-                return INIT_TRAJ_DUPLICATE_JOINT_NAME;
-            }
+            return INIT_TRAJ_INVALID_JOINTNAME;
         }
-
-            if (!Ros_MotionControl_FindCtrlGroupAndIndex(sequenceGoalJointNames->data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
-            {
-                return INIT_TRAJ_INVALID_JOINTNAME;
-            }
-            ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-            //this processes all points in the trajectory array FOR A SINGLE AXIS at a time
-            Init_Trajectory_Status convertStatus = Ros_MotionControl_ConvertTrajectoryToJointMotionData(sequenceOfPoints, jointIndexInTraj, ctrlGroup, jointIndexInCtrlGroup, ctrlGroup->trajectoryToProcess);
-            if (convertStatus != INIT_TRAJ_OK)
-                return convertStatus;
+        ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
+        //this processes all points in the trajectory array FOR A SINGLE AXIS at a time
+        Init_Trajectory_Status convertStatus = Ros_MotionControl_ConvertTrajectoryToJointMotionData(sequenceOfPoints, jointIndexInTraj, ctrlGroup, jointIndexInCtrlGroup, ctrlGroup->trajectoryToProcess);
+        if (convertStatus != INIT_TRAJ_OK)
+            return convertStatus;
         } //for each joint in a single trajectory point
 
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
@@ -614,6 +615,11 @@ UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__Q
             //Wait for it to be processed before adding a new point.
             return motoros2_interfaces__msg__QueueResultEnum__BUSY;
         }
+    }
+
+    if (Ros_MotionControl_HasDuplicateNames(&request->joint_names))
+    {
+        return INIT_TRAJ_DUPLICATE_JOINT_NAME;
     }
 
     //for each joint/axis in a single trajectory point
@@ -1123,6 +1129,24 @@ BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String jointName,
         }
     }
 
+    return FALSE;
+}
+
+BOOL Ros_MotionControl_HasDuplicateNames(rosidl_runtime_c__String__Sequence* jointNames)
+{
+    for (int i = 0; i < jointNames->size - 1; i += 1)
+    {
+        for (int j = (i + 1); j < jointNames->size; j += 1)
+        {
+            if (strncmp(jointNames->data[i].data,
+                jointNames->data[j].data,
+                MAX_JOINT_NAME_LENGTH) == 0)
+            {
+                Ros_Debug_BroadcastMsg("Joint name [%s] is used for multiple joints in the trajectory (indices: %d and %d).", jointNames->data[i].data, i, j);
+                return TRUE;
+            }
+        }
+    }
     return FALSE;
 }
 
