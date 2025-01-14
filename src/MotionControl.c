@@ -21,6 +21,16 @@
 Init_Trajectory_Status Ros_MotionControl_ConvertTrajectoryToJointMotionData(trajectory_msgs__msg__JointTrajectoryPoint__Sequence* in_jointTrajData, 
     int incomingAxisIndex, CtrlGroup* ctrlGroup, int ctrlGroupAxisIndex, JointMotionData* out_jointMotionData);
 
+/// <summary>
+/// Given a joint name, search through each control group and axis to find
+/// the control group + axis number of the corresponding joint
+/// </summary>
+/// <param name="jointName">Pointer to the head of the incoming trajectory</param>
+/// <param name="group_idx">Index of the control group which has the joint corresponding to jointName</param>
+/// <param name="joint_idx">Index of the axis within the control group which has the joint corresponding to jointName</param>
+/// <returns>TRUE for success, FALSE for failure</returns>
+BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String jointName, int* group_idx, int* joint_idx);
+
 BOOL Ros_MotionControl_AllGroupsInitComplete = FALSE;
 
 MOTION_MODE Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
@@ -102,54 +112,16 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
             }
         }
 
-        //find the ctrlgroup for this joint
-        BOOL bFound = FALSE;
-        for (grpIndex = 0; grpIndex < MAX_CONTROLLABLE_GROUPS; grpIndex += 1)
-        {
+            if (!Ros_MotionControl_FindCtrlGroupAndIndex(sequenceGoalJointNames->data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
+            {
+                return INIT_TRAJ_INVALID_JOINTNAME;
+            }
             ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-            if (!ctrlGroup)
-                continue;
-
-            for (jointIndexInCtrlGroup = 0; jointIndexInCtrlGroup < MP_GRP_AXES_NUM; jointIndexInCtrlGroup += 1)
-            {
-                char* jointName = ctrlGroup->jointNames_userDefined[jointIndexInCtrlGroup];
-                if (strlen(jointName) != 0)
-                {
-                    if (strcmp(jointName, sequenceGoalJointNames->data[jointIndexInTraj].data) == 0)
-                    {
-                        bFound = TRUE;
-                        break;
-                    }
-                }
-            }
-
-            if (bFound)
-                break;
-        }
-
-        if (!bFound)
-        {
-            Ros_Debug_BroadcastMsg("Joint name [%s] is not valid. Check motoros2_config.yaml and update accordingly.", sequenceGoalJointNames->data[jointIndexInTraj].data);
-            Ros_Debug_BroadcastMsg("Valid names:");
-            for (int groupIndex = 0; groupIndex < MAX_CONTROLLABLE_GROUPS; groupIndex += 1)
-            {
-                for (int jointIndex = 0; jointIndex < MP_GRP_AXES_NUM; jointIndex += 1)
-                {
-                    char* configListEntry = g_nodeConfigSettings.joint_names[(groupIndex * MP_GRP_AXES_NUM) + jointIndex];
-                    if (strlen(configListEntry) != 0)
-                        Ros_Debug_BroadcastMsg(" - %s", configListEntry);
-                }
-            }
-
-            return INIT_TRAJ_INVALID_JOINTNAME;
-        }
-
-        //this processes all points in the trajectory array FOR A SINGLE AXIS at a time
-        Init_Trajectory_Status convertStatus = Ros_MotionControl_ConvertTrajectoryToJointMotionData(sequenceOfPoints, jointIndexInTraj, ctrlGroup, jointIndexInCtrlGroup, ctrlGroup->trajectoryToProcess);
-        if (convertStatus != INIT_TRAJ_OK)
-            return convertStatus;
-
-    } //for each joint in a single trajectory point
+            //this processes all points in the trajectory array FOR A SINGLE AXIS at a time
+            Init_Trajectory_Status convertStatus = Ros_MotionControl_ConvertTrajectoryToJointMotionData(sequenceOfPoints, jointIndexInTraj, ctrlGroup, jointIndexInCtrlGroup, ctrlGroup->trajectoryToProcess);
+            if (convertStatus != INIT_TRAJ_OK)
+                return convertStatus;
+        } //for each joint in a single trajectory point
 
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
@@ -650,48 +622,11 @@ UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__Q
         int  jointIndexInCtrlGroup;
         CtrlGroup* ctrlGroup;
 
-
-        //find the ctrlgroup for this joint
-        BOOL bFound = FALSE;
-        for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
+        if (!Ros_MotionControl_FindCtrlGroupAndIndex(request->joint_names.data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
         {
-            ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-            if (!ctrlGroup)
-                continue;
-
-            for (jointIndexInCtrlGroup = 0; jointIndexInCtrlGroup < MP_GRP_AXES_NUM; jointIndexInCtrlGroup += 1)
-            {
-                char* jointName = ctrlGroup->jointNames_userDefined[jointIndexInCtrlGroup];
-                if (strlen(jointName) != 0)
-                {
-                    if (strcmp(jointName, request->joint_names.data[jointIndexInTraj].data) == 0)
-                    {
-                        bFound = TRUE;
-                        break;
-                    }
-                }
-            }
-
-            if (bFound)
-                break;
-        }
-
-        if (!bFound)
-        {
-            Ros_Debug_BroadcastMsg("Joint name [%s] is not valid. Check motoros2_config.yaml and update accordingly.", request->joint_names.data[jointIndexInTraj].data);
-            Ros_Debug_BroadcastMsg("Valid names:");
-            for (int groupIndex = 0; groupIndex < MAX_CONTROLLABLE_GROUPS; groupIndex += 1)
-            {
-                for (int jointIndex = 0; jointIndex < MP_GRP_AXES_NUM; jointIndex += 1)
-                {
-                    char* configListEntry = g_nodeConfigSettings.joint_names[(groupIndex * MP_GRP_AXES_NUM) + jointIndex];
-                    if (strlen(configListEntry) != 0)
-                        Ros_Debug_BroadcastMsg(" - %s", configListEntry);
-                }
-            }
-
             return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
         }
+        ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
 
         // for point queuing, we create a single-point trajectory, store the incoming
         // point in it and send it off for processing by the trajectory processing
@@ -1144,6 +1079,48 @@ BOOL Ros_MotionControl_HasDataInQueue()
             return TRUE;
         else if (qCnt == ERROR)
             return ERROR;
+    }
+
+    return FALSE;
+}
+
+BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String jointName, int* group_idx, int* joint_idx)
+{
+    CtrlGroup* ctrlGroup;
+    int grpIndex;
+    int jointIndexInCtrlGroup;
+    char* name = jointName.data;
+
+    //find the ctrlgroup for this joint
+    for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
+    {
+        ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
+
+        for (jointIndexInCtrlGroup = 0; jointIndexInCtrlGroup < MP_GRP_AXES_NUM; jointIndexInCtrlGroup += 1)
+        {
+            char* ctrlGroupJointName = ctrlGroup->jointNames_userDefined[jointIndexInCtrlGroup];
+            if (strlen(ctrlGroupJointName) != 0)
+            {
+                if (strcmp(ctrlGroupJointName, name) == 0)
+                {
+                    *group_idx = grpIndex;
+                    *joint_idx = jointIndexInCtrlGroup;
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+    Ros_Debug_BroadcastMsg("Joint name [%s] is not valid. Check motoros2_config.yaml and update accordingly.", name);
+    Ros_Debug_BroadcastMsg("Valid names:");
+    for (int groupIndex = 0; groupIndex < MAX_CONTROLLABLE_GROUPS; groupIndex += 1)
+    {
+        for (int jointIndex = 0; jointIndex < MP_GRP_AXES_NUM; jointIndex += 1)
+        {
+            char* configListEntry = g_nodeConfigSettings.joint_names[(groupIndex * MP_GRP_AXES_NUM) + jointIndex];
+            if (strlen(configListEntry) != 0)
+                Ros_Debug_BroadcastMsg(" - %s", configListEntry);
+        }
     }
 
     return FALSE;
