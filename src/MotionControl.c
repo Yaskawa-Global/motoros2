@@ -360,14 +360,8 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
         if (Ros_MotionControl_AllGroupsInitComplete)
         {
             // if there is no message to process, delay and try again
-            if (ctrlGroup->hasDataToProcess && ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
+            if (!g_Ros_Controller.bStopMotion && ctrlGroup->hasDataToProcess && ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
             {
-                if (g_Ros_Controller.bStopMotion)
-                {
-                    bzero(ctrlGroup->trajectoryToProcess, sizeof(ctrlGroup->trajectoryToProcess));
-                    ctrlGroup->hasDataToProcess = FALSE;
-                    continue;
-                }
 
                 Ros_Debug_BroadcastMsg("Processing next point in trajectory [Group #%d - T=%.3f: (%7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f)]",
                     ctrlGroup->groupNo, (double)ctrlGroup->trajectoryIterator->time * 0.001,
@@ -559,7 +553,7 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
             } // IF this group has a point to process
             else
             {
-                if (Ros_MotionControl_IsMotionMode_Trajectory())
+                if (g_Ros_Controller.bStopMotion || Ros_MotionControl_IsMotionMode_Trajectory())
                 {
                     bzero(ctrlGroup->trajectoryToProcess, sizeof(ctrlGroup->trajectoryToProcess));
                     ctrlGroup->hasDataToProcess = FALSE;
@@ -1045,7 +1039,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
 
                 Ros_ActionServer_FJT_UpdateProgressTracker(&moveData);
             }
-            else
+            else 
                 ret = 0;
 
             if (ret != 0)
@@ -1219,19 +1213,12 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
     // Check that background processing of message has been stopped
     for (checkCnt = 0; checkCnt < MOTION_STOP_TIMEOUT; checkCnt++)
     {
-        BOOL bAtLeastOne = FALSE;
-        for (int i = 0; i < g_Ros_Controller.numGroup; i += 1)
-        {
-            if (g_Ros_Controller.ctrlGroups[i]->hasDataToProcess)
-                bAtLeastOne = TRUE;
-        }
-
-        if (!bAtLeastOne)
+        if (!Ros_MotionControl_HasDataToProcess())
         {
             bStopped = TRUE;
             break;
         }
-        else
+        else 
             Ros_Sleep(1);
     }
 
@@ -1267,8 +1254,6 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
 //-------------------------------------------------------------------
 BOOL Ros_MotionControl_ClearQ_All()
 {
-    BOOL bRet = TRUE;
-
     for (int groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo++)
     {
         // Stop addtional items from being added to the queue
@@ -1286,9 +1271,14 @@ BOOL Ros_MotionControl_ClearQ_All()
             // Unlock the q
             mpSemGive(q->q_lock);
         }
+        else
+        {
+            Ros_Debug_BroadcastMsg("ERROR: Unable to clear queue.  Queue is locked up! (Group #%d)", groupNo);
+            return FALSE;
+        }
     }
 
-    return bRet;
+    return TRUE;
 }
 
 // only for this compilation unit for now
@@ -1520,10 +1510,11 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
     if (Ros_MotionControl_HasDataInQueue())
     {
         Ros_Debug_BroadcastMsg("%s: clearing leftover data in queue", __func__);
-        Ros_MotionControl_ClearQ_All();
 
-        if (Ros_MotionControl_HasDataInQueue())
+        if (Ros_MotionControl_ClearQ_All())
+        {
             Ros_Debug_BroadcastMsg("%s: WARNING: still data in queue", __func__);
+        }
     }
 
     // have to initialize the prevPulsePos that will be used when interpolating the traj
