@@ -16,7 +16,7 @@ static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* 
 
 static int motoRos_PositionMonitor_totalRobots = 0;
 
-void Ros_PositionMonitor_Initialize()
+void Ros_PositionMonitor_Initialize(TF_Static_Data* tf_static_data, rcl_publisher_t* publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static)
 {
     MOTOROS2_MEM_TRACE_START(pos_mon_init);
 
@@ -47,9 +47,9 @@ void Ros_PositionMonitor_Initialize()
     //==================================
     //Create publisher for static cartesian transform (e.g. tool0 to flange)
 
-    Ros_StaticTransformBroadcaster_Init();
+    Ros_StaticTransformBroadcaster_Init(publisher_transform_static, msg_transform_static);
 
-    Ros_PositionMonitor_CalculateStaticTransforms();
+    Ros_PositionMonitor_CalculateStaticTransforms(tf_static_data);
 
     MOTOROS2_MEM_TRACE_REPORT(pos_mon_init);
 }
@@ -218,18 +218,18 @@ static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* 
     }
 }
 
-void Ros_PositionMonitor_CalculateStaticTransforms()
+void Ros_PositionMonitor_CalculateStaticTransforms(TF_Static_Data *tf_static_data)
 {
     MP_XYZ vectorOrg, vectorX, vectorY; //for mpMakeFrame
     vectorOrg.x = 0;    vectorOrg.y = 0;    vectorOrg.z = 0;
     vectorX.x = 0;      vectorX.y = 0;      vectorX.z = 1;
     vectorY.x = 0;      vectorY.y = -1;     vectorY.z = 0;
-    mpMakeFrame(&vectorOrg, &vectorX, &vectorY, &g_TF_Static_Data.frameTool0ToFlange);
-    mpInvFrame(&g_TF_Static_Data.frameTool0ToFlange, &g_TF_Static_Data.frameFlangeToTool0);
-    mpFrameToZYXeuler(&g_TF_Static_Data.frameFlangeToTool0, &g_TF_Static_Data.coordFlangeToTool0);
+    mpMakeFrame(&vectorOrg, &vectorX, &vectorY, &tf_static_data->frameTool0ToFlange);
+    mpInvFrame(&tf_static_data->frameTool0ToFlange, &tf_static_data->frameFlangeToTool0);
+    mpFrameToZYXeuler(&tf_static_data->frameFlangeToTool0, &tf_static_data->coordFlangeToTool0);
 }
 
-bool Ros_PositionMonitor_Send_TF_Static() 
+bool Ros_PositionMonitor_Send_TF_Static(TF_Static_Data* tf_static_data, rcl_publisher_t* publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static)
 {
     //Timestamp
     INT64 theTime = rmw_uros_epoch_nanos();
@@ -245,16 +245,16 @@ bool Ros_PositionMonitor_Send_TF_Static()
         rosidl_runtime_c__String__assign(&messages.data[i].header.frame_id, formatBuffer);
         snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/tool0", frame_prefix, i + 1);
         rosidl_runtime_c__String__assign(&messages.data[i].child_frame_id, formatBuffer);
-        Ros_MpCoord_To_GeomMsgsTransform(&g_TF_Static_Data.coordFlangeToTool0, &messages.data[i].transform);
+        Ros_MpCoord_To_GeomMsgsTransform(&tf_static_data->coordFlangeToTool0, &messages.data[i].transform);
         Ros_Nanos_To_Time_Msg(theTime, &messages.data[i].header.stamp);
     }
     messages.size = motoRos_PositionMonitor_totalRobots;
-    bool ret = Ros_StaticTransformBroadcaster_Send(messages.data, motoRos_PositionMonitor_totalRobots);
+    bool ret = Ros_StaticTransformBroadcaster_Send(publisher_transform_static, msg_transform_static, messages.data, motoRos_PositionMonitor_totalRobots);
     geometry_msgs__msg__TransformStamped__Sequence__fini(&messages);
     return ret;
 }
 
-void Ros_PositionMonitor_Cleanup()
+void Ros_PositionMonitor_Cleanup(rcl_publisher_t* publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static)
 {
     MOTOROS2_MEM_TRACE_START(pos_mon_fini);
 
@@ -286,12 +286,12 @@ void Ros_PositionMonitor_Cleanup()
         Ros_Debug_BroadcastMsg("Failed cleaning up TF publisher: %d", ret);
     tf2_msgs__msg__TFMessage__destroy(g_messages_PositionMonitor.transform);
 
-    Ros_StaticTransformBroadcaster_Cleanup();
+    Ros_StaticTransformBroadcaster_Cleanup(publisher_transform_static, msg_transform_static);
 
     MOTOROS2_MEM_TRACE_REPORT(pos_mon_fini);
 }
 
-void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto, long* pulsePos_moto_track, INT64 timestamp)
+void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto, long* pulsePos_moto_track, TF_Static_Data *tf_static_data, INT64 timestamp)
 {
     double track_pos_meters[MAX_PULSE_AXES];
     BITSTRING figure;
@@ -406,10 +406,10 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
 
     mpMulFrame(&frameBaseToTcp, &frameTcpToTool0, &frameBaseToTool0);
 
-    mpMulFrame(&frameBaseToTool0, &g_TF_Static_Data.frameTool0ToFlange, &frameBaseToFlange);
+    mpMulFrame(&frameBaseToTool0, &tf_static_data->frameTool0ToFlange, &frameBaseToFlange);
     mpFrameToZYXeuler(&frameBaseToFlange, &coordBaseToFlange);
 
-    mpMulFrame(&g_TF_Static_Data.frameFlangeToTool0, &frameTool0ToTcp, &frameFlangeToTcp);
+    mpMulFrame(&tf_static_data->frameFlangeToTool0, &frameTool0ToTcp, &frameFlangeToTcp);
     mpFrameToZYXeuler(&frameFlangeToTcp, &coordToolData);
 
     //=======================
@@ -421,7 +421,7 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
     Ros_MpCoord_To_GeomMsgsTransform(&coordToolData, transform);
 }
 
-void Ros_PositionMonitor_UpdateLocation()
+void Ros_PositionMonitor_UpdateLocation(TF_Static_Data *tf_static_data)
 {
     long pulsePos_moto[MAX_CONTROLLABLE_GROUPS][MAX_PULSE_AXES];
     long pulsePos_moto_track[MAX_CONTROLLABLE_GROUPS][MAX_PULSE_AXES];
@@ -480,7 +480,7 @@ void Ros_PositionMonitor_UpdateLocation()
 
         // cartesian
         if (g_nodeConfigSettings.publish_tf)
-            Ros_PositionMonitor_CalculateTransforms(groupIndex, pulsePos_moto[groupIndex], pulsePos_moto_track[groupIndex], theTime);
+            Ros_PositionMonitor_CalculateTransforms(groupIndex, pulsePos_moto[groupIndex], pulsePos_moto_track[groupIndex], tf_static_data, theTime);
 
         //----------------------------
         //VELOCITY

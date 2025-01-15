@@ -36,12 +36,11 @@ typedef struct
     MP_FRAME frameTool0ToFlange, frameFlangeToTool0;
     MP_COORD coordFlangeToTool0;
 } TF_Static_Data;
-TF_Static_Data g_TF_Static_Data;
 
-extern void Ros_PositionMonitor_Initialize();
-extern void Ros_PositionMonitor_Cleanup();
-extern void Ros_PositionMonitor_UpdateLocation();
-extern bool Ros_PositionMonitor_Send_TF_Static();
-void Ros_PositionMonitor_CalculateStaticTransforms();
+extern void Ros_PositionMonitor_Initialize(TF_Static_Data* tf_static_data, rcl_publisher_t* publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static);
+extern void Ros_PositionMonitor_Cleanup(rcl_publisher_t* publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static);
+extern void Ros_PositionMonitor_UpdateLocation(TF_Static_Data *);
+extern bool Ros_PositionMonitor_Send_TF_Static(TF_Static_Data*, rcl_publisher_t* publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static);
+void Ros_PositionMonitor_CalculateStaticTransforms(TF_Static_Data*);
 
 #endif  // MOTOROS2_POSITION_MONITOR_H

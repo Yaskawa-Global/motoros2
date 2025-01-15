@@ -6,10 +6,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "MotoROS.h"
-rcl_publisher_t g_publishers_transform_static;
-tf2_msgs__msg__TFMessage* g_messages_transform_static;
 
-void Ros_StaticTransformBroadcaster_Init()
+void Ros_StaticTransformBroadcaster_Init(rcl_publisher_t *publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static)
 {
     char formatBuffer[MAX_TF_FRAME_NAME_LENGTH];
 
@@ -43,7 +41,7 @@ void Ros_StaticTransformBroadcaster_Init()
     //-------------
     //create TF publisher (static)
     rcl_ret_t ret = rclc_publisher_init(
-        &g_publishers_transform_static,
+        publisher_transform_static,
         &g_microRosNodeInfo.node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(tf2_msgs, msg, TFMessage),
         formatBuffer,
@@ -53,17 +51,17 @@ void Ros_StaticTransformBroadcaster_Init()
 
     //--------------
     //create message for static cartesian transform
-    g_messages_transform_static = tf2_msgs__msg__TFMessage__create();
+    ret = tf2_msgs__msg__TFMessage__init(msg_transform_static);
 
-    motoRosAssert(geometry_msgs__msg__TransformStamped__Sequence__init(&g_messages_transform_static->transforms, STATIC_TRANSFORM_BROADCASTER_MAX_TF_COUNT),
+    motoRosAssert(geometry_msgs__msg__TransformStamped__Sequence__init(&msg_transform_static->transforms, STATIC_TRANSFORM_BROADCASTER_MAX_TF_COUNT),
         SUBCODE_FAIL_ALLOCATE_STATIC_TRANSFORM);
-    g_messages_transform_static->transforms.size = 0;
+    msg_transform_static->transforms.size = 0;
 }
 
-bool Ros_StaticTransformBroadcaster_Send(geometry_msgs__msg__TransformStamped *msg, int count)
+bool Ros_StaticTransformBroadcaster_Send(rcl_publisher_t *publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static, geometry_msgs__msg__TransformStamped *msg, int count)
 {
     rcl_ret_t ret;
-    geometry_msgs__msg__TransformStamped__Sequence* transforms = &g_messages_transform_static->transforms;
+    geometry_msgs__msg__TransformStamped__Sequence* transforms = &msg_transform_static->transforms;
     for (int i = 0; i < count; i++)
     {
         Ros_Debug_BroadcastMsg("Attempting to publish static transform, %s->%s...", msg->header.frame_id.data, msg->child_frame_id.data);
@@ -92,7 +90,7 @@ bool Ros_StaticTransformBroadcaster_Send(geometry_msgs__msg__TransformStamped *m
             }
         }
     }
-    ret = rcl_publish(&g_publishers_transform_static, g_messages_transform_static, NULL);
+    ret = rcl_publish(publisher_transform_static, msg_transform_static, NULL);
     if (ret == RCL_RET_OK) 
     {
         Ros_Debug_BroadcastMsg("Updated message successfully published");
@@ -103,13 +101,13 @@ bool Ros_StaticTransformBroadcaster_Send(geometry_msgs__msg__TransformStamped *m
     return false;
 }
 
-void Ros_StaticTransformBroadcaster_Cleanup()
+void Ros_StaticTransformBroadcaster_Cleanup(rcl_publisher_t* publisher_transform_static, tf2_msgs__msg__TFMessage* msg_transform_static)
 {
     rcl_ret_t ret;
     Ros_Debug_BroadcastMsg("Cleanup TF STATIC publisher");
-    ret = rcl_publisher_fini(&g_publishers_transform_static, &g_microRosNodeInfo.node);
+    ret = rcl_publisher_fini(publisher_transform_static, &g_microRosNodeInfo.node);
     if (ret != RCL_RET_OK)
         Ros_Debug_BroadcastMsg("Failed cleaning up TF STATIC publisher: %d", ret);
-    tf2_msgs__msg__TFMessage__destroy(g_messages_transform_static);
+    tf2_msgs__msg__TFMessage__fini(msg_transform_static);
 }
 
