@@ -239,22 +239,64 @@ typedef enum
 } ALARM_RCL_RCLC_FAIL_SUBCODE; //8017
 
 
+/// <summary>
+/// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// </summary>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
+extern void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure);
+
+/// <summary>
+/// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display.</param>
+extern void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...);
+
+/// <summary>
+/// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
+/// An additional message will be displayed to help the user understand the error.
+/// Prints messages to debug log indicating the actual and expected values
+/// </summary>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
+/// <param name="actual_str">String containing actual value of variable being checked.</param>
+/// <param name="expected_str">String containing expected value of variable being checked.</param>
+/// <param name="msgFmtOnFailure">Format-string msg to display.</param>
+extern void motoRos_ASSERT_FAIL_ACTUAL_EXPECTED_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actual_str, char* expected_str, char* msgFmtOnFailure, ...);
+
+/// <summary>
+/// Validate that an RCL return value is OK. If the return code is anything other than OK,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will
+/// indicate both a context-specific MotoROS2 code and also the RCL return code.
+/// </summary>
+/// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
+extern void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure);
+
+/// <summary>
+/// Validate that an RCL return value is OK. If the return code is anything other than OK,
+/// then raise a fatal alarm on the pendant and block further execution. The alarm will
+/// indicate both a context-specific MotoROS2 code and also the RCL return code. An additional
+/// message will be displayed to help the user understand the error.
+/// </summary>
+/// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
+/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
+/// <param name="msgFmtOnFailure">Format-string msge to display to the user.</param>
+extern void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...);
+
+extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
+extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
+extern const char* const Ros_ErrorHandling_Init_Trajectory_Status_ToString(Init_Trajectory_Status code);
+
 #define motoRos_ASSERT_GENERIC_COMPARISON_INT_MESSAGE(actual, benchmark, subCodeOnFailure, actualName, benchmarkName, op, msgFmtOnFailure, ...) \
     do { \
         if (!((actual) op (benchmark))) \
         { \
-            char motoRos_error_handling_assert_msg[ERROR_MSG_MAX_SIZE] = {0}; \
-            snprintf(motoRos_error_handling_assert_msg, ERROR_MSG_MAX_SIZE, msgFmtOnFailure, ##__VA_ARGS__); \
-            Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE); \
-            Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE); \
-            mpSetAlarm(ALARM_ASSERTION_FAIL, motoRos_error_handling_assert_msg, subCodeOnFailure); \
-            FOREVER \
-            { \
-                Ros_Debug_BroadcastMsg("MotoROS2 Assertion Failure: %s (subcode: %d)", motoRos_error_handling_assert_msg, subCodeOnFailure); \
-                Ros_Debug_BroadcastMsg("Actual: %s == %d", actualName, (actual)); \
-                Ros_Debug_BroadcastMsg("Expected: %s %s %d (%s)", actualName, #op, (benchmark), benchmarkName); \
-                Ros_Sleep(5000); \
-            } \
+            char motoRos_assert_actual_str[64]; \
+            char motoRos_assert_expected_str[64]; \
+            snprintf((motoRos_assert_actual_str), 64, "Actual: %s == %d", (actualName), (actual)); \
+            snprintf((motoRos_assert_expected_str), 64, "Expected: %s %s %d (%s)", (actualName), (#op), (benchmark), (benchmarkName)); \
+            motoRos_ASSERT_FAIL_ACTUAL_EXPECTED_MESSAGE((subCodeOnFailure), (motoRos_assert_actual_str), (motoRos_assert_expected_str), (msgFmtOnFailure), ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -262,18 +304,11 @@ typedef enum
     do { \
         if (!((actual) op (benchmark))) \
         { \
-            char motoRos_error_handling_assert_msg[ERROR_MSG_MAX_SIZE] = {0}; \
-            snprintf(motoRos_error_handling_assert_msg, ERROR_MSG_MAX_SIZE, msgFmtOnFailure, ##__VA_ARGS__); \
-            Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE); \
-            Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE); \
-            mpSetAlarm(ALARM_ASSERTION_FAIL, motoRos_error_handling_assert_msg, subCodeOnFailure); \
-            FOREVER \
-            { \
-                Ros_Debug_BroadcastMsg("MotoROS2 Assertion Failure: %s (subcode: %d)", motoRos_error_handling_assert_msg, subCodeOnFailure); \
-                Ros_Debug_BroadcastMsg("Actual: %s == %p", actualName, (actual)); \
-                Ros_Debug_BroadcastMsg("Expected: %s %s %p (%s)", actualName, #op, (benchmark), benchmarkName); \
-                Ros_Sleep(5000); \
-            } \
+            char motoRos_assert_actual_str[64]; \
+            char motoRos_assert_expected_str[64]; \
+            snprintf((motoRos_assert_actual_str), 64, "Actual: %s == %p", (actualName), (actual)); \
+            snprintf((motoRos_assert_expected_str), 64, "Expected: %s %s %p (%s)", (actualName), (#op), (benchmark), (benchmarkName)); \
+            motoRos_ASSERT_FAIL_ACTUAL_EXPECTED_MESSAGE((subCodeOnFailure), (motoRos_assert_actual_str), (motoRos_assert_expected_str), (msgFmtOnFailure), ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -501,43 +536,5 @@ typedef enum
 /// <param name="msgFmtOnFailure">Format-string msg to display to the user if the assertion fails.</param>
 #define motoRos_ASSERT_NOT_NULL_MESSAGE(ptr, subCodeOnFailure, msgFmtOnFailure, ...) \
     motoRos_ASSERT_GENERIC_COMPARISON_POINTER_MESSAGE(ptr, NULL, subCodeOnFailure,  #ptr, "NULL", !=, msgFmtOnFailure, ##__VA_ARGS__)
-
-/// <summary>
-/// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
-/// </summary>
-/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
-extern void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure);
-
-/// <summary>
-/// Raise a fatal alarm on the pendant and block further execution. The alarm will indicate a context-specific MotoROS2 code.
-/// An additional message will be displayed to help the user understand the error.
-/// </summary>
-/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display.</param>
-/// <param name="msgFmtOnFailure">Format-string msg to display.</param>
-extern void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...);
-
-/// <summary>
-/// Validate that an RCL return value is OK. If the return code is anything other than OK,
-/// then raise a fatal alarm on the pendant and block further execution. The alarm will
-/// indicate both a context-specific MotoROS2 code and also the RCL return code.
-/// </summary>
-/// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
-/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
-extern void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure);
-
-/// <summary>
-/// Validate that an RCL return value is OK. If the return code is anything other than OK,
-/// then raise a fatal alarm on the pendant and block further execution. The alarm will
-/// indicate both a context-specific MotoROS2 code and also the RCL return code. An additional
-/// message will be displayed to help the user understand the error.
-/// </summary>
-/// <param name="rcl_return_code">RCL return code to verify is OK. Assertion will occur if not OK.</param>
-/// <param name="subCodeOnFailure">Context-specific alarm [subcode] to display in addition to the RCL return code.</param>
-/// <param name="msgFmtOnFailure">Format-string msge to display to the user.</param>
-extern void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...);
-
-extern const char* const Ros_ErrorHandling_ErrNo_ToString(int errNo);
-extern const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCode code);
-extern const char* const Ros_ErrorHandling_Init_Trajectory_Status_ToString(Init_Trajectory_Status code);
 
 #endif  // MOTOROS2_ERROR_HANDLING_H

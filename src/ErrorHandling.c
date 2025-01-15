@@ -133,6 +133,14 @@ void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure)
 }
 void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...)
 {
+    va_list va;
+    va_start(va, msgFmtOnFailure);
+    motoRos_ASSERT_FAIL_ACTUAL_EXPECTED_MESSAGE(subCodeOnFailure, NULL, NULL, msgFmtOnFailure, va);
+    va_end(va);
+}
+
+void motoRos_ASSERT_FAIL_ACTUAL_EXPECTED_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actual_str, char* expected_str, char* msgFmtOnFailure, ...)
+{
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
 
@@ -150,6 +158,8 @@ void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, 
     FOREVER
     {
         Ros_Debug_BroadcastMsg("motoRos_ASSERT_FAIL: %s (subcode: %d)", msg, subCodeOnFailure);
+        Ros_Debug_BroadcastMsg(actual_str);
+        Ros_Debug_BroadcastMsg(expected_str);
         Ros_Sleep(5000);
     }
 }
