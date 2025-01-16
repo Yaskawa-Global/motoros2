@@ -52,14 +52,10 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
     int grpIndex, jointIndexInTraj, pointIndex;
 
     //Verify we're not already running a trajectory
-    for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
+    if (Ros_MotionControl_HasDataToProcess())
     {
-        if (g_Ros_Controller.ctrlGroups[grpIndex]->hasDataToProcess)
-        {
-            Ros_Debug_BroadcastMsg("Already processing trajectory data - Rejecting new trajectory (Group #%d)",
-                g_Ros_Controller.ctrlGroups[grpIndex]->groupNo);
-            return INIT_TRAJ_ALREADY_IN_MOTION;
-        }
+        Ros_Debug_BroadcastMsg("Already processing trajectory data - Rejecting new trajectory");
+        return INIT_TRAJ_ALREADY_IN_MOTION;
     }
 
     Ros_MotionControl_AllGroupsInitComplete = FALSE;
