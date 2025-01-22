@@ -14,7 +14,7 @@
 
 static inline INT64 Ros_Duration_Msg_To_Millis(builtin_interfaces__msg__Duration const* const x)
 {
-    return (INT64)(x->sec * 1000) + (INT64)(x->nanosec * 0.000001);
+    return ((INT64)x->sec * 1000) + (INT64)(x->nanosec * 0.000001);
 }
 
 static inline INT64 Ros_Duration_Msg_To_Nanos(builtin_interfaces__msg__Duration const* const x)
