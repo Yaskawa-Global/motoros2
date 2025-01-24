@@ -26,65 +26,7 @@ Attach the log it produces and a copy of the `PANELBOX.LOG` from the robot's tea
 
 ## Network issues
 
-If you are unable to connect the PC running the micro-ROS agent application and the controller, the network configuration may be the issue. Network problems can sometimes be the root of seemingly unrelated problems, such as rcl/rclc errors.
-
-To troubleshoot network issues, first ensure that the robot controller's IP address is `MANUAL SETTING`. It is important that it is not using DHCP. [See here](../README.md#checking-network-configuration).
-
-If that is not the problem, check that the `agent_ip_address` matches the IP address of the PC. Also make sure that the robot controller IP address is on the same subnet as the PC.
-
-If there is a mismatch somewhere, choose one of the following options:
-
-1. Modify the `agent_ip_address` key in the `motoros2_config.yaml` file and specify an IP address that is on the robot's subnet. Then [propagate the changes to the Yaskawa controller](../README.md#updating-the-configuration). You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller. You will also need to make sure tha the subnet mask matches that of the controller.
-2. Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
-3. Modify the robot controller's network settings to add a gateway which can reach the Agent's IP address.
-
-Refer to the relevant Yaskawa Motoman documentation for information on how to change the controller's network configuration.
-
-Test if the two are connected by opening a terminal on the PC and attempting to ping the robot controller's IP. For example
-
-```shell
-ping 192.168.1.31
-```
-
-If you receive a near-immediate response upon attempting to ping the controller, then the potential network issues mentioned above are resolved. Try to connect again via the micro-ROS agent. If the micro-ROS agent still cannot connect to the controller, there may be a firewall configuration issue.
-
-If you do not receive a near-immediate after attempting to ping the controller, there is still some issue. You may have made a mistake previously, or there could be a firewall issue, or there could be a network hardware issue.
-
-### Firewall issues
-
-Firewall rules on the PC running the micro-ROS agent application may prevent it from connecting to the robot controller. The controller and the PC must be able to send UDP packets back and forth.
-
-Assuming the PC is running Ubuntu, you can check the status of the firewall using the default firewall configuration tool `ufw` with the command below.
-
-```shell
-sudo ufw status
-```
-
-If the status shows as active, you should use the following command to see what firewall rules have been added that may prevent communication.
-
-```shell
-sudo ufw show added
-```
-
-Look at the rules and remove any that may interfere with the connection for MotoROS2. For example, if the rule `ufw deny 8888/udp` was a present, you would want to remove it.
-
-Using `ros2 multicast send` and `ros2 multicast receive` can be helpful for diagnosing firewall problems.
-
-For further discussion on how to fix firewall issues, see [here](https://stackoverflow.com/a/75087882).
-
-If you wish to disable your firewall to test if it is the source of your problem, you may do so, but be aware of the risks associated with that.
-
-It is possible that firewall rules are not visible via `ufw`, but that they are still in place. That goes beyond the scope of this troubleshooting guide, but it is a possibility.
-
-### Other potential network problems
-
-There are other potential network configuration problems.
-
-Make sure that there are no IP address conflicts with either the client PC or the robot controller.
-
-Make sure that all of the connections between the controller and the PC are solid, and that all of the cables and peripheral equipment works properly.
-
-If all else fails, Wireshark can be a valuable tool for finding where network problems lie.
+For difficulty with initial connection with no alarm on the pendant, see the [network troubleshooting guide](troubleshooting.md#network-issues).
 
 ## MotoROS2 error and alarm codes
 
@@ -573,15 +515,7 @@ ALARM 8011
 *Solution:*
 The `agent_ip_address` key in the `motoros2_config.yaml` configuration file is an address that is not reachable by the robot controller.
 
-First, ensure that the robot controller's IP address is `MANUAL SETTING`. It is important that it is not using DHCP. [See here](../README.md#checking-network-configuration).
-
-If that is not the problem, choose one of the following options:
-
-1. Modify the `agent_ip_address` key in the `motoros2_config.yaml` file and specify an IP address that is on the robot's subnet. Then [propagate the changes to the Yaskawa controller](../README.md#updating-the-configuration). You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller.
-2. Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
-3. Modify the robot controller's network settings to add a gateway which can reach the Agent's IP address.
-
-Refer to the relevant Yaskawa Motoman documentation for information on how to change the controller's network configuration.
+Ensure that the robot controller's IP address is not assigned using DHCP and that the controller and the PC are on the same subnet. [See here](network_configuration.md#network-configuration).
 
 ### Alarm: 8011[19]
 
@@ -744,15 +678,7 @@ Where `x` is either `1` or `2`.
 *Solution:*
 This problem is often caused by the `agent_ip_address` key in the `motoros2_config.yaml` configuration file set to an address that is not reachable by the robot controller.
 
-First, ensure that the robot controller's IP address is `MANUAL SETTING`. It is important that it is not using DHCP. [See here](../README.md#checking-network-configuration).
-
-If that is not the problem, choose one of the following options:
-
-1. Modify the `agent_ip_address` key in the `motoros2_config.yaml` file and specify an IP address that is on the robot's subnet. Then [propagate the changes to the Yaskawa controller](../README.md#updating-the-configuration). You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller.
-2. Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
-3. Modify the robot controller's network settings to add a gateway which can reach the Agent's IP address.
-
-Refer to the relevant Yaskawa Motoman documentation for information on how to change the controller's network configuration.
+Ensure that the robot controller's IP address is not assigned using DHCP and that the controller and the PC are on the same subnet. [See here](network_configuration.md#network-configuration).
 
 ### Alarm: 8011[60 - 62]
 
@@ -1263,7 +1189,7 @@ The actual `rcl` return value is given in the text of the alarm (represented by 
 Info about the return value indicating an error can be found [here](https://docs.ros2.org/latest/api/rcl/types_8h_source.html).
 Some problems are user-serviceable based on the diagnoses, and others are indicative of an error within MotoROS2.
 Please reference the troubleshooting steps of the secondary alarm code for more information.
-If the the secondary alarm code is not helpful, then consider checking for faults in the network connection between the PC and the robot controller. If the connection is not stable, `rcl` and `rclc` may return an error.
+If the the secondary alarm code is not helpful, then consider checking for faults in the [network connection](network_configuration.md#network-issues) between the PC and the robot controller. If the connection is not stable, `rcl` and `rclc` may return an error.
 
 If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
