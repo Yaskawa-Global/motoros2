@@ -29,7 +29,7 @@ Init_Trajectory_Status Ros_MotionControl_ConvertTrajectoryToJointMotionData(traj
 /// <param name="group_idx">Index of the control group which has the joint corresponding to jointName</param>
 /// <param name="joint_idx">Index of the axis within the control group which has the joint corresponding to jointName</param>
 /// <returns>TRUE for success, FALSE for failure</returns>
-BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String jointName, int* group_idx, int* joint_idx);
+BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String* jointName, int* group_idx, int* joint_idx);
 
 
 /// <summary>
@@ -109,7 +109,7 @@ Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence
         int jointIndexInCtrlGroup;
         CtrlGroup* ctrlGroup;
 
-        if (!Ros_MotionControl_FindCtrlGroupAndIndex(sequenceGoalJointNames->data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
+        if (!Ros_MotionControl_FindCtrlGroupAndIndex(&sequenceGoalJointNames->data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
         {
             return INIT_TRAJ_INVALID_JOINTNAME;
         }
@@ -624,7 +624,7 @@ UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__Q
         int  jointIndexInCtrlGroup;
         CtrlGroup* ctrlGroup;
 
-        if (!Ros_MotionControl_FindCtrlGroupAndIndex(request->joint_names.data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
+        if (!Ros_MotionControl_FindCtrlGroupAndIndex(&request->joint_names.data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
         {
             return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
         }
@@ -1086,12 +1086,12 @@ BOOL Ros_MotionControl_HasDataInQueue()
     return FALSE;
 }
 
-BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String jointName, int* group_idx, int* joint_idx)
+BOOL Ros_MotionControl_FindCtrlGroupAndIndex(rosidl_runtime_c__String* jointName, int* group_idx, int* joint_idx)
 {
     CtrlGroup* ctrlGroup;
     int grpIndex;
     int jointIndexInCtrlGroup;
-    char* name = jointName.data;
+    char* name = jointName->data;
 
     //find the ctrlgroup for this joint
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
