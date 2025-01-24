@@ -38,7 +38,7 @@ The following sections document how to download, install, configure, use and tro
 - *Online* mode:
   - DX200: insert USB stick with `motoros2_config.yaml` into `CN106` in the controller cabinet
   - YC1000[micro]: load `motoros2_config.yaml` via `USER DEFINED FILES`
-- start an instance of the [micro-ROS Agent](#the-micro-ros-agent) on a PC
+- start an instance of the [micro-ROS Agent](#running-the-micro-ros-agent) on a PC
 - reboot controller
 - verify [MotoROS2 is running](#verifying-successful-installation)
 - read about [known issues and limitations](#known-issues--limitations)
@@ -54,15 +54,18 @@ The following sections document how to download, install, configure, use and tro
   - [Downloading the files](#downloading-the-files)
   - [Extracting the files](#extracting-the-files)
   - [Verifying integrity of the download](#verifying-integrity-of-the-download)
-- [Configuration](#configuration)
-  - [Verifying YAML correctness](#verifying-yaml-correctness)
-- [Example INFORM jobs](#example-inform-jobs)
+- [Building from source](doc/build_from_source.md)
 - [Installation](#installation)
   - [Checking MotoPlus configuration](#checking-motoplus-configuration)
-  - [DX200, YRC1000 and YRC1000micro](#dx200-yrc1000-and-yrc1000micro)
-- [Building from source](doc/build_from_source.md)
-- [Updating the configuration](#updating-the-configuration)
-- [The micro-ROS Agent](#the-micro-ros-agent)
+  - [Installing MotoROS2 out file](#installing-motoros2-out-file)
+- [Example INFORM jobs](#example-inform-jobs)
+- [Understanding the micro-ROS Agent](#understanding-the-micro-ros-agent)
+- [Configuration](#configuration)
+  - [Network Configuration](#network-configuration)
+  - [Configuration File](#configuration-file)
+  - [Verifying YAML correctness](#verifying-yaml-correctness)
+  - [Updating the configuration](#updating-the-configuration)
+- [Running the micro-ROS Agent](#running-the-micro-ros-agent)
   - [Using Docker (Linux Only)](#using-docker-linux-only)
   - [Using the ROS 2 package](#using-the-ros-2-package)
 - [Verifying successful installation](#verifying-successful-installation)
@@ -181,7 +184,7 @@ The values must match *exactly*.
 | YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.3`    | `c0e61adbf5bf6fd6a734211f15bb0f0a` |
 | YRC1000micro  | Jazzy            | `mr2_yrc1m_j.out` | `TODO`     | `TODO`                             |
 
-If the hash matches, proceed with the next section, [Configuration](#configuration).
+If the hash matches, proceed with the next section, [Installation](#installation).
 
 If the hash does not match, download the correct version from the [Releases](https://github.com/yaskawa-global/motoros2/releases) page again (to exclude a failed download was the cause), extract it and run `md5sum` on the binary again.
 If the hash still doesn't match, report the issue on the [issue tracker](https://github.com/yaskawa-global/motoros2/issues).
@@ -189,66 +192,9 @@ Be sure to describe which version of MotoROS2 was downloaded, from where, how it
 
 **Note**: please verify you ran `md5sum` against the `.out` file, not the `.zip` nor any other file included in the release.
 
-## Configuration
+## Building from source
 
-All MotoROS2 distribution `.zip` files come with a template `.yaml` file, which *must* be updated before deployment to a specific Yaskawa Motoman robot controller.
-
-For more information on all configuration settings, please refer to the `motoros2_config.yaml` file in the release `.zip`.
-
-All fields have defaults, except the IP address and UDP port number at which MotoROS2 expects the micro-ROS Agent to be reachable.
-These fields must be set to correct values by users, as otherwise MotoROS2 will not be able to communicate with the ROS 2 node graph.
-
-Edit the template `.yaml` and change the `agent_ip_address` and `agent_port_number` to point to the host which will run the micro-ROS Agent application.
-Review the rest of the configuration file and change values as necessary for your specific deployment.
-
-### Verifying YAML correctness
-
-We recommend checking YAML syntax of the configuration file before copying it to the controller.
-
-**Note**: we recommend using an off-line tool, to prevent information in the `.yaml` file from being submitted to an on-line service.
-Users are of course free to use tools they prefer, but we'll only document using `yamllint` (ie: an off-line tool) in this section.
-
-`yamllint` is written in Python, so works on Windows, Linux and OSX.
-Many package managers (such as `apt`, on Ubuntu and Debian) include it in their default distributions, but the versions available are generally too old, so the developers use a Python virtual environment:
-
-```shell
-python3 -m venv $HOME/venv_yamllint
-source $HOME/venv_yamllint/bin/activate
-(venv_yamllint) pip3 install yamllint
-```
-
-MotoROS2 comes with a configuration file for [yamllint](https://yamllint.readthedocs.io/en/stable) which facilitates checking `motoros2_config.yaml` with the settings the developers use.
-
-To verify the file has been correctly edited:
-
-```shell
-(venv_yamllint) cd /path/to/motoros2/config
-(venv_yamllint) yamllint -s . && echo "all ok"
-```
-
-For a correctly formatted file, this should print `all ok`.
-
-If `yamllint` prints warnings or errors, correct the offending line(s) and rerun `yamllint`.
-
-## Example INFORM jobs
-
-All MotoROS2 release `.zip`s contain a copy of the default INFORM jobs (`.jbi` and associated `.dat`).
-
-The following variants are shipped with MotoROS2 in the `robot_jobs` sub directory:
-
-| **Directory**               | **Description**      | **Supported controller(s)**  |
-|:----------------------------|:---------------------|:-----------------------------|
-| `single_arm`                | Single robot group   | DX200, YRC1000, YRC1000micro |
-| `single_arm_with_ext_axis`  | Robot + station axis | DX200, YRC1000, YRC1000micro |
-| `single_arm_with_base_axis` | Robot + base axis    | DX200, YRC1000, YRC1000micro |
-| `two_arms`                  | Two robot groups     | DX200, YRC1000, YRC1000micro |
-| `sda_dual_arm`              | SDA robots *only*    | -                            |
-
-**These jobs are not required.**
-The INFORM job will be automatically generated at startup.
-These are only provided for convenience to show the required commands if a custom job is required.
-
-If needed, open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues) to ask for support with creating a custom job.
+Please refer to [doc/Building from source](doc/build_from_source.md).
 
 ## Installation
 
@@ -262,18 +208,7 @@ Use the following steps to verify MotoPlus has been correctly configured for Mot
  1. move to `MotoPlus FUNC.`, make sure it is set to `USED`. If it isn't, set it to `USED`
  1. move cursor down to `MOTOMAN DRIVER` and make sure it is set to `USED`. If it isn't, set it to `USED`
 
-#### Checking network configuration
-
-While still in *Maintenance* mode and *MANAGEMENT* security level, check the following network settings:
-
- 1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
- 1. move to `LAN INTERFACE SETTING`, make sure `IP ADDRESS SETTING(LAN[X])` for the NIC you are using is set to `MANUAL SETTING`. If it isn't, set it to `MANUAL SETTING`
- 1. Before leaving this screen, make sure that the robot controller's IP address is on the subnet of the PC running the micro-ROS agent application, and that the PC is on the subnet of the robot controller. To do this, choose one of the following options:
-    - Modify the `agent_ip_address` key in the `motoros2_config.yaml` file and specify an IP address that is on the robot's subnet. Then [propagate the changes to the Yaskawa controller](#updating-the-configuration). You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller.
-    - Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
-    - Modify the robot controller's network settings to add a gateway which can reach the IP address of the subnet of the PC running the micro-ROS agent.
-
-### DX200, YRC1000, and YRC1000micro
+### Installing MotoROS2 out file
 
 Place the `.out` (main binary), `.yaml` (configuration), and `.dat` (I/O names) files on an external storage device: Compact Flash (CF), Secure Digital (SD), and USB sticks can be used depending on the controller model.
 Insert the storage device into the robot's programming pendant.
@@ -355,17 +290,88 @@ If `SAVE DATA CRC CHECK FUNC (FSU)` was disabled at the start of this procedure,
  1. navigate to `SAVE DATA CRC CHECK FUNC (FSU)`
  1. set this feature to `VALID`
 
-## Building from source
+## Example INFORM jobs
 
-Please refer to [doc/Building from source](doc/build_from_source.md).
+All MotoROS2 release `.zip`s contain a copy of the default INFORM jobs (`.jbi` and associated `.dat`).
 
-## Updating the configuration
+The following variants are shipped with MotoROS2 in the `robot_jobs` sub directory:
+
+| **Directory**               | **Description**      | **Supported controller(s)**  |
+|:----------------------------|:---------------------|:-----------------------------|
+| `single_arm`                | Single robot group   | DX200, YRC1000, YRC1000micro |
+| `single_arm_with_ext_axis`  | Robot + station axis | DX200, YRC1000, YRC1000micro |
+| `single_arm_with_base_axis` | Robot + base axis    | DX200, YRC1000, YRC1000micro |
+| `two_arms`                  | Two robot groups     | DX200, YRC1000, YRC1000micro |
+| `sda_dual_arm`              | SDA robots *only*    | -                            |
+
+**These jobs are not required.**
+The INFORM job will be automatically generated at startup.
+These are only provided for convenience to show the required commands if a custom job is required.
+
+If needed, open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues) to ask for support with creating a custom job.
+
+## Understanding the micro-ROS Agent
+
+MotoROS2 is built using the micro-ROS stack.
+micro-ROS applications can not directly communicate with ROS 2 RMWs.
+However, the micro-ROS Agent can act as a transparent bridge between MotoROS2 and ROS 2.
+The micro-ROS agent will run on the host PC which is sending commands to the MotoROS2 node.
+The micro-ROS Agent must always be running for MotoROS2 to function correctly.
+
+## Configuration
+
+### Network configuration
+
+Follow the [network configuration instructions](doc/network_configuration.md#network-configuration)
+
+### Configuration file
+
+All MotoROS2 distribution `.zip` files come with a template `.yaml` file, which *must* be updated before deployment to a specific Yaskawa Motoman robot controller.
+
+For more information on all configuration settings, please refer to the `motoros2_config.yaml` file in the release `.zip`.
+
+All fields have defaults, except the IP address and UDP port number at which MotoROS2 expects the micro-ROS Agent to be reachable.
+These fields must be set to correct values by users, as otherwise MotoROS2 will not be able to communicate with the ROS 2 node graph.
+
+Edit the template `.yaml` and change the `agent_ip_address` and `agent_port_number` to point to the host which will run the micro-ROS Agent application (the PC, not the robot controller).
+Review the rest of the configuration file and change values as necessary for your specific deployment.
+
+### Verifying YAML correctness
+
+We recommend checking YAML syntax of the configuration file before copying it to the controller.
+
+**Note**: we recommend using an off-line tool, to prevent information in the `.yaml` file from being submitted to an on-line service.
+Users are of course free to use tools they prefer, but we'll only document using `yamllint` (ie: an off-line tool) in this section.
+
+`yamllint` is written in Python, so works on Windows, Linux and OSX.
+Many package managers (such as `apt`, on Ubuntu and Debian) include it in their default distributions, but the versions available are generally too old, so the developers use a Python virtual environment:
+
+```shell
+python3 -m venv $HOME/venv_yamllint
+source $HOME/venv_yamllint/bin/activate
+(venv_yamllint) pip3 install yamllint
+```
+
+MotoROS2 comes with a configuration file for [yamllint](https://yamllint.readthedocs.io/en/stable) which facilitates checking `motoros2_config.yaml` with the settings the developers use.
+
+To verify the file has been correctly edited:
+
+```shell
+(venv_yamllint) cd /path/to/motoros2/config
+(venv_yamllint) yamllint -s . && echo "all ok"
+```
+
+For a correctly formatted file, this should print `all ok`.
+
+If `yamllint` prints warnings or errors, correct the offending line(s) and rerun `yamllint`.
+
+### Updating the configuration
 
 It may be necessary to update MotoROS2 configuration during or after initial deployment.
 
-### YRC1000 and YRC1000micro
+#### YRC1000 and YRC1000micro
 
-#### Controller software YAS4.70 or YBS3.02 or later
+##### Controller software YAS4.70 or YBS3.02 or later
 
 In *Normal Operation* mode:
 
@@ -378,7 +384,7 @@ In *Normal Operation* mode:
  1. touch `[YES]` to overwrite
  1. reboot the robot controller
 
-#### Older controller software
+##### Older controller software
 
 Due to the way the controller treats files, `motoros2_config.yaml` cannot be directly overwritten using the `[EX MEMORY]` menu.
 Instead, MotoROS2 has a built-in mechanism which updates the controller's copy of the `.yaml` file with a new version placed on a USB stick.
@@ -414,7 +420,7 @@ To extract a copy of your current configuration from the teach pendant:
 1. cursor to `USER DEFINED FILES` and press `[SELECT]`
 1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
 
-### DX200 only
+#### DX200 only
 
  1. power down the robot controller and open the cabinet
  1. locate the USB port labelled `CN106` on the robot's CPU board and remove the USB stick
@@ -423,10 +429,7 @@ To extract a copy of your current configuration from the teach pendant:
  1. power on the controller and wait for it to fully boot (ie: you see the regular UI on the teach pendant)
  1. verify MotoROS2 has started
 
-## The micro-ROS Agent
-
-The micro-ROS Agent acts as the transparent bridge between MotoROS2 and ROS 2.
-As micro-ROS applications can not directly communicate with ROS 2 RMWs, the Agent must always be running for MotoROS2 to function correctly.
+## Running the micro-ROS Agent
 
 There are two main ways to run the Agent: using a Docker image or by building it in a Colcon workspace.
 
@@ -555,7 +558,7 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 
 ## Verifying successful installation
 
-After the final reboot of the controller, and after [starting the micro-ROS Agent](#the-micro-ros-agent), the Agent should show MotoROS2 registering its publishers, services and action servers.
+After the final reboot of the controller, and after [starting the micro-ROS Agent](#running-the-micro-ros-agent), the Agent should show MotoROS2 registering its publishers, services and action servers.
 
 Note: if you are using ROS 2 Galactic, please first read [Only FastDDS is supported](#only-fastdds-is-supported).
 
@@ -569,13 +572,15 @@ Now run `ros2 node list`.
 Provided you have no other ROS 2 nodes running, you should see a single `motoman_ab_cd_ef` node listed, with `ab_cd_ef` being the last three bytes of the MAC address of the controller.
 If you set `node_name` to something else in [the configuration](#updating-the-configuration), you should of course see the expected node name listed instead.
 
+If the node is not listed, use the [debug log client](doc/troubleshooting.md#debug-log-client) as a tool and the [network troubleshooting guide](doc/network_configuration.md#network-issues) as a starting point for troubleshooting.
+
 ## Usage
 
 ### Basic usage with ROS
 
 Note: if you are using ROS 2 Galactic, please first read [Only FastDDS is supported](#only-fastdds-is-supported).
 
-As MotoROS2 uses micro-ROS, you must always make sure to first [start the micro-ROS Agent](#the-micro-ros-agent).
+As MotoROS2 uses micro-ROS, you must always make sure to first [start the micro-ROS Agent](#running-the-micro-ros-agent).
 After registration with the Agent, MotoROS2 behaves like any other ROS 2 node.
 
 For initial discovery of the ROS API, we recommend using the [ros2 node](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html), [ros2 topic](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html), [ros2 service](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services/Understanding-ROS2-Services.html) and [ros2 action](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html) commandlets.

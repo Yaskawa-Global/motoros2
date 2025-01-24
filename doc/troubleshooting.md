@@ -498,7 +498,7 @@ ALARM 8011
 *Solution:*
 The `agent_ip_address` and `agent_port_number` keys must be configured in the `motoros2_config.yaml` configuration file.
 This must be the IP address of the PC that runs the micro-ROS Agent application.
-The port must match the number that was used when [starting the agent](../README.md#the-micro-ros-agent) (default is `8888`).
+The port must match the number that was used when [starting the agent](../README.md#running-the-micro-ros-agent) (default is `8888`).
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 

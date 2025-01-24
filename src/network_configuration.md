@@ -1,16 +1,23 @@
-﻿## Network Configuration
+﻿<!--
+SPDX-FileCopyrightText: 2023, Yaskawa America, Inc.
+SPDX-FileCopyrightText: 2023, Delft University of Technology
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+-->
+
+# Network Configuration
 
 You will need to use a LAN cable to allow the robot controller to communicate with the PC running the [micro-ROS Agent](../README.md#the-micro-ros-agent).
 
 - On DX200 and YRC1000micro, this will connect to the `LAN` port.
 - On the YRC1000, you may choose to connect this to either the `LAN2` port or the `LAN3` port
 
-The simplest configuration will have the robot simply plugged directly in to the PC. 
+The simplest configuration will have the robot simply plugged directly in to the PC.
 More complicated configurations are common, but is recommended to have a direct connection until initial setup is complete to reduce points of failure.
 
-### Configuring Controller
+## Configuring Controller
 
-#### YRC1000 and YRC1000micro
+### YRC1000 and YRC1000micro
 
 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode
 1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
@@ -19,7 +26,7 @@ More complicated configurations are common, but is recommended to have a direct 
 1. make sure `IP ADDRESS SETTING(LAN[X])` for the port you are using is set to `MANUAL SETTING`. If it not, make sure that `DNS SETTING` and `SNTP SETTING` are not set to `DHCP SETTING` for the NIC you are using (change them if you need to), and then set `IP ADDRESS SETTING` to `MANUAL SETTING`
 1. hit `{ENTER}` on the pendant keypad and touch `[OK]`
 
-#### DX200
+### DX200
 
 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode
 1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
@@ -28,7 +35,7 @@ More complicated configurations are common, but is recommended to have a direct 
 1. make sure that `IP ADDRESS SETTING` is set to `MANUAL SETTING`. If it is not, make sure that `DNS SETTING` and `SNTP SETTING` are not set to `DHCP SETTING` (change them if you need to), and then set `IP ADDRESS SETTING` to `MANUAL SETTING`
 1. hit `{ENTER}` on the pendant keypad and touch `[OK]`
 
-### Get controller and PC on same subnet
+## Get controller and PC on same subnet
 
 If the controller and PC are not on the same subnet, choose one of the following options:
 
@@ -87,11 +94,11 @@ sudo ufw show added
 
 As an example of a rule that may interfere with MotoROS2 communication, `ufw deny from any proto udp` as a high priority rule would make it impossible to connect.
 
-There are many ways to fix the issue if it is a firewall. 
+There are many ways to fix the issue if it is a firewall.
 You could create firewall rules that specifically permit the connection with higher priority than the rules that deny communication.
 For example, if the rules from the following set of commands are given high priority, they will allow for UDP connection for host PC IP address `192.168.1.15` and controller IP address `192.168.1.31` on port `8888` for ROS2 communication and on port `21789` for debug communication.
 
-Note that this an extremely narrow set of rules that would permit communication. Much more concise rules could be applied. 
+Note that this an extremely narrow set of rules that would permit communication. Much more concise rules could be applied.
 
 ```shell
 sudo ufw allow out from 192.168.1.15 to 192.168.1.31 proto udp
