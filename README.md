@@ -61,7 +61,7 @@ The following sections document how to download, install, configure, use and tro
 - [Example INFORM jobs](#example-inform-jobs)
 - [Understanding the micro-ROS Agent](#understanding-the-micro-ros-agent)
 - [Configuration](#configuration)
-  - [Network Configuration](#network-configuration)
+  - [Network Configuration](doc/network-configuration.md)
   - [Configuration File](#configuration-file)
   - [Verifying YAML correctness](#verifying-yaml-correctness)
   - [Updating the configuration](#updating-the-configuration)

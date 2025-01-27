@@ -515,7 +515,8 @@ ALARM 8011
 *Solution:*
 The `agent_ip_address` key in the `motoros2_config.yaml` configuration file is an address that is not reachable by the robot controller.
 
-Ensure that the robot controller's IP address is not assigned using DHCP and that the controller and the PC are on the same subnet. [See here](network_configuration.md#network-configuration).
+Ensure that the robot controller's IP address is not assigned using DHCP and that the controller and the PC are on the same subnet.
+[See here](network_configuration.md#network-configuration).
 
 ### Alarm: 8011[19]
 
@@ -678,7 +679,8 @@ Where `x` is either `1` or `2`.
 *Solution:*
 This problem is often caused by the `agent_ip_address` key in the `motoros2_config.yaml` configuration file set to an address that is not reachable by the robot controller.
 
-Ensure that the robot controller's IP address is not assigned using DHCP and that the controller and the PC are on the same subnet. [See here](network_configuration.md#network-configuration).
+Ensure that the robot controller's IP address is not assigned using DHCP and that the controller and the PC are on the same subnet.
+[See here](network_configuration.md#network-configuration).
 
 ### Alarm: 8011[60 - 62]
 
@@ -965,7 +967,9 @@ If the alarm is raised again, and if auto-detection is not needed or desired, ma
 
 On YRC1000, set it to either `USER_LAN1` or `USER_LAN2`, depending on which LAN port is used to connect the controller to the PC running the micro-ROS Agent application.
 
-If auto-detection is to be used, verify `agent_ip_address` is set to an IP that can be reached by MotoROS2 over the LAN port which is connected to the PC running the micro-ROS Agent application (either directly, or via a default gateway configured on the controller). Also, make sure that on the robot controller, the `IP ADDRESS SETTING(LAN[X])` for the LAN port being used is set to `MANUAL SETTING`. [See here](../README.md#checking-network-configuration).
+If auto-detection is to be used, verify `agent_ip_address` is set to an IP that can be reached by MotoROS2 over the LAN port which is connected to the PC running the micro-ROS Agent application (either directly, or via a default gateway configured on the controller).
+Also, make sure that on the robot controller, the `IP ADDRESS SETTING(LAN[X])` for the LAN port being used is set to `MANUAL SETTING`.
+[See here](../README.md#checking-network-configuration).
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
@@ -1189,7 +1193,8 @@ The actual `rcl` return value is given in the text of the alarm (represented by 
 Info about the return value indicating an error can be found [here](https://docs.ros2.org/latest/api/rcl/types_8h_source.html).
 Some problems are user-serviceable based on the diagnoses, and others are indicative of an error within MotoROS2.
 Please reference the troubleshooting steps of the secondary alarm code for more information.
-If the the secondary alarm code is not helpful, then consider checking for faults in the [network connection](network_configuration.md#network-issues) between the PC and the robot controller. If the connection is not stable, `rcl` and `rclc` may return an error.
+If the the secondary alarm code is not helpful, then consider checking for faults in the [network connection](network_configuration.md#network-issues) between the PC and the robot controller.
+If the connection is not stable, `rcl` and `rclc` may return an error.
 
 If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
 Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).

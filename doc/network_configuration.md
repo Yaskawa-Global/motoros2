@@ -7,7 +7,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Network Configuration
 
-You will need to use a LAN cable to allow the robot controller to communicate with the PC running the [micro-ROS Agent](../README.md#the-micro-ros-agent).
+You will need to use a LAN cable to allow the robot controller to communicate with the PC running the [micro-ROS Agent](../README.md#understanding-the-micro-ros-agent).
 
 - On DX200 and YRC1000micro, this will connect to the `LAN` port.
 - On the YRC1000, you may choose to connect this to either the `LAN2` port or the `LAN3` port
@@ -23,7 +23,8 @@ More complicated configurations are common, but is recommended to have a direct 
 1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
 1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
 1. move to `LAN INTERFACE SETTING`
-1. make sure `IP ADDRESS SETTING(LAN[X])` for the port you are using is set to `MANUAL SETTING`. If it not, make sure that `DNS SETTING` and `SNTP SETTING` are not set to `DHCP SETTING` for the NIC you are using (change them if you need to), and then set `IP ADDRESS SETTING` to `MANUAL SETTING`
+1. make sure `IP ADDRESS SETTING(LAN[X])` for the port you are using is set to `MANUAL SETTING`.
+If it is not, make sure that `DNS SETTING` and `SNTP SETTING` are not set to `DHCP SETTING` for the NIC you are using (change them if you need to), and then set `IP ADDRESS SETTING` to `MANUAL SETTING`
 1. hit `{ENTER}` on the pendant keypad and touch `[OK]`
 
 ### DX200
@@ -32,15 +33,19 @@ More complicated configurations are common, but is recommended to have a direct 
 1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
 1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
 1. move to `NETWORK SETTING` and then to `HOST SETUP`
-1. make sure that `IP ADDRESS SETTING` is set to `MANUAL SETTING`. If it is not, make sure that `DNS SETTING` and `SNTP SETTING` are not set to `DHCP SETTING` (change them if you need to), and then set `IP ADDRESS SETTING` to `MANUAL SETTING`
+1. make sure that `IP ADDRESS SETTING` is set to `MANUAL SETTING`.
+If it is not, make sure that `DNS SETTING` and `SNTP SETTING` are not set to `DHCP SETTING` (change them if you need to), and then set `IP ADDRESS SETTING` to `MANUAL SETTING`
 1. hit `{ENTER}` on the pendant keypad and touch `[OK]`
 
 ## Get controller and PC on same subnet
 
 If the controller and PC are not on the same subnet, choose one of the following options:
 
-- Modify the `agent_ip_address` key in the `motoros2_config.yaml` file and specify an IP address that is on the robot's subnet. See [here](../README.md#configuration-file) for informationa about the config file. Then [propagate the changes to the Yaskawa controller](../README.md#updating-the-configuration). You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller.
-- Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
+- Modify the `agent_ip_address` key in the `motoros2_config.yaml` file and specify an IP address that is on the robot's subnet.
+See [here](../README.md#configuration-file) for information about the config file.
+Then [propagate the changes to the Yaskawa controller](../README.md#updating-the-configuration).
+You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller.
+-Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
 - Modify the robot controller's network settings to add a gateway which can reach the IP address of the subnet of the PC running the micro-ROS agent.
 
 ## Network issues
@@ -49,7 +54,7 @@ If you are unable to connect the PC running the micro-ROS agent application and 
 Network problems can sometimes be the root of seemingly unrelated problems, such as rcl/rclc errors.
 
 To troubleshoot network issues, first ensure that the robot controller's IP address is `MANUAL SETTING`.
-It is important that it is [not using DHCP](#network-configuration).
+It is important that it is not using DHCP.
 
 If that is not the problem, check that the `agent_ip_address` in the yaml configuration matches the IP address of the PC.
 Also make sure that the [robot controller IP address is on the same subnet as the PC](#get-controller-and-pc-on-same-subnet).
@@ -98,7 +103,8 @@ There are many ways to fix the issue if it is a firewall.
 You could create firewall rules that specifically permit the connection with higher priority than the rules that deny communication.
 For example, if the rules from the following set of commands are given high priority, they will allow for UDP connection for host PC IP address `192.168.1.15` and controller IP address `192.168.1.31` on port `8888` for ROS2 communication and on port `21789` for debug communication.
 
-Note that this an extremely narrow set of rules that would permit communication. Much more concise rules could be applied.
+Note that this an extremely narrow set of rules that would permit communication.
+Much more concise rules could be applied.
 
 ```shell
 sudo ufw allow out from 192.168.1.15 to 192.168.1.31 proto udp
