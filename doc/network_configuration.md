@@ -45,7 +45,7 @@ If the controller and PC are not on the same subnet, choose one of the following
 See [here](../README.md#configuration-file) for information about the config file.
 Then [propagate the changes to the Yaskawa controller](../README.md#updating-the-configuration).
 You will need to ensure that the PC running the micro-ROS agent application uses this static IP address on the network port connected to the robot controller.
--Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
+- Modify the robot controller's IP and subnet mask so it is on the subnet of the PC running the micro-ROS agent.
 - Modify the robot controller's network settings to add a gateway which can reach the IP address of the subnet of the PC running the micro-ROS agent.
 
 ## Network issues
