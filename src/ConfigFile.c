@@ -147,7 +147,7 @@ void Ros_ConfigFile_SetAllDefaultValues()
     {
         Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
             __func__, ROS_USER_LAN1, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA0,
+        motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA0,
             "Must enable ETHERNET function");
     }
 
@@ -157,7 +157,7 @@ void Ros_ConfigFile_SetAllDefaultValues()
     {
         Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
             __func__, ROS_USER_LAN2, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA1,
+        motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA1,
             "Must enable ETHERNET function");
     }
 #endif
@@ -536,16 +536,29 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     //NOTE 2: this does not affect the micro-ROS side (ie: MotoROS2).
     //        This setting is used by the Agent to join the correct
     //        DDS domain.
-    motoRosAssert_withMsg(g_nodeConfigSettings.ros_domain_id >= MIN_ROS_DOMAIN_ID_LINUX && g_nodeConfigSettings.ros_domain_id <= MAX_ROS_DOMAIN_ID_LINUX,
-        SUBCODE_CONFIGURATION_INVALID_DOMAIN_ID,
+    motoRos_ASSERT_GREATER_THAN_OR_EQUAL_TO_INT_MESSAGE(g_nodeConfigSettings.ros_domain_id, 
+        MIN_ROS_DOMAIN_ID_LINUX,
+        SUBCODE_FAIL_OPTIONS_INIT_DOMAIN_ID_TOO_SMALL,
+        "Domain ID (%d) invalid",
+        g_nodeConfigSettings.ros_domain_id);
+
+    motoRos_ASSERT_LESS_THAN_OR_EQUAL_TO_INT_MESSAGE(g_nodeConfigSettings.ros_domain_id, 
+        MAX_ROS_DOMAIN_ID_LINUX,
+        SUBCODE_FAIL_OPTIONS_INIT_DOMAIN_ID_TOO_LARGE,
         "Domain ID (%d) invalid",
         g_nodeConfigSettings.ros_domain_id);
 
     //-----------------------------------------
     //Verify we have an Agent address
-    motoRosAssert_withMsg(strlen(g_nodeConfigSettings.agent_ip_address) != 0 && strlen(g_nodeConfigSettings.agent_port_number) != 0,
+    motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(strlen(g_nodeConfigSettings.agent_ip_address),
+        0,
         SUBCODE_CONFIGURATION_MISSING_AGENT_IP,
-        "Missing Agent IP/Port");
+        "Missing Agent IP");
+
+    motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(strlen(g_nodeConfigSettings.agent_port_number),
+        0,
+        SUBCODE_CONFIGURATION_MISSING_AGENT_PORT,
+        "Missing Agent Port");
 
     //-----------------------------------------
     //Verify agent is on my subnet (or a gateway is specified)
@@ -554,7 +567,7 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     //check first lan port
     STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
         g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnMySubnet);
-    motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+    motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
         "Host on NIC check 1");
 
 #if defined (YRC1000)
@@ -563,24 +576,26 @@ void Ros_ConfigFile_ValidateCriticalSettings()
         //check second lan port
         status = Ros_ConfigFile_HostOnNetworkInterface(
             g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnMySubnet);
-        motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+        motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
             "Host on NIC check 2");
     }
 #endif
 
-    motoRosAssert_withMsg(bAgentOnMySubnet,
+    motoRos_ASSERT_TRUE_MESSAGE(bAgentOnMySubnet,
         SUBCODE_CONFIGURATION_INVALID_AGENT_SUBNET,
         "Agent IP on wrong subnet");
 
     //-----------------------------------------
     //Verify we have node name
-    motoRosAssert_withMsg(Ros_strnlen(g_nodeConfigSettings.node_name, MAX_YAML_STRING_LEN) != 0,
+    motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(Ros_strnlen(g_nodeConfigSettings.node_name, MAX_YAML_STRING_LEN), 
+        0,
         SUBCODE_CONFIGURATION_INVALID_NODE_NAME,
         "Must specify node name");
 
     //-----------------------------------------
     //Verify we have an INFORM job name
-    motoRosAssert_withMsg(Ros_strnlen(g_nodeConfigSettings.inform_job_name, MAX_YAML_STRING_LEN) != 0,
+    motoRos_ASSERT_NOT_EQUAL_INT_MESSAGE(Ros_strnlen(g_nodeConfigSettings.inform_job_name, MAX_YAML_STRING_LEN), 
+        0,
         SUBCODE_CONFIGURATION_INVALID_JOB_NAME,
         "Must specify INFORM job name");
 }
@@ -641,7 +656,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
             BOOL bAgentOnInterface = FALSE;
             STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
                 g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnInterface);
-            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+            motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
                 "Host on NIC check 1 auto-detect");
 
             if (bAgentOnInterface)
@@ -660,7 +675,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
             BOOL bAgentOnInterface = FALSE;
             STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
                 g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnInterface);
-            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
+            motoRos_ASSERT_EQUAL_INT_MESSAGE(status, OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
                 "Host on NIC check 2 auto-detect");
 
             if (bAgentOnInterface)

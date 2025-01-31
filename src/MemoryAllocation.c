@@ -78,5 +78,5 @@ void Ros_Allocation_Initialize(rcl_allocator_t* const allocator)
     allocator->state = NULL;
 
     //configure Micro-ROS to use our allocator. Errors are fatal.
-    motoRosAssert(rcutils_set_default_allocator(allocator), SUBCODE_FAIL_MEM_ALLOC_CFG);
+    motoRos_ASSERT_TRUE(rcutils_set_default_allocator(allocator), SUBCODE_FAIL_MEM_ALLOC_CFG);
 }

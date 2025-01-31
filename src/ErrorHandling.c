@@ -127,45 +127,49 @@ const char* const Ros_ErrorHandling_Init_Trajectory_Status_ToString(Init_Traject
     }
 }
 
-void motoRosAssert(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
+void motoRos_ASSERT_FAIL(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure)
 {
-    motoRosAssert_withMsg(mustBeTrue, subCodeIfFalse, APPLICATION_NAME ": Fatal Error");
+    motoRos_ASSERT_FAIL_MESSAGE(subCodeOnFailure, APPLICATION_NAME ": Fatal Error");
+}
+void motoRos_ASSERT_FAIL_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...)
+{
+    va_list va;
+    va_start(va, msgFmtOnFailure);
+    motoRos_ASSERT_FAIL_ACTUAL_EXPECTED_MESSAGE(subCodeOnFailure, NULL, NULL, msgFmtOnFailure, va);
+    va_end(va);
 }
 
-void motoRosAssert_withMsg(BOOL mustBeTrue, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
+void motoRos_ASSERT_FAIL_ACTUAL_EXPECTED_MESSAGE(ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* actual_str, char* expected_str, char* msgFmtOnFailure, ...)
 {
     char msg[ERROR_MSG_MAX_SIZE];
     va_list va;
 
-    if (mustBeTrue)
-    {
-        return;
-    }
-
     bzero(msg, ERROR_MSG_MAX_SIZE);
 
-    va_start(va, msgFmtIfFalse);
-    vsnprintf(msg, ERROR_MSG_MAX_SIZE, msgFmtIfFalse, va);
+    va_start(va, msgFmtOnFailure);
+    vsnprintf(msg, ERROR_MSG_MAX_SIZE, msgFmtOnFailure, va);
     va_end(va);
 
     Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
     Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE);
 
-    mpSetAlarm(ALARM_ASSERTION_FAIL, msg, subCodeIfFalse);
+    mpSetAlarm(ALARM_ASSERTION_FAIL, msg, subCodeOnFailure);
 
     FOREVER
     {
-        Ros_Debug_BroadcastMsg("motoRosAssert: %s (subcode: %d)", msg, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_ASSERT_FAIL: %s (subcode: %d)", msg, subCodeOnFailure);
+        Ros_Debug_BroadcastMsg(actual_str);
+        Ros_Debug_BroadcastMsg(expected_str);
         Ros_Sleep(5000);
     }
 }
 
-void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse)
+void motoRos_RCLAssertOK(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure)
 {
-    motoRos_RCLAssertOK_withMsg(rcl_return_code, subCodeIfFalse, APPLICATION_NAME ": Fatal Error");
+    motoRos_RCLAssertOK_withMsg(rcl_return_code, subCodeOnFailure, APPLICATION_NAME ": Fatal Error");
 }
 
-void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeIfFalse, char* msgFmtIfFalse, ...)
+void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCODE subCodeOnFailure, char* msgFmtOnFailure, ...)
 {
     char rcl_api_msg[ERROR_MSG_MAX_SIZE];
     char assert_msg[ERROR_MSG_MAX_SIZE];
@@ -179,20 +183,20 @@ void motoRos_RCLAssertOK_withMsg(int rcl_return_code, ALARM_ASSERTION_FAIL_SUBCO
 
     snprintf(rcl_api_msg, ERROR_MSG_MAX_SIZE, "RCL(C) API error: %d", rcl_return_code);
 
-    va_start(va, msgFmtIfFalse);
-    vsnprintf(assert_msg, ERROR_MSG_MAX_SIZE, msgFmtIfFalse, va);
+    va_start(va, msgFmtOnFailure);
+    vsnprintf(assert_msg, ERROR_MSG_MAX_SIZE, msgFmtOnFailure, va);
     va_end(va);
 
     Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
     Ros_Controller_SetIOState(IO_FEEDBACK_INITIALIZATION_DONE, FALSE);
 
     mpSetAlarm(ALARM_RCL_RCLC_FAIL, rcl_api_msg, SUBCODE_RCL_RCLC_API_ERROR);
-    mpSetAlarm(ALARM_ASSERTION_FAIL, assert_msg, subCodeIfFalse);
+    mpSetAlarm(ALARM_ASSERTION_FAIL, assert_msg, subCodeOnFailure);
 
     FOREVER
     {
         Ros_Debug_BroadcastMsg("motoRos_RCLAssertOK: %s (alarm code: %d) (subcode: %d)", rcl_api_msg, ALARM_RCL_RCLC_FAIL, SUBCODE_RCL_RCLC_API_ERROR);
-        Ros_Debug_BroadcastMsg("motoRos_RCLAssertOK: %s (alarm code: %d) (subcode: %d)", assert_msg, ALARM_ASSERTION_FAIL, subCodeIfFalse);
+        Ros_Debug_BroadcastMsg("motoRos_RCLAssertOK: %s (alarm code: %d) (subcode: %d)", assert_msg, ALARM_ASSERTION_FAIL, subCodeOnFailure);
         Ros_Sleep(5000);
     }
 }
