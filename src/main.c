@@ -51,6 +51,10 @@ void Ros_ReportVersionInfoToController()
 
 void RosInitTask()
 {
+    TF_Static_Data tf_static_data;
+    rcl_publisher_t publisher_transform_static; 
+    tf2_msgs__msg__TFMessage msg_transform_static;
+
     g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
 
     Ros_ConfigFile_SetAllDefaultValues();
@@ -123,7 +127,7 @@ void RosInitTask()
 
         Ros_InformChecker_ValidateJob();
 
-        Ros_PositionMonitor_Initialize();
+        Ros_PositionMonitor_Initialize(&tf_static_data, &publisher_transform_static, &msg_transform_static);
         Ros_ActionServer_FJT_Initialize(); //initialize action server - FollowJointTrajectory
 
         Ros_ServiceQueueTrajPoint_Initialize();
@@ -146,9 +150,10 @@ void RosInitTask()
 
         Ros_Debug_BroadcastMsg("Initialization complete.");
 
+        Ros_PositionMonitor_Send_TF_Static(&tf_static_data, &publisher_transform_static, &msg_transform_static);
+
         //==================================
         ULONG tickBefore = 0;
-
         while(g_Ros_Communication_AgentIsConnected)
         {
             //figure out how long to sleep to achieve the user-configured rate
@@ -182,7 +187,7 @@ void RosInitTask()
             }
 
             //Update robot's feedback position and publish the topics
-            Ros_PositionMonitor_UpdateLocation();
+            Ros_PositionMonitor_UpdateLocation(&tf_static_data);
         }
 
         //==================================
@@ -213,7 +218,7 @@ void RosInitTask()
         Ros_ServiceQueueTrajPoint_Cleanup();
 
         Ros_ActionServer_FJT_Cleanup();
-        Ros_PositionMonitor_Cleanup();
+        Ros_PositionMonitor_Cleanup(&publisher_transform_static, &msg_transform_static);
         Ros_Controller_Cleanup();
         Ros_Communication_Cleanup(); 
         Ros_mpGetRobotCalibrationData_Cleanup();
