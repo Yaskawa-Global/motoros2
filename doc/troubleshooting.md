@@ -620,7 +620,7 @@ These alarms are often caused by version incompatibilities between ROS 2 (on the
 
 Ensure only compatible versions are used.
 
-As an example: the *Humble* version of MotoROS2 should only be used with ROS 2 *Humble* on the client PC and with the *Humble* version of the micro-ROS Agent.
+As an example: the *Jazzy* version of MotoROS2 should only be used with ROS 2 *Jazzy* on the client PC and with the *Jazzy* version of the micro-ROS Agent.
 Please also verify the client PC uses a version of ROS 2 that is [supported by MotoROS2](https://github.com/Yaskawa-Global/motoros2#general-requirements).
 
 If the behavior persists, save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.

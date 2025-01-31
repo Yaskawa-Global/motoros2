@@ -5,38 +5,47 @@ SPDX-License-Identifier: Apache-2.0
 -->
 <root>
 	<libExtension>
+		<YRC1000_jazzy>yrcLib_jazzy;yrcLib</YRC1000_jazzy>
+		<YRC1000u_jazzy>yrcmLib_jazzy;yrcmLib</YRC1000u_jazzy>
+		<DX200_jazzy>dnLib_jazzy;dnLib</DX200_jazzy>
 		<YRC1000_humble>yrcLib_humble;yrcLib</YRC1000_humble>
 		<YRC1000u_humble>yrcmLib_humble;yrcmLib</YRC1000u_humble>
+		<DX200_humble>dnLib_humble;dnLib</DX200_humble>
 		<YRC1000_foxy>yrcLib_foxy;yrcLib</YRC1000_foxy>
 		<YRC1000u_foxy>yrcmLib_foxy;yrcmLib</YRC1000u_foxy>
+		<DX200_foxy>dnLib_foxy;dnLib</DX200_foxy>
 		<YRC1000_galactic>yrcLib_galactic;yrcLib</YRC1000_galactic>
 		<YRC1000u_galactic>yrcmLib_galactic;yrcmLib</YRC1000u_galactic>
-		<DX200_humble>dnLib_humble;dnLib</DX200_humble>
-		<DX200_foxy>dnLib_foxy;dnLib</DX200_foxy>
 		<DX200_galactic>dnLib_galactic;dnLib</DX200_galactic>
 	</libExtension>
 	
 	<appName>
+		<YRC1000_jazzy>MOTOPLUS-YRC1000</YRC1000_jazzy>
+		<YRC1000u_jazzy>MOTOPLUS-YRC1000micro</YRC1000u_jazzy>
+		<DX200_jazzy>MOTOPLUS-DX200</DX200_jazzy>
 		<YRC1000_humble>MOTOPLUS-YRC1000</YRC1000_humble>
 		<YRC1000u_humble>MOTOPLUS-YRC1000micro</YRC1000u_humble>
+		<DX200_humble>MOTOPLUS-DX200</DX200_humble>
 		<YRC1000_foxy>MOTOPLUS-YRC1000</YRC1000_foxy>
 		<YRC1000u_foxy>MOTOPLUS-YRC1000micro</YRC1000u_foxy>
+		<DX200_foxy>MOTOPLUS-DX200</DX200_foxy>
 		<YRC1000_galactic>MOTOPLUS-YRC1000</YRC1000_galactic>
 		<YRC1000u_galactic>MOTOPLUS-YRC1000micro</YRC1000u_galactic>
-		<DX200_humble>MOTOPLUS-DX200</DX200_humble>
-		<DX200_foxy>MOTOPLUS-DX200</DX200_foxy>
 		<DX200_galactic>MOTOPLUS-DX200</DX200_galactic>
 	</appName>
 	
 	<compilers>
+		<YRC1000_jazzy>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_jazzy>
+		<YRC1000u_jazzy>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_jazzy>
+		<DX200_jazzy>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_jazzy>
 		<YRC1000_humble>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_humble>
 		<YRC1000u_humble>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_humble>
+		<DX200_humble>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_humble>
 		<YRC1000_foxy>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_foxy>
 		<YRC1000u_foxy>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_foxy>
+		<DX200_foxy>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_foxy>
 		<YRC1000_galactic>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_galactic>
 		<YRC1000u_galactic>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_galactic>
-		<DX200_humble>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_humble>
-		<DX200_foxy>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_foxy>
 		<DX200_galactic>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_galactic>
 	</compilers>
 </root>

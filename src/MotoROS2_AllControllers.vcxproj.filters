@@ -247,6 +247,27 @@
     <None Include="DX200_galacticLinkerArguments.mps">
       <Filter>Compile Settings</Filter>
     </None>
+    <None Include="DX200_jazzyCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_jazzyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_jazzyCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_jazzyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_jazzyCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_jazzyLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000_jazzy\libmicroros.yrcLib_jazzy">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -425,7 +446,7 @@
     <ClInclude Include="RosMotoPlusConversionUtils.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="MotoPlusExterns.h">
+	<ClInclude Include="MotoPlusExterns.h">
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
     <ClInclude Include="InformCheckerAndGenerator.h">

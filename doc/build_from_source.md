@@ -21,7 +21,7 @@ The MotoPlus SDK is not compatible with Visual Studio Code.
 - **MotoPlus SDK for Visual Studio v1.5.1 or higher**.
 This is not the same as MotoPlus IDE. Users in Asian regions will need to purchase this software from [Yaskawa America directly](https://www.motoman.com/en-us/products/robots/sales-quote).
 If you already have a license for an older version of the MotoPlus SDK, please contact `techsupport@motoman.com` or `ccs@yaskawa.eu` for assistance obtaining a newer edition.
-- **libmicroros library and headers** that corresponds to your target edition of ROS 2 (Foxy, Humble, etc) and the Yaskawa controller series you are building MotoROS2 for
+- **libmicroros library and headers** that corresponds to your target edition of ROS 2 (Humble, Jazzy, etc) and the Yaskawa controller series you are building MotoROS2 for
 Although `libmicroros` as used by MotoROS2 is derived from the open-source [micro-ROS](https://micro.ros.org) project, various patches were needed to make it compatible with MotoPlus. As of writing, these patches can not be made open-source yet. Because of this, we distribute the `libmicroros` dependency as a closed-source library.
 These can be found on the [micro_ros_motoplus/Releases](https://github.com/yaskawa-global/micro_ros_motoplus/releases) page.
 
@@ -35,19 +35,19 @@ These are provided as separate downloads and can be found on the [micro_ros_moto
 
 When downloading `libmicroros` from the repo, the folder will be named with a unique identifier corresponding to the time stamp of the build.
 Rename the folder to `libmicroros_<controller-series>_<ros-2-variant>`.
-E.g. `libmicroros_yrc1000_humble`.
+E.g. `libmicroros_yrc1000_jazzy`.
 
 Move the folder containing `libmicroros` and the headers inside the folder with the Visual Studio solution (ie: `MotoROS2.sln`).
 
-Example showing where `libmicroros_yrc1000_humble` should be moved for a Humble build of MotoROS2 targetting a YRC1000 controller:
+Example showing where `libmicroros_yrc1000_jazzy` should be moved for a Jazzy build of MotoROS2 targetting a YRC1000 controller:
 
 ```text
 motoros2
-|-- libmicroros_yrc1000_humble
+|-- libmicroros_yrc1000_jazzy
 |   |-- include
 |   |   `-- ...
 |   |-- build_info.yaml
-|   `-- libmicroros.yrcLib_humble
+|   `-- libmicroros.yrcLib_jazzy
 |-- src
 |   |-- ...
 |   `-- MotoROS2_AllControllers.vcxproj
@@ -82,7 +82,7 @@ This procedure will also allow you to verify the Visual Studio project configura
    This can be a relative path, using MSBuild macros.
    Copy this path, as it will be used again in the next step.
 
-   Example: `$(ProjectDir)..\libmicroros_yrc1000_humble\include;`
+   Example: `$(ProjectDir)..\libmicroros_yrc1000_jazzy\include;`
    NOTE: Do not use the `$(SolutionDir)` macro in this step.
    The path should be either relative to the project file or absolute.
 
@@ -90,7 +90,7 @@ This procedure will also allow you to verify the Visual Studio project configura
 
 1. Choose `NMake` from the left tree view.
    Ensure the start of the `Include Search Path` includes the path to the `libmicroros` headers.
-   Example: `$(ProjectDir)..\libmicroros_yrc1000_humble\include;`
+   Example: `$(ProjectDir)..\libmicroros_yrc1000_jazzy\include;`
 
    ![intellisense_search_path.png](img/intellisense_search_path.png)
 

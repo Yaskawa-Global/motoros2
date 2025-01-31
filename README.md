@@ -100,8 +100,8 @@ The following general requirements must be met in order to be able to use MotoRO
 - the controller must have a correctly configured network connection:
   - DX200 and YRC1000micro: `LAN`
   - YRC1000: either `LAN2` or `LAN3`
-- ROS 2 version: Foxy, Galactic or Humble.
-  MotoROS2 does not support ROS 2 Iron Irwini, nor Jazzy nor Rolling Ridley.
+- ROS 2 version: Foxy, Galactic, Humble, or Jazzy.
+  MotoROS2 does not support ROS 2 Iron Irwini nor Rolling Ridley.
 - Docker or a from-source build of the micro-ROS Agent
 - FastDDS as RMW (even when using ROS 2 Galactic)
 
@@ -159,8 +159,8 @@ To calculate the MD5 hash on Debian/Ubuntu for the main MotoROS2 binary, run the
 
 ```shell
 $ cd /path/to/where/the/binary/was/saved
-$ md5sum -b mr2_yrc1_h.out
-e2d088b765a0bfed501aa213a1be1de0  mr2_yrc1_h.out
+$ md5sum -b mr2_yrc1_j.out
+[TODO]  mr2_yrc1_j.out
 ```
 
 Compare the output of `md5sum` when run against the binary downloaded in the previous section ([Downloading the files](#downloading-the-files)) with the values listed in the following table.
@@ -171,12 +171,15 @@ The values must match *exactly*.
 | DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.3`    | `a9a9e10403f726062c25d97654fad316` |
 | DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.3`    | `e8db7512215da240b28b985f2f2af98b` |
 | DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.3`    | `611bda537655cf8a60d85600da6043f4` |
+| DX200         | Jazzy            | `mr2_dx2_j.out`   | `TODO`     | `TODO`                             |
 | YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.3`    | `84bfb44e2043372127d9dfc1157a79b5` |
 | YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.3`    | `866e090b6c724429ce03117712c951f4` |
 | YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.3`    | `e2d088b765a0bfed501aa213a1be1de0` |
+| YRC1000       | Jazzy            | `mr2_yrc1_j.out`  | `TODO`     | `TODO`                             |
 | YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.3`    | `027e77b427a212aa63e5d7962d48ad92` |
 | YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.3`    | `042d753a7729784fec8c5c23bef3e685` |
 | YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.3`    | `c0e61adbf5bf6fd6a734211f15bb0f0a` |
+| YRC1000micro  | Jazzy            | `mr2_yrc1m_j.out` | `TODO`     | `TODO`                             |
 
 If the hash matches, proceed with the next section, [Configuration](#configuration).
 
@@ -423,11 +426,12 @@ Choose one or the other.
 
 ### Using Docker (Linux Only)
 
-The command shown here starts the `humble` version of the `micro-ros-agent` Docker image.
+The command shown here starts the `jazzy` version of the `micro-ros-agent` Docker image.
 However, always make sure to use a version of the Agent image which corresponds to the version of ROS 2 that is being used.
 
 With ROS 2 Foxy, use `microros/micro-ros-agent:foxy`.
 With ROS 2 Humble, use `microros/micro-ros-agent:humble`.
+With ROS 2 Jazzy, use `microros/micro-ros-agent:jazzy`.
 
 To start the Agent (on a machine with Docker already installed and setup to allow non-root access):
 
@@ -437,7 +441,7 @@ docker run \
   --rm \
   --net=host \
   --user=$(id -u):$(id -g) \
-  microros/micro-ros-agent:humble \
+  microros/micro-ros-agent:jazzy \
     udp4 \
     --port 8888
 ```
@@ -449,11 +453,12 @@ docker run \
 The micro-ROS Agent can also be built as a ROS 2 package in a Colcon workspace.
 This procedure is rather involved, so only do this if the pre-configured Docker image can not be used.
 
-The following sections show how to build the Humble version of the Agent in a dedicated workspace (adapt the paths used below if a different workspace should be used instead).
+The following sections show how to build the Jazzy version of the Agent in a dedicated workspace (adapt the paths used below if a different workspace should be used instead).
 
 Note: always make sure to use a version of the Agent which corresponds to the version of ROS 2 that is being used.
 For ROS 2 Foxy, checkout the `foxy` branch.
 For ROS 2 Humble, checkout the `humble` branch.
+For ROS 2 Jazzy, checkout the `jazzy` branch.
 
 #### Linux (Debian/Ubuntu)
 
@@ -462,12 +467,12 @@ This requires a working ROS 2 development environment (compiler, CMake, Git, Col
 In a terminal:
 
 ```shell
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 sudo apt update
 rosdep update --rosdistro=$ROS_DISTRO
 mkdir -p $HOME/micro_ros_agent_ws/src
 git clone \
-  -b humble \
+  -b jazzy \
   https://github.com/micro-ROS/micro_ros_setup.git \
   $HOME/micro_ros_agent_ws/src/micro_ros_setup
 rosdep install \
@@ -486,7 +491,7 @@ The Agent application will only need to be built *once*, unless it needs to be u
 Finally, to run the Agent:
 
 ```shell
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 source $HOME/micro_ros_agent_ws/install/local_setup.bash
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 ```
@@ -505,14 +510,14 @@ If you are using a different version of Visual Studio, update the path to match.
 Now execute the following commands:
 
 ```batch
-call "C:\path\to\ros2-humble\local_setup.bat"
+call "C:\path\to\ros2-jazzy\local_setup.bat"
 mkdir "%USERPROFILE%\micro_ros_agent_ws\src"
 git clone ^
-  -b humble ^
+  -b jazzy ^
   https://github.com/micro-ROS/micro_ros_msgs.git ^
   "%USERPROFILE%\micro_ros_agent_ws\src\micro_ros_msgs"
 git clone ^
-  -b humble ^
+  -b jazzy ^
   https://github.com/micro-ROS/micro-ROS-Agent.git ^
   "%USERPROFILE%\micro_ros_agent_ws\src\micro-ROS-Agent"
 cd "%USERPROFILE%\micro_ros_agent_ws"
@@ -543,7 +548,7 @@ After the final reboot of the controller, and after [starting the micro-ROS Agen
 
 Note: if you are using ROS 2 Galactic, please first read [Only FastDDS is supported](#only-fastdds-is-supported).
 
-On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS) or Humble):
+On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS), Humble, or Jazzy):
 
 1. open a new terminal
 1. `source` the ROS 2 installation
@@ -562,7 +567,7 @@ Note: if you are using ROS 2 Galactic, please first read [Only FastDDS is suppor
 As MotoROS2 uses micro-ROS, you must always make sure to first [start the micro-ROS Agent](#the-micro-ros-agent).
 After registration with the Agent, MotoROS2 behaves like any other ROS 2 node.
 
-For initial discovery of the ROS API, we recommend using the [ros2 node](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html), [ros2 topic](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html), [ros2 service](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services/Understanding-ROS2-Services.html) and [ros2 action](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html) commandlets.
+For initial discovery of the ROS API, we recommend using the [ros2 node](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html), [ros2 topic](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html), [ros2 service](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services/Understanding-ROS2-Services.html) and [ros2 action](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html) commandlets.
 Refer also to the [ROS API](#ros-api) section for more information on the various topics, services and actions MotoROS2 supports.
 
 In order to be able to interact with MotoROS2 (either using the command line tools or from ROS 2 nodes), the message, service and action definitions must first be made available.
@@ -674,7 +679,7 @@ The default QoS profiles used for the topics MotoROS2 publishes to are listed in
 | `robot_status` | *Sensor data* | Same                      |
 | `tf`           | *Default*     | *Reliable* reliability    |
 
-Please refer to [About Quality of Service settings: QoS profiles](https://docs.ros.org/en/humble/Concepts/About-Quality-of-Service-Settings.html#qos-profiles) in the general ROS 2 documentation for more information about these default profiles.
+Please refer to [About Quality of Service settings: QoS profiles](https://docs.ros.org/en/jazzy/Concepts/About-Quality-of-Service-Settings.html#qos-profiles) in the general ROS 2 documentation for more information about these default profiles.
 
 These values are based on tests with other ROS 2 components and applications and analyses of implementations of subscribers by the authors of MotoROS2 (examples include RViz2 and MoveIt2).
 But these profiles can not be compatible with all possible combinations of subscribers, and thus have been made configurable.
@@ -731,7 +736,7 @@ None of the other RMWs are supported, including Cyclone DDS, which is the defaul
 
 Symptoms of this incompatibility are seemingly functional ROS 2 network connections, where topics are succesfully published and subscribed to, but service invocations and action goal submissions appear to *hang*.
 
-**Note**: ROS 2 Foxy, ROS 2 Humble and ROS 2 Rolling all use FastDDS by default.
+**Note**: ROS 2 Foxy, ROS 2 Humble, ROS 2 Jazzy, and ROS 2 Rolling all use FastDDS by default.
 If you haven't changed your default RMW, you should not need to change anything for MotoROS2.
 
 **Work-around**: unfortunately, this limitation is caused by a middleware-layer incompatibility with respect to how service requests are (de)serialised by the respective RMWs ([ros2/rmw_cyclonedds#184](https://github.com/ros2/rmw_cyclonedds/issues/184)), and without significant changes to the way MotoROS2 operates, has no known work-around.
@@ -742,7 +747,7 @@ Note that the `RMW_IMPLEMENTATION` environment variable must be `export`ed to al
 Please note that the `ros-galactic-rmw-fastrtps-cpp` package must be install *prior* to building the client application workspace.
 If the workspace has already been built, it must be rebuilt after installing the package.
 
-Refer to [Working with multiple ROS 2 middleware implementations](https://docs.ros.org/en/humble/How-To-Guides/Working-with-multiple-RMW-implementations.html) in the ROS 2 documentation for more information about configuring different RMWs with ROS 2.
+Refer to [Working with multiple ROS 2 middleware implementations](https://docs.ros.org/en/jazzy/How-To-Guides/Working-with-multiple-RMW-implementations.html) in the ROS 2 documentation for more information about configuring different RMWs with ROS 2.
 
 ### Maximum length of trajectories
 
