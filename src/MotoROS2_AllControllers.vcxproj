@@ -365,6 +365,7 @@
   <ItemGroup>
     <None Include="..\doc\build_from_source.md" />
     <None Include="..\doc\faq.md" />
+    <None Include="..\doc\network_configuration.md" />
     <None Include="..\doc\ros_api.md" />
     <None Include="..\doc\troubleshooting.md" />
     <None Include="..\libmicroros_dx200_foxy\libmicroros.dnLib_foxy" />
@@ -404,7 +405,6 @@
     <None Include="DX200_humbleLinkerArguments.mps" />
     <None Include="DX200_jazzyCompilerArguments.mps" />
     <None Include="DX200_jazzyLinkerArguments.mps" />
-    <None Include="network_configuration.md" />
     <None Include="YRC1000u_foxyCompilerArguments.mps" />
     <None Include="YRC1000u_foxyLinkerArguments.mps" />
     <None Include="YRC1000u_galacticCompilerArguments.mps" />

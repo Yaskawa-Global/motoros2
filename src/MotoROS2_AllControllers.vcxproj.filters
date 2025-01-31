@@ -268,7 +268,7 @@
     <None Include="..\libmicroros_yrc1000_jazzy\libmicroros.yrcLib_jazzy">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
-	<None Include="network_configuration.md">
+	<None Include="..\doc\network_configuration.md">
       <Filter>Docs\doc</Filter>
     </None>
   </ItemGroup>
@@ -356,6 +356,9 @@
     </ClCompile>
     <ClCompile Include="RosMotoPlusConversionUtils.c">
       <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests_ActionServer_FJT.c">
+      <Filter>Source Files\Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -449,9 +452,6 @@
     <ClInclude Include="RosMotoPlusConversionUtils.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
-	<ClInclude Include="MotoPlusExterns.h">
-      <Filter>Header Files\Robot Controller</Filter>
-    </ClInclude>
     <ClInclude Include="InformCheckerAndGenerator.h">
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
@@ -466,6 +466,12 @@
     </ClInclude>
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h">
       <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\MotoPlusExterns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_ActionServer_FJT.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
