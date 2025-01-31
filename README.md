@@ -54,10 +54,10 @@ The following sections document how to download, install, configure, use and tro
   - [Downloading the files](#downloading-the-files)
   - [Extracting the files](#extracting-the-files)
   - [Verifying integrity of the download](#verifying-integrity-of-the-download)
-- [Building from source](doc/build_from_source.md)
 - [Installation](#installation)
   - [Checking MotoPlus configuration](#checking-motoplus-configuration)
   - [Installing MotoROS2 out file](#installing-motoros2-out-file)
+- [Building from source](doc/build_from_source.md)
 - [Example INFORM jobs](#example-inform-jobs)
 - [Understanding the micro-ROS Agent](#understanding-the-micro-ros-agent)
 - [Configuration](#configuration)
@@ -192,10 +192,6 @@ Be sure to describe which version of MotoROS2 was downloaded, from where, how it
 
 **Note**: please verify you ran `md5sum` against the `.out` file, not the `.zip` nor any other file included in the release.
 
-## Building from source
-
-Please refer to [doc/Building from source](doc/build_from_source.md).
-
 ## Installation
 
 ### Checking MotoPlus configuration
@@ -289,6 +285,12 @@ If `SAVE DATA CRC CHECK FUNC (FSU)` was disabled at the start of this procedure,
  1. touch `[Setup]`→`[Function Enable]`
  1. navigate to `SAVE DATA CRC CHECK FUNC (FSU)`
  1. set this feature to `VALID`
+
+## Building from source
+
+Downloading and installing the binaries hosted on this repository as shown in the instructions above is the easiest way to run MotoROS2, and it is the recommended method.
+But if you would like to modify the behavior or feature set of MotoROS2 yourself, you will have to build from source.
+Please refer to [doc/Building from source](doc/build_from_source.md) for instructions on how to do so.
 
 ## Example INFORM jobs
 
