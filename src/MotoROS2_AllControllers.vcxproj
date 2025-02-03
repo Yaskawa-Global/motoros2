@@ -365,6 +365,7 @@
   <ItemGroup>
     <None Include="..\doc\build_from_source.md" />
     <None Include="..\doc\faq.md" />
+    <None Include="..\doc\network_configuration.md" />
     <None Include="..\doc\ros_api.md" />
     <None Include="..\doc\troubleshooting.md" />
     <None Include="..\libmicroros_dx200_foxy\libmicroros.dnLib_foxy" />
