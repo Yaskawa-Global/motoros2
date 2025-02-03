@@ -7,6 +7,34 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
+## Forthcoming
+
+**Breaking change**:
+
+Users who are updating from a lower version must remove the `motoros2_interfaces` packages from their Colcon workspaces (from the `src`, `build` and `install` spaces), and follow the installation instructions in the [Build and installation](https://github.com/yaskawa-global/motoros2_client_interface_dependencies#build-and-installation) section in the `README` of the new `yaskawa-global/motoros2_client_interface_dependencies` package.
+Breaking changes have been introduced in this version of MotoROS2, and failure to update and rebuild the workspace will lead to the inability to receive messages from MotoROS2 and/or crashes of client applications.
+
+For Jazzy, MotoROS2 is now built against `micro_ros_motoplus` version `20250113`.
+
+For Humble, Galactic, and Foxy, MotoROS2 is now built against `micro_ros_motoplus` version `20241211`.
+
+New functionality:
+
+- Added support for Jazzy Jalisco ([#337](https://github.com/Yaskawa-Global/motoros2/pull/337))
+- rcl and rclc errors now get forwarded to the user for simplified troubleshooting ([#306](https://github.com/Yaskawa-Global/motoros2/pull/306))
+- Allow users to insert USB with config file after bootup ([#299](https://github.com/Yaskawa-Global/motoros2/pull/299))
+- Users can enable/disable debug broadcast and choose debug broadcast port ([#309](https://github.com/Yaskawa-Global/motoros2/pull/309))
+
+Changes:
+
+- Default joint names for single-group systems are simplified (`joint_M`) ([#340](https://github.com/Yaskawa-Global/motoros2/pull/340))
+- Fix bug where `stop_traj_mode` would have response message indicating failure even after succeeding ([#352](https://github.com/Yaskawa-Global/motoros2/pull/352))
+- Fix response if `reset_error` service is called when major alarm is active ([#298](https://github.com/Yaskawa-Global/motoros2/pull/298))
+- Fixed condition so tool 63 can be selected properly ([#314](https://github.com/Yaskawa-Global/motoros2/pull/314))
+- Error messages for `start_traj_mode` and `start_point_queue_mode` are more accurate and descriptive ([#297](https://github.com/Yaskawa-Global/motoros2/pull/297))
+- Fixed FJT goal tolerance violation message ([#345](https://github.com/Yaskawa-Global/motoros2/pull/345))
+- Always check for duplicate joint names in `queue_traj_point` ([#358](https://github.com/Yaskawa-Global/motoros2/pull/358))
+
 ## 0.1.3 (2024-08-01)
 
 MotoROS2 is now built against `micro_ros_motoplus` version `20240710`.
