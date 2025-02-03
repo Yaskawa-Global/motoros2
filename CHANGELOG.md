@@ -7,6 +7,37 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
+## Forthcoming
+
+**Added support for ROS2 Jazzy Jalisco!** ([#337](https://github.com/Yaskawa-Global/motoros2/pull/337))
+
+MotoROS2 is now built against `micro_ros_motoplus` version `20250207`.
+
+Breaking changes have been introduced in this version of MotoROS2, and failure to update and rebuild the workspace will lead to the inability to receive messages from MotoROS2 and/or crashes of client applications.
+
+**Breaking changes:**
+
+- Default joint names for single-group systems have been simplified (`joint_M`) ([#340](https://github.com/Yaskawa-Global/motoros2/pull/340))
+- Changes to `motoros2_interfaces` built into `micro_ros_motoplus` mean that you must update your client PC's ROS2 workspaces using `motoros2_client_interface_dependencies` version `0.1.1`. See the instructions [here](https://github.com/yaskawa-global/motoros2_client_interface_dependencies#overview).
+
+New functionality:
+
+- Allow users to insert USB with config file after bootup ([#299](https://github.com/Yaskawa-Global/motoros2/pull/299))
+- rcl and rclc errors now get forwarded to the user for simplified troubleshooting ([#306](https://github.com/Yaskawa-Global/motoros2/pull/306))
+- Users can enable/disable debug broadcast and choose debug broadcast port ([#309](https://github.com/Yaskawa-Global/motoros2/pull/309))
+
+Changes:
+
+- Error messages for `start_traj_mode` and `start_point_queue_mode` are more accurate and descriptive ([#297](https://github.com/Yaskawa-Global/motoros2/pull/297))
+- Fix response if `reset_error` service is called when major alarm is active ([#298](https://github.com/Yaskawa-Global/motoros2/pull/298))
+- Fixed condition so tool 63 can be selected properly ([#314](https://github.com/Yaskawa-Global/motoros2/pull/314))
+- The `queue_traj_point` service will give more detailed error messages if trajectory initialization fails ([#341](https://github.com/Yaskawa-Global/motoros2/pull/341))
+- Fixed FJT goal tolerance violation message ([#345](https://github.com/Yaskawa-Global/motoros2/pull/345))
+- Fix bug where `stop_traj_mode` would have response message indicating failure even after succeeding ([#352](https://github.com/Yaskawa-Global/motoros2/pull/352))
+- Always check for duplicate joint names in `queue_traj_point` ([#358](https://github.com/Yaskawa-Global/motoros2/pull/358))
+- General refactor of code that processes incoming trajectories ([#358](https://github.com/Yaskawa-Global/motoros2/pull/358))
+- The MAC address used for the default node name and key name now always matches the MAC address used for ROS traffic ([#365](https://github.com/Yaskawa-Global/motoros2/pull/365))
+
 ## 0.1.3 (2024-08-01)
 
 MotoROS2 is now built against `micro_ros_motoplus` version `20240710`.
