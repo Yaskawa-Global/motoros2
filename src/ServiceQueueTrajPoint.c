@@ -85,6 +85,7 @@ void Ros_ServiceQueueTrajPoint_Trigger(const void* request_msg, void* response_m
     }
     else
     {
+        const char* initMsg;
         response->result_code.value = Ros_MotionControl_ProcessQueuedTrajectoryPoint(request);
 
         switch (response->result_code.value)
@@ -92,11 +93,6 @@ void Ros_ServiceQueueTrajPoint_Trigger(const void* request_msg, void* response_m
         case motoros2_interfaces__msg__QueueResultEnum__SUCCESS: 
             rosidl_runtime_c__String__assign(&response->message,
                 motoros2_interfaces__msg__QueueResultEnum__SUCCESS_STR);
-            break;
-
-        case motoros2_interfaces__msg__QueueResultEnum__INIT_FAILURE:
-            rosidl_runtime_c__String__assign(&response->message, 
-                motoros2_interfaces__msg__QueueResultEnum__INIT_FAILURE_STR);
             break;
 
         case motoros2_interfaces__msg__QueueResultEnum__BUSY:
@@ -110,8 +106,18 @@ void Ros_ServiceQueueTrajPoint_Trigger(const void* request_msg, void* response_m
             break;
 
         default:
-            rosidl_runtime_c__String__assign(&response->message, 
-                "Error occurred while adding the trajectory point to the queue.");
+            //Otherwise it should be a forwarded Init_Trajectory_Status value that was returned by Ros_MotionControl_ProcessQueuedTrajectoryPoint()
+            initMsg =  Ros_ErrorHandling_Init_Trajectory_Status_ToString((Init_Trajectory_Status)response->result_code.value);
+            //If there is an Init_Trajectory_Status string associated with that forwarded value, assign that string for the result message. Otherwise assign a generic failure string. 
+            if (strcmp(initMsg, motoros2_interfaces__msg__InitTrajEnum__INIT_TRAJ_UNSPECIFIED_STR) == 0) {
+                rosidl_runtime_c__String__assign(&response->message,
+                    "Unspecified error occurred while adding the trajectory point to the queue.");
+            }
+            else
+            {
+                rosidl_runtime_c__String__assign(&response->message,
+                    initMsg);
+            }
             break;
         }
         Ros_Debug_BroadcastMsg("Reply (%d): %s", response->result_code.value, response->message.data);
