@@ -23,7 +23,7 @@
 
 #define DEFAULT_NODE_NAME               "motoman" //will be suffixed with MAC ID
 
-#define DEFAULT_NODE_NAMSPACE           ""
+#define DEFAULT_NODE_NAMESPACE          ""
 
 #define DEFAULT_SYNCTIME                TRUE
 

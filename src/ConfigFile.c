@@ -167,7 +167,7 @@ void Ros_ConfigFile_SetAllDefaultValues()
 
     //=========
     //node_namespace
-    sprintf(g_nodeConfigSettings.node_namespace, "%s", DEFAULT_NODE_NAMSPACE);
+    sprintf(g_nodeConfigSettings.node_namespace, "%s", DEFAULT_NODE_NAMESPACE);
 
     //=========
     //remap_rules (a single space-separated string for now)
