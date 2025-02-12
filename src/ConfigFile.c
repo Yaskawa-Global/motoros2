@@ -422,7 +422,7 @@ void Ros_ConfigFile_CheckUsbForNewConfigFile()
     }
 
     mpGetCalendar(&calendar);
-    ret = snprintf(usbFilePathRename, MAX_PATH_LEN, FORMAT_CONFIG_FILE_BACKUP, MP_USB0_DEV_DOS, CONFIG_FILE_NAME, 
+    ret = snprintf(usbFilePathRename, MAX_PATH_LEN, FORMAT_CONFIG_FILE_BACKUP, MP_USB0_DEV_DOS, CONFIG_FILE_NAME,
         calendar.usYear, calendar.usMonth, calendar.usDay, calendar.usHour, calendar.usMin, calendar.usSec);
     if (ret < 0 || ret >= MAX_PATH_LEN)
     {
@@ -549,6 +549,7 @@ void Ros_ConfigFile_ValidateCriticalSettings()
 
     //-----------------------------------------
     //Verify agent is on my subnet (or a gateway is specified)
+    //Save the LAN port being used for ROS traffic
     BOOL bAgentOnMySubnet = FALSE;
 
     //check first lan port
@@ -556,6 +557,8 @@ void Ros_ConfigFile_ValidateCriticalSettings()
         g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnMySubnet);
     motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
         "Host on NIC check 1");
+    //This will be re-assigned later if it is not on the right subnet
+    g_Ros_Controller.rosTrafficLanPort = ROS_USER_LAN1;
 
 #if defined (YRC1000)
     if (!bAgentOnMySubnet)
@@ -565,6 +568,8 @@ void Ros_ConfigFile_ValidateCriticalSettings()
             g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnMySubnet);
         motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
             "Host on NIC check 2");
+        //If not on the subnet, it will alarm and cease before this matters...
+        g_Ros_Controller.rosTrafficLanPort = ROS_USER_LAN2;
     }
 #endif
 
@@ -598,7 +603,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     if (g_nodeConfigSettings.executor_sleep_period < MIN_EXECUTOR_SLEEP_PERIOD ||
         g_nodeConfigSettings.executor_sleep_period > MAX_EXECUTOR_SLEEP_PERIOD)
     {
-        Ros_Debug_BroadcastMsg("executor_sleep_period value %d is invalid; reverting to default of %d", 
+        Ros_Debug_BroadcastMsg("executor_sleep_period value %d is invalid; reverting to default of %d",
             g_nodeConfigSettings.executor_sleep_period, DEFAULT_EXECUTOR_SLEEP_PERIOD);
 
         mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid executor_sleep_period", SUBCODE_CONFIGURATION_INVALID_EXECUTOR_PERIOD);
@@ -712,7 +717,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
         //Check if the port setting is valid only if the debug broadcast is enabled
 #if defined (YRC1000)
         if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1 &&
-            g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN2 && 
+            g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN2 &&
             g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN_ALL)
 #elif defined (FS100) || defined (DX200)  || defined (YRC1000u)
         if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1)
@@ -895,7 +900,7 @@ void Ros_ConfigFile_Parse()
     // we can no longer broadcast over ALL, we have to change it to only broadcast over one port
     if (g_nodeConfigSettings.debug_broadcast_enabled &&
         (g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN1 ||
-            g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN2)) 
+            g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN2))
     {
         Ros_Debug_SetFromConfig();
     }

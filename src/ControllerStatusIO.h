@@ -75,6 +75,8 @@ typedef struct
     int totalAxesCount;                                     // Number of axes attached to the controller (all groups)
     CtrlGroup* ctrlGroups[MAX_CONTROLLABLE_GROUPS];         // Array of the controller control group
 
+    UINT8 rosTrafficLanPort;
+
     // Controller Status
     MP_IO_INFO ioStatusAddr[IO_ROBOTSTATUS_MAX];            // Array of Specific Input Address representing the I/O status
     USHORT ioStatus[IO_ROBOTSTATUS_MAX];                    // Array storing the current status of the controller
