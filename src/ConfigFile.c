@@ -138,36 +138,12 @@ void Ros_ConfigFile_SetAllDefaultValues()
 
     //=========
     //node_name
-    UCHAR macId[6];
-
-    //TODO(gavanderhoorn): get MAC only from interface which is used for
-    //ROS traffic (https://github.com/Yaskawa-Global/motoros2/issues/57)
-    STATUS status = Ros_GetMacAddress(ROS_USER_LAN1, macId);
-    if (status != OK)
-    {
-        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
-            __func__, ROS_USER_LAN1, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA0,
-            "Must enable ETHERNET function");
-    }
-
-#if defined (YRC1000)
-    //Try second interface if first one didn't succeed
-    if (status != OK && (status = Ros_GetMacAddress(ROS_USER_LAN2, macId)) != OK)
-    {
-        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
-            __func__, ROS_USER_LAN2, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA1,
-            "Must enable ETHERNET function");
-    }
-#endif
-
-    //last three bytes of MAC ID are a unique identifier
-    sprintf(g_nodeConfigSettings.node_name, "%s_%02x_%02x_%02x", DEFAULT_NODE_NAME, macId[3], macId[4], macId[5]);
+    //give it an invalid name so that later on, it will know if it was assigned a name from the config file or not
+    sprintf(g_nodeConfigSettings.node_name, "%s", PLACEHOLDER_NODE_NAME);
 
     //=========
     //node_namespace
-    sprintf(g_nodeConfigSettings.node_namespace, "%s", DEFAULT_NODE_NAMSPACE);
+    sprintf(g_nodeConfigSettings.node_namespace, "%s", DEFAULT_NODE_NAMESPACE);
 
     //=========
     //remap_rules (a single space-separated string for now)
@@ -422,7 +398,7 @@ void Ros_ConfigFile_CheckUsbForNewConfigFile()
     }
 
     mpGetCalendar(&calendar);
-    ret = snprintf(usbFilePathRename, MAX_PATH_LEN, FORMAT_CONFIG_FILE_BACKUP, MP_USB0_DEV_DOS, CONFIG_FILE_NAME, 
+    ret = snprintf(usbFilePathRename, MAX_PATH_LEN, FORMAT_CONFIG_FILE_BACKUP, MP_USB0_DEV_DOS, CONFIG_FILE_NAME,
         calendar.usYear, calendar.usMonth, calendar.usDay, calendar.usHour, calendar.usMin, calendar.usSec);
     if (ret < 0 || ret >= MAX_PATH_LEN)
     {
@@ -549,6 +525,7 @@ void Ros_ConfigFile_ValidateCriticalSettings()
 
     //-----------------------------------------
     //Verify agent is on my subnet (or a gateway is specified)
+    //Save the LAN port being used for ROS traffic
     BOOL bAgentOnMySubnet = FALSE;
 
     //check first lan port
@@ -556,6 +533,8 @@ void Ros_ConfigFile_ValidateCriticalSettings()
         g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnMySubnet);
     motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
         "Host on NIC check 1");
+    //This will be re-assigned later if it is not on the right subnet
+    g_Ros_Controller.rosTrafficLanPort = ROS_USER_LAN1;
 
 #if defined (YRC1000)
     if (!bAgentOnMySubnet)
@@ -565,12 +544,34 @@ void Ros_ConfigFile_ValidateCriticalSettings()
             g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnMySubnet);
         motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
             "Host on NIC check 2");
+        //If not on the subnet, it will alarm and cease before this matters...
+        g_Ros_Controller.rosTrafficLanPort = ROS_USER_LAN2;
     }
 #endif
 
     motoRosAssert_withMsg(bAgentOnMySubnet,
         SUBCODE_CONFIGURATION_INVALID_AGENT_SUBNET,
         "Agent IP on wrong subnet");
+
+    //Save the MAC address of the port being used for ROS traffic
+    status = Ros_GetMacAddress(g_Ros_Controller.rosTrafficLanPort, g_Ros_Controller.rosTrafficMacAddr);
+    if (status != OK)
+    {
+        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
+            __func__, g_Ros_Controller.rosTrafficLanPort, status);
+        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA0,
+            "Must enable ETHERNET function");
+    }
+
+    if (strncmp(g_nodeConfigSettings.node_name, PLACEHOLDER_NODE_NAME, MAX_YAML_STRING_LEN) == 0)
+    {
+        //last three bytes of MAC ID are a unique identifier
+        sprintf(g_nodeConfigSettings.node_name, "%s_%02x_%02x_%02x", DEFAULT_NODE_NAME_PREFIX, g_Ros_Controller.rosTrafficMacAddr[3],
+            g_Ros_Controller.rosTrafficMacAddr[4], g_Ros_Controller.rosTrafficMacAddr[5]);
+
+        Ros_Debug_BroadcastMsg("%s: node_name not provided, setting to default: g_nodeConfigSettings.node_name -- %s",
+            __func__, g_nodeConfigSettings.node_name);
+    }
 
     //-----------------------------------------
     //Verify we have node name
@@ -598,7 +599,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     if (g_nodeConfigSettings.executor_sleep_period < MIN_EXECUTOR_SLEEP_PERIOD ||
         g_nodeConfigSettings.executor_sleep_period > MAX_EXECUTOR_SLEEP_PERIOD)
     {
-        Ros_Debug_BroadcastMsg("executor_sleep_period value %d is invalid; reverting to default of %d", 
+        Ros_Debug_BroadcastMsg("executor_sleep_period value %d is invalid; reverting to default of %d",
             g_nodeConfigSettings.executor_sleep_period, DEFAULT_EXECUTOR_SLEEP_PERIOD);
 
         mpSetAlarm(ALARM_CONFIGURATION_FAIL, "Invalid executor_sleep_period", SUBCODE_CONFIGURATION_INVALID_EXECUTOR_PERIOD);
@@ -635,57 +636,11 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     {
         Ros_Debug_BroadcastMsg("UserLan monitor enabled, checking port setting ..");
 
-        //try to auto-detect if the port was not configured
         if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
         {
-            BOOL bAgentOnInterface = FALSE;
-            STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
-                g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnInterface);
-            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
-                "Host on NIC check 1 auto-detect");
-
-            if (bAgentOnInterface)
-            {
-                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN1;
-                Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
-                    g_nodeConfigSettings.userlan_monitor_port);
-            }
+            g_nodeConfigSettings.userlan_monitor_port = (Ros_UserLan_Port_Setting)g_Ros_Controller.rosTrafficLanPort;
         }
-
-#if defined (YRC1000)
-        //on these controllers we can try the second interface, if we haven't
-        //already determined we should monitor the first
-        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
-        {
-            BOOL bAgentOnInterface = FALSE;
-            STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
-                g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnInterface);
-            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
-                "Host on NIC check 2 auto-detect");
-
-            if (bAgentOnInterface)
-            {
-                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN2;
-                Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
-                    g_nodeConfigSettings.userlan_monitor_port);
-            }
-        }
-#endif
-
-        //if we still haven't determined which port to monitor, we'll raise an
-        //alarm and disable monitoring. There is no appropriate default value
-        //here, and user intervention is required.
-        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
-        {
-            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "UserLan port detect failed",
-                SUBCODE_CONFIGURATION_USERLAN_MONITOR_AUTO_DETECT_FAILED);
-            g_nodeConfigSettings.userlan_monitor_enabled = FALSE;
-            Ros_Debug_BroadcastMsg(
-                "UserLan port auto-detection failed, disabling monitor");
-        }
-
-        //otherwise, either auto-detect worked, or a fixed value was configured.
-        //In both cases, verify it's an acceptable value.
+        //otherwise a fixed value was configured. Verify that it is an acceptable value.
         else
         {
 #if defined (YRC1000)
@@ -712,7 +667,7 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
         //Check if the port setting is valid only if the debug broadcast is enabled
 #if defined (YRC1000)
         if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1 &&
-            g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN2 && 
+            g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN2 &&
             g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN_ALL)
 #elif defined (FS100) || defined (DX200)  || defined (YRC1000u)
         if (g_nodeConfigSettings.debug_broadcast_port != CFG_ROS_USER_LAN1)
@@ -888,6 +843,7 @@ void Ros_ConfigFile_Parse()
 
     } while (!bOkToInit);
 
+    //Order matters. Validate critical settings first. Then validate non-critical settings. 
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
 #if defined(YRC1000)
@@ -895,7 +851,7 @@ void Ros_ConfigFile_Parse()
     // we can no longer broadcast over ALL, we have to change it to only broadcast over one port
     if (g_nodeConfigSettings.debug_broadcast_enabled &&
         (g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN1 ||
-            g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN2)) 
+            g_nodeConfigSettings.debug_broadcast_port == CFG_ROS_USER_LAN2))
     {
         Ros_Debug_SetFromConfig();
     }

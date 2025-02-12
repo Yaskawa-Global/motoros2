@@ -21,9 +21,10 @@
 #define MIN_ROS_DOMAIN_ID_LINUX         0
 #define MAX_ROS_DOMAIN_ID_LINUX         101
 
-#define DEFAULT_NODE_NAME               "motoman" //will be suffixed with MAC ID
+#define PLACEHOLDER_NODE_NAME           "" //temporary/placeholder
+#define DEFAULT_NODE_NAME_PREFIX        "motoman" //will be suffixed with MAC ID
 
-#define DEFAULT_NODE_NAMSPACE           ""
+#define DEFAULT_NODE_NAMESPACE          ""
 
 #define DEFAULT_SYNCTIME                TRUE
 
