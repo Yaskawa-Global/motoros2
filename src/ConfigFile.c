@@ -138,32 +138,8 @@ void Ros_ConfigFile_SetAllDefaultValues()
 
     //=========
     //node_name
-    UCHAR macId[6];
-
-    //TODO(gavanderhoorn): get MAC only from interface which is used for
-    //ROS traffic (https://github.com/Yaskawa-Global/motoros2/issues/57)
-    STATUS status = Ros_GetMacAddress(ROS_USER_LAN1, macId);
-    if (status != OK)
-    {
-        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
-            __func__, ROS_USER_LAN1, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA0,
-            "Must enable ETHERNET function");
-    }
-
-#if defined (YRC1000)
-    //Try second interface if first one didn't succeed
-    if (status != OK && (status = Ros_GetMacAddress(ROS_USER_LAN2, macId)) != OK)
-    {
-        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
-            __func__, ROS_USER_LAN2, status);
-        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA1,
-            "Must enable ETHERNET function");
-    }
-#endif
-
-    //last three bytes of MAC ID are a unique identifier
-    sprintf(g_nodeConfigSettings.node_name, "%s_%02x_%02x_%02x", DEFAULT_NODE_NAME, macId[3], macId[4], macId[5]);
+    //give it an invalid name so that later on, it will know if it was assigned a name from the config file or not
+    sprintf(g_nodeConfigSettings.node_name, "%s", PLACEHOLDER_NODE_NAME);
 
     //=========
     //node_namespace
@@ -576,6 +552,26 @@ void Ros_ConfigFile_ValidateCriticalSettings()
     motoRosAssert_withMsg(bAgentOnMySubnet,
         SUBCODE_CONFIGURATION_INVALID_AGENT_SUBNET,
         "Agent IP on wrong subnet");
+
+    //Save the MAC address of the port being used for ROS traffic
+    status = Ros_GetMacAddress(g_Ros_Controller.rosTrafficLanPort, g_Ros_Controller.rosTrafficMacAddr);
+    if (status != OK)
+    {
+        Ros_Debug_BroadcastMsg("%s: Ros_GetMacAddress: iface: %d; error: %d",
+            __func__, g_Ros_Controller.rosTrafficLanPort, status);
+        motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FAIL_MP_NICDATA0,
+            "Must enable ETHERNET function");
+    }
+
+    if (strncmp(g_nodeConfigSettings.node_name, PLACEHOLDER_NODE_NAME, MAX_YAML_STRING_LEN) == 0)
+    {
+        //last three bytes of MAC ID are a unique identifier
+        sprintf(g_nodeConfigSettings.node_name, "%s_%02x_%02x_%02x", DEFAULT_NODE_NAME_PREFIX, g_Ros_Controller.rosTrafficMacAddr[3],
+            g_Ros_Controller.rosTrafficMacAddr[4], g_Ros_Controller.rosTrafficMacAddr[5]);
+
+        Ros_Debug_BroadcastMsg("%s: node_name not provided, setting to default: g_nodeConfigSettings.node_name -- %s",
+            __func__, g_nodeConfigSettings.node_name);
+    }
 
     //-----------------------------------------
     //Verify we have node name

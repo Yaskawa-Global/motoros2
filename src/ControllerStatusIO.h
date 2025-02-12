@@ -76,6 +76,7 @@ typedef struct
     CtrlGroup* ctrlGroups[MAX_CONTROLLABLE_GROUPS];         // Array of the controller control group
 
     UINT8 rosTrafficLanPort;
+    UCHAR rosTrafficMacAddr[6];
 
     // Controller Status
     MP_IO_INFO ioStatusAddr[IO_ROBOTSTATUS_MAX];            // Array of Specific Input Address representing the I/O status
