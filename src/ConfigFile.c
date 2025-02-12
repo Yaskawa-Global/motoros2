@@ -640,57 +640,11 @@ void Ros_ConfigFile_ValidateNonCriticalSettings()
     {
         Ros_Debug_BroadcastMsg("UserLan monitor enabled, checking port setting ..");
 
-        //try to auto-detect if the port was not configured
         if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
         {
-            BOOL bAgentOnInterface = FALSE;
-            STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
-                g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN1, &bAgentOnInterface);
-            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
-                "Host on NIC check 1 auto-detect");
-
-            if (bAgentOnInterface)
-            {
-                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN1;
-                Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
-                    g_nodeConfigSettings.userlan_monitor_port);
-            }
+            g_nodeConfigSettings.userlan_monitor_port = (Ros_UserLan_Port_Setting)g_Ros_Controller.rosTrafficLanPort;
         }
-
-#if defined (YRC1000)
-        //on these controllers we can try the second interface, if we haven't
-        //already determined we should monitor the first
-        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
-        {
-            BOOL bAgentOnInterface = FALSE;
-            STATUS status = Ros_ConfigFile_HostOnNetworkInterface(
-                g_nodeConfigSettings.agent_ip_address, ROS_USER_LAN2, &bAgentOnInterface);
-            motoRosAssert_withMsg(status == OK, SUBCODE_CONFIGURATION_AGENT_ON_NET_CHECK,
-                "Host on NIC check 2 auto-detect");
-
-            if (bAgentOnInterface)
-            {
-                g_nodeConfigSettings.userlan_monitor_port = CFG_ROS_USER_LAN2;
-                Ros_Debug_BroadcastMsg("UserLan monitor auto-detect port: %d",
-                    g_nodeConfigSettings.userlan_monitor_port);
-            }
-        }
-#endif
-
-        //if we still haven't determined which port to monitor, we'll raise an
-        //alarm and disable monitoring. There is no appropriate default value
-        //here, and user intervention is required.
-        if (g_nodeConfigSettings.userlan_monitor_port == CFG_ROS_USER_LAN_AUTO)
-        {
-            mpSetAlarm(ALARM_CONFIGURATION_FAIL, "UserLan port detect failed",
-                SUBCODE_CONFIGURATION_USERLAN_MONITOR_AUTO_DETECT_FAILED);
-            g_nodeConfigSettings.userlan_monitor_enabled = FALSE;
-            Ros_Debug_BroadcastMsg(
-                "UserLan port auto-detection failed, disabling monitor");
-        }
-
-        //otherwise, either auto-detect worked, or a fixed value was configured.
-        //In both cases, verify it's an acceptable value.
+        //otherwise a fixed value was configured. Verify that it is an acceptable value.
         else
         {
 #if defined (YRC1000)
@@ -893,6 +847,7 @@ void Ros_ConfigFile_Parse()
 
     } while (!bOkToInit);
 
+    //Order matters. Validate critical settings first. Then validate non-critical settings. 
     Ros_ConfigFile_ValidateCriticalSettings();
     Ros_ConfigFile_ValidateNonCriticalSettings();
 #if defined(YRC1000)
