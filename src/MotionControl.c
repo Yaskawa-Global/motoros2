@@ -569,7 +569,7 @@ BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_dat
     return TRUE;
 }
 
-UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request)
+UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request)
 {
     if (Ros_MotionControl_MustInitializePointQueue)
     {
@@ -579,9 +579,13 @@ UINT8 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__Q
         status = Ros_MotionControl_InitPointQueue(request);
 
         if (status == INIT_TRAJ_OK)
+        {
             return motoros2_interfaces__msg__QueueResultEnum__SUCCESS;
+        }
         else
-            return motoros2_interfaces__msg__QueueResultEnum__INIT_FAILURE;
+        {
+            return status;
+        }
     }
 
     //------------------------------------------------------------
