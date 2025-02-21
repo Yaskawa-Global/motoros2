@@ -268,8 +268,14 @@
     <None Include="..\libmicroros_yrc1000_jazzy\libmicroros.yrcLib_jazzy">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
-	<None Include="..\doc\network_configuration.md">
+    <None Include="..\doc\network_configuration.md">
       <Filter>Docs\doc</Filter>
+    </None>
+    <None Include="..\libmicroros_dx200_jazzy\libmicroros.dnLib_jazzy">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000u_jazzy\libmicroros.yrcmLib_jazzy">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -371,9 +371,11 @@
     <None Include="..\libmicroros_dx200_foxy\libmicroros.dnLib_foxy" />
     <None Include="..\libmicroros_dx200_galactic\libmicroros.dnLib_galactic" />
     <None Include="..\libmicroros_dx200_humble\libmicroros.dnLib_humble" />
+    <None Include="..\libmicroros_dx200_jazzy\libmicroros.dnLib_jazzy" />
     <None Include="..\libmicroros_yrc1000u_foxy\libmicroros.yrcmLib_foxy" />
     <None Include="..\libmicroros_yrc1000u_galactic\libmicroros.yrcmLib_galactic" />
     <None Include="..\libmicroros_yrc1000u_humble\libmicroros.yrcmLib_humble" />
+    <None Include="..\libmicroros_yrc1000u_jazzy\libmicroros.yrcmLib_jazzy" />
     <None Include="..\libmicroros_yrc1000_foxy\libmicroros.yrcLib_foxy" />
     <None Include="..\libmicroros_yrc1000_galactic\libmicroros.yrcLib_galactic" />
     <None Include="..\libmicroros_yrc1000_humble\libmicroros.yrcLib_humble" />
