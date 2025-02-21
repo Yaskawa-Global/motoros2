@@ -9,7 +9,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 ## Forthcoming
 
-**Added support for ROS2 Jazzy Jalisco!** ([#337](https://github.com/Yaskawa-Global/motoros2/pull/337))
+**Added support for ROS2 Jazzy Jalisco!** ([#337](https://github.com/Yaskawa-Global/motoros2/pull/337), [#371](https://github.com/Yaskawa-Global/motoros2/pull/371))
 
 MotoROS2 is now built against `micro_ros_motoplus` version `20250207`.
 
