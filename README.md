@@ -16,7 +16,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 [![license - Apache-2.0](https://img.shields.io/:license-Apache--2.0-yellowgreen.svg "MotoROS2 itself is licensed under the Apache-2.0 license. Please see the LICENSES directory for additional license files")](https://opensource.org/licenses/Apache-2.0)
 [![support level: consortium / vendor](https://img.shields.io/badge/support%20level-consortium%20/%20vendor-brightgreen.svg)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
 
-![Version: 0.1.3](https://img.shields.io/badge/version-0.1.3-informational.svg)
+![Version: 0.2.0](https://img.shields.io/badge/version-0.2.0-informational.svg)
 
 ## Overview
 
@@ -119,7 +119,7 @@ Look for the version number starting with `DN`, `YAS` or `YBS`.
 
 ## Option Function compatibility
 
-The current version of MotoROS2 (`0.1.3`) is ***not*** compatible with the following Option Function(s) and/or other MotoPlus application(s):
+The current version of MotoROS2 (`0.2.0`) is ***not*** compatible with the following Option Function(s) and/or other MotoPlus application(s):
 
 - Simple Connect
 
@@ -163,7 +163,7 @@ To calculate the MD5 hash on Debian/Ubuntu for the main MotoROS2 binary, run the
 ```shell
 $ cd /path/to/where/the/binary/was/saved
 $ md5sum -b mr2_yrc1_j.out
-[TODO]  mr2_yrc1_j.out
+E00F8498242256B57566BFEBAAAB8A35 mr2_yrc1_j.out
 ```
 
 Compare the output of `md5sum` when run against the binary downloaded in the previous section ([Downloading the files](#downloading-the-files)) with the values listed in the following table.
@@ -171,18 +171,18 @@ The values must match *exactly*.
 
 |**Controller** |**ROS 2 Version** | **File**          |**Version** | **MD5 hash**                       |
 |:--------------|:-----------------|:------------------|:-----------|:-----------------------------------|
-| DX200         | Foxy             | `mr2_dx2_f.out`   | `0.1.3`    | `a9a9e10403f726062c25d97654fad316` |
-| DX200         | Galactic         | `mr2_dx2_g.out`   | `0.1.3`    | `e8db7512215da240b28b985f2f2af98b` |
-| DX200         | Humble           | `mr2_dx2_h.out`   | `0.1.3`    | `611bda537655cf8a60d85600da6043f4` |
-| DX200         | Jazzy            | `mr2_dx2_j.out`   | `TODO`     | `TODO`                             |
-| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.1.3`    | `84bfb44e2043372127d9dfc1157a79b5` |
-| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.1.3`    | `866e090b6c724429ce03117712c951f4` |
-| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.1.3`    | `e2d088b765a0bfed501aa213a1be1de0` |
-| YRC1000       | Jazzy            | `mr2_yrc1_j.out`  | `TODO`     | `TODO`                             |
-| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.1.3`    | `027e77b427a212aa63e5d7962d48ad92` |
-| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.1.3`    | `042d753a7729784fec8c5c23bef3e685` |
-| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.1.3`    | `c0e61adbf5bf6fd6a734211f15bb0f0a` |
-| YRC1000micro  | Jazzy            | `mr2_yrc1m_j.out` | `TODO`     | `TODO`                             |
+| DX200         | Foxy             | `mr2_dx2_f.out`   | `0.2.0`    | `36046DF3890AAF221AC312FE0B5401FF` |
+| DX200         | Galactic         | `mr2_dx2_g.out`   | `0.2.0`    | `181B3724C5FF3A42C597F545836410DB` |
+| DX200         | Humble           | `mr2_dx2_h.out`   | `0.2.0`    | `F8CADE51D3777537050B1D19CE06100F` |
+| DX200         | Jazzy            | `mr2_dx2_j.out`   | `0.2.0`    | `2C9FEC185F1803EFBA52F24AAA325FA3` |
+| YRC1000       | Foxy             | `mr2_yrc1_f.out`  | `0.2.0`    | `4A5E13412C4D9A2AFBEF9A6B19CC1790` |
+| YRC1000       | Galactic         | `mr2_yrc1_g.out`  | `0.2.0`    | `ED571C65DE0E4785CE40B7BED9E1FE9E` |
+| YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.2.0`    | `2C3539E2145684AF355F3E02202CF1EB` |
+| YRC1000       | Jazzy            | `mr2_yrc1_j.out`  | `0.2.0`    | `E00F8498242256B57566BFEBAAAB8A35` |
+| YRC1000micro  | Foxy             | `mr2_yrc1m_f.out` | `0.2.0`    | `A4A5565BEEA06EB93FD88A04E14895D5` |
+| YRC1000micro  | Galactic         | `mr2_yrc1m_g.out` | `0.2.0`    | `244765F881D98CD805D1CD76D582FF8B` |
+| YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.2.0`    | `9448379CE4F13212B1D2AE5EDD822E03` |
+| YRC1000micro  | Jazzy            | `mr2_yrc1m_j.out` | `0.2.0`    | `9BB1788F4B73BB5E18B18C5D4534EC56` |
 
 If the hash matches, proceed with the next section, [Installation](#installation).
 
