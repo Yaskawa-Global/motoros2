@@ -7,7 +7,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
-## Forthcoming
+## 0.2.0 (2025-03-06)
 
 **Added support for ROS2 Jazzy Jalisco!** ([#337](https://github.com/Yaskawa-Global/motoros2/pull/337), [#371](https://github.com/Yaskawa-Global/motoros2/pull/371))
 
