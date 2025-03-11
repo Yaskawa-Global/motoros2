@@ -269,7 +269,7 @@ publisher_qos:
 # (refer to the provided INFORM job files for the general structure).
 #
 # DEFAULT: false
-#allow_custom_inform: false
+#allow_custom_inform_job: false
 
 #-----------------------------------------------------------------------------
 # Ignore missing calibration data on multi-group systems with TF broadcast
