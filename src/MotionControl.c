@@ -325,10 +325,11 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
             if (!g_Ros_Controller.bStopMotion && ctrlGroup->hasDataToProcess && ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
             {
 
-                Ros_Debug_BroadcastMsg("Processing next point in trajectory [Group #%d - T=%.3f: (%7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f)]",
+                Ros_Debug_BroadcastMsg("Processing next point in trajectory [Group #%d - T=%.3f: (%7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f)]",
                     ctrlGroup->groupNo, (double)ctrlGroup->trajectoryIterator->time * 0.001,
                     ctrlGroup->trajectoryIterator->pos[0], ctrlGroup->trajectoryIterator->pos[1], ctrlGroup->trajectoryIterator->pos[2],
-                    ctrlGroup->trajectoryIterator->pos[3], ctrlGroup->trajectoryIterator->pos[4], ctrlGroup->trajectoryIterator->pos[5]);
+                    ctrlGroup->trajectoryIterator->pos[3], ctrlGroup->trajectoryIterator->pos[4], ctrlGroup->trajectoryIterator->pos[5],
+                    ctrlGroup->trajectoryIterator->pos[6], ctrlGroup->trajectoryIterator->pos[7]);
 
                 //-------------------------------------
                 // Check that incoming data is valid

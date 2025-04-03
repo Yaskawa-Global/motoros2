@@ -186,17 +186,17 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
         }
         Ros_Debug_BroadcastMsg(startupMessage);
 
-        Ros_Debug_BroadcastMsg("maxInc[%d] (in motoman joint order): %d, %d, %d, %d, %d, %d, %d",
+        Ros_Debug_BroadcastMsg("maxInc[%d] (in motoman joint order): %d, %d, %d, %d, %d, %d, %d, %d",
             groupIndex,
             ctrlGroup->maxInc.maxIncrement[0],ctrlGroup->maxInc.maxIncrement[1],ctrlGroup->maxInc.maxIncrement[2],
             ctrlGroup->maxInc.maxIncrement[3],ctrlGroup->maxInc.maxIncrement[4],ctrlGroup->maxInc.maxIncrement[5],
-            ctrlGroup->maxInc.maxIncrement[6]);
+            ctrlGroup->maxInc.maxIncrement[6],ctrlGroup->maxInc.maxIncrement[7]);
 
-        Ros_Debug_BroadcastMsg("maxSpeed[%d] (in ros joint order): %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f",
+        Ros_Debug_BroadcastMsg("maxSpeed[%d] (in ros joint order): %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f",
             groupIndex,
             ctrlGroup->maxSpeed[0],ctrlGroup->maxSpeed[1],ctrlGroup->maxSpeed[2],
             ctrlGroup->maxSpeed[3],ctrlGroup->maxSpeed[4],ctrlGroup->maxSpeed[5],
-            ctrlGroup->maxSpeed[6]);
+            ctrlGroup->maxSpeed[6],ctrlGroup->maxSpeed[7]);
 
         //----------------------------------------------------------------
         if(bInitOk == FALSE)
