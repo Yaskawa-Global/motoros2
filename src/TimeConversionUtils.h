@@ -11,56 +11,77 @@
 
 #include "MotoROS.h"
 
+static inline void floor_divide(INT64 dividend, INT64 divisor, INT64* quotient, INT64* remainder)
+{
+    *quotient = dividend / divisor;
+    // If the division has a remainder, and the result is negative,
+    // we need to adjust to floor the result
+    if (dividend % divisor != 0 && ((dividend < 0) != (divisor < 0)))
+    {
+        *quotient -= 1;
+    }
+
+    *remainder = abs(dividend - *quotient * divisor);
+}
 
 static inline INT64 Ros_Duration_Msg_To_Millis(builtin_interfaces__msg__Duration const* const x)
 {
-    return ((INT64)x->sec * 1000) + (INT64)(x->nanosec * 0.000001);
+    return (x->sec * 1000LL) + (x->nanosec / (1000LL * 1000LL));
 }
 
 static inline INT64 Ros_Duration_Msg_To_Nanos(builtin_interfaces__msg__Duration const* const x)
 {
-    return ((INT64)x->sec * 1000000000LL) + (INT64)x->nanosec;
+    return (x->sec * 1000LL * 1000LL * 1000LL) + (x->nanosec);
 }
 
 static inline void Ros_Millis_To_Duration_Msg(INT64 x, builtin_interfaces__msg__Duration* const y)
 {
-    y->sec = x / 1000;
-    y->nanosec = (x % 1000) * 1000000;
+    INT64 remainder, quotient;
+    floor_divide(x, 1000LL, &quotient, &remainder);
+    y->sec = quotient;
+    y->nanosec = remainder * 1000LL * 1000LL;
 }
 
 static inline void Ros_Nanos_To_Duration_Msg(INT64 x, builtin_interfaces__msg__Duration* const y)
 {
-    y->sec = x / 1000000000LL;
-    y->nanosec = (x % 1000000000LL);
+    INT64 remainder, quotient;
+    floor_divide(x, 1000LL * 1000LL * 1000LL, &quotient, &remainder);
+    y->sec = quotient;
+    y->nanosec = remainder;
 }
 
 static inline INT64 Ros_Time_Msg_To_Millis(builtin_interfaces__msg__Time const* const x)
 {
-    return ((INT64)x->sec * 1000) + (INT64)(x->nanosec * 0.000001);
+    return (x->sec * 1000LL) + (x->nanosec / (1000LL * 1000LL));
 }
 
 static inline INT64 Ros_Time_Msg_To_Nanos(builtin_interfaces__msg__Time const* const x)
 {
-    return ((INT64)x->sec * 1000000000LL) + (INT64)x->nanosec;
+    return (x->sec * 1000LL * 1000LL * 1000LL) + x->nanosec;
 }
 
 static inline void Ros_Millis_To_Time_Msg(INT64 x, builtin_interfaces__msg__Time* const y)
 {
-    y->sec = x / 1000;
-    y->nanosec = (x % 1000) * 1000000;
+    INT64 remainder, quotient;
+    floor_divide(x, 1000LL, &quotient, &remainder);
+    y->sec = quotient;
+    y->nanosec = remainder * 1000LL * 1000LL;
 }
-
 
 static inline void Ros_Nanos_To_Time_Msg(INT64 x, builtin_interfaces__msg__Time* const y)
 {
-    y->sec = x / 1000000000LL;
-    y->nanosec = (x % 1000000000LL);
+    INT64 remainder, quotient;
+    floor_divide(x, 1000LL * 1000LL * 1000LL, &quotient, &remainder);
+    y->sec = quotient;
+    y->nanosec = remainder;
 }
 
 static inline void Ros_Nanos_To_Timespec(INT64 x, struct timespec* const y)
 {
-    y->tv_sec = x / 1000000000LL;
-    y->tv_nsec = (x % 1000000000LL);
+    INT64 remainder, quotient;
+    floor_divide(x, 1000LL * 1000LL * 1000LL, &quotient, &remainder);
+    y->tv_sec = quotient;
+    y->tv_nsec = remainder;
 }
 
 
