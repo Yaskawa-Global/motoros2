@@ -76,6 +76,7 @@ void RosInitTask()
     bTestResult &= Ros_Testing_RosMotoPlusConversionUtils();
     bTestResult &= Ros_Testing_ControllerStatusIO();
     bTestResult &= Ros_Testing_ActionServer_FJT();
+    bTestResult &= Ros_Testing_TimeConversionUtils();
     bTestResult ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
     Ros_Debug_BroadcastMsg("===");
 #endif

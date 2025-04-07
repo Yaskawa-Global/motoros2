@@ -30,4 +30,32 @@ BOOL Ros_Testing_CompareLong(long a, long b)
     return ok;
 }
 
+BOOL Ros_Testing_INT64_Equals(INT64 a, INT64 b)
+{
+    BOOL ok = a == b;
+
+    if (!ok)
+        Ros_Debug_BroadcastMsg("Fail: %lld != %lld", a, b);
+
+    return ok;
+}
+
+BOOL Ros_Testing_Timespec_Equals(const struct timespec* lhs, const struct timespec* rhs)
+{
+    BOOL ok = lhs->tv_sec == rhs->tv_sec;
+
+    if (!ok)
+    {
+        Ros_Debug_BroadcastMsg("Fail timespec seconds: %d != %d", lhs->tv_sec, rhs->tv_sec);
+    }
+
+    ok &= lhs->tv_nsec == rhs->tv_nsec;
+
+    if (!ok)
+    {
+        Ros_Debug_BroadcastMsg("Fail timespec nanos: %d != %d", lhs->tv_nsec, rhs->tv_nsec);
+    }
+    return ok;
+}
+
 #endif //MOTOROS2_TESTING_ENABLE
