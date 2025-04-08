@@ -92,7 +92,7 @@ void Ros_Testing_CtrlGroup_MakeFakeSiaRobot(CtrlGroup* group)
 
 BOOL Ros_Testing_CtrlGroup_PosConverters()
 {
-    CtrlGroup group;
+    CtrlGroup *group= (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
     long motoPos[MAX_PULSE_AXES];
     double rosPos[MAX_PULSE_AXES];
     BOOL bOk, bAllTestsPassed;
@@ -102,12 +102,12 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
     //-------------------------------------------------------------------------
     // 6 DOF
     //-------------------------------------------------------------------------
-    Ros_Testing_CtrlGroup_MakeFake6dofRobot(&group);
+    Ros_Testing_CtrlGroup_MakeFake6dofRobot(group);
 
     for (int i = 0; i < MAX_PULSE_AXES; i += 1)
         motoPos[i] = (i * 1000) + 2000; //{2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000}
-
-    Ros_CtrlGroup_ConvertToRosPos(&group, motoPos, rosPos);
+    
+    Ros_CtrlGroup_ConvertToRosPos(group, motoPos, rosPos);
 
     bOk = Ros_Testing_CompareDouble(rosPos[0], (2000.0/9.0));
     bOk &= Ros_Testing_CompareDouble(rosPos[1], (3000.0/8.0));
@@ -130,7 +130,7 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
 
     rosPos[6] = rosPos[7] = 123.456; //these two axes are not used. they should get zeroed out in Ros_CtrlGroup_ConvertToMotoPos
 
-    Ros_CtrlGroup_ConvertToMotoPos_FromSequentialOrdering(&group, rosPos, motoPos);
+    Ros_CtrlGroup_ConvertToMotoPos_FromSequentialOrdering(group, rosPos, motoPos);
 
     bOk = Ros_Testing_CompareLong(motoPos[0], 2000);
     bOk &= Ros_Testing_CompareLong(motoPos[1], 3000);
@@ -154,12 +154,12 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
     //-------------------------------------------------------------------------
     // DELTA
     //-------------------------------------------------------------------------
-    Ros_Testing_CtrlGroup_MakeFakeDeltaRobot(&group);
+    Ros_Testing_CtrlGroup_MakeFakeDeltaRobot(group);
 
     for (int i = 0; i < MAX_PULSE_AXES; i += 1)
         motoPos[i] = (i * 1000) + 2000; //{2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000}
 
-    Ros_CtrlGroup_ConvertToRosPos(&group, motoPos, rosPos);
+    Ros_CtrlGroup_ConvertToRosPos(group, motoPos, rosPos);
 
     bOk = Ros_Testing_CompareDouble(rosPos[0], (2000.0 / 9.0));
     bOk &= Ros_Testing_CompareDouble(rosPos[1], (3000.0 / 8.0));
@@ -175,7 +175,7 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
         bAllTestsPassed = FALSE;
     }
 
-    Ros_CtrlGroup_ConvertToMotoPos_FromSequentialOrdering(&group, rosPos, motoPos);
+    Ros_CtrlGroup_ConvertToMotoPos_FromSequentialOrdering(group, rosPos, motoPos);
 
     bOk = Ros_Testing_CompareLong(motoPos[0], 2000);
     bOk &= Ros_Testing_CompareLong(motoPos[1], 3000);
@@ -194,12 +194,12 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
     //-------------------------------------------------------------------------
     // SIA
     //-------------------------------------------------------------------------
-    Ros_Testing_CtrlGroup_MakeFakeSiaRobot(&group);
+    Ros_Testing_CtrlGroup_MakeFakeSiaRobot(group);
 
     for (int i = 0; i < MAX_PULSE_AXES; i += 1)
         motoPos[i] = (i * 1000) + 2000; //{2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000}
 
-    Ros_CtrlGroup_ConvertToRosPos(&group, motoPos, rosPos);
+    Ros_CtrlGroup_ConvertToRosPos(group, motoPos, rosPos);
 
     bOk = Ros_Testing_CompareDouble(rosPos[0], (2000.0 / 9.0));
     bOk &= Ros_Testing_CompareDouble(rosPos[1], (3000.0 / 8.0));
@@ -218,7 +218,7 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
         bAllTestsPassed = FALSE;
     }
 
-    Ros_CtrlGroup_ConvertToMotoPos_FromSequentialOrdering(&group, rosPos, motoPos);
+    Ros_CtrlGroup_ConvertToMotoPos_FromSequentialOrdering(group, rosPos, motoPos);
 
     bOk = Ros_Testing_CompareLong(motoPos[0], 2000);
     bOk &= Ros_Testing_CompareLong(motoPos[1], 3000);
@@ -237,30 +237,34 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
         bAllTestsPassed = FALSE;
     }
 
+    mpFree(group);
+
     return bAllTestsPassed;
 }
 
 BOOL Ros_Testing_CtrlGroup_HasBaseTrack()
 {
-    CtrlGroup group;
+    CtrlGroup* group = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    bzero(group, sizeof(CtrlGroup));
     BOOL bOk, bAllTestsPassed = TRUE;
 
     //no base track
-    group.baseTrackGroupId = (MP_GRP_ID_TYPE)-1;
-    group.baseTrackGroupIndex = -1;
+    group->baseTrackGroupId = (MP_GRP_ID_TYPE)-1;
+    group->baseTrackGroupIndex = -1;
 
-    bOk = Ros_CtrlGroup_HasBaseTrack(&group) == FALSE;
+    bOk = Ros_CtrlGroup_HasBaseTrack(group) == FALSE;
     Ros_Debug_BroadcastMsg("Testing CtrlGroup HasBaseTrack - no base track: %s", bOk ? "PASS" : "FAIL");
     bAllTestsPassed &= bOk;
 
     //has base track: R1+B1
-    group.baseTrackGroupId = MP_B1_GID;
-    group.baseTrackGroupIndex = 1;
+    group->baseTrackGroupId = MP_B1_GID;
+    group->baseTrackGroupIndex = 1;
 
-    bOk = Ros_CtrlGroup_HasBaseTrack(&group) == TRUE;
+    bOk = Ros_CtrlGroup_HasBaseTrack(group) == TRUE;
     Ros_Debug_BroadcastMsg("Testing CtrlGroup HasBaseTrack - base track (B1): %s", bOk ? "PASS" : "FAIL");
     bAllTestsPassed &= bOk;
 
+    mpFree(group);
     return bAllTestsPassed;
 }
 

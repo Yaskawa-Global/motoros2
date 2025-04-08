@@ -85,13 +85,12 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0;
 
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
     controller.numGroup = 1;
-    controller.numRobot = 1;
-    controller.ctrlGroups[0] = &grp0;
+    controller.ctrlGroups[0] = grp0;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
 
     //R1: NO warning, nothing to calibrate with a single group
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -102,6 +101,8 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+
     return bSuccess;
 }
 
@@ -110,16 +111,16 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0, grp1;
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
 
     controller.numGroup = 2;
-    controller.numRobot = 1;
-    controller.ctrlGroups[0] = &grp0;
-    controller.ctrlGroups[1] = &grp1;
+    controller.ctrlGroups[0] = grp0;
+    controller.ctrlGroups[1] = grp1;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(&grp1, /*groupNo=*/ 1, /*groupId=*/ MP_B1_GID);
-    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ &grp0, /*base=*/ &grp1);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(grp1, /*groupNo=*/ 1, /*groupId=*/ MP_B1_GID);
+    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ grp0, /*base=*/ grp1);
 
     //R1+B1: NO warning, as base tracks don't get calibrated
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -130,6 +131,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+    mpFree(grp1);
+
     return bSuccess;
 }
 
@@ -138,15 +142,15 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1R2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0, grp1;
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
 
     controller.numGroup = 2;
-    controller.numRobot = 1;
-    controller.ctrlGroups[0] = &grp0;
-    controller.ctrlGroups[1] = &grp1;
+    controller.ctrlGroups[0] = grp0;
+    controller.ctrlGroups[1] = grp1;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp1, /*groupNo=*/ 1, /*groupId=*/ MP_R2_GID);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp1, /*groupNo=*/ 1, /*groupId=*/ MP_R2_GID);
 
     //R1+R2: YES warning, but only if TF enabled AND calib failed to load
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -157,6 +161,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1R2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1R2: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+    mpFree(grp1);
+
     return bSuccess;
 }
 
@@ -165,19 +172,20 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0, grp1, grp2;
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
 
     controller.numGroup = 3;
-    controller.numRobot = 2;
-    controller.ctrlGroups[0] = &grp0;
-    controller.ctrlGroups[1] = &grp1;
-    controller.ctrlGroups[2] = &grp2;
+    controller.ctrlGroups[0] = grp0;
+    controller.ctrlGroups[1] = grp1;
+    controller.ctrlGroups[2] = grp2;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(&grp2, /*groupNo=*/ 2, /*groupId=*/ MP_B1_GID);
-    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ &grp0, /*base=*/ &grp2);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(grp2, /*groupNo=*/ 2, /*groupId=*/ MP_B1_GID);
+    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ grp0, /*base=*/ grp2);
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp1, /*groupNo=*/ 1, /*groupId=*/ MP_R2_GID);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp1, /*groupNo=*/ 1, /*groupId=*/ MP_R2_GID);
 
     //R1B1+R2: YES warning, but only if TF enabled AND calib failed to load
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -188,6 +196,10 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+    mpFree(grp1);
+    mpFree(grp2);
+
     return bSuccess;
 }
 
@@ -196,15 +208,15 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0, grp1;
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
 
     controller.numGroup = 2;
-    controller.numRobot = 1;
-    controller.ctrlGroups[0] = &grp0;
-    controller.ctrlGroups[1] = &grp1;
+    controller.ctrlGroups[0] = grp0;
+    controller.ctrlGroups[1] = grp1;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(&grp1, /*groupNo=*/ 1, /*groupId=*/ MP_S1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(grp1, /*groupNo=*/ 1, /*groupId=*/ MP_S1_GID);
 
     //R1S1: YES warning, but only if TF enabled AND calib failed to load
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -215,6 +227,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+    mpFree(grp1);
+
     return bSuccess;
 }
 
@@ -223,17 +238,18 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1S2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0, grp1, grp2;
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
 
     controller.numGroup = 3;
-    controller.numRobot = 1;
-    controller.ctrlGroups[0] = &grp0;
-    controller.ctrlGroups[1] = &grp1;
-    controller.ctrlGroups[2] = &grp2;
+    controller.ctrlGroups[0] = grp0;
+    controller.ctrlGroups[1] = grp1;
+    controller.ctrlGroups[2] = grp2;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(&grp1, /*groupNo=*/ 1, /*groupId=*/ MP_S1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(&grp2, /*groupNo=*/ 2, /*groupId=*/ MP_S2_GID);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(grp1, /*groupNo=*/ 1, /*groupId=*/ MP_S1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(grp2, /*groupNo=*/ 2, /*groupId=*/ MP_S2_GID);
 
     //R1S1S2: YES warning, but only if TF enabled AND calib failed to load
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -244,6 +260,10 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1S2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1S2: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+    mpFree(grp1);
+    mpFree(grp2);
+
     return bSuccess;
 }
 
@@ -252,19 +272,20 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1S1()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0, grp1, grp2;
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
 
     controller.numGroup = 3;
-    controller.numRobot = 1;
-    controller.ctrlGroups[0] = &grp0;
-    controller.ctrlGroups[1] = &grp1;
-    controller.ctrlGroups[2] = &grp2;
+    controller.ctrlGroups[0] = grp0;
+    controller.ctrlGroups[1] = grp1;
+    controller.ctrlGroups[2] = grp2;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(&grp1, /*groupNo=*/ 1, /*groupId=*/ MP_B1_GID);
-    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ &grp0, /*base=*/ &grp1);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(grp1, /*groupNo=*/ 1, /*groupId=*/ MP_B1_GID);
+    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ grp0, /*base=*/ grp1);
 
-    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(&grp2, /*groupNo=*/ 2, /*groupId=*/ MP_S1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeStationGroup(grp2, /*groupNo=*/ 2, /*groupId=*/ MP_S1_GID);
 
     //R1B1S1: YES warning, but only if TF enabled AND calib failed to load
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -275,6 +296,10 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1S1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1S1: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+    mpFree(grp1);
+    mpFree(grp2);
+
     return bSuccess;
 }
 
@@ -283,22 +308,24 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2B2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup grp0, grp1, grp2, grp3;
+    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp3 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
 
     controller.numGroup = 4;
-    controller.numRobot = 2;
-    controller.ctrlGroups[0] = &grp0;
-    controller.ctrlGroups[1] = &grp1;
-    controller.ctrlGroups[2] = &grp2;
-    controller.ctrlGroups[3] = &grp3;
+    controller.ctrlGroups[0] = grp0;
+    controller.ctrlGroups[1] = grp1;
+    controller.ctrlGroups[2] = grp2;
+    controller.ctrlGroups[3] = grp3;
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(&grp1, /*groupNo=*/ 1, /*groupId=*/ MP_B1_GID);
-    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ &grp0, /*base=*/ &grp1);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp0, /*groupNo=*/ 0, /*groupId=*/ MP_R1_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(grp1, /*groupNo=*/ 1, /*groupId=*/ MP_B1_GID);
+    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ grp0, /*base=*/ grp1);
 
-    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(&grp2, /*groupNo=*/ 2, /*groupId=*/ MP_R2_GID);
-    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(&grp3, /*groupNo=*/ 3, /*groupId=*/ MP_B2_GID);
-    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ &grp2, /*base=*/ &grp3);
+    Ros_Testing_ControllerStatusIO_MakeFake6dofRobot(grp2, /*groupNo=*/ 2, /*groupId=*/ MP_R2_GID);
+    Ros_Testing_ControllerStatusIO_MakeFakeBaseGroup(grp3, /*groupNo=*/ 3, /*groupId=*/ MP_B2_GID);
+    Ros_Testing_ControllerStatusIO_AssignRobotToBaseGroup(/*robot=*/ grp2, /*base=*/ grp3);
 
     //R1B1R2B2: YES warning, but only if TF enabled AND calib failed to load
     bSuccess &= FALSE == Ros_Controller_ShouldWarnNoCalibDataLoaded(&controller, /*bCalibLoadedOk=*/ FALSE, /*bPublishTfEnabled=*/ FALSE);
@@ -309,6 +336,11 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2B2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2B2: %s", bSuccess ? "PASS" : "FAIL");
 
+    mpFree(grp0);
+    mpFree(grp1);
+    mpFree(grp2);
+    mpFree(grp3);
+
     return bSuccess;
 }
 
@@ -318,7 +350,7 @@ BOOL Ros_Testing_ControllerStatusIO()
 {
     BOOL bSuccess = TRUE;
 
-// disabled for now, cause controllers to crash (stack overflow issue perhaps?)
+    // disabled for now, cause controllers to crash (stack overflow issue perhaps?)
 #if 0
 
     bSuccess &= Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1();
