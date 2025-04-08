@@ -56,6 +56,9 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_empty_jtole
     const size_t NUM_JOINTS = 6;
     double posTolerances[NUM_JOINTS];
 
+    rosidl_runtime_c__String__Sequence__init(&joint_names, NUM_JOINTS);
+    joint_names.size = 0;
+
     //init capacity to NUM_JOINTS, but don't add any elements
     control_msgs__msg__JointTolerance__Sequence__init(&joint_tolerances, NUM_JOINTS);
     joint_tolerances.size = 0;
@@ -92,7 +95,6 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_out_array_t
     BOOL bSuccess = TRUE;
 
     STATUS status = 0;
-    control_msgs__msg__JointTolerance joint_tolerance;
     control_msgs__msg__JointTolerance__Sequence joint_tolerances;
     rosidl_runtime_c__String__Sequence joint_names;
     const size_t NUM_JOINTS = 6;
@@ -111,9 +113,6 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_out_array_t
     joint_tolerances.size = 0;
 
     //add (at least) a single JointTolerance (don't need to init it, just add it)
-    bzero(&joint_tolerance, sizeof(joint_tolerance));
-    control_msgs__msg__JointTolerance__init(&joint_tolerance);
-    joint_tolerances.data[0] = joint_tolerance;
     joint_tolerances.size = 1;
 
     //call
@@ -139,7 +138,6 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_more_jtol_t
     BOOL bSuccess = TRUE;
 
     STATUS status = 0;
-    control_msgs__msg__JointTolerance joint_tolerance;
     control_msgs__msg__JointTolerance__Sequence joint_tolerances;
     rosidl_runtime_c__String__Sequence joint_names;
     const size_t NUM_JOINTS = 6;
@@ -153,11 +151,8 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_more_jtol_t
     joint_tolerances.size = 0;
 
     //add a single JointTolerance
-    bzero(&joint_tolerance, sizeof(joint_tolerance));
-    control_msgs__msg__JointTolerance__init(&joint_tolerance);
-    rosidl_runtime_c__String__assign(&joint_tolerance.name, "joint5");
-    joint_tolerance.position = 1.0;
-    joint_tolerances.data[0] = joint_tolerance;
+    rosidl_runtime_c__String__assign(&joint_tolerances.data[0].name, "joint5");
+    joint_tolerances.data[0].position = 1.0;
     joint_tolerances.size = 1;
 
     //no jnames, zero len output array, but 1 jtol: that's legal, just means the jtol
@@ -193,7 +188,6 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slo
     BOOL bSuccess = TRUE;
 
     STATUS status = 0;
-    control_msgs__msg__JointTolerance joint_tolerance;
     control_msgs__msg__JointTolerance__Sequence joint_tolerances;
     rosidl_runtime_c__String__Sequence joint_names;
     const size_t NUM_JOINTS = 6;
@@ -210,13 +204,10 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slo
     control_msgs__msg__JointTolerance__Sequence__init(&joint_tolerances, NUM_JOINTS);
     joint_tolerances.size = 0;
 
-    bzero(&joint_tolerance, sizeof(joint_tolerance));
-    control_msgs__msg__JointTolerance__init(&joint_tolerance);
-    rosidl_runtime_c__String__assign(&joint_tolerance.name, JOINT_NAME);
-    joint_tolerance.position = J0_POS_TOL;
-    joint_tolerance.velocity = 0.0;
-    joint_tolerance.acceleration = 0.0;
-    joint_tolerances.data[0] = joint_tolerance;
+    rosidl_runtime_c__String__assign(&joint_tolerances.data[0].name, JOINT_NAME);
+    joint_tolerances.data[0].position = J0_POS_TOL;
+    joint_tolerances.data[0].velocity = 0.0;
+    joint_tolerances.data[0].acceleration = 0.0;
     joint_tolerances.size = 1;
 
     status = Ros_ActionServer_FJT_Parse_GoalPosTolerances(&joint_tolerances, &joint_names, posTolerances, NUM_JOINTS);
@@ -247,7 +238,6 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slo
     BOOL bSuccess = TRUE;
 
     STATUS status = 0;
-    control_msgs__msg__JointTolerance joint_tolerance;
     control_msgs__msg__JointTolerance__Sequence joint_tolerances;
     rosidl_runtime_c__String__Sequence joint_names;
     const size_t NUM_JOINTS = 6;
@@ -267,13 +257,10 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_jtol_in_slo
     joint_tolerances.size = 0;
 
     //add a single JointTolerance
-    bzero(&joint_tolerance, sizeof(joint_tolerance));
-    control_msgs__msg__JointTolerance__init(&joint_tolerance);
-    rosidl_runtime_c__String__assign(&joint_tolerance.name, JOINT_NAME);
-    joint_tolerance.position = J0_POS_TOL;
-    joint_tolerance.velocity = 0.0;
-    joint_tolerance.acceleration = 0.0;
-    joint_tolerances.data[0] = joint_tolerance;
+    rosidl_runtime_c__String__assign(&joint_tolerances.data[0].name, JOINT_NAME);
+    joint_tolerances.data[0].position = J0_POS_TOL;
+    joint_tolerances.data[0].velocity = 0.0;
+    joint_tolerances.data[0].acceleration = 0.0;
     joint_tolerances.size = 1;
 
     status = Ros_ActionServer_FJT_Parse_GoalPosTolerances(&joint_tolerances, &joint_names, posTolerances, NUM_JOINTS);
@@ -301,7 +288,6 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_last_settin
     BOOL bSuccess = TRUE;
 
     STATUS status = 0;
-    control_msgs__msg__JointTolerance joint_tolerance;
     control_msgs__msg__JointTolerance__Sequence joint_tolerances;
     rosidl_runtime_c__String__Sequence joint_names;
     const size_t NUM_JOINTS = 3;
@@ -318,23 +304,18 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Parse_GoalPosTolerances_last_settin
     joint_tolerances.size = 0;
 
     //JointTolerance for joint1
-    bzero(&joint_tolerance, sizeof(joint_tolerance));
-    control_msgs__msg__JointTolerance__init(&joint_tolerance);
-    rosidl_runtime_c__String__assign(&joint_tolerance.name, "joint1");
-    joint_tolerance.position = 0.123;
-    control_msgs__msg__JointTolerance__copy(&joint_tolerance, &joint_tolerances.data[0]);
+    rosidl_runtime_c__String__assign(&joint_tolerances.data[0].name, "joint1");
+    joint_tolerances.data[0].position = 0.123;
     joint_tolerances.size = 1;
 
     //JointTolerance for joint2
-    rosidl_runtime_c__String__assign(&joint_tolerance.name, "joint2");
-    joint_tolerance.position = 0.234;
-    control_msgs__msg__JointTolerance__copy(&joint_tolerance, &joint_tolerances.data[1]);
+    rosidl_runtime_c__String__assign(&joint_tolerances.data[1].name, "joint2");
+    joint_tolerances.data[1].position = 0.234;
     joint_tolerances.size = 2;
 
     //JointTolerance for joint1 -- NOTE: DUPLICATE
-    rosidl_runtime_c__String__assign(&joint_tolerance.name, "joint1");
-    joint_tolerance.position = 0.345;
-    control_msgs__msg__JointTolerance__copy(&joint_tolerance, &joint_tolerances.data[2]);
+    rosidl_runtime_c__String__assign(&joint_tolerances.data[2].name, "joint1");
+    joint_tolerances.data[2].position = 0.345;
     joint_tolerances.size = 3;
 
     status = Ros_ActionServer_FJT_Parse_GoalPosTolerances(&joint_tolerances, &joint_names, posTolerances, NUM_JOINTS);
@@ -474,6 +455,7 @@ static BOOL Ros_Testing_Ros_ActionServer_FJT_Reorder_TrajPt_To_Internal_Order_tr
     //on purpose of course
     bzero(&traj_point, sizeof(traj_point));
     trajectory_msgs__msg__JointTrajectoryPoint__init(&traj_point);
+    rosidl_runtime_c__double__Sequence__init(&traj_point.positions, NUM_JOINTS);
     traj_point.positions.data[0] = 0.0;
     traj_point.positions.size = 1;
 
