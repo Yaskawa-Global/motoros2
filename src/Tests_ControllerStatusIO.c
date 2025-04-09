@@ -84,7 +84,7 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1()
 
     Controller controller;
 
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
     controller.numGroup = 1;
     controller.ctrlGroups[0] = grp0;
 
@@ -99,7 +99,7 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
+    Ros_CtrlGroup_Dtor(grp0);
 
     return bSuccess;
 }
@@ -109,8 +109,8 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp1 = Ros_CtrlGroup_Ctor();
 
     controller.numGroup = 2;
     controller.ctrlGroups[0] = grp0;
@@ -129,8 +129,8 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
-    mpFree(grp1);
+    Ros_CtrlGroup_Dtor(grp0);
+    Ros_CtrlGroup_Dtor(grp1);
 
     return bSuccess;
 }
@@ -140,8 +140,8 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1R2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp1 = Ros_CtrlGroup_Ctor();
 
     controller.numGroup = 2;
     controller.ctrlGroups[0] = grp0;
@@ -159,8 +159,8 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1R2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1R2: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
-    mpFree(grp1);
+    Ros_CtrlGroup_Dtor(grp0);
+    Ros_CtrlGroup_Dtor(grp1);
 
     return bSuccess;
 }
@@ -170,9 +170,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp1 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp2 = Ros_CtrlGroup_Ctor();
 
     controller.numGroup = 3;
     controller.ctrlGroups[0] = grp0;
@@ -194,9 +194,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
-    mpFree(grp1);
-    mpFree(grp2);
+    Ros_CtrlGroup_Dtor(grp0);
+    Ros_CtrlGroup_Dtor(grp1);
+    Ros_CtrlGroup_Dtor(grp2);
 
     return bSuccess;
 }
@@ -206,8 +206,8 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp1 = Ros_CtrlGroup_Ctor();
 
     controller.numGroup = 2;
     controller.ctrlGroups[0] = grp0;
@@ -225,8 +225,8 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
-    mpFree(grp1);
+    Ros_CtrlGroup_Dtor(grp0);
+    Ros_CtrlGroup_Dtor(grp1);
 
     return bSuccess;
 }
@@ -236,9 +236,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1S2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp1 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp2 = Ros_CtrlGroup_Ctor();
 
     controller.numGroup = 3;
     controller.ctrlGroups[0] = grp0;
@@ -258,9 +258,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1S2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1S1S2: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
-    mpFree(grp1);
-    mpFree(grp2);
+    Ros_CtrlGroup_Dtor(grp0);
+    Ros_CtrlGroup_Dtor(grp1);
+    Ros_CtrlGroup_Dtor(grp2);
 
     return bSuccess;
 }
@@ -270,9 +270,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1S1()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp1 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp2 = Ros_CtrlGroup_Ctor();
 
     controller.numGroup = 3;
     controller.ctrlGroups[0] = grp0;
@@ -294,9 +294,9 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1S1()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1S1: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
-    mpFree(grp1);
-    mpFree(grp2);
+    Ros_CtrlGroup_Dtor(grp0);
+    Ros_CtrlGroup_Dtor(grp1);
+    Ros_CtrlGroup_Dtor(grp2);
 
     return bSuccess;
 }
@@ -306,10 +306,10 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2B2()
     BOOL bSuccess = TRUE;
 
     Controller controller;
-    CtrlGroup* grp0 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp1 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp2 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
-    CtrlGroup* grp3 = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp0 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp1 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp2 = Ros_CtrlGroup_Ctor();
+    CtrlGroup* grp3 = Ros_CtrlGroup_Ctor();
 
     controller.numGroup = 4;
     controller.ctrlGroups[0] = grp0;
@@ -334,10 +334,10 @@ BOOL Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2B2()
     //report overall result
     Ros_Debug_BroadcastMsg("Testing Ros_Testing_ControllerStatusIO_ShouldWarnNoCalibDataLoaded_R1B1R2B2: %s", bSuccess ? "PASS" : "FAIL");
 
-    mpFree(grp0);
-    mpFree(grp1);
-    mpFree(grp2);
-    mpFree(grp3);
+    Ros_CtrlGroup_Dtor(grp0);
+    Ros_CtrlGroup_Dtor(grp1);
+    Ros_CtrlGroup_Dtor(grp2);
+    Ros_CtrlGroup_Dtor(grp3);
 
     return bSuccess;
 }

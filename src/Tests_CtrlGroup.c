@@ -92,7 +92,7 @@ void Ros_Testing_CtrlGroup_MakeFakeSiaRobot(CtrlGroup* group)
 
 BOOL Ros_Testing_CtrlGroup_PosConverters()
 {
-    CtrlGroup *group= (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup *group= Ros_CtrlGroup_Ctor();
     long motoPos[MAX_PULSE_AXES];
     double rosPos[MAX_PULSE_AXES];
     BOOL bOk, bAllTestsPassed;
@@ -237,14 +237,14 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
         bAllTestsPassed = FALSE;
     }
 
-    mpFree(group);
+    Ros_CtrlGroup_Dtor(group);
 
     return bAllTestsPassed;
 }
 
 BOOL Ros_Testing_CtrlGroup_HasBaseTrack()
 {
-    CtrlGroup* group = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* group = Ros_CtrlGroup_Ctor();
     bzero(group, sizeof(CtrlGroup));
     BOOL bOk, bAllTestsPassed = TRUE;
 
@@ -264,7 +264,7 @@ BOOL Ros_Testing_CtrlGroup_HasBaseTrack()
     Ros_Debug_BroadcastMsg("Testing CtrlGroup HasBaseTrack - base track (B1): %s", bOk ? "PASS" : "FAIL");
     bAllTestsPassed &= bOk;
 
-    mpFree(group);
+    Ros_CtrlGroup_Dtor(group);
     return bAllTestsPassed;
 }
 
