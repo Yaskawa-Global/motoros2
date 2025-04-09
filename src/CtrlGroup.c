@@ -55,7 +55,9 @@ const char* Ros_CtrlGroup_GRP_ID_String[] =
 
 CtrlGroup* Ros_CtrlGroup_Ctor()
 {
-    return (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    CtrlGroup* grp = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    bzero(grp, sizeof(CtrlGroup));
+    return grp;
 }
 
 void Ros_CtrlGroup_Dtor(CtrlGroup* grp)

@@ -245,7 +245,6 @@ BOOL Ros_Testing_CtrlGroup_PosConverters()
 BOOL Ros_Testing_CtrlGroup_HasBaseTrack()
 {
     CtrlGroup* group = Ros_CtrlGroup_Ctor();
-    bzero(group, sizeof(CtrlGroup));
     BOOL bOk, bAllTestsPassed = TRUE;
 
     //no base track
