@@ -44,11 +44,11 @@ BOOL Ros_Testing_Ros_Duration_Msg_To_Millis()
 
     const builtin_interfaces__msg__Duration M8 = { INT_MIN, 0 };
     millis = Ros_Duration_Msg_To_Millis(&M8);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL, millis);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e3), millis);
 
     const builtin_interfaces__msg__Duration M9 = { INT_MIN, 999999999 };
     millis = Ros_Duration_Msg_To_Millis(&M9);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL + 999, millis);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e3) + 999, millis);
 
     Ros_Debug_BroadcastMsg("Testing Ros_Duration_Msg_To_Millis: %s", bSuccess ? "PASS" : "FAIL");
     return bSuccess;
@@ -89,11 +89,11 @@ BOOL Ros_Testing_Ros_Duration_Msg_To_Nanos()
 
     const builtin_interfaces__msg__Duration M8 = { INT_MIN, 864 };
     nanos = Ros_Duration_Msg_To_Nanos(&M8);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL * 1000LL * 1000LL + 864, nanos);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e9) + 864, nanos);
 
     const builtin_interfaces__msg__Duration M9 = { INT_MIN, 0 };
     nanos = Ros_Duration_Msg_To_Nanos(&M9);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL * 1000LL * 1000LL, nanos);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e9), nanos);
 
     Ros_Debug_BroadcastMsg("Testing Ros_Duration_Msg_To_Nanos: %s", bSuccess ? "PASS" : "FAIL");
     return bSuccess;
@@ -150,7 +150,7 @@ BOOL Ros_Testing_Ros_Millis_To_Duration_Msg()
 
     M1.sec = INT_MIN;
     M1.nanosec = 999000000;
-    millis = INT_MIN * 1000LL + 999;
+    millis = INT_MIN * ((INT64)1e3) + 999;
     Ros_Millis_To_Duration_Msg(millis, &M2);
     bSuccess &= builtin_interfaces__msg__Duration__are_equal(&M1, &M2);
 
@@ -203,7 +203,7 @@ BOOL Ros_Testing_Ros_Nanos_To_Duration_Msg()
 
     M1.sec = INT_MIN;
     M1.nanosec = 0;
-    nanos = INT_MIN * 1000LL * 1000LL * 1000LL;
+    nanos = INT_MIN * ((INT64)1e9);
     Ros_Nanos_To_Duration_Msg(nanos, &M2);
     bSuccess &= builtin_interfaces__msg__Duration__are_equal(&M1, &M2);
 
@@ -246,11 +246,11 @@ BOOL Ros_Testing_Ros_Time_Msg_To_Millis()
 
     const builtin_interfaces__msg__Time M8 = { INT_MIN, 0 };
     millis = Ros_Time_Msg_To_Millis(&M8);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL, millis);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e3), millis);
 
     const builtin_interfaces__msg__Time M9 = { INT_MIN, 999999999 };
     millis = Ros_Time_Msg_To_Millis(&M9);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL + 999, millis);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e3) + 999, millis);
 
     Ros_Debug_BroadcastMsg("Testing Ros_Time_Msg_To_Millis: %s", bSuccess ? "PASS" : "FAIL");
     return bSuccess;
@@ -291,11 +291,11 @@ BOOL Ros_Testing_Ros_Time_Msg_To_Nanos()
 
     const builtin_interfaces__msg__Time M8 = { INT_MIN, 864 };
     nanos = Ros_Time_Msg_To_Nanos(&M8);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL * 1000LL * 1000LL + 864, nanos);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e9) + 864, nanos);
 
     const builtin_interfaces__msg__Time M9 = { INT_MIN, 0 };
     nanos = Ros_Time_Msg_To_Nanos(&M9);
-    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * 1000LL * 1000LL * 1000LL, nanos);
+    bSuccess &= Ros_Testing_INT64_Equals(INT_MIN * ((INT64)1e9), nanos);
 
     Ros_Debug_BroadcastMsg("Testing Ros_Time_Msg_To_Nanos: %s", bSuccess ? "PASS" : "FAIL");
     return bSuccess;
@@ -352,7 +352,7 @@ BOOL Ros_Testing_Ros_Millis_To_Time_Msg()
 
     M1.sec = INT_MIN;
     M1.nanosec = 999000000;
-    millis = INT_MIN * 1000LL + 999;
+    millis = INT_MIN * ((INT64)1e3) + 999;
     Ros_Millis_To_Time_Msg(millis, &M2);
     bSuccess &= builtin_interfaces__msg__Time__are_equal(&M1, &M2);
 
@@ -405,7 +405,7 @@ BOOL Ros_Testing_Ros_Nanos_To_Time_Msg()
 
     M1.sec = INT_MIN;
     M1.nanosec = 0;
-    nanos = INT_MIN * 1000LL * 1000LL * 1000LL;
+    nanos = INT_MIN * ((INT64)1e9);
     Ros_Nanos_To_Time_Msg(nanos, &M2);
     bSuccess &= builtin_interfaces__msg__Time__are_equal(&M1, &M2);
 
@@ -448,16 +448,16 @@ BOOL Ros_Testing_Ros_Nanos_To_Timespec()
     return bSuccess;
 }
 
-BOOL Ros_Testing_Mixed_Time_Testing() 
+BOOL Ros_Testing_Mixed_Time_Testing()
 {
     BOOL bSuccess = TRUE;
     INT64 output;
     builtin_interfaces__msg__Time time_msg, output_time_msg;
     builtin_interfaces__msg__Duration duration_msg, output_duration_msg;
 
-    
+
     INT64 millisecond_inputs[] = { 0, 1, 99, 1000, 99999, 1743788456057, 2147483647999 };
-    for (int i = 0; i < sizeof(millisecond_inputs) / sizeof(INT64); i++) 
+    for (int i = 0; i < sizeof(millisecond_inputs) / sizeof(INT64); i++)
     {
         Ros_Millis_To_Duration_Msg(millisecond_inputs[i], &duration_msg);
         output = Ros_Duration_Msg_To_Millis(&duration_msg);

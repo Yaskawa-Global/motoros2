@@ -26,52 +26,52 @@ static inline void floor_divide(INT64 dividend, INT64 divisor, INT64* quotient, 
 
 static inline INT64 Ros_Duration_Msg_To_Millis(builtin_interfaces__msg__Duration const* const x)
 {
-    return (x->sec * 1000LL) + (x->nanosec / (1000LL * 1000LL));
+    return (x->sec * (INT64)1e3) + (x->nanosec / (INT64)1e6);
 }
 
 static inline INT64 Ros_Duration_Msg_To_Nanos(builtin_interfaces__msg__Duration const* const x)
 {
-    return (x->sec * 1000LL * 1000LL * 1000LL) + (x->nanosec);
+    return (x->sec * (INT64)1e9) + (x->nanosec);
 }
 
 static inline void Ros_Millis_To_Duration_Msg(INT64 x, builtin_interfaces__msg__Duration* const y)
 {
     INT64 remainder, quotient;
-    floor_divide(x, 1000LL, &quotient, &remainder);
+    floor_divide(x, (INT64)1e3, &quotient, &remainder);
     y->sec = quotient;
-    y->nanosec = remainder * 1000LL * 1000LL;
+    y->nanosec = remainder * (INT64)1e6;
 }
 
 static inline void Ros_Nanos_To_Duration_Msg(INT64 x, builtin_interfaces__msg__Duration* const y)
 {
     INT64 remainder, quotient;
-    floor_divide(x, 1000LL * 1000LL * 1000LL, &quotient, &remainder);
+    floor_divide(x, (INT64)1e9, &quotient, &remainder);
     y->sec = quotient;
     y->nanosec = remainder;
 }
 
 static inline INT64 Ros_Time_Msg_To_Millis(builtin_interfaces__msg__Time const* const x)
 {
-    return (x->sec * 1000LL) + (x->nanosec / (1000LL * 1000LL));
+    return (x->sec * (INT64)1e3) + (x->nanosec / ((INT64)1e6));
 }
 
 static inline INT64 Ros_Time_Msg_To_Nanos(builtin_interfaces__msg__Time const* const x)
 {
-    return (x->sec * 1000LL * 1000LL * 1000LL) + x->nanosec;
+    return (x->sec * (INT64)1e9) + x->nanosec;
 }
 
 static inline void Ros_Millis_To_Time_Msg(INT64 x, builtin_interfaces__msg__Time* const y)
 {
     INT64 remainder, quotient;
-    floor_divide(x, 1000LL, &quotient, &remainder);
+    floor_divide(x, (INT64)1e3, &quotient, &remainder);
     y->sec = quotient;
-    y->nanosec = remainder * 1000LL * 1000LL;
+    y->nanosec = remainder * (INT64)1e6;
 }
 
 static inline void Ros_Nanos_To_Time_Msg(INT64 x, builtin_interfaces__msg__Time* const y)
 {
     INT64 remainder, quotient;
-    floor_divide(x, 1000LL * 1000LL * 1000LL, &quotient, &remainder);
+    floor_divide(x, (INT64)1e9, &quotient, &remainder);
     y->sec = quotient;
     y->nanosec = remainder;
 }
@@ -79,7 +79,7 @@ static inline void Ros_Nanos_To_Time_Msg(INT64 x, builtin_interfaces__msg__Time*
 static inline void Ros_Nanos_To_Timespec(INT64 x, struct timespec* const y)
 {
     INT64 remainder, quotient;
-    floor_divide(x, 1000LL * 1000LL * 1000LL, &quotient, &remainder);
+    floor_divide(x, (INT64)1e9, &quotient, &remainder);
     y->tv_sec = quotient;
     y->tv_nsec = remainder;
 }
