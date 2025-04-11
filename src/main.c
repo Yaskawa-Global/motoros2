@@ -70,6 +70,7 @@ void RosInitTask()
 
 #ifdef MOTOROS2_TESTING_ENABLE
     Ros_Debug_BroadcastMsg("===");
+    MOTOROS2_MEM_TRACE_START(testing)
     Ros_Debug_BroadcastMsg("Performing unit tests");
     BOOL bTestResult = TRUE;
     bTestResult &= Ros_Testing_CtrlGroup();
@@ -77,6 +78,7 @@ void RosInitTask()
     bTestResult &= Ros_Testing_ControllerStatusIO();
     bTestResult &= Ros_Testing_ActionServer_FJT();
     bTestResult ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
+    MOTOROS2_MEM_TRACE_REPORT(testing)
     Ros_Debug_BroadcastMsg("===");
 #endif
 

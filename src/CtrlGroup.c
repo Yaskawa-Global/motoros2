@@ -53,6 +53,18 @@ const char* Ros_CtrlGroup_GRP_ID_String[] =
     "s24",
 };
 
+CtrlGroup* Ros_CtrlGroup_Ctor()
+{
+    CtrlGroup* grp = (CtrlGroup*)mpMalloc(sizeof(CtrlGroup));
+    bzero(grp, sizeof(CtrlGroup));
+    return grp;
+}
+
+void Ros_CtrlGroup_Dtor(CtrlGroup* grp)
+{
+    mpFree(grp);
+}
+
 //-------------------------------------------------------------------
 // Create a CtrlGroup data structure for existing group otherwise
 // return NULL

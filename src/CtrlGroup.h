@@ -103,6 +103,9 @@ typedef struct
 // External Functions Declaration
 //---------------------------------
 
+extern CtrlGroup* Ros_CtrlGroup_Ctor();
+extern void Ros_CtrlGroup_Dtor(CtrlGroup* ctrlGroup);
+
 //Initialize specific control group. This should be called for each group connected to the robot
 //controller in numerical order.
 //  int groupNo: Zero based index of the group number (0-3)
