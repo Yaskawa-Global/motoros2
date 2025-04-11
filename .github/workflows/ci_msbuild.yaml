@@ -62,8 +62,8 @@ jobs:
         uros: [
           { release: 20250207, codename: foxy     },
           { release: 20250207, codename: galactic },
-          { release: 20250207, codename: humble   },
-          { release: 20250207, codename: jazzy    },
+          { release: 20250328, codename: humble   },
+          { release: 20250328, codename: jazzy    },
         ]
 
     steps:
