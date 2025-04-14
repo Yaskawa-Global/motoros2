@@ -45,6 +45,8 @@ MOTION_MODE Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
 
 BOOL Ros_MotionControl_MustInitializePointQueue = TRUE; //first point of streaming trajectory must match current-position
 
+int64_t Ros_MotionControl_TrajectoryExecutionStartTime;
+
 Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence* sequenceGoalJointNames, trajectory_msgs__msg__JointTrajectoryPoint__Sequence* sequenceOfPoints)
 {
     long requestPulsePos[MAX_PULSE_AXES];
@@ -682,7 +684,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
 
     MP_CTRL_GRP_SEND_DATA ctrlGrpData;
     MP_PULSE_POS_RSP_DATA prevPulsePosData[MAX_CONTROLLABLE_GROUPS];
-    MP_PULSE_POS_RSP_DATA pulsePosData;
+    MP_PULSE_POS_RSP_DATA pulsePosData[MAX_CONTROLLABLE_GROUPS];
 
     // --- FSU Speed Limit related ---
     // When FSU speed limitation is active, some pulses for an interpolation cycle may not be processed by the controller.
@@ -705,6 +707,8 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     BOOL queueRead[MAX_CONTROLLABLE_GROUPS];                            // Flag indicating that new increment data was retrieve from the queue on this cycle.
     BOOL isMissingPulse;                                                // Flag that there are pulses send in last cycle that are missing from the command (pulses were not processed)
     BOOL hasUnprocessedData;                                            // Flag that at least one axis (any group) still has unprecessed data. (Used to continue sending data after the queue is empty.)
+    BOOL startOfTrajectory;
+    UINT64 time_executing_trajectory;
 
     bzero(newPulseInc, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
     bzero(toProcessPulses, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
@@ -716,6 +720,8 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
     bzero(skipReadingQ, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
     bzero(queueRead, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
 
+    time_executing_trajectory = 0;
+    startOfTrajectory = TRUE;
     isMissingPulse = FALSE;
     hasUnprocessedData = FALSE;
 
@@ -740,6 +746,12 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
             && (Ros_MotionControl_HasDataInQueue() || hasUnprocessedData)
             && !g_Ros_Controller.bStopMotion)
         {
+            if (startOfTrajectory)
+            {
+                time_executing_trajectory = 0;
+                startOfTrajectory = false;
+                Ros_MotionControl_TrajectoryExecutionStartTime = rmw_uros_epoch_millis();
+            }
             // For each control group, retrieve the new pulse increments for this cycle
             for (i = 0; i < g_Ros_Controller.numGroup; i++)
             {
@@ -853,13 +865,13 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                 // and check if it matches the amount if increment sent last cycle.  If it doesn't then
                 // some pulses are missing and the amount of unprocessed pulses needs to be added to this cycle.
                 ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
-                mpGetPulsePos(&ctrlGrpData, &pulsePosData);
+                mpGetPulsePos(&ctrlGrpData, &pulsePosData[i]);
                 isMissingPulse = FALSE;                
                 for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
                 {
                     // Check how many pulses we processed from last increment
-                    processedPulses[axis] = pulsePosData.lPos[axis] - prevPulsePosData[i].lPos[axis];
-                    prevPulsePosData[i].lPos[axis] = pulsePosData.lPos[axis];
+                    processedPulses[axis] = pulsePosData[i].lPos[axis] - prevPulsePosData[i].lPos[axis];
+                    prevPulsePosData[i].lPos[axis] = pulsePosData[i].lPos[axis];
 
                     // Remove those pulses from the amount to process.  
                     // If everything was processed, then there should by 0 pulses left. Otherwise FSU Speed limit prevented processing
@@ -972,7 +984,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                 // Send pulse increment to the controller command position
                 ret = mpExRcsIncrementMove(&moveData);
 
-                Ros_ActionServer_FJT_UpdateProgressTracker(&moveData);
+                Ros_ActionServer_FJT_UpdateProgressTracker(pulsePosData, &moveData, time_executing_trajectory);
             }
             else 
                 ret = 0;
@@ -1030,9 +1042,12 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                     Ros_Debug_BroadcastMsg("Stopping all motion");
                 }
             }
+            time_executing_trajectory += g_Ros_Controller.interpolPeriod;
         }
         else
         {
+            startOfTrajectory = TRUE;
+            time_executing_trajectory = 0;
             // Reset previous position in case the robot is moved externally
             bzero(toProcessPulses, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
             hasUnprocessedData = FALSE;

@@ -8,6 +8,10 @@
 #ifndef MOTOROS2_ACTION_SERVER_FJT_H
 #define MOTOROS2_ACTION_SERVER_FJT_H
 
+#include "MotoROS.h"
+
+#define MAX_CONTROLLABLE_GROUPS             8
+
 #define MAX_NUMBER_OF_POINTS_PER_TRAJECTORY 200
 #define MIN_NUMBER_OF_POINTS_PER_TRAJECTORY 2   //current position and destination
 
@@ -27,7 +31,7 @@ extern void Ros_ActionServer_FJT_ProcessFeedback();
 extern void Ros_ActionServer_FJT_ProcessResult();
 extern bool Ros_ActionServer_FJT_Goal_Cancel(rclc_action_goal_handle_t* goal_handle, void* context);
 
-extern void Ros_ActionServer_FJT_UpdateProgressTracker(MP_EXPOS_DATA* incrementData);
+extern void Ros_ActionServer_FJT_UpdateProgressTracker(MP_PULSE_POS_RSP_DATA pulsePosData[MAX_CONTROLLABLE_GROUPS], MP_EXPOS_DATA* moveData, UINT64 time_executing_trajectory);
 
 
 #endif  // MOTOROS2_ACTION_SERVER_FJT_H
