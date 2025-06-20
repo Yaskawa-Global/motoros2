@@ -7,6 +7,19 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
+## Forthcoming
+
+MotoROS2 is now built against `micro_ros_motoplus` version `20250328`.
+
+Changes:
+
+- Increase internal MTU between MotoROS2 and the micro-ROS Agent to support larger `JointState` messages ([#11](https://github.com/Yaskawa-Global/motoros2/issues/11))
+- Support Agent port numbers longer than 5 digits ([#374](https://github.com/Yaskawa-Global/motoros2/discussions/374))
+- Correct configuration item name for custom INFORM jobs ([#389](https://github.com/Yaskawa-Global/motoros2/pull/389))
+- Always print values for all axes in debug messages ([#398](https://github.com/Yaskawa-Global/motoros2/pull/398))
+- Correct time conversion math ([#411](https://github.com/Yaskawa-Global/motoros2/pull/411))
+- Correct memory management in unit tests ([#412](https://github.com/Yaskawa-Global/motoros2/pull/412))
+
 ## 0.2.0 (2025-03-06)
 
 **Added support for ROS2 Jazzy Jalisco!** ([#337](https://github.com/Yaskawa-Global/motoros2/pull/337), [#371](https://github.com/Yaskawa-Global/motoros2/pull/371))
@@ -31,6 +44,7 @@ Changes:
 - Error messages for `start_traj_mode` and `start_point_queue_mode` are more accurate and descriptive ([#297](https://github.com/Yaskawa-Global/motoros2/pull/297))
 - Fix response if `reset_error` service is called when major alarm is active ([#298](https://github.com/Yaskawa-Global/motoros2/pull/298))
 - Fixed condition so tool 63 can be selected properly ([#314](https://github.com/Yaskawa-Global/motoros2/pull/314))
+- Fix memory leaks ([#325](https://github.com/Yaskawa-Global/motoros2/pull/325), [#35](https://github.com/Yaskawa-Global/motoros2/issues/35))
 - The `queue_traj_point` service will give more detailed error messages if trajectory initialization fails ([#341](https://github.com/Yaskawa-Global/motoros2/pull/341))
 - Fixed FJT goal tolerance violation message ([#345](https://github.com/Yaskawa-Global/motoros2/pull/345))
 - Fix bug where `stop_traj_mode` would have response message indicating failure even after succeeding ([#352](https://github.com/Yaskawa-Global/motoros2/pull/352))
