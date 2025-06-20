@@ -7,6 +7,20 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # Changelog
 
+## Forthcoming
+
+MotoROS2 is now built against `micro_ros_motoplus` version `20250328`.
+
+Changes:
+
+- Increase internal MTU between MotoROS2 and the microROS Agent to support joint_states for larger systems ([#11](https://github.com/Yaskawa-Global/motoros2/issues/11))
+- Fix memory leaks ([#325](https://github.com/Yaskawa-Global/motoros2/pull/325), [#35](https://github.com/Yaskawa-Global/motoros2/issues/35))
+- Allow agent port numbers that are greater than 5 digits ([#374](https://github.com/Yaskawa-Global/motoros2/discussions/374))
+- Correct the label for the setting which allows custom INFORM jobs ([#389](https://github.com/Yaskawa-Global/motoros2/pull/389))
+- Display all axes in debug messages ([#398](https://github.com/Yaskawa-Global/motoros2/pull/398))
+- Time conversions were truncating some milliseconds ([#402](https://github.com/Yaskawa-Global/motoros2/issues/402))
+- Properly manage memory allocations in the unit tests ([#412](https://github.com/Yaskawa-Global/motoros2/pull/412))
+
 ## 0.2.0 (2025-03-06)
 
 **Added support for ROS2 Jazzy Jalisco!** ([#337](https://github.com/Yaskawa-Global/motoros2/pull/337), [#371](https://github.com/Yaskawa-Global/motoros2/pull/371))
