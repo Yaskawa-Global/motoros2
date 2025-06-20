@@ -86,7 +86,6 @@ The following sections document how to download, install, configure, use and tro
   - [No support for partial goals](#no-support-for-partial-goals)
   - [Upper limit to publishing frequency](#upper-limit-to-publishing-frequency)
   - [Incorrect transform tree origin with multi-robot setups](#incorrect-transform-tree-origin-with-multi-robot-setups)
-  - [Memory leak](#memory-leak)
 - [Provisional roadmap](#provisional-roadmap)
 - [Frequently Asked Questions](doc/faq.md)
 - [Troubleshooting](doc/troubleshooting.md)
@@ -824,13 +823,6 @@ For example, an `R1+R2` configuration, without calibration, will have the origin
 Refer to the relevant Yaskawa Motoman documentation for more information on how to perform a robot-to-robot calibration.
 
 After robot-calibration, the transform between the shared `world` frame and each robot's `base` frame will be known, and MotoROS2 will include it in the transforms it broadcasts.
-
-### Memory leak
-
-**Description**: there is a small memory leak which occurs each time the micro-ROS Agent disconnects from the controller.
-
-**Work-around**: none at this time.
-The issue is being investigated.
 
 ### Some group combinations won't publish data
 
