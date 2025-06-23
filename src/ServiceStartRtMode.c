@@ -54,6 +54,12 @@ void Ros_ServiceStartRtMode_Trigger(const void* request_msg, void* response_msg)
     response->success = TRUE;
     rosidl_runtime_c__String__assign(&response->message, "");
 
+    Ros_Debug_BroadcastMsg("Creating new task: IncMoveTask");
+
+    g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
+        (FUNCPTR)Ros_MotionControl_IncMoveLoopStart,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
     MotionNotReadyCode motion_result_code = Ros_MotionControl_StartMotionMode(MOTION_MODE_RT, &response->message);
     if (motion_result_code != MOTION_READY)
     {

@@ -666,380 +666,141 @@ UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__
     return motoros2_interfaces__msg__QueueResultEnum__SUCCESS;
 }
 
+#define IPPROTO_TCP  6
+extern STATUS setsockopt(int s, int level, int optname, char* optval, int optlen);
+
 //-------------------------------------------------------------------
 // Task to move the robot at each interpolation increment
 //-------------------------------------------------------------------
 void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
 {
     MP_EXPOS_DATA moveData;
+    int i, ret;
+    BOOL isPositive = TRUE;
+    MP_CTRL_GRP_SEND_DATA ctrlGrpSendData;
+    MP_PULSE_POS_RSP_DATA pulsePosRspData;
+    int sockServer, sockConnection;
+    struct sockaddr_in serverSockAddr;
+    struct sockaddr_in clientSockAddr;
+    int sizeofSockAddr;
+    int useNoDelay = 1;
+    char buffer[64];
 
-    Incremental_q* q;
-    int i;
-    int ret;
-    UINT64 inc_data_time;
-    UINT64 q_time;
-    int axis;
+    //-----------------------------------------------------------------
 
-    MP_CTRL_GRP_SEND_DATA ctrlGrpData;
-    MP_PULSE_POS_RSP_DATA prevPulsePosData[MAX_CONTROLLABLE_GROUPS];
-    MP_PULSE_POS_RSP_DATA pulsePosData;
+    sockServer = mpSocket(AF_INET, SOCK_STREAM, 0);
 
-    // --- FSU Speed Limit related ---
-    // When FSU speed limitation is active, some pulses for an interpolation cycle may not be processed by the controller.
-    // To track the true amount of pulses processed, we keep track of the command position and by substracting the
-    // the previous position from the current one, we can confirm the amount if pulses precessed.
-    // If the amount processed doesn't match the amount sent at the previous cycle, we resend the unprocessed pulses amount.
-    // To keep the motion smooth, the 'maximum speed' (max pulses per cycle) is tracked and used to skip reading
-    // more pulse increment from the queue if the amount of unprocessed pulses is larger than the detected speed.
-    // The 'maximum speed' is also used to prevent exceeding the commanded speed once the FSU Speed Limit is removed.
-    //
-    // The following set of variables are used to track FSU speed limitation.
-    LONG newPulseInc[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];         // Pulse increments that we just retrieved from the incQueue
-    LONG toProcessPulses[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];     // Total pulses that still need to be sent to the command
-    LONG processedPulses[MP_GRP_AXES_NUM];                              // Amount of pulses from the last command that were actually processed (accepted)
-    LONG maxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];            // ROS speed (amount of pulses for one cycle from the data queue) that should not be exceeded
-    LONG maxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];      // Number of pulses (absolute) that remains to be processed at the 'maxSpeed'
-    LONG prevMaxSpeed[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];        // Previous data queue reading 'maxSpeed'
-    LONG prevMaxSpeedRemain[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];  // Previous data queue reading 'maxSpeedRemain'
-    BOOL skipReadingQ[MAX_CONTROLLABLE_GROUPS];                         // Flag indicating to skip reading more data from the increment queue (there is enough unprocessed from previous cycles remaining)
-    BOOL queueRead[MAX_CONTROLLABLE_GROUPS];                            // Flag indicating that new increment data was retrieve from the queue on this cycle.
-    BOOL isMissingPulse;                                                // Flag that there are pulses send in last cycle that are missing from the command (pulses were not processed)
-    BOOL hasUnprocessedData;                                            // Flag that at least one axis (any group) still has unprecessed data. (Used to continue sending data after the queue is empty.)
+    memset(&serverSockAddr, 0, sizeof(struct sockaddr_in));
+    serverSockAddr.sin_family = AF_INET;
+    serverSockAddr.sin_addr.s_addr = INADDR_ANY;
+    serverSockAddr.sin_port = mpHtons(50245);
 
-    bzero(newPulseInc, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    bzero(toProcessPulses, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    bzero(processedPulses, sizeof(LONG) * MP_GRP_AXES_NUM);
-    bzero(prevMaxSpeed, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    bzero(prevMaxSpeedRemain, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    bzero(maxSpeed, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    bzero(maxSpeedRemain, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-    bzero(skipReadingQ, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
-    bzero(queueRead, sizeof(BOOL) * MAX_CONTROLLABLE_GROUPS);
+    ret = mpBind(sockServer, (struct sockaddr*)&serverSockAddr, sizeof(struct sockaddr_in));
 
-    isMissingPulse = FALSE;
-    hasUnprocessedData = FALSE;
+    ret = mpListen(sockServer, SOMAXCONN);
 
-    Ros_Debug_BroadcastMsg("IncMoveTask Started");
+    memset(&clientSockAddr, 0, sizeof(clientSockAddr));
+    sizeofSockAddr = sizeof(clientSockAddr);
 
+    sockConnection = mpAccept(sockServer, (struct sockaddr*)&clientSockAddr, &sizeofSockAddr);
+
+    setsockopt(sockConnection, IPPROTO_TCP, TCP_NODELAY, (char*)&useNoDelay, sizeof(int));
+
+
+    //-----------------------------------------------------------------
     bzero(&moveData, sizeof(moveData));
 
-    for (i = 0; i < g_Ros_Controller.numGroup; i++)
-    {
-        moveData.ctrl_grp |= (0x01 << i);
-        moveData.grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
+    moveData.ctrl_grp |= (0x01 << i);
+    moveData.grp_pos_info[0].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
 
-        ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
-        mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
-    }
+    ctrlGrpSendData.sCtrlGrp = 0; //r1
 
-    FOREVER
+    while(TRUE)
     {
         mpClkAnnounce(MP_INTERPOLATION_CLK);
 
-        if (Ros_Controller_IsMotionReady()
-            && (Ros_MotionControl_HasDataInQueue() || hasUnprocessedData)
-            && !g_Ros_Controller.bStopMotion)
+        mpRecv(sockConnection, buffer, sizeof(buffer), 0);
+
+        moveData.grp_pos_info[0].pos_tag.data[2] = 0;
+        moveData.grp_pos_info[0].pos_tag.data[3] = 0x80;
+        moveData.grp_pos_info[0].pos_tag.data[4] = 0;
+        
+        mpGetPulsePos(&ctrlGrpSendData, &pulsePosRspData);
+
+        if (isPositive && pulsePosRspData.lPos[3] >= 180000)
+            isPositive = FALSE;
+        else if (!isPositive && pulsePosRspData.lPos[3] <= -180000)
+            isPositive = TRUE;
+
+        if (isPositive)
+            moveData.grp_pos_info[0].pos[3] = 100;
+        else
+            moveData.grp_pos_info[0].pos[3] = -100;
+
+        // Make sure motion / goal has not been cancelled in the meantime.
+        // Additionally, if the Agent PC is disconnected, check to see if
+        // motion should continue.
+        if (!g_Ros_Controller.bStopMotion && g_Ros_Communication_AgentIsConnected)
         {
-            // For each control group, retrieve the new pulse increments for this cycle
-            for (i = 0; i < g_Ros_Controller.numGroup; i++)
-            {
-                queueRead[i] = FALSE;
-                if (skipReadingQ[i])
-                {
-                    // Reset skip flag and set position increment to 0
-                    skipReadingQ[i] = FALSE;
-                    bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
-                }
-                else
-                {
-                    // Retrieve position increment from the queue.
-                    q = &g_Ros_Controller.ctrlGroups[i]->inc_q;
-
-                    // Lock the q before manipulating it
-                    if (mpSemTake(q->q_lock, Q_LOCK_TIMEOUT) == OK)
-                    {
-                        if (q->cnt > 0)
-                        {
-                            // Initialize moveData with the next data from the queue
-                            inc_data_time = q->data[q->idx].time;
-                            q_time = g_Ros_Controller.ctrlGroups[i]->q_time;
-                            moveData.grp_pos_info[i].pos_tag.data[2] = q->data[q->idx].tool;
-                            moveData.grp_pos_info[i].pos_tag.data[3] = q->data[q->idx].frame;
-                            moveData.grp_pos_info[i].pos_tag.data[4] = q->data[q->idx].user;
-
-                            memcpy(&moveData.grp_pos_info[i].pos, &q->data[q->idx].inc, sizeof(LONG) * MP_GRP_AXES_NUM);
-                            queueRead[i] = TRUE;
-
-                            // increment index in the queue and decrease the count
-                            q->idx = Q_OFFSET_IDX(q->idx, 1, Q_SIZE);
-                            q->cnt--;
-
-                            // Check if complete interpolation period covered.
-                            // (Because time period of data received from ROS may not be a multiple of the
-                            // controller interpolation clock period, the queue may contain partiel period and
-                            // more than one queue increment maybe required to complete the interpolation period)
-                            while (q->cnt > 0)
-                            {
-                                if ((q_time <= q->data[q->idx].time)
-                                    && (q->data[q->idx].time - q_time <= g_Ros_Controller.interpolPeriod))
-                                {
-                                    // next incMove is part of same interpolation period
-
-                                    // check that information is in the same format
-                                    if ((moveData.grp_pos_info[i].pos_tag.data[2] != q->data[q->idx].tool)
-                                        || (moveData.grp_pos_info[i].pos_tag.data[3] != q->data[q->idx].frame)
-                                        || (moveData.grp_pos_info[i].pos_tag.data[4] != q->data[q->idx].user))
-                                    {
-                                        // Different format can't combine information
-                                        break;
-                                    }
-
-                                    // add next incMove to current incMove
-                                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                                        moveData.grp_pos_info[i].pos[axis] += q->data[q->idx].inc[axis];
-                                    inc_data_time = q->data[q->idx].time;
-
-                                    // increment index in the queue and decrease the count
-                                    q->idx = Q_OFFSET_IDX(q->idx, 1, Q_SIZE);
-                                    q->cnt--;
-                                }
-                                else
-                                {
-                                    // interpolation period complete
-                                    break;
-                                }
-                            }
-
-                            g_Ros_Controller.ctrlGroups[i]->q_time = inc_data_time;
-                        }
-                        else
-                        {
-                            // Queue is empty, initialize to 0 pulse increment
-                            moveData.grp_pos_info[i].pos_tag.data[2] = 0;
-                            moveData.grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
-                            moveData.grp_pos_info[i].pos_tag.data[4] = 0;
-                            bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
-                        }
-
-                        // Unlock the q
-                        mpSemGive(q->q_lock);
-                    }
-                    else
-                    {
-                        Ros_Debug_BroadcastMsg("ERROR: Can't get data from queue. Queue is locked up (Group #%d)", g_Ros_Controller.ctrlGroups[i]->groupNo);
-                        bzero(&moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
-                        continue;
-                    }
-                }
-            }
-
-            hasUnprocessedData = FALSE;
-            for (i = 0; i < g_Ros_Controller.numGroup; i++)
-            {
-                memcpy(newPulseInc[i], moveData.grp_pos_info[i].pos, sizeof(LONG) * MP_GRP_AXES_NUM);
-
-                // record the speed associate with the next amount of pulses
-                if (queueRead[i])
-                {
-                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                    {
-                        maxSpeed[i][axis] = abs(newPulseInc[i][axis]);
-                        maxSpeedRemain[i][axis] = abs(newPulseInc[i][axis]);
-                    }
-                }
-
-                // Check if pulses are missing from last increment.
-                // Get the current controller command position and substract the previous command position
-                // and check if it matches the amount if increment sent last cycle.  If it doesn't then
-                // some pulses are missing and the amount of unprocessed pulses needs to be added to this cycle.
-                ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
-                mpGetPulsePos(&ctrlGrpData, &pulsePosData);
-                isMissingPulse = FALSE;                
-                for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                {
-                    // Check how many pulses we processed from last increment
-                    processedPulses[axis] = pulsePosData.lPos[axis] - prevPulsePosData[i].lPos[axis];
-                    prevPulsePosData[i].lPos[axis] = pulsePosData.lPos[axis];
-
-                    // Remove those pulses from the amount to process.  
-                    // If everything was processed, then there should by 0 pulses left. Otherwise FSU Speed limit prevented processing
-                    toProcessPulses[i][axis] -= processedPulses[axis];
-                    if (toProcessPulses[i][axis] != 0)
-                        isMissingPulse = TRUE;
-
-                    // Add the new pulses to be processed for this iteration 
-                    toProcessPulses[i][axis] += newPulseInc[i][axis];
-
-                    if (toProcessPulses[i][axis] != 0)
-                        hasUnprocessedData = TRUE;
-                }
-
-                // Check if pulses are missing which means that the FSU speed limit is enabled
-                if (isMissingPulse)
-                {
-                    UINT64 max_inc;
-
-                    // Prevent going faster than original requested speed once speed limit turns off
-                    // Check if the speed (inc) of previous interation should be considered by checking 
-                    // if the unprocessed pulses from that speed setting still remains.
-                    // If all the pulses of previous increment were processed, then transfer the current 
-                    // speed and process the next increment from the increment queue.
-                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                    {
-                        // Check if has pulses to process
-                        if (toProcessPulses[i][axis] == 0)
-                            prevMaxSpeedRemain[i][axis] = 0;
-                        else
-                            prevMaxSpeedRemain[i][axis] = abs(prevMaxSpeedRemain[i][axis]) - abs(processedPulses[axis]);
-                    }
-
-                    // Check if still have data to process from previous iteration
-                    skipReadingQ[i] = FALSE;
-                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                    {
-                        if (prevMaxSpeedRemain[i][axis] > 0)
-                            skipReadingQ[i] = TRUE;
-                    }
-
-                    if (!skipReadingQ[i]) {
-                        for (axis = 0; axis < MP_GRP_AXES_NUM; axis++) {
-                            // Transfer the current speed as the new prevSpeed
-                            prevMaxSpeed[i][axis] = maxSpeed[i][axis];
-                            prevMaxSpeedRemain[i][axis] += maxSpeedRemain[i][axis];
-                        }
-                    }
-
-                    // Set the number of pulse that can be sent without exceeding speed
-                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                    {
-                        // Check if has pulses to process
-                        if (toProcessPulses[i][axis] == 0)
-                            continue;
-
-                        // Maximum inc that should be send ()
-                        if (prevMaxSpeed[i][axis] > 0)
-                            // if previous speed is defined use it
-                            max_inc = prevMaxSpeed[i][axis];
-                        else
-                        {
-                            if (maxSpeed[i][axis] > 0)
-                                // else fallback on current speed if defined
-                                max_inc = maxSpeed[i][axis];
-                            else if (newPulseInc[i][axis] != 0)
-                                // use the current speed if none zero.
-                                max_inc = abs(newPulseInc[i][axis]);
-                            else
-                                // otherwise use the axis max speed
-                                max_inc = g_Ros_Controller.ctrlGroups[i]->maxInc.maxIncrement[axis];
-
-                            if(max_inc > 1)
-                                Ros_Debug_BroadcastMsg("Warning undefined speed: Axis %d Defaulting Max Inc: %d (prevSpeed: %d curSpeed %d)",
-                                axis, max_inc, prevMaxSpeed[i][axis], maxSpeed[i][axis]);
-
-                        }
-
-                        // Set new increment and recalculate unsent pulses
-                        if (abs(toProcessPulses[i][axis]) <= max_inc)
-                        {
-                            // Pulses to send is small than max, so send everything
-                            moveData.grp_pos_info[i].pos[axis] = toProcessPulses[i][axis];
-                        }
-                        else {
-                            // Pulses to send is too high, so send the amount matching the maximum speed
-                            if (toProcessPulses[i][axis] >= 0)
-                                moveData.grp_pos_info[i].pos[axis] = max_inc;
-                            else
-                                moveData.grp_pos_info[i].pos[axis] = -max_inc;
-                        }
-                    }
-                }
-                else
-                {
-                    // No PFL Speed Limit detected
-                    for (axis = 0; axis < MP_GRP_AXES_NUM; axis++)
-                    {
-                        prevMaxSpeed[i][axis] = abs(moveData.grp_pos_info[i].pos[axis]);
-                        prevMaxSpeedRemain[i][axis] = abs(moveData.grp_pos_info[i].pos[axis]);
-                    }
-                }
-            }
-
-            // Make sure motion / goal has not been cancelled in the meantime.
-            // Additionally, if the Agent PC is disconnected, check to see if
-            // motion should continue.
-            if (!g_Ros_Controller.bStopMotion && (g_Ros_Communication_AgentIsConnected || !g_nodeConfigSettings.stop_motion_on_disconnect))
-            {
-                // Send pulse increment to the controller command position
-                ret = mpExRcsIncrementMove(&moveData);
-
-                Ros_ActionServer_FJT_UpdateProgressTracker(&moveData);
-            }
-            else 
-                ret = 0;
-
-            if (ret != 0)
-            {
-                // Failure: command rejected by controller.
-                // Update controller status to help identify cause
-                Ros_Controller_IoStatusUpdate();
-
-                if (ret == E_EXRCS_CTRL_GRP)
-                    Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned: %d (ctrl_grp = %d)", ret, moveData.ctrl_grp);
-                else if (ret == E_EXRCS_IMOV_UNREADY && g_Ros_Controller.bPFLEnabled)
-                {
-                    // Check if this is caused by a known cause (E-Stop, Hold, Alarm, Error)
-                    if (!Ros_Controller_IsEStop() && !Ros_Controller_IsHold()
-                        && !Ros_Controller_IsAlarm() && !Ros_Controller_IsError()) {
-                        Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned UNREADY: %d (Could be PFL Active)", E_EXRCS_IMOV_UNREADY);
-                        g_Ros_Controller.bPFLduringRosMove = TRUE;
-                    }
-                }
-                else if (ret == E_EXRCS_PFL_FUNC_BUSY && g_Ros_Controller.bPFLEnabled)
-                {
-                    Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned PFL Active");
-                    g_Ros_Controller.bPFLduringRosMove = TRUE;
-                }
-                else if (ret == E_EXRCS_UNDER_ENERGY_SAVING)
-                {
-                    // retry until servos turn on and motion is accepted
-                    int checkCount;
-                    for (checkCount = 0; checkCount < MOTION_START_TIMEOUT; checkCount += MOTION_START_CHECK_PERIOD)
-                    {
-                        ret = mpExRcsIncrementMove(&moveData);
-                        if (ret != E_EXRCS_UNDER_ENERGY_SAVING)
-                            break;
-
-                        Ros_Sleep(MOTION_START_CHECK_PERIOD);
-                    }
-                    if (g_Ros_Controller.bMpIncMoveError)
-                        Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned Eco mode enabled");
-                }
-                else if(ret == E_EXRCS_IMOV_UNREADY)
-                {
-                    Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned -1 (Not executing WAIT instruction)");
-                }
-                else
-                    Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned: %d", ret);
-
-                // Stop motion if motion was rejected
-                if (ret != 0)
-                {
-                    // Flag to prevent further motion until Trajectory mode is reenabled
-                    g_Ros_Controller.bMpIncMoveError = TRUE;
-                    Ros_MotionControl_StopMotion(/*bKeepJobRunning = */ FALSE);
-                    Ros_Debug_BroadcastMsg("Stopping all motion");
-                }
-            }
+            // Send pulse increment to the controller command position
+            ret = mpExRcsIncrementMove(&moveData);
         }
         else
+            ret = 0;
+
+        mpSend(sockConnection, buffer, sizeof(buffer), 0);
+
+        if (ret != 0)
         {
-            // Reset previous position in case the robot is moved externally
-            bzero(toProcessPulses, sizeof(LONG) * MP_GRP_AXES_NUM * MAX_CONTROLLABLE_GROUPS);
-            hasUnprocessedData = FALSE;
-            for (i = 0; i < g_Ros_Controller.numGroup; i++)
+            // Failure: command rejected by controller.
+            // Update controller status to help identify cause
+            Ros_Controller_IoStatusUpdate();
+
+            if (ret == E_EXRCS_CTRL_GRP)
+                Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned: %d (ctrl_grp = %d)", ret, moveData.ctrl_grp);
+            else if (ret == E_EXRCS_IMOV_UNREADY && g_Ros_Controller.bPFLEnabled)
             {
-                ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
-                mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
+                // Check if this is caused by a known cause (E-Stop, Hold, Alarm, Error)
+                if (!Ros_Controller_IsEStop() && !Ros_Controller_IsHold()
+                    && !Ros_Controller_IsAlarm() && !Ros_Controller_IsError()) {
+                    Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned UNREADY: %d (Could be PFL Active)", E_EXRCS_IMOV_UNREADY);
+                    g_Ros_Controller.bPFLduringRosMove = TRUE;
+                }
+            }
+            else if (ret == E_EXRCS_PFL_FUNC_BUSY && g_Ros_Controller.bPFLEnabled)
+            {
+                Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned PFL Active");
+                g_Ros_Controller.bPFLduringRosMove = TRUE;
+            }
+            else if (ret == E_EXRCS_UNDER_ENERGY_SAVING)
+            {
+                // retry until servos turn on and motion is accepted
+                int checkCount;
+                for (checkCount = 0; checkCount < MOTION_START_TIMEOUT; checkCount += MOTION_START_CHECK_PERIOD)
+                {
+                    ret = mpExRcsIncrementMove(&moveData);
+                    if (ret != E_EXRCS_UNDER_ENERGY_SAVING)
+                        break;
+
+                    Ros_Sleep(MOTION_START_CHECK_PERIOD);
+                }
+                if (g_Ros_Controller.bMpIncMoveError)
+                    Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned Eco mode enabled");
+            }
+            else if (ret == E_EXRCS_IMOV_UNREADY)
+            {
+                Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned -1 (Not executing WAIT instruction)");
+            }
+            else
+                Ros_Debug_BroadcastMsg("mpExRcsIncrementMove returned: %d", ret);
+
+            // Stop motion if motion was rejected
+            if (ret != 0)
+            {
+                // Flag to prevent further motion until Trajectory mode is reenabled
+                g_Ros_Controller.bMpIncMoveError = TRUE;
+                Ros_MotionControl_StopMotion(/*bKeepJobRunning = */ FALSE);
+                Ros_Debug_BroadcastMsg("Stopping all motion");
             }
         }
     }
@@ -1608,14 +1369,10 @@ BOOL Ros_MotionControl_IsMotionMode_PointQueue()
         MOTION_MODE_POINTQUEUE);
 }
 
-BOOL Ros_MotionControl_IsMotionMode_RawStreaming()
+BOOL Ros_MotionControl_IsMotionMode_RealTime()
 {
-    return FALSE;
-    
-    //TODO
-    // 
-    //return (Ros_MotionControl_ActiveMotionMode ==
-    //    STREAMING_RAW_INCREMENTS);
+    return (Ros_MotionControl_ActiveMotionMode ==
+        MOTION_MODE_RT);
 }
 
 void Ros_MotionControl_ValidateMotionModeIsOk()

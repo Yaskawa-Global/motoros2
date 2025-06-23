@@ -173,23 +173,23 @@ BOOL Ros_Controller_Initialize()
 
     //==================================
     // If not started, start the IncMoveTask (there should be only one instance of this thread)
-    if (g_Ros_Controller.tidIncMoveThread == INVALID_TASK)
-    {
-        Ros_Debug_BroadcastMsg("Creating new task: IncMoveTask");
+    //if (g_Ros_Controller.tidIncMoveThread == INVALID_TASK)
+    //{
+    //    Ros_Debug_BroadcastMsg("Creating new task: IncMoveTask");
 
-        g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
-            (FUNCPTR)Ros_MotionControl_IncMoveLoopStart,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        if (g_Ros_Controller.tidIncMoveThread == ERROR)
-        {
-            Ros_Debug_BroadcastMsg("Failed to create task for incremental-motion.  Check robot parameters.");
-            g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
-            Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
-            mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_INCREMENTAL_MOTION);
+    //    g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
+    //        (FUNCPTR)Ros_MotionControl_IncMoveLoopStart,
+    //        0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    //    if (g_Ros_Controller.tidIncMoveThread == ERROR)
+    //    {
+    //        Ros_Debug_BroadcastMsg("Failed to create task for incremental-motion.  Check robot parameters.");
+    //        g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+    //        Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
+    //        mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_INCREMENTAL_MOTION);
 
-            return FALSE;
-        }
-    }
+    //        return FALSE;
+    //    }
+    //}
 
     //==================================
     // Check and report eco-mode settings
