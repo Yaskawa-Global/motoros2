@@ -134,6 +134,7 @@ void RosInitTask()
         Ros_ServiceResetError_Initialize();
         Ros_ServiceStartTrajMode_Initialize();
         Ros_ServiceStartPointQueueMode_Initialize();
+        Ros_ServiceStartRtMode_Initialize();
         Ros_ServiceStopTrajMode_Initialize();
         Ros_ServiceSelectMotionTool_Initialize();
 
@@ -211,6 +212,7 @@ void RosInitTask()
         Ros_ServiceStopTrajMode_Cleanup();
         Ros_ServiceStartTrajMode_Cleanup();
         Ros_ServiceStartPointQueueMode_Cleanup();
+        Ros_ServiceStartRtMode_Cleanup();
         Ros_ServiceResetError_Cleanup();
         Ros_ServiceReadWriteIO_Cleanup();
         Ros_ServiceQueueTrajPoint_Cleanup();

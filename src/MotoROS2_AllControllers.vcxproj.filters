@@ -369,6 +369,9 @@
     <ClCompile Include="Tests_TimeConversionUtils.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceStartRtMode.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
@@ -484,6 +487,9 @@
     </ClInclude>
     <ClInclude Include="Tests_TimeConversionUtils.h">
       <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceStartRtMode.h">
+      <Filter>Header Files\Services</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
