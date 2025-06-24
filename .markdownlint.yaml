@@ -21,3 +21,7 @@ MD033:
 # we use the double asterisk style throughout our documentation
 MD050:
   style: asterisk
+
+# MD059 - Link text should be descriptive
+# we disable this for now as it doesn't align with how we use links
+MD059: false
