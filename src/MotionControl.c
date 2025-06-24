@@ -704,27 +704,34 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
 
     sockConnection = mpAccept(sockServer, (struct sockaddr*)&clientSockAddr, &sizeofSockAddr);
 
+    //Ros_Debug_BroadcastMsg("accepted");
+
     setsockopt(sockConnection, IPPROTO_TCP, TCP_NODELAY, (char*)&useNoDelay, sizeof(int));
 
+    //Ros_Debug_BroadcastMsg("optted");
 
     //-----------------------------------------------------------------
     bzero(&moveData, sizeof(moveData));
 
-    moveData.ctrl_grp |= (0x01 << i);
-    moveData.grp_pos_info[0].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
+    moveData.ctrl_grp |= (0x01 << 0);
+    moveData.grp_pos_info[0].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[0]);
 
     ctrlGrpSendData.sCtrlGrp = 0; //r1
+
+    //Ros_Debug_BroadcastMsg("configed");
 
     while(TRUE)
     {
         mpClkAnnounce(MP_INTERPOLATION_CLK);
 
+        //Ros_Debug_BroadcastMsg("recv");
         mpRecv(sockConnection, buffer, sizeof(buffer), 0);
 
         moveData.grp_pos_info[0].pos_tag.data[2] = 0;
         moveData.grp_pos_info[0].pos_tag.data[3] = 0x80;
         moveData.grp_pos_info[0].pos_tag.data[4] = 0;
-        
+
+        //Ros_Debug_BroadcastMsg("get pos");
         mpGetPulsePos(&ctrlGrpSendData, &pulsePosRspData);
 
         if (isPositive && pulsePosRspData.lPos[3] >= 180000)
@@ -732,11 +739,11 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
         else if (!isPositive && pulsePosRspData.lPos[3] <= -180000)
             isPositive = TRUE;
 
-        if (isPositive)
-            moveData.grp_pos_info[0].pos[3] = 100;
-        else
-            moveData.grp_pos_info[0].pos[3] = -100;
+        moveData.grp_pos_info[0].pos[3] = *(int*)buffer;
+        if (!isPositive)
+            moveData.grp_pos_info[0].pos[3] *= -1;
 
+        //Ros_Debug_BroadcastMsg("if");
         // Make sure motion / goal has not been cancelled in the meantime.
         // Additionally, if the Agent PC is disconnected, check to see if
         // motion should continue.
@@ -748,8 +755,10 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
         else
             ret = 0;
 
+        //Ros_Debug_BroadcastMsg("send");
         mpSend(sockConnection, buffer, sizeof(buffer), 0);
 
+        //Ros_Debug_BroadcastMsg("ret = %d", ret);
         if (ret != 0)
         {
             // Failure: command rejected by controller.
@@ -797,6 +806,7 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
             // Stop motion if motion was rejected
             if (ret != 0)
             {
+                Ros_Debug_BroadcastMsg("stop it");
                 // Flag to prevent further motion until Trajectory mode is reenabled
                 g_Ros_Controller.bMpIncMoveError = TRUE;
                 Ros_MotionControl_StopMotion(/*bKeepJobRunning = */ FALSE);
