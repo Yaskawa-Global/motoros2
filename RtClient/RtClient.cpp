@@ -57,25 +57,27 @@ int main() {
 
     std::cout << "Connected to server on port 50245." << std::endl;
 
-    // 5. Send and receive data (example)
-    std::string message = "Hello!";
-    iResult = send(clientSocket, message.c_str(), (int)message.length(), 0);
-    if (iResult == SOCKET_ERROR) {
-        error("Error sending message");
-    }
-    //std::cout << "Sent: " << message << std::endl;
+    while (true)
+    {
+        int ppc = 200;
+        iResult = send(clientSocket, (char*)&ppc, sizeof(ppc), 0);
+        if (iResult == SOCKET_ERROR) {
+            error("Error sending message");
+        }
+        //std::cout << "Sent: " << message << std::endl;
 
-    char buffer[1024];
-    iResult = recv(clientSocket, buffer, sizeof(buffer) - 1, 0); // Leave space for null terminator
-    if (iResult > 0) {
-        buffer[iResult] = '\0'; // Null-terminate the received data
-        //std::cout << "Received: " << buffer << std::endl;
-    }
-    else if (iResult == 0) {
-        std::cout << "Server closed the connection." << std::endl;
-    }
-    else {
-        error("Error receiving message");
+        char buffer[1024];
+        iResult = recv(clientSocket, buffer, sizeof(buffer) - 1, 0); // Leave space for null terminator
+        if (iResult > 0) {
+            buffer[iResult] = '\0'; // Null-terminate the received data
+            //std::cout << "Received: " << buffer << std::endl;
+        }
+        else if (iResult == 0) {
+            std::cout << "Server closed the connection." << std::endl;
+        }
+        else {
+            error("Error receiving message");
+        }
     }
 
     // 6. Close the socket
