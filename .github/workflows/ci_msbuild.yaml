@@ -85,7 +85,7 @@ jobs:
 
     - name: Generate token (micro_ros_motoplus)
       id: gen_token
-      uses: actions/create-github-app-token@v1
+      uses: actions/create-github-app-token@v2
       with:
         app-id: ${{ secrets.MPLMB_APP_ID }}
         private-key: ${{ secrets.MPLMB_APP_PRIVATE_KEY }}
