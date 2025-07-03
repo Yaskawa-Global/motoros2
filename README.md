@@ -86,6 +86,7 @@ The following sections document how to download, install, configure, use and tro
   - [No support for partial goals](#no-support-for-partial-goals)
   - [Upper limit to publishing frequency](#upper-limit-to-publishing-frequency)
   - [Incorrect transform tree origin with multi-robot setups](#incorrect-transform-tree-origin-with-multi-robot-setups)
+  - [Certain topics won't publish data](#certain-topics-wont-publish-data)
 - [Provisional roadmap](#provisional-roadmap)
 - [Frequently Asked Questions](doc/faq.md)
 - [Troubleshooting](doc/troubleshooting.md)
@@ -818,16 +819,27 @@ Refer to the relevant Yaskawa Motoman documentation for more information on how 
 
 After robot-calibration, the transform between the shared `world` frame and each robot's `base` frame will be known, and MotoROS2 will include it in the transforms it broadcasts.
 
-### Some group combinations won't publish data
+### Certain topics won't publish data
 
-**Description**: it has been observed that an R1+R2+S1 system will not publish data `/joint_states` or `/tf`.
-All other topics and services work as expected.
+**Description**: Some topics, most commonly `joint_states` (but sometimes others), fail to publish data.
+Some other topics (e.g. `robot_status`) publish data properly, and services send data as expected.
+This is likely to occur if your system has a large number of joints or long joint names.
 
-**Work-around**: such a multi-group system would need to be broken up into a independent systems.
-(E.g. `R1+R2+S1` would be broken up into `R1+S1` and another `R1`).
+**Work-arounds**: There are two options for working around this behavior.
 
-The cause of this behavior is unknown.
-The issue is being investigated.
+1. Reduce the length of your messages.
+For example, you can reduce the length of the `sensor_msgs/JointState` message published to the `joint_states` topic by modifying [`joint_names`](https://github.com/Yaskawa-Global/motoros2/blob/6bc583955ae0ef1615c036c4014df909fe46f9c1/config/motoros2_config.yaml#L165-L185) in [the configuration file](#configuration) to reduce the length of the joint names.
+Follow [Updating the configuration](#updating-the-configuration) to propagate this change to MotoROS2.
+The current MTU is `2048` bytes, so take that into consideration when reducing message size.
+1. Change your topic to reliable reliability by setting its [QoS profile to `default`](https://github.com/Yaskawa-Global/motoros2/blob/6bc583955ae0ef1615c036c4014df909fe46f9c1/config/motoros2_config.yaml#L227-L244) in [the configuration file](#configuration).
+Follow [Updating the configuration](#updating-the-configuration) to propagate this change to MotoROS2.
+Be aware that changing publisher QoS settings may break compatibility between subscribers and publishers.
+You may have to change the QoS settings of subscribers in response.
+See [Default QoS Settings](#default-qos-settings) for more information.
+
+This behavior occurs because messages published to best-effort reliability topics cannot be fragmented and reassembled.
+So, if a message on a best-effort reliability topic is large enough that the MTU is exceeded, the message will be lost.
+The root cause of the failure to publish large messages on best-effort reliability topics is further described [here](https://github.com/eProsima/Micro-XRCE-DDS-Client/issues/394#issuecomment-2519526357).
 
 ## Provisional roadmap
 
