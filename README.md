@@ -818,17 +818,6 @@ Refer to the relevant Yaskawa Motoman documentation for more information on how 
 
 After robot-calibration, the transform between the shared `world` frame and each robot's `base` frame will be known, and MotoROS2 will include it in the transforms it broadcasts.
 
-### Some group combinations won't publish data
-
-**Description**: it has been observed that an R1+R2+S1 system will not publish data `/joint_states` or `/tf`.
-All other topics and services work as expected.
-
-**Work-around**: such a multi-group system would need to be broken up into a independent systems.
-(E.g. `R1+R2+S1` would be broken up into `R1+S1` and another `R1`).
-
-The cause of this behavior is unknown.
-The issue is being investigated.
-
 ## Provisional roadmap
 
 This section gives a brief overview of features, enhancements and other tasks that are currently on the MotoROS2 roadmap.
