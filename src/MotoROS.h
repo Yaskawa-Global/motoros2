@@ -100,6 +100,7 @@
 #include "ServiceResetError.h"
 #include "ServiceStartTrajMode.h"
 #include "ServiceStartPointQueueMode.h"
+#include "ServiceStartRtMode.h"
 #include "ServiceStopTrajMode.h"
 #include "ServiceSelectMotionTool.h"
 #include "MotionControl.h"
