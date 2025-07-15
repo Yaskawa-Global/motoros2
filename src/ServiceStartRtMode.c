@@ -53,12 +53,6 @@ void Ros_ServiceStartRtMode_Trigger(const void* request_msg, void* response_msg)
     rosidl_runtime_c__String__assign(&response->message, "");
     response->period = g_Ros_Controller.interpolPeriod;
 
-
-    //-----------------------------------
-    //TODO: Call implementation
-    //-----------------------------------
-
-
     response->result_code.value = Ros_MotionControl_StartMotionMode(MOTION_MODE_RT, &response->message);
     if (response->result_code.value != MOTION_READY)
     {
