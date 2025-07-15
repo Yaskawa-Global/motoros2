@@ -437,6 +437,7 @@
     <ClCompile Include="ServiceQueueTrajPoint.c" />
     <ClCompile Include="ServiceReadWriteIO.c" />
     <ClCompile Include="ServiceStartPointQueueMode.c" />
+    <ClCompile Include="ServiceStartRtMode.c" />
     <ClCompile Include="ServiceStopTrajMode.c" />
     <ClCompile Include="ServiceStartTrajMode.c" />
     <ClCompile Include="ServiceSelectMotionTool.c" />
@@ -472,6 +473,7 @@
     <ClInclude Include="ServiceQueueTrajPoint.h" />
     <ClInclude Include="ServiceReadWriteIO.h" />
     <ClInclude Include="ServiceStartPointQueueMode.h" />
+    <ClInclude Include="ServiceStartRtMode.h" />
     <ClInclude Include="ServiceStopTrajMode.h" />
     <ClInclude Include="ServiceStartTrajMode.h" />
     <ClInclude Include="ServiceSelectMotionTool.h" />
