@@ -71,9 +71,11 @@
 #include <motoros2_interfaces/srv/write_m_register.h>
 #include <motoros2_interfaces/msg/io_result_codes.h>
 #include <motoros2_interfaces/msg/init_traj_enum.h>
+#include <motoros2_interfaces/msg/control_mode_enum.h>
 #include <motoros2_interfaces/srv/reset_error.h>
 #include <motoros2_interfaces/srv/start_traj_mode.h>
 #include <motoros2_interfaces/srv/start_point_queue_mode.h>
+#include <motoros2_interfaces/srv/start_rt_mode.h>
 #include <motoros2_interfaces/srv/queue_traj_point.h>
 #include <motoros2_interfaces/srv/select_motion_tool.h>
 #include <builtin_interfaces/msg/duration.h>

@@ -13,8 +13,8 @@ extern rcl_service_t g_serviceStartRtMode;
 
 typedef struct
 {
-    std_srvs__srv__Trigger_Request request;
-    std_srvs__srv__Trigger_Response response;
+    motoros2_interfaces__srv__StartRtMode_Request request;
+    motoros2_interfaces__srv__StartRtMode_Response response;
 } ServiceStartRtMode_Messages;
 extern ServiceStartRtMode_Messages g_messages_StartRtMode;
 
