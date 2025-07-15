@@ -1608,14 +1608,10 @@ BOOL Ros_MotionControl_IsMotionMode_PointQueue()
         MOTION_MODE_POINTQUEUE);
 }
 
-BOOL Ros_MotionControl_IsMotionMode_RawStreaming()
+BOOL Ros_MotionControl_IsMotionMode_RealTime()
 {
-    return FALSE;
-    
-    //TODO
-    // 
-    //return (Ros_MotionControl_ActiveMotionMode ==
-    //    STREAMING_RAW_INCREMENTS);
+    return (Ros_MotionControl_ActiveMotionMode ==
+        MOTION_MODE_RT);
 }
 
 void Ros_MotionControl_ValidateMotionModeIsOk()
