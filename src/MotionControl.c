@@ -669,7 +669,7 @@ UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__
 //-------------------------------------------------------------------
 // Task to move the robot at each interpolation increment
 //-------------------------------------------------------------------
-void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
+void Ros_MotionControl_NonRtIncMoveLoopStart() //<-- IP_CLK priority task
 {
     MP_EXPOS_DATA moveData;
 
@@ -1328,6 +1328,43 @@ static STATUS Ros_Controller_DisableEcoMode()
         return NG;
 }
 
+BOOL StartInterpolationTask(MOTION_MODE mode)
+{
+    //==================================
+    // If not started, start the IncMoveTask (there should be only one instance of this thread)
+    if (g_Ros_Controller.tidIncMoveThread == INVALID_TASK)
+    {
+        Ros_Debug_BroadcastMsg("Creating new task: IncMoveTask");
+
+        if (mode == MOTION_MODE_TRAJECTORY || mode == MOTION_MODE_POINTQUEUE)
+        {
+            g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
+                (FUNCPTR)Ros_MotionControl_NonRtIncMoveLoopStart,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            if (g_Ros_Controller.tidIncMoveThread == ERROR)
+            {
+                Ros_Debug_BroadcastMsg("Failed to create task for incremental-motion.  Check robot parameters.");
+                g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+                Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
+                mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_INCREMENTAL_MOTION);
+
+                return FALSE;
+            }
+        }
+        else if (mode == MOTION_MODE_RT)
+        {
+            asdf; //Launch RT thread here
+        }
+        else
+            return FALSE;
+
+        return TRUE;
+    }
+
+    Ros_Debug_BroadcastMsg("ERROR - IncMoveTask is already allocated");
+    return FALSE;
+}
+
 //-----------------------------------------------------------------------
 // Attempts to start playback of a job to put the controller in RosMotion mode
 //
@@ -1512,6 +1549,8 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         }
     }
 
+    StartInterpolationTask(mode);
+
     // have to initialize the prevPulsePos that will be used when interpolating the traj
     for(grpNo = 0; grpNo < g_Ros_Controller.numGroup; ++grpNo)
     {
@@ -1594,6 +1633,9 @@ void Ros_MotionControl_StopTrajMode()
     ioWriteData.ulAddr = g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_WAITING_ROS].ulAddr;
     ioWriteData.ulValue = 0;
     mpWriteIO(&ioWriteData, 1);
+
+    mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
+    g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
 }
 
 BOOL Ros_MotionControl_IsMotionMode_Trajectory()
