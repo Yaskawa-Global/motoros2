@@ -1341,22 +1341,25 @@ BOOL StartInterpolationTask(MOTION_MODE mode)
             g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
                 (FUNCPTR)Ros_MotionControl_NonRtIncMoveLoopStart,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-            if (g_Ros_Controller.tidIncMoveThread == ERROR)
-            {
-                Ros_Debug_BroadcastMsg("Failed to create task for incremental-motion.  Check robot parameters.");
-                g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
-                Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
-                mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_INCREMENTAL_MOTION);
-
-                return FALSE;
-            }
         }
         else if (mode == MOTION_MODE_RT)
         {
-            asdf; //Launch RT thread here
+            g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
+                (FUNCPTR)MotionControl_RtIncMoveLoopStart,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }
         else
             return FALSE;
+
+        if (g_Ros_Controller.tidIncMoveThread == ERROR)
+        {
+            Ros_Debug_BroadcastMsg("Failed to create task for incremental-motion.  Check robot parameters.");
+            g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+            Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
+            mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_INCREMENTAL_MOTION);
+
+            return FALSE;
+        }
 
         return TRUE;
     }
