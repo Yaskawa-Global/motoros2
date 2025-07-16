@@ -434,6 +434,7 @@
     <ClCompile Include="FileUtilityFunctions.c" />
     <ClCompile Include="InformCheckerAndGenerator.c" />
     <ClCompile Include="MemoryAllocation.c" />
+    <ClCompile Include="RealTimeMotionControl.c" />
     <ClCompile Include="ServiceQueueTrajPoint.c" />
     <ClCompile Include="ServiceReadWriteIO.c" />
     <ClCompile Include="ServiceStartPointQueueMode.c" />
