@@ -372,6 +372,9 @@
     <ClCompile Include="ServiceStartRtMode.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="RealTimeMotionControl.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
