@@ -26,7 +26,7 @@ Attach the log it produces and a copy of the `PANELBOX.LOG` from the robot's tea
 
 ## Network issues
 
-For difficulty with initial connection with no alarm on the pendant, see the [network troubleshooting guide](troubleshooting.md#network-issues).
+For difficulty with initial connection with no alarm on the pendant, see the [network troubleshooting guide](network_configuration.md#network-issues).
 
 ## MotoROS2 error and alarm codes
 
