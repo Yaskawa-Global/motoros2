@@ -469,6 +469,7 @@
     <ClInclude Include="InformCheckerAndGenerator.h" />
     <ClInclude Include="MemoryAllocation.h" />
     <ClInclude Include="MemoryTracing.h" />
+    <ClInclude Include="RealTimeMotionControl.h" />
     <ClInclude Include="RosApiNameConstants.h" />
     <ClInclude Include="..\lib\MotoPlusExterns.h" />
     <ClInclude Include="ServiceQueueTrajPoint.h" />

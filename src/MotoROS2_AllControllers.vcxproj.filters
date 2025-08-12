@@ -494,5 +494,8 @@
     <ClInclude Include="ServiceStartRtMode.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
+    <ClInclude Include="RealTimeMotionControl.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
