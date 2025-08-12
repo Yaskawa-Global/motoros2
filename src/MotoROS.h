@@ -106,6 +106,7 @@
 #include "ServiceStopTrajMode.h"
 #include "ServiceSelectMotionTool.h"
 #include "MotionControl.h"
+#include "RealTimeMotionControl.h"
 #include "ConfigFile.h"
 #include "RosApiNameConstants.h"
 #include "TimeConversionUtils.h"
