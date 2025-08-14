@@ -1395,7 +1395,7 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
 
     Ros_Controller_IoStatusUpdate();
     // Check if already in the proper mode
-    if (Ros_Controller_IsMotionReady())
+    if (Ros_Controller_IsMotionReady() && Ros_MotionControl_ActiveMotionMode != MOTION_MODE_INACTIVE)
     {
         Ros_Debug_BroadcastMsg("Already active");
         return MOTION_READY;
