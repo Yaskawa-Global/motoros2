@@ -50,6 +50,7 @@ void Ros_RtMotionControl_JointSpace()
 
     struct fd_set fds;
     struct timeval tv;
+    struct timeval* timeout;
 
     //=========================================================================================
 
@@ -79,7 +80,12 @@ void Ros_RtMotionControl_JointSpace()
         tv.tv_usec = 0;
         tv.tv_sec = g_nodeConfigSettings.timeout_for_rt_msg;
 
-        if (mpSelect(sockServer + 1, &fds, NULL, NULL, &tv) > 0)
+        if (g_nodeConfigSettings.timeout_for_rt_msg != -1)
+            timeout = &tv;
+        else
+            timeout = NULL;
+
+        if (mpSelect(sockServer + 1, &fds, NULL, NULL, timeout) > 0)
         {
             bzero(&incomingCommand, sizeof(incomingCommand));
             bytes_received = mpRecvFrom(sockServer, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
