@@ -69,11 +69,11 @@ void Ros_RtMotionControl_JointSpace()
     if (!Ros_RtMotionControl_OpenSocket(&sockServer))
         mpDeleteSelf;
 
+    Ros_Debug_BroadcastMsg("Starting RT session");
+
     //=========================================================================================
     while (TRUE)
     {
-
-        //-------------------------------------------------------------------------------------
         FD_ZERO(&fds);
         FD_SET(sockServer, &fds);
 
@@ -181,6 +181,7 @@ void Ros_RtMotionControl_Cleanup()
 bool Ros_RtMotionControl_OpenSocket(int* sockServer)
 {
     struct sockaddr_in server_addr;
+    int optval = 1;
 
     *sockServer = mpSocket(AF_INET, SOCK_DGRAM, 0);
     if (*sockServer < 0)
@@ -188,6 +189,8 @@ bool Ros_RtMotionControl_OpenSocket(int* sockServer)
         Ros_Debug_BroadcastMsg("ERROR: Could not allocate socket for RT interface");
         return false;
     }
+
+    Ros_setsockopt(*sockServer, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(optval));
 
     // Bind socket to port
     memset(&server_addr, 0, sizeof(server_addr));
