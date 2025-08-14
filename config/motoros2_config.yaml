@@ -318,3 +318,20 @@ publisher_qos:
 # OPTIONS: USER_LAN1, USER_LAN2
 # DEFAULT: (all available network ports)
 #debug_broadcast_port: USER_LAN1
+
+#-----------------------------------------------------------------------------
+# For the real time motion interface, which port should the UDP messages
+# be transmitted on?
+#
+# DEFAULT: '8889'
+#rt_udp_port_number: '8889'
+
+#-----------------------------------------------------------------------------
+# Timeout for real time motion commands. If a command packet is not received
+# within this number of seconds, the motion mode will be cancelled.
+#
+# Setting this to '-1' will never timeout. In that case, you must explicitly
+# call '/stop_traj_mode' to stop the motion mode.
+#
+# DEFAULT: 30
+#timeout_for_rt_msg: 30
