@@ -72,13 +72,16 @@ void Ros_RtMotionControl_JointSpace()
         if (bytes_received > 0)
         {
 
-#warning deal with rollover
+#warning deal with rollover;
             if (incomingCommand.sequenceId < sequenceId)
-                continue; //drop this packet
-
-            if ((sequenceId - incomingCommand.sequenceId) >= MAX_SEQUENCE_DIFFERENCE)
             {
-                Ros_Debug_BroadcastMsg("ERROR: Missed too many command packets");
+                Ros_Debug_BroadcastMsg("WARN: Received old command packet (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
+                continue; //drop this packet
+            }
+
+            if ((incomingCommand.sequenceId - sequenceId) >= MAX_SEQUENCE_DIFFERENCE)
+            {
+                Ros_Debug_BroadcastMsg("ERROR: Missed too many command packets (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
                 break; //drop the connection
             }
 
@@ -97,7 +100,9 @@ void Ros_RtMotionControl_JointSpace()
             }
 
             // Send increment to robot
-            mpExRcsIncrementMove(&moveData);
+            int ret = mpExRcsIncrementMove(&moveData);
+            if (ret != OK)
+                Ros_Debug_BroadcastMsg("WARN: mpExRcsIncrementMove returned %d", ret);
 
             sequenceId = incomingCommand.sequenceId;
 
@@ -105,7 +110,10 @@ void Ros_RtMotionControl_JointSpace()
             mpSendTo(sockServer, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
         }
         else
+        {
+            Ros_Debug_BroadcastMsg("ERROR: recvFrom returned an error");
             break;
+        }
 
         // Wait for next interpolation cycle
         mpClkAnnounce(MP_INTERPOLATION_CLK);
@@ -113,6 +121,8 @@ void Ros_RtMotionControl_JointSpace()
 
     mpClose(sockRtCommandListener);
     sockRtCommandListener = -1;
+
+    Ros_Debug_BroadcastMsg("Ending Rt Session");
 
     g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
     mpDeleteSelf;
