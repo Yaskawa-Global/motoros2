@@ -110,7 +110,9 @@ typedef enum
 #define DEFAULT_ULAN_DEBUG_BROADCAST_PORT        CFG_ROS_USER_LAN1
 #endif
 
-#define DEFAULT_RT_UDP_PORT_NUMBER     "8889"
+#define DEFAULT_RT_UDP_PORT_NUMBER      "8889"
+
+#define DEFAULT_TIMEOUT_FOR_RT_MSG      30
 
 typedef struct
 {
@@ -159,6 +161,8 @@ typedef struct
     Ros_UserLan_Port_Setting debug_broadcast_port;
 
     char rt_udp_port_number[MAX_YAML_STRING_LEN];
+
+    int timeout_for_rt_msg;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;
