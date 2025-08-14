@@ -1342,11 +1342,11 @@ BOOL StartInterpolationTask(MOTION_MODE mode)
                 (FUNCPTR)Ros_MotionControl_NonRtIncMoveLoopStart,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }
-        else if (mode == MOTION_MODE_RT)
+        else if (mode == MOTION_MODE_RT_JOINT || mode == MOTION_MODE_RT_CARTESIAN)
         {
             g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
-                (FUNCPTR)MotionControl_RtIncMoveLoopStart,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                (FUNCPTR)Ros_RtMotionControl_RtIncMoveLoopStart,
+                (int)mode, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }
         else
             return FALSE;
@@ -1637,6 +1637,9 @@ void Ros_MotionControl_StopTrajMode()
     ioWriteData.ulValue = 0;
     mpWriteIO(&ioWriteData, 1);
 
+    if (Ros_MotionControl_IsMotionMode_RealTime())
+        Ros_RtMotionControl_Cleanup();
+
     mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
     g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
 }
@@ -1656,7 +1659,7 @@ BOOL Ros_MotionControl_IsMotionMode_PointQueue()
 BOOL Ros_MotionControl_IsMotionMode_RealTime()
 {
     return (Ros_MotionControl_ActiveMotionMode ==
-        MOTION_MODE_RT);
+        (MOTION_MODE_RT_JOINT || MOTION_MODE_RT_CARTESIAN));
 }
 
 void Ros_MotionControl_ValidateMotionModeIsOk()

@@ -20,7 +20,8 @@ typedef enum
     MOTION_MODE_INACTIVE,
     MOTION_MODE_TRAJECTORY,
     MOTION_MODE_POINTQUEUE,
-    MOTION_MODE_RT,
+    MOTION_MODE_RT_JOINT,
+    MOTION_MODE_RT_CARTESIAN,
 } MOTION_MODE;
 
 extern Init_Trajectory_Status Ros_MotionControl_InitTrajectory(control_msgs__action__FollowJointTrajectory_SendGoal_Request* pending_ros_goal_request);
