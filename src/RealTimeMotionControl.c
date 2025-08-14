@@ -19,6 +19,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, RtReply* reply);
 
 static int sockRtCommandListener = -1;
 
+extern MOTION_MODE Ros_MotionControl_ActiveMotionMode;
 
 void Ros_RtMotionControl_RtIncMoveLoopStart(MOTION_MODE mode)
 {
@@ -47,6 +48,10 @@ void Ros_RtMotionControl_JointSpace()
 
     UINT32 sequenceId = 0;
 
+    struct fd_set fds;
+    struct timeval tv;
+
+    //=========================================================================================
 
     bzero(&moveData, sizeof(moveData));
 
@@ -63,64 +68,80 @@ void Ros_RtMotionControl_JointSpace()
     if (!Ros_RtMotionControl_OpenSocket(&sockServer))
         mpDeleteSelf;
 
-    //-------------------------------------------------------------------------------------
+    //=========================================================================================
     while (TRUE)
     {
-        bzero(&incomingCommand, sizeof(incomingCommand));
-        bytes_received = mpRecvFrom(sockServer, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
 
-        if (bytes_received > 0)
+        //-------------------------------------------------------------------------------------
+        FD_ZERO(&fds);
+        FD_SET(sockServer, &fds);
+
+        tv.tv_usec = 0;
+        tv.tv_sec = g_nodeConfigSettings.timeout_for_rt_msg;
+
+        if (mpSelect(sockServer + 1, &fds, NULL, NULL, &tv) > 0)
         {
+            bzero(&incomingCommand, sizeof(incomingCommand));
+            bytes_received = mpRecvFrom(sockServer, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
 
-#warning deal with rollover;
-            if (incomingCommand.sequenceId < sequenceId)
+            if (bytes_received > 0)
             {
-                Ros_Debug_BroadcastMsg("WARN: Received old command packet (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
-                continue; //drop this packet
-            }
-
-            if ((incomingCommand.sequenceId - sequenceId) >= MAX_SEQUENCE_DIFFERENCE)
-            {
-                Ros_Debug_BroadcastMsg("ERROR: Missed too many command packets (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
-                break; //drop the connection
-            }
-
-            // For each control group, convert radians to pulses and prepare moveData
-            for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
-            {
-                CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
-
-                Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, incomingCommand.delta_rad[groupNo], pulse_increments);
-
-                // Copy pulse increments to moveData
-                for (i = 0; i < ctrlGroup->numAxes; i++)
+                #warning deal with rollover;
+                if (incomingCommand.sequenceId < sequenceId)
                 {
-                    moveData.grp_pos_info[groupNo].pos[i] = pulse_increments[i];
+                    Ros_Debug_BroadcastMsg("WARN: Received old command packet (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
+                    continue; //drop this packet
                 }
+
+                if ((incomingCommand.sequenceId - sequenceId) >= MAX_SEQUENCE_DIFFERENCE)
+                {
+                    Ros_Debug_BroadcastMsg("ERROR: Missed too many command packets (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
+                    break; //drop the connection
+                }
+
+                // For each control group, convert radians to pulses and prepare moveData
+                for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
+                {
+                    CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
+
+                    Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, incomingCommand.delta_rad[groupNo], pulse_increments);
+
+                    // Copy pulse increments to moveData
+                    for (i = 0; i < ctrlGroup->numAxes; i++)
+                    {
+                        moveData.grp_pos_info[groupNo].pos[i] = pulse_increments[i];
+                    }
+                }
+
+                // Send increment to robot
+                int ret = mpExRcsIncrementMove(&moveData);
+                if (ret != OK)
+                    Ros_Debug_BroadcastMsg("WARN: mpExRcsIncrementMove returned %d", ret);
+            }
+            else
+            {
+                Ros_Debug_BroadcastMsg("ERROR: recvFrom returned an error");
+                break;
             }
 
-            // Send increment to robot
-            int ret = mpExRcsIncrementMove(&moveData);
-            if (ret != OK)
-                Ros_Debug_BroadcastMsg("WARN: mpExRcsIncrementMove returned %d", ret);
+            // Wait for next interpolation cycle
+            mpClkAnnounce(MP_INTERPOLATION_CLK);
 
+            //send status back to the PC and notify it that I'm ready for another packet
             sequenceId = incomingCommand.sequenceId;
-
-            Ros_RtMotionControl_PopulateReplyMessage(sequenceId , &outgoingReply);
+            Ros_RtMotionControl_PopulateReplyMessage(sequenceId, &outgoingReply);
             mpSendTo(sockServer, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
         }
         else
         {
-            Ros_Debug_BroadcastMsg("ERROR: recvFrom returned an error");
+            Ros_Debug_BroadcastMsg("No packets received for %d seconds", g_nodeConfigSettings.timeout_for_rt_msg);
             break;
         }
-
-        // Wait for next interpolation cycle
-        mpClkAnnounce(MP_INTERPOLATION_CLK);
     }
 
     mpClose(sockRtCommandListener);
     sockRtCommandListener = -1;
+    Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
 
     Ros_Debug_BroadcastMsg("Ending Rt Session");
 
