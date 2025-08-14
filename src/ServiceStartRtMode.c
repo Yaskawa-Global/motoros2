@@ -48,12 +48,14 @@ void Ros_ServiceStartRtMode_Trigger(const void* request_msg, void* response_msg)
 {
     StartRtMode_Request* request = (StartRtMode_Request*)request_msg;
     StartRtMode_Response* response = (StartRtMode_Response*)response_msg;
+    
+    MOTION_MODE mm = request->control_mode.value == motoros2_interfaces__msg__ControlModeEnum__CARTESIAN ? MOTION_MODE_RT_CARTESIAN : MOTION_MODE_RT_JOINT;
 
     response->result_code.value = MOTION_READY;
     rosidl_runtime_c__String__assign(&response->message, "");
     response->period = g_Ros_Controller.interpolPeriod;
 
-    response->result_code.value = Ros_MotionControl_StartMotionMode(MOTION_MODE_RT, &response->message);
+    response->result_code.value = Ros_MotionControl_StartMotionMode(mm, &response->message);
     if (response->result_code.value != MOTION_READY)
     {
         // update response
