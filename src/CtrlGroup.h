@@ -128,6 +128,7 @@ extern void Ros_CtrlGroup_ConvertToRosPos(CtrlGroup* ctrlGroup, long const pulse
 extern void Ros_CtrlGroup_ConvertToRosTorque(CtrlGroup* ctrlGroup, double const motoTorque[MAX_PULSE_AXES], double rosTorque[MAX_PULSE_AXES]);
 extern void Ros_CtrlGroup_ConvertToMotoPos_FromSequentialOrdering(CtrlGroup* ctrlGroup, double const radPos[MAX_PULSE_AXES], long pulsePos[MAX_PULSE_AXES]);
 extern void Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(CtrlGroup* ctrlGroup, double const rosPos[MAX_PULSE_AXES], long motopulsePos[MAX_PULSE_AXES]);
+extern void Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(CtrlGroup* ctrlGroup, long const motopulsePos[MAX_PULSE_AXES], double rosPos[MAX_PULSE_AXES]);
 
 extern UCHAR Ros_CtrlGroup_GetAxisConfig(CtrlGroup* ctrlGroup);
 
