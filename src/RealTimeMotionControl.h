@@ -17,7 +17,6 @@ extern void Ros_RtMotionControl_Cleanup();
 
 struct RtPacket_
 {
-    // Indentation is now done with regular spaces
     UINT32 sequenceId;
     double delta_rad[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
 } PACKED;
@@ -26,13 +25,10 @@ typedef struct RtPacket_ RtPacket;
 
 struct RtReply_
 {
-    // Indentation is now done with regular spaces
     UINT32 sequenceId; //echo
 } PACKED;
 typedef struct RtReply_ RtReply;
 
-
-// No trailing space character here
 #undef PACKED
 
 #endif //MOTOROS2_REALTIME_MOTION_CONTROL_H
