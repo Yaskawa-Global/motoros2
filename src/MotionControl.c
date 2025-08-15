@@ -1345,7 +1345,7 @@ BOOL StartInterpolationTask(MOTION_MODE mode)
         else if (mode == MOTION_MODE_RT_JOINT || mode == MOTION_MODE_RT_CARTESIAN)
         {
             g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
-                (FUNCPTR)Ros_RtMotionControl_RtIncMoveLoopStart,
+                (FUNCPTR)Ros_RtMotionControl_HyperRobotCommanderx5,
                 (int)mode, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }
         else

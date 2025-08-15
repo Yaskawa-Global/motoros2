@@ -10,7 +10,7 @@
 
 #define PACKED __attribute__ ((__packed__))
 
-extern void Ros_RtMotionControl_RtIncMoveLoopStart(MOTION_MODE mode);
+extern void Ros_RtMotionControl_HyperRobotCommanderx5(MOTION_MODE mode);
 extern void Ros_RtMotionControl_Cleanup();
 
 #define MAX_SEQUENCE_DIFFERENCE     50      //0.2 seconds

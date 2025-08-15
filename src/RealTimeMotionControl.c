@@ -21,7 +21,7 @@ static int sockRtCommandListener = -1;
 
 extern MOTION_MODE Ros_MotionControl_ActiveMotionMode;
 
-void Ros_RtMotionControl_RtIncMoveLoopStart(MOTION_MODE mode)
+void Ros_RtMotionControl_HyperRobotCommanderx5(MOTION_MODE mode)
 {
     if (mode == MOTION_MODE_RT_JOINT)
         Ros_RtMotionControl_JointSpace();
