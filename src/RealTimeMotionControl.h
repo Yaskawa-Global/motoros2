@@ -18,6 +18,11 @@ extern void Ros_RtMotionControl_Cleanup();
 struct RtPacket_
 {
     UINT32 sequenceId;
+    
+    //The order of the joints must be in the order of [S L U R B T E 8].
+    //Please note that for seven axis robots, the 'E' joint is phyically
+    //mounted in the middle of the arm. But it must be sent at the end
+    //of the joint array.
     double delta_rad[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
 } PACKED;
 typedef struct RtPacket_ RtPacket;
@@ -25,7 +30,10 @@ typedef struct RtPacket_ RtPacket;
 
 struct RtReply_
 {
-    UINT32 sequenceId; //echo
+    UINT32 sequenceEcho;
+
+    double feedbackPosition[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
+
 } PACKED;
 typedef struct RtReply_ RtReply;
 

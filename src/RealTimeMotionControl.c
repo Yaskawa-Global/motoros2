@@ -124,6 +124,7 @@ void Ros_RtMotionControl_JointSpace()
                 {
                     CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
 
+                    //joints must be in moto-order
                     Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, incomingCommand.delta_rad[groupNo], pulse_increments);
 
                     // Copy pulse increments to moveData
@@ -230,5 +231,15 @@ bool Ros_RtMotionControl_OpenSocket(int* sockServer)
 
 void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, RtReply* reply)
 {
-    reply->sequenceId = sequenceId;
+    long pulsePos_moto[MAX_CONTROLLABLE_GROUPS][MAX_PULSE_AXES];
+
+    reply->sequenceEcho = sequenceId;
+
+    for (int groupIndex = 0; groupIndex < g_Ros_Controller.numGroup; groupIndex += 1)
+    {
+        CtrlGroup* group = g_Ros_Controller.ctrlGroups[groupIndex];
+
+        Ros_CtrlGroup_GetFBPulsePos(group, pulsePos_moto[groupIndex]);
+        Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, pulsePos_moto[groupIndex], reply->feedbackPosition[groupIndex]);
+    }
 }
