@@ -34,14 +34,14 @@ void Ros_RtMotionControl_JointSpace()
     MP_EXPOS_DATA moveData;
     int i, groupNo, bytes_received;
 
+    bool bFirstRecv = true;
     struct sockaddr_in client_addr;
+    struct sockaddr_in previous_client_addr;
     int client_addr_len = sizeof(client_addr);
 
     MP_CTRL_GRP_SEND_DATA ctrlGrpData;
     MP_PULSE_POS_RSP_DATA prevPulsePosData[MAX_CONTROLLABLE_GROUPS];
     long pulse_increments[MAX_PULSE_AXES];
-
-    int sockServer;
 
     RtPacket incomingCommand;
     RtReply outgoingReply;
@@ -66,7 +66,7 @@ void Ros_RtMotionControl_JointSpace()
         mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
     }
 
-    if (!Ros_RtMotionControl_OpenSocket(&sockServer))
+    if (!Ros_RtMotionControl_OpenSocket(&sockRtCommandListener))
         mpDeleteSelf;
 
     Ros_Debug_BroadcastMsg("Starting RT session");
@@ -75,7 +75,7 @@ void Ros_RtMotionControl_JointSpace()
     while (TRUE)
     {
         FD_ZERO(&fds);
-        FD_SET(sockServer, &fds);
+        FD_SET(sockRtCommandListener, &fds);
 
         tv.tv_usec = 0;
         tv.tv_sec = g_nodeConfigSettings.timeout_for_rt_msg;
@@ -85,15 +85,29 @@ void Ros_RtMotionControl_JointSpace()
         else
             timeout = NULL;
 
-        if (mpSelect(sockServer + 1, &fds, NULL, NULL, timeout) > 0)
+        if (mpSelect(sockRtCommandListener + 1, &fds, NULL, NULL, timeout) > 0)
         {
             bzero(&incomingCommand, sizeof(incomingCommand));
-            bytes_received = mpRecvFrom(sockServer, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
+            bytes_received = mpRecvFrom(sockRtCommandListener, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
+
+            if (bFirstRecv)
+            {
+                previous_client_addr = client_addr; //only allow a single commander
+                //flag is cleared down below
+            }
+            else
+            {
+                if (memcmp(&client_addr, &previous_client_addr, sizeof(struct sockaddr_in)) != 0)
+                {
+                    Ros_Debug_BroadcastMsg("ERROR: Received command packets from multiple sources");
+                    break; //drop the connection
+                }
+            }
 
             if (bytes_received > 0)
             {
                 #warning deal with rollover;
-                if (incomingCommand.sequenceId < sequenceId)
+                if (incomingCommand.sequenceId <= sequenceId && !bFirstRecv)
                 {
                     Ros_Debug_BroadcastMsg("WARN: Received old command packet (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
                     continue; //drop this packet
@@ -123,6 +137,8 @@ void Ros_RtMotionControl_JointSpace()
                 int ret = mpExRcsIncrementMove(&moveData);
                 if (ret != OK)
                     Ros_Debug_BroadcastMsg("WARN: mpExRcsIncrementMove returned %d", ret);
+
+                bFirstRecv = false;
             }
             else
             {
@@ -136,7 +152,7 @@ void Ros_RtMotionControl_JointSpace()
             //send status back to the PC and notify it that I'm ready for another packet
             sequenceId = incomingCommand.sequenceId;
             Ros_RtMotionControl_PopulateReplyMessage(sequenceId, &outgoingReply);
-            mpSendTo(sockServer, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
+            mpSendTo(sockRtCommandListener, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
         }
         else
         {
@@ -160,6 +176,10 @@ void Ros_RtMotionControl_Cartesian()
     Ros_MotionControl_StopTrajMode();
     Ros_Debug_BroadcastMsg("ERROR: Cartesian interface not yet implemented");
     mpSetAlarm(ALARM_OPERATION_FAIL, "Cartesian not yet implemented", SUBCODE_NOT_IMPLEMENTED);
+
+    Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
+    g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+
     mpDeleteSelf;
 }
 
