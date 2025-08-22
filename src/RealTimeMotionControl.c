@@ -10,8 +10,10 @@
 
 #include "MotoROS.h"
 
-void Ros_RtMotionControl_JointSpace();
-void Ros_RtMotionControl_Cartesian();
+void Ros_RtMotionControl_InitJointSpace(MP_EXPOS_DATA* moveData);
+void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData);
+bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
+bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 void Ros_RtMotionControl_Cleanup();
 bool Ros_RtMotionControl_OpenSocket(int* sockServer);
 void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, RtReply* reply);
@@ -23,14 +25,6 @@ extern MOTION_MODE Ros_MotionControl_ActiveMotionMode;
 
 void Ros_RtMotionControl_HyperRobotCommanderx5(MOTION_MODE mode)
 {
-    if (mode == MOTION_MODE_RT_JOINT)
-        Ros_RtMotionControl_JointSpace();
-    else
-        Ros_RtMotionControl_Cartesian();
-}
-
-void Ros_RtMotionControl_JointSpace()
-{
     MP_EXPOS_DATA moveData;
     int i, groupNo, bytes_received;
 
@@ -38,10 +32,6 @@ void Ros_RtMotionControl_JointSpace()
     struct sockaddr_in client_addr;
     struct sockaddr_in previous_client_addr;
     int client_addr_len = sizeof(client_addr);
-
-    MP_CTRL_GRP_SEND_DATA ctrlGrpData;
-    MP_PULSE_POS_RSP_DATA prevPulsePosData[MAX_CONTROLLABLE_GROUPS];
-    long pulse_increments[MAX_PULSE_AXES];
 
     RtPacket incomingCommand;
     RtReply outgoingReply;
@@ -54,17 +44,11 @@ void Ros_RtMotionControl_JointSpace()
 
     //=========================================================================================
 
-    bzero(&moveData, sizeof(moveData));
+    if (mode == MOTION_MODE_RT_JOINT)
+        Ros_RtMotionControl_InitJointSpace(&moveData);
+    else
+        Ros_RtMotionControl_InitCartesian(&moveData);
 
-    for (i = 0; i < g_Ros_Controller.numGroup; i++)
-    {
-        moveData.ctrl_grp |= (0x01 << i);
-        moveData.grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
-        moveData.grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
-
-        ctrlGrpData.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;
-        mpGetPulsePos(&ctrlGrpData, &prevPulsePosData[i]);
-    }
 
     if (!Ros_RtMotionControl_OpenSocket(&sockRtCommandListener))
         mpDeleteSelf;
@@ -119,19 +103,15 @@ void Ros_RtMotionControl_JointSpace()
                     break; //drop the connection
                 }
 
-                // For each control group, convert radians to pulses and prepare moveData
-                for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
+                if (mode == MOTION_MODE_RT_JOINT)
                 {
-                    CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
-
-                    //joints must be in moto-order
-                    Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, incomingCommand.delta_rad[groupNo], pulse_increments);
-
-                    // Copy pulse increments to moveData
-                    for (i = 0; i < ctrlGroup->numAxes; i++)
-                    {
-                        moveData.grp_pos_info[groupNo].pos[i] = pulse_increments[i];
-                    }
+                    if (!Ros_RtMotionControl_ParseJointSpace(&incomingCommand, &moveData))
+                        break; //drop the connection
+                }
+                else
+                {
+                    if (!Ros_RtMotionControl_ParseCartesian(&incomingCommand, &moveData))
+                        break; //drop the connection
                 }
 
                 // Send increment to robot
@@ -172,16 +152,106 @@ void Ros_RtMotionControl_JointSpace()
     mpDeleteSelf;
 }
 
-void Ros_RtMotionControl_Cartesian()
+
+void Ros_RtMotionControl_InitJointSpace(MP_EXPOS_DATA* moveData)
 {
-    Ros_MotionControl_StopTrajMode();
-    Ros_Debug_BroadcastMsg("ERROR: Cartesian interface not yet implemented");
-    mpSetAlarm(ALARM_OPERATION_FAIL, "Cartesian not yet implemented", SUBCODE_NOT_IMPLEMENTED);
+    int i;
 
-    Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
-    g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+    bzero(moveData, sizeof(MP_EXPOS_DATA));
 
-    mpDeleteSelf;
+    for (i = 0; i < g_Ros_Controller.numGroup; i++)
+    {
+        moveData->ctrl_grp |= (0x01 << i);
+        moveData->grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
+        moveData->grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
+    }
+}
+
+void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
+{
+    int i;
+
+    bzero(moveData, sizeof(MP_EXPOS_DATA));
+
+#warning how to specify multi group? ;;;
+    moveData->ctrl_grp = 1; //R1 independent operation
+    moveData->m_ctrl_grp = 0;
+    moveData->s_ctrl_grp = 0;
+
+    for (i = 0; i < g_Ros_Controller.numGroup; i++)
+    {
+        moveData->grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
+        #warning how to specify tool ? ;;;
+        moveData->grp_pos_info[i].pos_tag.data[2] = 0;
+        moveData->grp_pos_info[i].pos_tag.data[3] = MP_INC_RF_DTYPE;
+    }
+}
+
+bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData)
+{
+    int i, groupNo;
+
+    long pulse_increments[MAX_PULSE_AXES];
+
+    // For each control group, convert radians to pulses and prepare moveData
+    for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
+    {
+        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
+
+        //joints must be in moto-order
+        Ros_CtrlGroup_ConvertRosUnitsToMotoUnits(ctrlGroup, incomingCommand->delta[groupNo], pulse_increments);
+
+        // Copy pulse increments to moveData
+        for (i = 0; i < ctrlGroup->numAxes; i++)
+        {
+            moveData->grp_pos_info[groupNo].pos[i] = pulse_increments[i];
+            
+            if (pulse_increments[i] > ctrlGroup->maxInc.maxIncrement[i])
+            {
+                Ros_Debug_BroadcastMsg("ERROR: The increment for axis [%d] exceeds the maximum limit of [%d] pulse counts", pulse_increments[i], ctrlGroup->maxInc.maxIncrement[i]);
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData)
+{
+    int i, groupNo;
+
+    // For each control group, convert radians to pulses and prepare moveData
+    for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
+    {
+        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
+
+
+        moveData->grp_pos_info[groupNo].pos[0] = incomingCommand->delta[groupNo][0] * 1000.0;
+        moveData->grp_pos_info[groupNo].pos[1] = incomingCommand->delta[groupNo][1] * 1000.0;
+        moveData->grp_pos_info[groupNo].pos[2] = incomingCommand->delta[groupNo][2] * 1000.0;
+
+        moveData->grp_pos_info[groupNo].pos[3] = incomingCommand->delta[groupNo][3] * 10000.0;
+        moveData->grp_pos_info[groupNo].pos[4] = incomingCommand->delta[groupNo][4] * 10000.0;
+        moveData->grp_pos_info[groupNo].pos[5] = incomingCommand->delta[groupNo][5] * 10000.0;
+
+        moveData->grp_pos_info[groupNo].pos[6] = incomingCommand->delta[groupNo][6] * 10000.0;
+
+        moveData->grp_pos_info[groupNo].pos[7] = incomingCommand->delta[groupNo][7] * 1000.0;
+
+        double vector = sqrt(pow(incomingCommand->delta[groupNo][0], 2) + //x^2
+                             pow(incomingCommand->delta[groupNo][1], 2) + //y^2
+                             pow(incomingCommand->delta[groupNo][2], 2)); //z^2
+        if (vector > 6.0) //1500 mm/sec == 6 mm per 4 milliseconds
+        {
+            Ros_Debug_BroadcastMsg("ERROR: The increment for the TCP exceeds the maximum limit of 1500 mm/sec");
+            return false;
+        }
+
+        //Ros_Debug_BroadcastMsg("moveData = %d, incomingCommand = %.5f", moveData->grp_pos_info[groupNo].pos[0], incomingCommand->delta[groupNo][0] * 1000.0);
+    }
+
+    return true;
 }
 
 void Ros_RtMotionControl_Cleanup()

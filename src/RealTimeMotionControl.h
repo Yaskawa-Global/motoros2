@@ -23,7 +23,12 @@ struct RtPacket_
     //Please note that for seven axis robots, the 'E' joint is phyically
     //mounted in the middle of the arm. But it must be sent at the end
     //of the joint array.
-    double delta_rad[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
+    //
+    //For joint-space, this will be radians of each joint.
+    //
+    //For cartesian, this will be millimeters and degrees of the TCP.
+    //Rotations are applied in the order of ZYX.
+    double delta[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
 } PACKED;
 typedef struct RtPacket_ RtPacket;
 
