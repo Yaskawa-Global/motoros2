@@ -10,7 +10,7 @@
 
 #define PACKED __attribute__ ((__packed__))
 
-extern void Ros_RtMotionControl_HyperRobotCommanderx5(MOTION_MODE mode);
+extern void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode);
 extern void Ros_RtMotionControl_Cleanup();
 
 #define MAX_SEQUENCE_DIFFERENCE     50      //0.2 seconds
@@ -26,7 +26,8 @@ struct RtPacket_
     //
     //For joint-space, this will be radians of each joint.
     //
-    //For cartesian, this will be millimeters and degrees of the TCP.
+    //For cartesian, this will be meters and radians of the TCP.
+    //The order of the joints must be in the order of [X Y Z Rx Ry Rz Re 8].
     //Rotations are applied in the order of ZYX.
     double delta[MAX_CONTROLLABLE_GROUPS][MP_GRP_AXES_NUM];
 } PACKED;
