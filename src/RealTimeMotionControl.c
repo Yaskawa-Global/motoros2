@@ -21,9 +21,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, RtReply* reply);
 
 static int sockRtCommandListener = -1;
 
-extern MOTION_MODE Ros_MotionControl_ActiveMotionMode;
-
-void Ros_RtMotionControl_HyperRobotCommanderx5(MOTION_MODE mode)
+void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 {
     MP_EXPOS_DATA moveData;
     int i, groupNo, bytes_received;
@@ -144,7 +142,6 @@ void Ros_RtMotionControl_HyperRobotCommanderx5(MOTION_MODE mode)
 
     mpClose(sockRtCommandListener);
     sockRtCommandListener = -1;
-    Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
 
     Ros_Debug_BroadcastMsg("Ending Rt Session");
 
@@ -226,18 +223,17 @@ bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA
     {
         CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
 
+        moveData->grp_pos_info[groupNo].pos[0] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][0]);
+        moveData->grp_pos_info[groupNo].pos[1] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][1]);
+        moveData->grp_pos_info[groupNo].pos[2] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][2]);
 
-        moveData->grp_pos_info[groupNo].pos[0] = incomingCommand->delta[groupNo][0] * 1000.0;
-        moveData->grp_pos_info[groupNo].pos[1] = incomingCommand->delta[groupNo][1] * 1000.0;
-        moveData->grp_pos_info[groupNo].pos[2] = incomingCommand->delta[groupNo][2] * 1000.0;
+        moveData->grp_pos_info[groupNo].pos[3] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][3]);
+        moveData->grp_pos_info[groupNo].pos[4] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][4]);
+        moveData->grp_pos_info[groupNo].pos[5] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][5]);
 
-        moveData->grp_pos_info[groupNo].pos[3] = incomingCommand->delta[groupNo][3] * 10000.0;
-        moveData->grp_pos_info[groupNo].pos[4] = incomingCommand->delta[groupNo][4] * 10000.0;
-        moveData->grp_pos_info[groupNo].pos[5] = incomingCommand->delta[groupNo][5] * 10000.0;
+        moveData->grp_pos_info[groupNo].pos[6] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][6]);
 
-        moveData->grp_pos_info[groupNo].pos[6] = incomingCommand->delta[groupNo][6] * 10000.0;
-
-        moveData->grp_pos_info[groupNo].pos[7] = incomingCommand->delta[groupNo][7] * 1000.0;
+        moveData->grp_pos_info[groupNo].pos[7] = incomingCommand->delta[groupNo][7]; //pulse or micron (no known manipulators use this axis)
 
         double vector = sqrt(pow(incomingCommand->delta[groupNo][0], 2) + //x^2
                              pow(incomingCommand->delta[groupNo][1], 2) + //y^2
