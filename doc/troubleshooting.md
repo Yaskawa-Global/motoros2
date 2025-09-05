@@ -732,6 +732,31 @@ The ETHERNET function must be enabled for the LAN interface that was specified i
 Either change the interface specified in the config file to a LAN interface that is enabled, or enable the corresponding LAN interface on the controller.
 Please contact your local Yaskawa representative to request the ETHERNET function if it is not enabled.
 
+### Alarm: 8011[65]
+
+*Example:*
+
+```text
+ALARM 8011
+ Cfg file yaml parsing error
+[65]
+```
+
+*Solution:*
+The config file yaml parser encountered an error, meaning that there is a syntax mistake somewhere in the `motoros2_config.yaml` file.
+Follow the instructions in [verifying yaml correctness](../README.md#verifying-yaml-correctness) to help find the error.
+Output from the [debug-listener script](#debug-log-client) may also provide a hint.
+
+After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
+
+If the behavior persists, open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues).
+Describe the problem and include the following items:
+
+- output from [debug-listener script](#debug-log-client) (complete and unedited).
+- version of MotoROS2.
+- copy of `motoros2_config.yaml` copied from the robot controller.
+- verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
 ### Alarm: 8012[xx]
 
 *Example:*
