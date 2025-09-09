@@ -11,7 +11,7 @@ jobs:
   yaml_lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: karancode/yamllint-github-action@v3.0.0
         with:
           yamllint_file_or_dir: 'config'
