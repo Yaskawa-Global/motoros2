@@ -140,13 +140,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
         }
     }
 
-    mpClose(sockRtCommandListener);
-    sockRtCommandListener = -1;
-
     Ros_Debug_BroadcastMsg("Ending Rt Session");
-
-    g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
-    mpDeleteSelf;
 }
 
 

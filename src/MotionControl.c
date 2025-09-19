@@ -1624,6 +1624,9 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
 
 void Ros_MotionControl_StopTrajMode()
 {
+    if (Ros_MotionControl_IsMotionMode_RealTime())
+        Ros_RtMotionControl_Cleanup();
+
     Ros_MotionControl_AllGroupsInitComplete = FALSE;
     Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
 
@@ -1636,9 +1639,6 @@ void Ros_MotionControl_StopTrajMode()
     ioWriteData.ulAddr = g_Ros_Controller.ioStatusAddr[IO_ROBOTSTATUS_WAITING_ROS].ulAddr;
     ioWriteData.ulValue = 0;
     mpWriteIO(&ioWriteData, 1);
-
-    if (Ros_MotionControl_IsMotionMode_RealTime())
-        Ros_RtMotionControl_Cleanup();
 
     mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
     g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
