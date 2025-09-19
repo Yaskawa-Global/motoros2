@@ -112,7 +112,7 @@ typedef enum
 
 #define DEFAULT_RT_UDP_PORT_NUMBER      "8889"
 
-#define DEFAULT_TIMEOUT_FOR_RT_MSG      30
+#define DEFAULT_TIMEOUT_FOR_RT_MSG      30000
 
 typedef struct
 {
