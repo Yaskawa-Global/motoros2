@@ -72,6 +72,13 @@ struct RtPacket_
     //The order of the joints must be in the order of [X Y Z Rx Ry Rz Re 8].
     //Rotations are applied in the order of ZYX.
     double delta[MAX_GROUPS][MP_GRP_AXES_NUM];
+    
+    //Set tool that will be used by motion API (ie: passed by us to mpExRcsIncrementMove(..))
+    //NOTE: this will change the 'motion tool' ONLY for those increments which
+    //      haven't yet been added to the increment queue. See also the ROS 2
+    //      'select_tool' service definition file in motoros2_interfaces.
+    int toolIndex[MAX_GROUPS]; //TOOL 0 - 63
+
 } PACKED;
 typedef struct RtPacket_ RtPacket;
 

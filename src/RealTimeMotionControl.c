@@ -16,7 +16,7 @@ bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DAT
 bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 void Ros_RtMotionControl_Cleanup();
 bool Ros_RtMotionControl_OpenSocket(int* sockServer);
-void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, RtReply* reply);
+void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtReply* reply);
 
 
 static int sockRtCommandListener = -1;
@@ -130,7 +130,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 
             //send status back to the PC and notify it that I'm ready for another packet
             sequenceId = incomingCommand.sequenceId;
-            Ros_RtMotionControl_PopulateReplyMessage(sequenceId, &outgoingReply);
+            Ros_RtMotionControl_PopulateReplyMessage(sequenceId, incomingCommand.toolIndex, &outgoingReply);
             mpSendTo(sockRtCommandListener, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
         }
         else
@@ -171,9 +171,8 @@ void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
 
     for (i = 0; i < g_Ros_Controller.numGroup; i++)
     {
+        moveData->ctrl_grp |= (1 << i);
         moveData->grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
-        #warning how to specify tool ? ;;;
-        moveData->grp_pos_info[i].pos_tag.data[2] = 0;
         moveData->grp_pos_info[i].pos_tag.data[3] = MP_INC_RF_DTYPE;
     }
 }
@@ -203,6 +202,8 @@ bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DAT
                 return false;
             }
         }
+
+        moveData->grp_pos_info[groupNo].pos_tag.data[2] = incomingCommand->toolIndex[groupNo];
     }
 
     return true;
@@ -215,7 +216,7 @@ bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA
     // For each control group, convert radians to pulses and prepare moveData
     for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
     {
-        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
+        moveData->grp_pos_info[groupNo].pos_tag.data[2] = incomingCommand->toolIndex[groupNo];
 
         moveData->grp_pos_info[groupNo].pos[TCP_X] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][TCP_X]);
         moveData->grp_pos_info[groupNo].pos[TCP_Y] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][TCP_Y]);
@@ -292,7 +293,7 @@ bool Ros_RtMotionControl_OpenSocket(int* sockServer)
     return true;
 }
 
-void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, RtReply* reply)
+void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtReply* reply)
 {
     long pulsePos_moto[MAX_CONTROLLABLE_GROUPS][MAX_PULSE_AXES];
 
