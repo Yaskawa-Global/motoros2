@@ -217,21 +217,21 @@ bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA
     {
         CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupNo];
 
-        moveData->grp_pos_info[groupNo].pos[0] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][0]);
-        moveData->grp_pos_info[groupNo].pos[1] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][1]);
-        moveData->grp_pos_info[groupNo].pos[2] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][2]);
+        moveData->grp_pos_info[groupNo].pos[TCP_X] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][TCP_X]);
+        moveData->grp_pos_info[groupNo].pos[TCP_Y] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][TCP_Y]);
+        moveData->grp_pos_info[groupNo].pos[TCP_Z] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][TCP_Z]);
 
-        moveData->grp_pos_info[groupNo].pos[3] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][3]);
-        moveData->grp_pos_info[groupNo].pos[4] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][4]);
-        moveData->grp_pos_info[groupNo].pos[5] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][5]);
+        moveData->grp_pos_info[groupNo].pos[TCP_Rx] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Rx]);
+        moveData->grp_pos_info[groupNo].pos[TCP_Ry] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Ry]);
+        moveData->grp_pos_info[groupNo].pos[TCP_Rz] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Rz]);
 
-        moveData->grp_pos_info[groupNo].pos[6] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][6]);
+        moveData->grp_pos_info[groupNo].pos[TCP_Re] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Re]);
 
-        moveData->grp_pos_info[groupNo].pos[7] = incomingCommand->delta[groupNo][7]; //pulse or micron (no known manipulators use this axis)
+        moveData->grp_pos_info[groupNo].pos[TCP_8] = incomingCommand->delta[groupNo][TCP_8]; //pulse or micron (no known manipulators use this axis)
 
-        double vector = sqrt(pow(incomingCommand->delta[groupNo][0], 2) + //x^2
-                             pow(incomingCommand->delta[groupNo][1], 2) + //y^2
-                             pow(incomingCommand->delta[groupNo][2], 2)); //z^2
+        double vector = sqrt(pow(incomingCommand->delta[groupNo][TCP_X], 2) + //x^2
+                             pow(incomingCommand->delta[groupNo][TCP_Y], 2) + //y^2
+                             pow(incomingCommand->delta[groupNo][TCP_Z], 2)); //z^2
         if (vector > 6.0) //1500 mm/sec == 6 mm per 4 milliseconds
         {
             Ros_Debug_BroadcastMsg("ERROR: The increment for the TCP exceeds the maximum limit of 1500 mm/sec");
