@@ -838,7 +838,6 @@ As such, no statements are made about priorities or development schedule for any
 
 The following items are on the MotoROS2 roadmap, and are listed here in no particular order:
 
-- support FS100 controllers
 - read/write of controller variables
 - CRUD of INFORM job files (ie: create, retrieve, update, delete)
 - starting/stopping INFORM jobs (other than `INIT_ROS`)
