@@ -24,7 +24,7 @@ static int sockRtCommandListener = -1;
 void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 {
     MP_EXPOS_DATA moveData;
-    int i, groupNo, bytes_received;
+    int bytes_received;
 
     bool bFirstRecv = true;
     struct sockaddr_in client_addr;
@@ -211,7 +211,7 @@ bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DAT
 
 bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData)
 {
-    int i, groupNo;
+    int groupNo;
 
     // For each control group, convert radians to pulses and prepare moveData
     for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
