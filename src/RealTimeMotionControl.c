@@ -271,6 +271,9 @@ bool Ros_RtMotionControl_OpenSocket(int* sockServer)
         return false;
     }
 
+    //This should allow another connection on this port immediately after closing a 
+    //previous connection. I don't really care if it fails or not. If it fails, then
+    //it is possible that the bind will fail. But maybe not...
     Ros_setsockopt(*sockServer, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(optval));
 
     // Bind socket to port
