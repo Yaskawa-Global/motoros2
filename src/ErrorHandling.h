@@ -231,7 +231,6 @@ typedef enum
 typedef enum
 {
     SUBCODE_OPERATION_SET_CYCLE,
-    SUBCODE_NOT_IMPLEMENTED,
 } ALARM_OPERATION_FAIL_SUBCODE; //8016
 
 typedef enum
