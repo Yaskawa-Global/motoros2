@@ -164,11 +164,9 @@ void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
 
     bzero(moveData, sizeof(MP_EXPOS_DATA));
 
-#warning how to specify multi group? ;;;
-    moveData->ctrl_grp = 1; //R1 independent operation
     moveData->m_ctrl_grp = 0;
     moveData->s_ctrl_grp = 0;
-
+    
     for (i = 0; i < g_Ros_Controller.numGroup; i++)
     {
         moveData->ctrl_grp |= (1 << i);
@@ -295,7 +293,15 @@ bool Ros_RtMotionControl_OpenSocket(int* sockServer)
 
 void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtReply* reply)
 {
-    long pulsePos_moto[MAX_CONTROLLABLE_GROUPS][MAX_PULSE_AXES];
+    long pulsePos_moto[MAX_PULSE_AXES];
+    long degrees[MP_GRP_AXES_NUM];
+    BITSTRING figure;
+    MP_COORD coord;
+    MP_CTRL_GRP_SEND_DATA ctrlGroup;
+    MP_PULSE_POS_RSP_DATA cmdPulse;
+
+    bzero(reply, sizeof(RtReply));
+    bzero(degrees, sizeof(long) * MP_GRP_AXES_NUM);
 
     reply->sequenceEcho = sequenceId;
 
@@ -303,7 +309,58 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtRepl
     {
         CtrlGroup* group = g_Ros_Controller.ctrlGroups[groupIndex];
 
-        Ros_CtrlGroup_GetFBPulsePos(group, pulsePos_moto[groupIndex]);
-        Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, pulsePos_moto[groupIndex], reply->feedbackPosition[groupIndex]);
+        //================================================================================
+        //FB pos
+        //================================================================================
+        Ros_CtrlGroup_GetFBPulsePos(group, pulsePos_moto);
+
+        //Angles
+        Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, pulsePos_moto, reply->feedbackPositionJoints[groupIndex]);
+        
+        for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
+            degrees[axis] = RAD_TO_DEG_0001(reply->feedbackPositionJoints[groupIndex][axis]);
+
+        //Cart
+        mpConvAxesToCartPos(groupIndex, degrees, tools[groupIndex], &figure, &coord);
+
+        reply->feedbackPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
+        reply->feedbackPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
+        reply->feedbackPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
+
+        reply->feedbackPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
+        reply->feedbackPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
+        reply->feedbackPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
+        reply->feedbackPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
+
+        //================================================================================
+        //CMD pos
+        //================================================================================
+#warning Should this be Ros_CtrlGroup_GetPulsePosCmd??? See https://github.com/Yaskawa-Global/motoros2/discussions/455 ;
+        ctrlGroup.sCtrlGrp = groupIndex;
+        mpGetPulsePos(&ctrlGroup, &cmdPulse);
+
+        //rad
+        Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, cmdPulse.lPos, reply->previousCommandPositionJoints[groupIndex]);
+        
+        //deg
+        for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
+            degrees[axis] = RAD_TO_DEG_0001(reply->previousCommandPositionJoints[groupIndex][axis]);
+
+        //Cart
+        mpConvAxesToCartPos(groupIndex, degrees, tools[groupIndex], &figure, &coord);
+
+        reply->previousCommandPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
+        reply->previousCommandPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
+        reply->previousCommandPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
+
+        reply->previousCommandPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
+        reply->previousCommandPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
+        reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
+        reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
+
+        //================================================================================
+        //FSU speed limit
+        //================================================================================
+#warning todo
     }
 }
