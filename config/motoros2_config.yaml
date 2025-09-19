@@ -341,7 +341,7 @@ publisher_qos:
 # the sequence ID. If too many packets are lost during communication, then it
 # should be assumed that the PC is not in sync with the robot.
 #
-# If the sequence ID of an incoming packet is different from the previous 
+# If the sequence ID of an incoming packet is different from the previous
 # command by a value greater than this, then the connection will be dropped.
 # The motion mode must be reactivated to be used again.
 #
