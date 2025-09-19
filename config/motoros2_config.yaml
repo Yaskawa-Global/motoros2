@@ -335,3 +335,15 @@ publisher_qos:
 #
 # DEFAULT: 30000 (30.000 seconds)
 #timeout_for_rt_msg: 30000
+
+#-----------------------------------------------------------------------------
+# When using the real time motion interface, each command packet must increment
+# the sequence ID. If too many packets are lost during communication, then it
+# should be assumed that the PC is not in sync with the robot.
+#
+# If the sequence ID of an incoming packet is different from the previous 
+# command by a value greater than this, then the connection will be dropped.
+# The motion mode must be reactivated to be used again.
+#
+# DEFAULT: 10
+#max_sequence_diff_for_rt_msg: 10
