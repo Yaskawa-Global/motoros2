@@ -114,6 +114,8 @@ typedef enum
 
 #define DEFAULT_TIMEOUT_FOR_RT_MSG      30000
 
+#define DEFAULT_MAX_SEQUENCE_DIFFERENCE 10
+
 typedef struct
 {
     //TODO(gavanderhoorn): add support for unsigned types
@@ -163,6 +165,7 @@ typedef struct
     char rt_udp_port_number[MAX_YAML_STRING_LEN];
 
     int timeout_for_rt_msg;
+    int max_sequence_diff_for_rt_msg;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;

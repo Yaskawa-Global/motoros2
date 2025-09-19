@@ -13,8 +13,6 @@
 extern void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode);
 extern void Ros_RtMotionControl_Cleanup();
 
-#define MAX_SEQUENCE_DIFFERENCE     50      //0.2 seconds
-
 struct RtPacket_
 {
     UINT32 sequenceId;

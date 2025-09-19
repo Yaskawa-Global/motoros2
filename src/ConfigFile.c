@@ -125,6 +125,7 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "debug_broadcast_port", &g_nodeConfigSettings.debug_broadcast_port, Value_UserLanPort },
     { "rt_udp_port_number", g_nodeConfigSettings.rt_udp_port_number, Value_String },
     { "timeout_for_rt_msg", &g_nodeConfigSettings.timeout_for_rt_msg, Value_Int },
+    { "max_sequence_diff_for_rt_msg", &g_nodeConfigSettings.max_sequence_diff_for_rt_msg, Value_Int },
 };
 
 void Ros_ConfigFile_SetAllDefaultValues()
@@ -236,6 +237,10 @@ void Ros_ConfigFile_SetAllDefaultValues()
     //=========
     //timeout_for_rt_msg
     g_nodeConfigSettings.timeout_for_rt_msg = DEFAULT_TIMEOUT_FOR_RT_MSG;
+
+    //=========
+    //max_sequence_diff_for_rt_msg
+    g_nodeConfigSettings.max_sequence_diff_for_rt_msg = DEFAULT_MAX_SEQUENCE_DIFFERENCE;
 }
 
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
@@ -758,6 +763,7 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: debug_broadcast_port = %d", config->debug_broadcast_port);
     Ros_Debug_BroadcastMsg("Config: rt_udp_port_number = %s", config->rt_udp_port_number);
     Ros_Debug_BroadcastMsg("Config: timeout_for_rt_msg = %d", config->timeout_for_rt_msg);
+    Ros_Debug_BroadcastMsg("Config: max_sequence_diff_for_rt_msg = %d", config->max_sequence_diff_for_rt_msg);
 }
 
 void Ros_ConfigFile_Parse()

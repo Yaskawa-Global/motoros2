@@ -95,7 +95,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                     continue; //drop this packet
                 }
 
-                if ((incomingCommand.sequenceId - sequenceId) >= MAX_SEQUENCE_DIFFERENCE)
+                if ((incomingCommand.sequenceId - sequenceId) > g_nodeConfigSettings.max_sequence_diff_for_rt_msg)
                 {
                     Ros_Debug_BroadcastMsg("ERROR: Missed too many command packets (seq: %d, new: %d)", sequenceId, incomingCommand.sequenceId);
                     break; //drop the connection
