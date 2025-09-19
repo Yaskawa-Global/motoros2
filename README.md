@@ -10,6 +10,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 ![YRC1000: supported](https://img.shields.io/badge/YRC1000-supported-blue.svg)
 ![YRC1000micro: supported](https://img.shields.io/badge/YRC1000micro-supported-blue.svg)
 ![DX200: supported](https://img.shields.io/badge/DX200-supported-blue.svg)
+![YNX1000: not supported](https://img.shields.io/badge/YNX1000-not%20supported-inactive.svg)
 ![FS100: not supported](https://img.shields.io/badge/FS100-not%20supported-inactive.svg)
 ![DX100: not supported](https://img.shields.io/badge/DX100-not%20supported-inactive.svg)
 
@@ -837,7 +838,6 @@ As such, no statements are made about priorities or development schedule for any
 
 The following items are on the MotoROS2 roadmap, and are listed here in no particular order:
 
-- support FS100 controllers
 - read/write of controller variables
 - CRUD of INFORM job files (ie: create, retrieve, update, delete)
 - starting/stopping INFORM jobs (other than `INIT_ROS`)
