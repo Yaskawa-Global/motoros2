@@ -328,10 +328,10 @@ publisher_qos:
 
 #-----------------------------------------------------------------------------
 # Timeout for real time motion commands. If a command packet is not received
-# within this number of seconds, the motion mode will be cancelled.
+# within this number of milliseconds, the motion mode will be cancelled.
 #
 # Setting this to '-1' will never timeout. In that case, you must explicitly
 # call '/stop_traj_mode' to stop the motion mode.
 #
-# DEFAULT: 30
-#timeout_for_rt_msg: 30
+# DEFAULT: 30000 (30.000 seconds)
+#timeout_for_rt_msg: 30000

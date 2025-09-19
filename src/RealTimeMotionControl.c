@@ -59,8 +59,8 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
         FD_ZERO(&fds);
         FD_SET(sockRtCommandListener, &fds);
 
-        tv.tv_usec = 0;
-        tv.tv_sec = g_nodeConfigSettings.timeout_for_rt_msg;
+        tv.tv_usec = (g_nodeConfigSettings.timeout_for_rt_msg % 1000) * 1000;
+        tv.tv_sec = g_nodeConfigSettings.timeout_for_rt_msg / 1000;
 
         if (g_nodeConfigSettings.timeout_for_rt_msg != -1)
             timeout = &tv;
@@ -135,7 +135,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
         }
         else
         {
-            Ros_Debug_BroadcastMsg("No packets received for %d seconds", g_nodeConfigSettings.timeout_for_rt_msg);
+            Ros_Debug_BroadcastMsg("No packets received for %d milliseconds", g_nodeConfigSettings.timeout_for_rt_msg);
             break;
         }
     }
