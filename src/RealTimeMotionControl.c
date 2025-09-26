@@ -16,10 +16,12 @@ bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DAT
 bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 void Ros_RtMotionControl_Cleanup();
 bool Ros_RtMotionControl_OpenSocket(int* sockServer);
-void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtReply* reply);
-
+void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply);
 
 static int sockRtCommandListener = -1;
+
+static LONG prevRtIncrementAmount[MAX_GROUPS][MAX_AXES];
+static LONG toProcessRtIncrements[MAX_GROUPS][MAX_AXES];
 
 void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 {
@@ -47,6 +49,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
     else
         Ros_RtMotionControl_InitCartesian(&moveData);
 
+    bzero(prevRtIncrementAmount, MAX_GROUPS * MAX_AXES * sizeof(LONG));
 
     if (!Ros_RtMotionControl_OpenSocket(&sockRtCommandListener))
         mpDeleteSelf;
@@ -130,8 +133,19 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 
             //send status back to the PC and notify it that I'm ready for another packet
             sequenceId = incomingCommand.sequenceId;
-            Ros_RtMotionControl_PopulateReplyMessage(sequenceId, incomingCommand.toolIndex, &outgoingReply);
+            Ros_RtMotionControl_PopulateReplyMessage(mode, &incomingCommand, &outgoingReply);
             mpSendTo(sockRtCommandListener, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
+
+            //track how big the increment SHOULD have been
+            //we'll compare next cycle to see what actually happened
+            bzero(toProcessRtIncrements, MAX_GROUPS * MAX_AXES * sizeof(LONG));
+            for (int groupIndex = 0; groupIndex < g_Ros_Controller.numGroup; groupIndex += 1)
+            {
+                for (int axis = 0; axis < MAX_AXES; axis += 1)
+                {
+                    toProcessRtIncrements[groupIndex][axis] = moveData.grp_pos_info[groupIndex].pos[axis];
+                }
+            }
         }
         else
         {
@@ -291,7 +305,7 @@ bool Ros_RtMotionControl_OpenSocket(int* sockServer)
     return true;
 }
 
-void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtReply* reply)
+void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply)
 {
     long pulsePos_moto[MAX_PULSE_AXES];
     long degrees[MP_GRP_AXES_NUM];
@@ -303,7 +317,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtRepl
     bzero(reply, sizeof(RtReply));
     bzero(degrees, sizeof(long) * MP_GRP_AXES_NUM);
 
-    reply->sequenceEcho = sequenceId;
+    reply->sequenceEcho = command->sequenceId;
 
     for (int groupIndex = 0; groupIndex < g_Ros_Controller.numGroup; groupIndex += 1)
     {
@@ -321,7 +335,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtRepl
             degrees[axis] = RAD_TO_DEG_0001(reply->feedbackPositionJoints[groupIndex][axis]);
 
         //Cart
-        mpConvAxesToCartPos(groupIndex, degrees, tools[groupIndex], &figure, &coord);
+        mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
 
         reply->feedbackPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
         reply->feedbackPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
@@ -350,7 +364,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtRepl
             degrees[axis] = RAD_TO_DEG_0001(reply->previousCommandPositionJoints[groupIndex][axis]);
 
         //Cart
-        mpConvAxesToCartPos(groupIndex, degrees, tools[groupIndex], &figure, &coord);
+        mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
 
         reply->previousCommandPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
         reply->previousCommandPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
@@ -364,6 +378,32 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtRepl
         //================================================================================
         //FSU speed limit
         //================================================================================
-#warning todo
+
+        LONG* coordAsArray = (LONG*)&coord;
+        LONG processedIncrement[MAX_AXES];
+        bzero(processedIncrement, sizeof(LONG) * MAX_AXES);
+        BOOL fsuDetected = FALSE;
+
+        // Check if pulses/mm's are missing from last increment.
+        // Get the current controller command position and substract the previous command position
+        // and check if it matches the amount if increment sent last cycle
+        for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
+        {
+            if (mode == MOTION_MODE_RT_JOINT)
+            {
+                processedIncrement[axis] = cmdPulse.lPos[axis] - prevRtIncrementAmount[groupIndex][axis];
+                prevRtIncrementAmount[groupIndex][axis] = cmdPulse.lPos[axis];
+            }
+            else if (mode == MOTION_MODE_RT_CARTESIAN)
+            {
+                processedIncrement[axis] = coordAsArray[axis] - prevRtIncrementAmount[groupIndex][axis];
+                prevRtIncrementAmount[groupIndex][axis] = coordAsArray[axis];
+            }
+
+            toProcessRtIncrements[groupIndex][axis] -= processedIncrement[axis];
+            if (toProcessRtIncrements[groupIndex][axis] > MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION)
+                fsuDetected = TRUE;
+        }
+        reply->fsuInterferenceDetected = fsuDetected;
     }
 }

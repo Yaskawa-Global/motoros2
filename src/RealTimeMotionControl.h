@@ -117,9 +117,19 @@ struct RtReply_
     double previousCommandPositionJoints[MAX_GROUPS][MP_GRP_AXES_NUM];
     double previousCommandPositionCartesian[MAX_GROUPS][MP_GRP_AXES_NUM];
 
+    //If the FSU speed limit is enabled, it can truncate the commanded
+    //delta increments. This flag is an indicator that the *previous*
+    //command cycle was truncated. It does NOT indicate that this most
+    //recent command packet was truncated.
     bool fsuInterferenceDetected;
 } PACKED;
 typedef struct RtReply_ RtReply;
+
+//When checking for interference from the FSU speed limit, there will
+//likely be some small rounding errors. So, the deviation must exceed
+//this amount before the system will report that the FSU has limited
+//the incoming motion command.
+#define MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION   START_MAX_PULSE_DEVIATION
 
 #undef PACKED
 
