@@ -118,7 +118,10 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                 // Send increment to robot
                 int ret = mpExRcsIncrementMove(&moveData);
                 if (ret != OK)
+                {
                     Ros_Debug_BroadcastMsg("WARN: mpExRcsIncrementMove returned %d", ret);
+                    break; //drop the connection
+                }
 
                 bFirstRecv = false;
             }
