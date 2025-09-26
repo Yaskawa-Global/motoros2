@@ -335,7 +335,10 @@ void Ros_RtMotionControl_PopulateReplyMessage(int sequenceId, int* tools, RtRepl
         //================================================================================
         //CMD pos
         //================================================================================
-#warning Should this be Ros_CtrlGroup_GetPulsePosCmd??? See https://github.com/Yaskawa-Global/motoros2/discussions/455 ;
+        //Should this be Ros_CtrlGroup_GetPulsePosCmd?
+        //Answer: No, it should not. That should only be used when converting incoming
+        //        positional commands that contain an absolute position.
+        //        See https://github.com/Yaskawa-Global/motoros2/discussions/455
         ctrlGroup.sCtrlGrp = groupIndex;
         mpGetPulsePos(&ctrlGroup, &cmdPulse);
 
