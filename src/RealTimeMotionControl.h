@@ -11,6 +11,7 @@
 #define PACKED __attribute__ ((__packed__))
 
 extern void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode);
+extern bool Ros_RtMotionControl_OpenSocket();
 extern void Ros_RtMotionControl_Cleanup();
 
 typedef enum

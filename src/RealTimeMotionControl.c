@@ -15,7 +15,6 @@ void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData);
 bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 void Ros_RtMotionControl_Cleanup();
-bool Ros_RtMotionControl_OpenSocket(int* sockServer);
 void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply);
 
 static int sockRtCommandListener = -1;
@@ -51,10 +50,10 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 
     bzero(prevRtIncrementAmount, MAX_GROUPS * MAX_AXES * sizeof(LONG));
 
-    if (!Ros_RtMotionControl_OpenSocket(&sockRtCommandListener))
-        mpDeleteSelf;
-
     Ros_Debug_BroadcastMsg("Starting RT session");
+
+    Ros_Debug_BroadcastMsg("Flushing stale packets from socket buffer...");
+    mpIoctl(sockRtCommandListener, FIOFLUSH, 1);
 
     //=========================================================================================
     while (TRUE)
@@ -262,35 +261,28 @@ bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA
 
 void Ros_RtMotionControl_Cleanup()
 {
-    if (sockRtCommandListener != -1)
-    {
-        mpClose(sockRtCommandListener);
-        sockRtCommandListener = -1;
-    }
+    //Do not close sockRtCommandListener. Allow it to persist
+    //indefinitely and be reused.
 
     if (g_Ros_Controller.tidIncMoveThread != INVALID_TASK)
     {
         mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
         g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+        Ros_Debug_BroadcastMsg("Deleting old R/T task");
     }
 }
 
-bool Ros_RtMotionControl_OpenSocket(int* sockServer)
+bool Ros_RtMotionControl_OpenSocket()
 {
     struct sockaddr_in server_addr;
     int optval = 1;
 
-    *sockServer = mpSocket(AF_INET, SOCK_DGRAM, 0);
-    if (*sockServer < 0)
+    sockRtCommandListener = mpSocket(AF_INET, SOCK_DGRAM, 0);
+    if (sockRtCommandListener < 0)
     {
         Ros_Debug_BroadcastMsg("ERROR: Could not allocate socket for RT interface");
         return false;
     }
-
-    //This should allow another connection on this port immediately after closing a 
-    //previous connection. I don't really care if it fails or not. If it fails, then
-    //it is possible that the bind will fail. But maybe not...
-    Ros_setsockopt(*sockServer, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof(optval));
 
     // Bind socket to port
     memset(&server_addr, 0, sizeof(server_addr));
@@ -298,10 +290,11 @@ bool Ros_RtMotionControl_OpenSocket(int* sockServer)
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = mpHtons(atoi(g_nodeConfigSettings.rt_udp_port_number));
 
-    if (mpBind(*sockServer, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0)
+    if (mpBind(sockRtCommandListener, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0)
     {
         Ros_Debug_BroadcastMsg("ERROR: Failed to bind UDP socket for real-time motion control");
-        mpClose(*sockServer);
+        mpClose(sockRtCommandListener);
+        sockRtCommandListener = -1;
         return false;
     }
 
