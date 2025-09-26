@@ -106,6 +106,14 @@ void RosInitTask()
     Ros_Controller_SetIOState(IO_FEEDBACK_RESERVED_8, FALSE);
 
     //==================================
+    //REUSEADDR isn't working (not officially supported anyway), so
+    //I need to keep the R/T socket open forever. But I also can't
+    //open it on a subtask which will be deleted as connections come
+    //and go. So, I'm opening on the one persistent task that never
+    //ends.
+    Ros_RtMotionControl_OpenSocket();
+
+    //==================================
     FOREVER
     {
         MOTOROS2_MEM_TRACE_START(full_connection_cycle);
