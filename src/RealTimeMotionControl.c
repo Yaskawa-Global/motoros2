@@ -205,7 +205,7 @@ void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
         moveData->grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
         moveData->grp_pos_info[i].pos_tag.data[3] = MP_INC_RF_DTYPE;
 
-        mpGetToolNo(MP_R1_GID, &getToolResp);
+        mpGetToolNo(MP_R1_GID + i, &getToolResp);
 
         cartSendData.sRobotNo = i;
         cartSendData.sFrame = 1; //1 = RF
