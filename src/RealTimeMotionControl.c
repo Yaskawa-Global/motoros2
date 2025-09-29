@@ -473,6 +473,15 @@ bool Ros_CheckForFsuInterference(MOTION_MODE mode, int* tools)
                 }
                 else if (mode == MOTION_MODE_RT_CARTESIAN)
                 {
+                    //When working in cartesian space, we're only going to monitor the translation.
+                    //1. There is no FSU speed limit for rotation. So it's moot.
+                    //2. When rotating by some increment, that rotation gets 'spread out' over multiple
+                    //   axes. Even if I put all of my commanded increment into a single axis, all 
+                    //   three of them are going to react. So, the cmd-value of my intended axis may
+                    //   not be the value I expect.
+                    if (axis >= TCP_Rx)
+                        break;
+
                     howMuchDidIActuallyMove[axis] = cartRespData.lPos[axis] - prevRtCmdPosition[groupIndex][axis];
                     prevRtCmdPosition[groupIndex][axis] = cartRespData.lPos[axis];
                 }
