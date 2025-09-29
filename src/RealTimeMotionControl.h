@@ -65,6 +65,7 @@ typedef enum
 
 struct RtPacket_
 {
+    //Must increment sequentially with each new command packet.
     UINT32 sequenceId;
     
     //The order of the joints must be in the order of [S L U R B T E 8].
@@ -109,9 +110,6 @@ struct RtReply_
     //the robot to reach. It's the calculated endpoint based on the sum
     //of all position increments received from the user.
     //
-    //This does NOT include the commanded delta from the most recent
-    //command packet.
-    //
     //This is used to track if the robot's speed is being limited
     //by the Functional Safety Unit (FSU). It can also be used to
     //monitor the latency between command and feedback.
@@ -130,7 +128,7 @@ typedef struct RtReply_ RtReply;
 //likely be some small rounding errors. So, the deviation must exceed
 //this amount before the system will report that the FSU has limited
 //the incoming motion command.
-#define MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION   START_MAX_PULSE_DEVIATION
+#define MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION   50  //50 pulse, 0.05 millimeters, or 0.005 degrees
 
 #undef PACKED
 
