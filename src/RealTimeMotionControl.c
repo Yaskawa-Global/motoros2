@@ -115,20 +115,23 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 
             if (bytes_received > 0)
             {
-                #warning deal with rollover;
-                if (incomingCommand.sequenceId <= previousSequenceId && !bFirstRecv)
+                //Check for old or same sequence ID (wraparound safe)
+                if ((int32_t)(incomingCommand.sequenceId - previousSequenceId) <= 0)
                 {
-                    Ros_Debug_BroadcastMsg("WARN: Received old command packet (seq: %d, new: %d)", previousSequenceId, incomingCommand.sequenceId);
+                    // This packet is old or a duplicate.
+                    Ros_Debug_BroadcastMsg("WARN: Received old command packet (prev: %u, new: %u)", previousSequenceId, incomingCommand.sequenceId);
 
-                    //send a copy of the previous reply to trigger next packet
+                    // Resend the previous reply and drop this packet.
                     mpSendTo(sockRtCommandListener, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
-                    continue; //drop this packet
+                    continue;
                 }
 
+                //Check if the sequence ID jumped too far ahead (wraparound safe)
                 if ((incomingCommand.sequenceId - previousSequenceId) > g_nodeConfigSettings.max_sequence_diff_for_rt_msg)
                 {
-                    Ros_Debug_BroadcastMsg("ERROR: Missed too many command packets (seq: %d, new: %d)", previousSequenceId, incomingCommand.sequenceId);
-                    break; //drop the connection
+                    Ros_Debug_BroadcastMsg("ERROR: Missed too many command packets (prev: %u, new: %u)",
+                        previousSequenceId, incomingCommand.sequenceId);
+                    break; // Drop the connection
                 }
 
                 if (mode == MOTION_MODE_RT_JOINT)
