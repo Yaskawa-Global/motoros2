@@ -128,7 +128,7 @@ typedef struct RtReply_ RtReply;
 //likely be some small rounding errors. So, the deviation must exceed
 //this amount before the system will report that the FSU has limited
 //the incoming motion command.
-#define MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION   50  //50 pulse, 0.05 millimeters, or 0.005 degrees
+#define MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION   50  //50 pulse, 0.050 millimeters, or 0.0050 degrees
 
 #undef PACKED
 

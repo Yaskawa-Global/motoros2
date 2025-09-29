@@ -56,7 +56,27 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
     Ros_Debug_BroadcastMsg("Starting RT session");
 
     Ros_Debug_BroadcastMsg("Flushing stale packets from socket buffer...");
-    mpIoctl(sockRtCommandListener, FIOFLUSH, 1);
+    //----------------------------
+    //mpIoctl(sockRtCommandListener, FIOFLUSH, 1);
+    //UPDATE: mpIoctl isn't working! We'll manually purge the buffer with a draining loop.
+    //----------------------------
+    while (TRUE)
+    {
+        FD_ZERO(&fds);
+        FD_SET(sockRtCommandListener, &fds);
+
+        //no wait
+        tv.tv_usec = 0;
+        tv.tv_sec = 0;
+
+        if (mpSelect(sockRtCommandListener + 1, &fds, NULL, NULL, &tv) > 0)
+        {
+            mpRecvFrom(sockRtCommandListener, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
+        }
+        else
+            break;
+    }
+    //----------------------------
 
     //=========================================================================================
     while (TRUE)
@@ -84,9 +104,11 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
             }
             else
             {
-                if (memcmp(&client_addr, &previous_client_addr, sizeof(struct sockaddr_in)) != 0)
+                if (memcmp(&client_addr.sin_addr.s_addr, &previous_client_addr.sin_addr.s_addr, sizeof(UINT32)) != 0)
                 {
-                    Ros_Debug_BroadcastMsg("ERROR: Received command packets from multiple sources");
+                    Ros_Debug_BroadcastMsg("ERROR: Received command packets from multiple sources (0x%08X and 0x%08X)",
+                                            (UINT32)previous_client_addr.sin_addr.s_addr,
+                                            (UINT32)client_addr.sin_addr.s_addr);
                     break; //drop the connection
                 }
             }
@@ -97,6 +119,9 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                 if (incomingCommand.sequenceId <= previousSequenceId && !bFirstRecv)
                 {
                     Ros_Debug_BroadcastMsg("WARN: Received old command packet (seq: %d, new: %d)", previousSequenceId, incomingCommand.sequenceId);
+
+                    //send a copy of the previous reply to trigger next packet
+                    mpSendTo(sockRtCommandListener, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
                     continue; //drop this packet
                 }
 
@@ -205,6 +230,10 @@ void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
         moveData->grp_pos_info[i].pos_tag.data[0] = Ros_CtrlGroup_GetAxisConfig(g_Ros_Controller.ctrlGroups[i]);
         moveData->grp_pos_info[i].pos_tag.data[3] = MP_INC_RF_DTYPE;
 
+        //NOTE: This isn't the best method for this. During testing, I had tool #2 selected
+        //      on the pendant, but I was commanding increments on tool #0. Because of this,
+        //      the first motion on each axis would trigger the FSU detection mechanism. But
+        //      it immediately recovers after one cycle.
         mpGetToolNo(MP_R1_GID + i, &getToolResp);
 
         cartSendData.sRobotNo = i;
@@ -451,11 +480,10 @@ bool Ros_CheckForFsuInterference(MOTION_MODE mode, int* tools)
                 difference = howMuchShouldIHaveMoved[groupIndex][axis] - howMuchDidIActuallyMove[axis];
                 if (abs(difference) > MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION)
                 {
-#warning remove this;
-                    Ros_Debug_BroadcastMsg("howMuchShouldIHaveMoved[%d][%d] = %d", groupIndex, axis, howMuchShouldIHaveMoved[groupIndex][axis]);
-                    Ros_Debug_BroadcastMsg("howMuchDidIActuallyMove[%d] = %d", axis, howMuchDidIActuallyMove[axis]);
-                    Ros_Debug_BroadcastMsg("difference = %d", difference);
-                    Ros_Debug_BroadcastMsg("---------");
+                    //Ros_Debug_BroadcastMsg("howMuchShouldIHaveMoved[%d][%d] = %d", groupIndex, axis, howMuchShouldIHaveMoved[groupIndex][axis]);
+                    //Ros_Debug_BroadcastMsg("howMuchDidIActuallyMove[%d] = %d", axis, howMuchDidIActuallyMove[axis]);
+                    //Ros_Debug_BroadcastMsg("difference = %d", difference);
+                    //Ros_Debug_BroadcastMsg("---------");
 
                     return TRUE;
                 }
