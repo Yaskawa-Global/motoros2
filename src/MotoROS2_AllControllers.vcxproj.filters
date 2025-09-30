@@ -277,6 +277,9 @@
     <None Include="..\libmicroros_yrc1000u_jazzy\libmicroros.yrcmLib_jazzy">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
+    <None Include="rt_control.md">
+      <Filter>Docs\doc</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">

@@ -1,6 +1,6 @@
 <!--
-SPDX-FileCopyrightText: 2022-2023, Yaskawa America, Inc.
-SPDX-FileCopyrightText: 2022-2023, Delft University of Technology
+SPDX-FileCopyrightText: 2022-2025, Yaskawa America, Inc.
+SPDX-FileCopyrightText: 2022-2025, Delft University of Technology
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
@@ -605,7 +605,12 @@ Instead, write a `FollowJointTrajectory` action *client* script or use a motion 
 
 ### Commanding motion
 
-The ROS API of MotoROS2 for commanding motion is similar to that of `motoman_driver` (with MotoROS1), and client applications are recommended to implement a similar flow of control to keep track of the state of the robot before, during and after trajectory and motion execution.
+There are three methods of commanding motion using MotoROS2.
+`FollowJointTrajectory` action server, point streaming, and real-time incremental control.
+
+#### - [FollowJointTrajectory](doc/ros_api.md#follow_joint_trajectory) action server.
+
+The ROS API of MotoROS2 for commanding motion is similar to that of motoman_driver (with MotoROS1), and client applications are recommended to implement a similar flow of control to keep track of the state of the robot before, during and after trajectory and motion execution.
 
 The following provides a high-level overview of the behaviour a client application should implement to successfully interact with the [FollowJointTrajectory](doc/ros_api.md#follow_joint_trajectory) action server offered by MotoROS2.
 While not all steps are absolutely necessary, checking for errors and monitoring execution progress facilitates achieving robust execution and minimises unexpected behaviour in both client and server.
@@ -632,7 +637,22 @@ As a final check, inspect the `error_code` field of the result to ascertain exec
 1. if there are more trajectories to execute, return to step 2.
 Otherwise call the [stop_traj_mode](doc/ros_api.md#stop_traj_mode) service to exit MotoROS2's trajectory execution mode
 
-Interaction with the *point streaming* interface (MotoROS2 `0.0.15` and newer) would be similar, although no `FollowJointTrajectory` action client would be created, no goals would be submitted and monitoring robot status would be done purely by subscribing to the [robot_status](doc/ros_api.md#robot_status) topic (instead of relying on an action client to report trajectory execution status).
+#### - [QueueTrajectoryPoint](doc/ros_api.md#queue_traj_point) point streaming
+
+Interaction with the *point streaming* interface (MotoROS2 `0.0.15` and newer) would be similar to the process above, although no `FollowJointTrajectory` action client would be created, no goals would be submitted and monitoring robot status would be done purely by subscribing to the [robot_status](doc/ros_api.md#robot_status) topic (instead of relying on an action client to report trajectory execution status).
+
+Rather than submitting a complete trajectory in a single goal, an indefinite number of points are submitted to the robot one at a time.
+The execution of the robot will be identical to the behavior of `FollowJointTrajectory`. 
+
+#### - [StartRtMode](doc/ros_api.md#start_rt_mode) real-time incremental motion
+
+This activates a separate UDP server which listens for real-time position increments.
+It is intended to be used in a closed loop system which requires low level control of the motion.
+This UDP server is activated using a ROS2 service.
+However, the protocol for commanding/monitoring motion is *not* based on ROS2 communication.
+
+This control mode minimizes overhead as much as possible by routing the user commands directly to the motion API.
+See [R/T Motion Control](doc/rt_control.md) for information on the protocol implementation.
 
 ### With MoveIt
 
@@ -844,9 +864,7 @@ The following items are on the MotoROS2 roadmap, and are listed here in no parti
 - native (ie: Agent-less) communication
 - support asynchronous motion / partial goals
 - complete ROS parameter server support (there is currently no support for `string`s in RCL)
-- real-time position streaming interface (skipping MotoROS2's internal motion queue)
 - Cartesian motion interfaces
-- velocity control (based on `mpExRcsIncrementMove(..)`)
 - integration with ROS logging (`rosout`)
 - publishing static transforms to `tf_static`
 - integrate a UI into the teach pendant / Smart Pendant

@@ -407,6 +407,7 @@
     <None Include="DX200_humbleLinkerArguments.mps" />
     <None Include="DX200_jazzyCompilerArguments.mps" />
     <None Include="DX200_jazzyLinkerArguments.mps" />
+    <None Include="rt_control.md" />
     <None Include="YRC1000u_foxyCompilerArguments.mps" />
     <None Include="YRC1000u_foxyLinkerArguments.mps" />
     <None Include="YRC1000u_galacticCompilerArguments.mps" />

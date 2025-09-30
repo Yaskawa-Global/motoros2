@@ -48,7 +48,7 @@ typedef enum
     TCP_Y,
     TCP_Z,
 
-    TCP_Rx,         //0.0001 degrees
+    TCP_Rx,         //radians
     TCP_Ry,
     TCP_Rz,
     TCP_Re,
