@@ -13,7 +13,7 @@ MotoROS2 is now built against `micro_ros_motoplus` version TODO
 
 New functionality:
 
-- Add new motion mode for real-time control of the robot. This pipes the user commands directly to the motion API with minimal overhead. ([#449]https://github.com/Yaskawa-Global/motoros2/pull/449)
+- Add new motion mode for real-time control of the robot. This pipes the user commands directly to the motion API with minimal overhead. ([#449](https://github.com/Yaskawa-Global/motoros2/pull/449))
 
 ## 0.2.1 (2025-06-26)
 

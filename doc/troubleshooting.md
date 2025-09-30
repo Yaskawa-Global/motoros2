@@ -582,7 +582,7 @@ The name must not be blank.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
-### Alarm: 8011[23 - 54] or `[56 - 58]` or `[65 - 66]`
+### Alarm: 8011[23 - 54] or [56 - 58] or [65 - 66]
 
 *Example:*
 
@@ -662,7 +662,7 @@ After correcting the configuration, the [changes will need to be propagated to t
 
 ### Alarm: 8011[56 - 58]
 
-Please refer to [Alarm: 8011[23 - 54]](#alarm-801123---54).
+Please refer to [Alarm: 8011[23 - 54]](#alarm-801123---54-or-56---58-or-65---66).
 
 ### Alarm: 8011[59]
 

@@ -608,7 +608,7 @@ Instead, write a `FollowJointTrajectory` action *client* script or use a motion 
 There are three methods of commanding motion using MotoROS2.
 `FollowJointTrajectory` action server, point streaming, and real-time incremental control.
 
-#### - [FollowJointTrajectory](doc/ros_api.md#follow_joint_trajectory) action server.
+#### - [FollowJointTrajectory](doc/ros_api.md#follow_joint_trajectory) action server
 
 The ROS API of MotoROS2 for commanding motion is similar to that of motoman_driver (with MotoROS1), and client applications are recommended to implement a similar flow of control to keep track of the state of the robot before, during and after trajectory and motion execution.
 
@@ -642,7 +642,7 @@ Otherwise call the [stop_traj_mode](doc/ros_api.md#stop_traj_mode) service to ex
 Interaction with the *point streaming* interface (MotoROS2 `0.0.15` and newer) would be similar to the process above, although no `FollowJointTrajectory` action client would be created, no goals would be submitted and monitoring robot status would be done purely by subscribing to the [robot_status](doc/ros_api.md#robot_status) topic (instead of relying on an action client to report trajectory execution status).
 
 Rather than submitting a complete trajectory in a single goal, an indefinite number of points are submitted to the robot one at a time.
-The execution of the robot will be identical to the behavior of `FollowJointTrajectory`. 
+The execution of the robot will be identical to the behavior of `FollowJointTrajectory`.
 
 #### - [StartRtMode](doc/ros_api.md#start_rt_mode) real-time incremental motion
 
