@@ -45,7 +45,7 @@ A "keep-alive" can be used by sending a command with zero increments.
 The command packet is a *packed* `RtPacket` structure.
 This contains a sequence ID, the increments for each control group, and the tool number to use for each control group.
 
-```
+```c
 //##########################################################################
 //                  !All data is little-endian!
 //##########################################################################
@@ -65,7 +65,7 @@ But it must be sent at the end of the joint array.
 
 See `JointIndeces` enum.
 
-```
+```c
 enum JointIndeces
 {
     Joint_S = 0,    //radians
@@ -87,7 +87,7 @@ When the `control_mode` is `CARTESIAN (2)`, the order of the joints in the `delt
 
 See `CartesianIndeces` enum.
 
-```
+```c
 enum CartesianIndeces
 {
     TCP_X = 0,      //meters
@@ -115,7 +115,7 @@ This will echo the sequence ID, provide feedback position, and provide command p
 Additionally, there is a flag to indicate if the Functional Safety Unit (FSU) reduced the speed of the **previous** command cycle.
 This indicates that the robot did not complete the full increment as commanded.
 
-```
+```c
 //##########################################################################
 //                  !All data is little-endian!
 //##########################################################################
@@ -138,3 +138,4 @@ struct RtReply
 Other motion modes may not be used at the same time as the real-time motion control server.
 By calling `stop_traj_mode`, the r/t server will be disposed.
 At that time, another motion mode may be used.
+
