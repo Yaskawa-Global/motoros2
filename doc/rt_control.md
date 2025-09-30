@@ -138,4 +138,3 @@ struct RtReply
 Other motion modes may not be used at the same time as the real-time motion control server.
 By calling `stop_traj_mode`, the r/t server will be disposed.
 At that time, another motion mode may be used.
-
