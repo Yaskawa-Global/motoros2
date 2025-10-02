@@ -63,10 +63,10 @@ When the `control_mode` is `JOINT_ANGLES (1)`, the order of the joints in the `d
 Please note that for seven axis robots, the `E` joint is phyically mounted in the middle of the arm.
 But it must be sent at the end of the joint array.
 
-See `JointIndeces` enum.
+See `JointIndices` enum.
 
 ```c
-enum JointIndeces
+enum JointIndices
 {
     Joint_S = 0,    //radians
     Joint_L,
@@ -85,10 +85,10 @@ enum JointIndeces
 
 When the `control_mode` is `CARTESIAN (2)`, the order of the joints in the `delta` array must be in order of `X Y Z Rx Ry Rz Re 8`.
 
-See `CartesianIndeces` enum.
+See `CartesianIndices` enum.
 
 ```c
-enum CartesianIndeces
+enum CartesianIndices
 {
     TCP_X = 0,      //meters
     TCP_Y,
