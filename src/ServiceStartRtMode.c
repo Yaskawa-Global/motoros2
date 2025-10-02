@@ -54,6 +54,8 @@ void Ros_ServiceStartRtMode_Trigger(const void* request_msg, void* response_msg)
     response->result_code.value = MOTION_READY;
     rosidl_runtime_c__String__assign(&response->message, "");
     response->period = g_Ros_Controller.interpolPeriod;
+    response->timeout_for_rt_msg = g_nodeConfigSettings.timeout_for_rt_msg;
+    response->max_sequence_diff_for_rt_msg = g_nodeConfigSettings.max_sequence_diff_for_rt_msg;
 
     response->result_code.value = Ros_MotionControl_StartMotionMode(mm, &response->message);
     if (response->result_code.value != MOTION_READY)
