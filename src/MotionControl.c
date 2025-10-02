@@ -1658,8 +1658,8 @@ BOOL Ros_MotionControl_IsMotionMode_PointQueue()
 
 BOOL Ros_MotionControl_IsMotionMode_RealTime()
 {
-    return (Ros_MotionControl_ActiveMotionMode ==
-        (MOTION_MODE_RT_JOINT || MOTION_MODE_RT_CARTESIAN));
+    return (Ros_MotionControl_ActiveMotionMode == MOTION_MODE_RT_JOINT || 
+            Ros_MotionControl_ActiveMotionMode == MOTION_MODE_RT_CARTESIAN);
 }
 
 void Ros_MotionControl_ValidateMotionModeIsOk()
