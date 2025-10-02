@@ -1,6 +1,6 @@
 <!--
-SPDX-FileCopyrightText: 2023, Yaskawa America, Inc.
-SPDX-FileCopyrightText: 2023, Delft University of Technology
+SPDX-FileCopyrightText: 2023 - 2025, Yaskawa America, Inc.
+SPDX-FileCopyrightText: 2023 - 2025, Delft University of Technology
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
@@ -126,6 +126,21 @@ Type: [motoros2_interfaces/srv/StartPointQueueMode](https://github.com/yaskawa-g
 
 Attempts to enable servo drives, activate the point-queue motion mode, and set the job-cycle mode to allow execution of INIT_ROS.
 This allows the `queue_traj_point` service (see below) to execute incoming `QueueTrajPoint` requests.
+
+Note: this service may fail if controller state prevents it from transitioning to trajectory mode.
+Inspect the `result_code` to determine the cause.
+Check the relevant fields of the `RobotStatus` messages to determine overall controller status.
+
+The `reset_error` service can be used to attempt to reset errors and alarms
+
+### start_rt_mode
+
+Type: [motoros2_interfaces/srv/StartRtMode](https://github.com/yaskawa-global/motoros2_interfaces/srv/StartRtMode.srv)
+
+Attempts to enable servo drives, activate the real-time UDP server, and set the job-cycle mode to allow execution of INIT_ROS.
+This allows the user to send incremental motion to the robot at the rate returned by the service (`period`).
+
+See [R/T Motion Control](rt_control.md) for information on the protocol implementation.
 
 Note: this service may fail if controller state prevents it from transitioning to trajectory mode.
 Inspect the `result_code` to determine the cause.
