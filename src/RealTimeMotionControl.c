@@ -467,38 +467,40 @@ bool Ros_CheckForFsuInterference(MOTION_MODE mode, int* tools)
         // and check if it matches the amount if increment sent last cycle
         for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
         {
-            if (howMuchShouldIHaveMoved[groupIndex][axis] != 0)
+            if (mode == MOTION_MODE_RT_CARTESIAN)
             {
-                if (mode == MOTION_MODE_RT_JOINT)
-                {
-                    howMuchDidIActuallyMove[axis] = cmdPulse.lPos[axis] - prevRtCmdPosition[groupIndex][axis];
-                    prevRtCmdPosition[groupIndex][axis] = cmdPulse.lPos[axis];
-                }
-                else if (mode == MOTION_MODE_RT_CARTESIAN)
-                {
-                    //When working in cartesian space, we're only going to monitor the translation.
-                    //1. There is no FSU speed limit for rotation. So it's moot.
-                    //2. When rotating by some increment, that rotation gets 'spread out' over multiple
-                    //   axes. Even if I put all of my commanded increment into a single axis, all 
-                    //   three of them are going to react. So, the cmd-value of my intended axis may
-                    //   not be the value I expect.
-                    if (axis >= TCP_Rx)
-                        break;
+                howMuchDidIActuallyMove[axis] = cartRespData.lPos[axis] - prevRtCmdPosition[groupIndex][axis];
+                prevRtCmdPosition[groupIndex][axis] = cartRespData.lPos[axis];
+            }
+			else if (mode == MOTION_MODE_RT_JOINT)
+            {
+                howMuchDidIActuallyMove[axis] = cmdPulse.lPos[axis] - prevRtCmdPosition[groupIndex][axis];
+                prevRtCmdPosition[groupIndex][axis] = cmdPulse.lPos[axis];
+            }
+        }
+		
+        for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
+        {
+            //When working in cartesian space, we're only going to monitor the translation.
+            //1. There is no FSU speed limit for rotation. So it's moot.
+            //2. When rotating by some increment, that rotation gets 'spread out' over multiple
+            //   axes. Even if I put all of my commanded increment into a single axis, all 
+            //   three of them are going to react. So, the cmd-value of my intended axis may
+            //   not be the value I expect.
+            if (mode == MOTION_MODE_RT_CARTESIAN && axis >= TCP_Rx)
+            {
+                break;
+            }
 
-                    howMuchDidIActuallyMove[axis] = cartRespData.lPos[axis] - prevRtCmdPosition[groupIndex][axis];
-                    prevRtCmdPosition[groupIndex][axis] = cartRespData.lPos[axis];
-                }
+            difference = howMuchShouldIHaveMoved[groupIndex][axis] - howMuchDidIActuallyMove[axis];
+            if (abs(difference) > MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION)
+            {
+                //Ros_Debug_BroadcastMsg("howMuchShouldIHaveMoved[%d][%d] = %d", groupIndex, axis, howMuchShouldIHaveMoved[groupIndex][axis]);
+                //Ros_Debug_BroadcastMsg("howMuchDidIActuallyMove[%d] = %d", axis, howMuchDidIActuallyMove[axis]);
+                //Ros_Debug_BroadcastMsg("difference = %d", difference);
+                //Ros_Debug_BroadcastMsg("---------");
 
-                difference = howMuchShouldIHaveMoved[groupIndex][axis] - howMuchDidIActuallyMove[axis];
-                if (abs(difference) > MAX_INCREMENT_DEVIATION_FOR_FSU_DETECTION)
-                {
-                    //Ros_Debug_BroadcastMsg("howMuchShouldIHaveMoved[%d][%d] = %d", groupIndex, axis, howMuchShouldIHaveMoved[groupIndex][axis]);
-                    //Ros_Debug_BroadcastMsg("howMuchDidIActuallyMove[%d] = %d", axis, howMuchDidIActuallyMove[axis]);
-                    //Ros_Debug_BroadcastMsg("difference = %d", difference);
-                    //Ros_Debug_BroadcastMsg("---------");
-
-                    return TRUE;
-                }
+                return TRUE;
             }
         }
     }
