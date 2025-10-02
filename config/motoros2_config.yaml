@@ -339,7 +339,7 @@ publisher_qos:
 #-----------------------------------------------------------------------------
 # When using the real time motion interface, each command packet must increment
 # the sequence ID. If too many packets are lost during communication, then it
-# should be assumed that the PC is not in sync with the robot.
+# will be assumed that the PC is not in sync with the robot.
 #
 # If the sequence ID of an incoming packet is different from the previous
 # command by a value greater than this, then the connection will be dropped.
