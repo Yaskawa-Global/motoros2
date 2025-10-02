@@ -26,7 +26,7 @@ typedef enum
     Group_8,
 
     MAX_GROUPS
-} GroupIndeces;
+} GroupIndices;
 
 typedef enum
 {
@@ -40,7 +40,7 @@ typedef enum
     Joint_8,
 
     MAX_JOINTS
-} JointIndeces;
+} JointIndices;
 
 typedef enum
 {
@@ -56,7 +56,7 @@ typedef enum
     TCP_8,          //pulse
 
     MAX_AXES //maxies
-} CartesianIndeces;
+} CartesianIndices;
 
 
 //##########################################################################
@@ -71,13 +71,13 @@ struct RtPacket_
     //The order of the joints must be in the order of [S L U R B T E 8].
     //Please note that for seven axis robots, the 'E' joint is phyically
     //mounted in the middle of the arm. But it must be sent at the end
-    //of the joint array. See JointIndeces enum.
+    //of the joint array. See JointIndices enum.
     //
     //For joint-space, this will be radians of each joint.
     //
     //For cartesian, this will be meters and radians of the TCP.
     //The order of the joints must be in the order of [X Y Z Rx Ry Rz Re 8].
-    //See CartesianIndeces enum.
+    //See CartesianIndices enum.
     //Rotations are applied in the order of ZYX.
     double delta[MAX_GROUPS][MP_GRP_AXES_NUM];
     
@@ -102,7 +102,7 @@ struct RtReply_
     //This is indicative of where the robot is physically located.
     //Please note that this will trail behind the commanded position.
     //The joint ordering will match that of the original command
-    //packet. See JointIndeces and CartesianIndeces enums.
+    //packet. See JointIndices and CartesianIndices enums.
     double feedbackPositionJoints[MAX_GROUPS][MP_GRP_AXES_NUM];
     double feedbackPositionCartesian[MAX_GROUPS][MP_GRP_AXES_NUM];
 
