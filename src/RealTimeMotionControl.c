@@ -116,7 +116,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
             if (bytes_received > 0)
             {
                 //Check for old or same sequence ID (wraparound safe)
-                if ((int32_t)(incomingCommand.sequenceId - previousSequenceId) <= 0)
+                if (((int32_t)(incomingCommand.sequenceId - previousSequenceId) <= 0) && !bFirstRecv)
                 {
                     // This packet is old or a duplicate.
                     Ros_Debug_BroadcastMsg("WARN: Received old command packet (prev: %u, new: %u)", previousSequenceId, incomingCommand.sequenceId);
