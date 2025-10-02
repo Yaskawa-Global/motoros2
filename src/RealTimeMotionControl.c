@@ -16,7 +16,8 @@ bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DAT
 bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 void Ros_RtMotionControl_Cleanup();
 void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply);
-bool Ros_CheckForFsuInterference(MOTION_MODE mode, int* tools);
+bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools);
+void Ros_RtMotionControl_PurgeBufferedPackets();
 
 static int sockRtCommandListener = -1;
 
@@ -56,27 +57,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
     Ros_Debug_BroadcastMsg("Starting RT session");
 
     Ros_Debug_BroadcastMsg("Flushing stale packets from socket buffer...");
-    //----------------------------
-    //mpIoctl(sockRtCommandListener, FIOFLUSH, 1);
-    //UPDATE: mpIoctl isn't working! We'll manually purge the buffer with a draining loop.
-    //----------------------------
-    while (TRUE)
-    {
-        FD_ZERO(&fds);
-        FD_SET(sockRtCommandListener, &fds);
-
-        //no wait
-        tv.tv_usec = 0;
-        tv.tv_sec = 0;
-
-        if (mpSelect(sockRtCommandListener + 1, &fds, NULL, NULL, &tv) > 0)
-        {
-            mpRecvFrom(sockRtCommandListener, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
-        }
-        else
-            break;
-    }
-    //----------------------------
+    Ros_RtMotionControl_PurgeBufferedPackets();
 
     //=========================================================================================
     while (TRUE)
@@ -145,7 +126,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                         break; //drop the connection
                 }
 
-                fsuLimitingDetected = Ros_CheckForFsuInterference(mode, incomingCommand.toolIndex);
+                fsuLimitingDetected = Ros_RtMotionControl_CheckForFsuInterference(mode, incomingCommand.toolIndex);
 
                 // Send increment to robot
                 int ret = mpExRcsIncrementMove(&moveData);
@@ -170,6 +151,8 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
             previousSequenceId = incomingCommand.sequenceId;
             Ros_RtMotionControl_PopulateReplyMessage(mode, &incomingCommand, &outgoingReply);
             outgoingReply.fsuInterferenceDetected = fsuLimitingDetected;
+
+            Ros_RtMotionControl_PurgeBufferedPackets(); //in case user sent multiple commands while this was sleeping
             mpSendTo(sockRtCommandListener, (char*)&outgoingReply, sizeof(RtReply), 0, (struct sockaddr*)&client_addr, client_addr_len);
 
             //track how big the increment SHOULD have been
@@ -428,7 +411,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
     }
 }
 
-bool Ros_CheckForFsuInterference(MOTION_MODE mode, int* tools)
+bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools)
 {
     MP_CTRL_GRP_SEND_DATA ctrlGroup;
     MP_PULSE_POS_RSP_DATA cmdPulse;
@@ -505,4 +488,34 @@ bool Ros_CheckForFsuInterference(MOTION_MODE mode, int* tools)
         }
     }
     return FALSE;
+}
+
+void Ros_RtMotionControl_PurgeBufferedPackets()
+{
+    struct fd_set fds;
+    struct timeval tv;
+    struct sockaddr_in client_addr;
+    int client_addr_len = sizeof(client_addr);
+    RtPacket incomingCommand;
+
+    //----------------------------
+    //mpIoctl(sockRtCommandListener, FIOFLUSH, 1);
+    //UPDATE: mpIoctl isn't working! We'll manually purge the buffer with a draining loop.
+    //----------------------------
+    while (TRUE)
+    {
+        FD_ZERO(&fds);
+        FD_SET(sockRtCommandListener, &fds);
+
+        //no wait
+        tv.tv_usec = 0;
+        tv.tv_sec = 0;
+
+        if (mpSelect(sockRtCommandListener + 1, &fds, NULL, NULL, &tv) > 0)
+        {
+            mpRecvFrom(sockRtCommandListener, (char*)&incomingCommand, sizeof(RtPacket), 0, (struct sockaddr*)&client_addr, &client_addr_len);
+        }
+        else
+            break;
+    }
 }
