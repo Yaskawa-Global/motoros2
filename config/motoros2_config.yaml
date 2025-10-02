@@ -330,6 +330,9 @@ publisher_qos:
 # Timeout for real time motion commands. If a command packet is not received
 # within this number of milliseconds, the motion mode will be cancelled.
 #
+# Additionally, if the client does not receive a reply packet within this
+# amount of time, then it should be assumed that the session is dead.
+#
 # Setting this to '-1' will never timeout. In that case, you must explicitly
 # call '/stop_traj_mode' to stop the motion mode.
 #

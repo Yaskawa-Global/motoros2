@@ -38,6 +38,8 @@ If a command is not received with 30 seconds (default), then the session times o
 At that point, the server must be reactivated by calling `stop_traj_mode` and `start_rt_mode`.
 A "keep-alive" can be used by sending a command with zero increments.
 
+Additionally, if the client does not receive a reply packet within this amount of time, then it should be assumed that the session is dead.
+
 <img src="img/RtFlow.png" alt="Command Flow" />
 
 ### Data format (command)
