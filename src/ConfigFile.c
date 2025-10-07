@@ -817,9 +817,7 @@ void Ros_ConfigFile_Parse()
                 if (!yaml_parser_parse(&parser, &event))
                 {
                     Ros_Debug_BroadcastMsg("Failed to parse: %s", parser.problem);
-                    yaml_parser_delete(&parser);
-                    bOkToInit = FALSE;
-                    continue;
+                    motoRosAssert_withMsg(FALSE, SUBCODE_CONFIGURATION_FILE_YAML_PARSING_ERROR, "Cfg file yaml parsing error");
                 }
                 Ros_ConfigFile_CheckYamlEvent(&event);
                 event_type = event.type;
