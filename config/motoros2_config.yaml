@@ -323,8 +323,8 @@ publisher_qos:
 # For the real time motion interface, which port should the UDP messages
 # be transmitted on?
 #
-# DEFAULT: '8889'
-#rt_udp_port_number: '8889'
+# DEFAULT: 8889
+#rt_udp_port_number: 8889
 
 #-----------------------------------------------------------------------------
 # Timeout for real time motion commands. If a command packet is not received
