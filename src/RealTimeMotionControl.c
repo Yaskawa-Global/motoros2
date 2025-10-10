@@ -305,12 +305,7 @@ void Ros_RtMotionControl_Cleanup()
     //Do not close sockRtCommandListener. Allow it to persist
     //indefinitely and be reused.
 
-    if (g_Ros_Controller.tidIncMoveThread != INVALID_TASK)
-    {
-        mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
-        g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
-        Ros_Debug_BroadcastMsg("Deleting old R/T task");
-    }
+    //Do not delete interpolation task. This is handled in Ros_MotionControl_StopTrajMode.
 }
 
 bool Ros_RtMotionControl_OpenSocket()
