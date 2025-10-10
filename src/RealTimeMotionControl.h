@@ -1,4 +1,4 @@
-// Corrected Code
+// RealTimeMotionControl.h
 
 // SPDX-FileCopyrightText: 2025, Yaskawa America, Inc.
 // SPDX-FileCopyrightText: 2025, Delft University of Technology
