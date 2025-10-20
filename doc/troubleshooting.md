@@ -582,7 +582,7 @@ The name must not be blank.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
-### Alarm: 8011[23 - 54] or [56 - 58] or [65 - 66]
+### Alarm: 8011[23 - 54] or [56 - 58] or [66 - 67]
 
 *Example:*
 
@@ -611,7 +611,7 @@ ALARM 8011
 [xx]
 ```
 
-Where `[xx]` is a subcode in the ranges `[23 - 54]` or `[56 - 58]` or `[65 - 66]`.
+Where `[xx]` is a subcode in the ranges `[23 - 54]` or `[56 - 58]` or `[66 - 67]`.
 
 *Solution:*
 These alarms are often caused by version incompatibilities between ROS 2 (on the client PC), micro-ROS (as part of MotoROS2) and/or the micro-ROS Agent.
