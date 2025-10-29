@@ -79,7 +79,7 @@ const char* const Ros_ErrorHandling_MotionNotReadyCode_ToString(MotionNotReadyCo
     case MOTION_NOT_READY_SERVO_ON_TIMEOUT:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_SERVO_ON_TIMEOUT_STR;
     case MOTION_NOT_READY_INVALID_SELECTION:
-        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_INVALID_SELECTION;
+        return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_INVALID_SELECTION_STR;
     default:
         return motoros2_interfaces__msg__MotionReadyEnum__NOT_READY_UNSPECIFIED_STR;
     }
