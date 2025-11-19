@@ -377,7 +377,7 @@ In *Normal Operation* mode:
  1. touch `[EX MEMORY]`→`[Load]`
  1. cursor to `USER DEFINED FILES` and press `[SELECT]`
  1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
- 1. touch `[YES]` to overwrite
+ 1. touch `[EXECUTE]` and press `[YES]` to overwrite
  1. reboot the robot controller
 
 ##### Older controller software
