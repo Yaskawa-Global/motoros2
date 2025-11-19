@@ -109,6 +109,13 @@ typedef enum
 #else
 #define DEFAULT_ULAN_DEBUG_BROADCAST_PORT        CFG_ROS_USER_LAN1
 #endif
+
+#define DEFAULT_RT_UDP_PORT_NUMBER      "8889"
+
+#define DEFAULT_TIMEOUT_FOR_RT_MSG      30000
+
+#define DEFAULT_MAX_SEQUENCE_DIFFERENCE 10
+
 typedef struct
 {
     //TODO(gavanderhoorn): add support for unsigned types
@@ -154,6 +161,11 @@ typedef struct
 
     BOOL debug_broadcast_enabled;
     Ros_UserLan_Port_Setting debug_broadcast_port;
+
+    char rt_udp_port_number[MAX_YAML_STRING_LEN];
+
+    int timeout_for_rt_msg;
+    int max_sequence_diff_for_rt_msg;
 } Ros_Configuration_Settings;
 
 extern Ros_Configuration_Settings g_nodeConfigSettings;
