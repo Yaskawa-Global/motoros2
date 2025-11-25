@@ -9,30 +9,30 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 The real-time motion control server is intended to be used in a closed loop system.
 It allows the user to command incremental offsets at the rate of the robot controller's interpolation clock.
-This control mode minimizes overhead as much as possible by routing the user commands directly to the MotoPlus motion API.
+This control mode minimizes overhead as much as possible by routing the user commands directly to the MotoPlus motion API, mpExRcsIncrementMove.
 
 ## Activation
 
-This control mode is activated using the [StartRtMode](ros_api.md#start_rt_mode) service.
+This control mode is activated using the [start_rt_mode](ros_api.md#start_rt_mode) service.
 The user must specify the `control_mode` to indicate whether the increments will be joint offsets (radians) or cartesian TCP offsets (meters / radians).
 
 If this service is successful, it will return a `result_code` of `Ready (1)`.
-Otherwise, please examine the `result_code` and `message` for more information.
+Otherwise, please examine the `result_code` and `message` files in the response for more information.
 
 The service will also return a `period` in milliseconds.
 This indicates the rate at which increment commands will be expected by the robot.
-The default `period` for a single robot arm is 4 milliseconds.
-However, that value will increase as additional axes or arms are added to the system.
+The default period for a single manipulator is 4 milliseconds.
+However, that value will increase as additional axes or manipulators are added to the system.
 
 ## Usage
 
 ### Command Flow
 
 Once activated, a UDP server will listen on port `8889` (default).
-The user then sends the first increment with a `sequenceId = 0`.
+The user then sends the first increment with a the `sequenceId` field set to `0`.
 After that, the user must wait until the robot replies before sending the next increment.
 Each subsequent command must increment the `sequenceId`. Additionally, each subsequent command must not be sent until the robot replies to the previous command.
-This will occur at the rate of the `period` from the [StartRtMode](ros_api.md#start_rt_mode) service.
+This will occur at the rate of the `period` from the [start_rt_mode](ros_api.md#start_rt_mode) service.
 
 If a command is not received with 30 seconds (default), then the session times out and is dropped.
 At that point, the server must be reactivated by calling `stop_traj_mode` and `start_rt_mode`.
@@ -112,7 +112,7 @@ Please note that rotations are applied in the order of `Z Y X`.
 ### Data format (reply)
 
 The command packet is a *packed* `RtReply` structure.
-This will echo the sequence ID, provide feedback position, and provide command position.
+This will echo the sequence ID, provide feedback position, and provide commanded position.
 
 Additionally, there is a flag to indicate if the Functional Safety Unit (FSU) reduced the speed of the **previous** command cycle.
 This indicates that the robot did not complete the full increment as commanded.
@@ -138,5 +138,6 @@ struct RtReply
 ## Deactivation
 
 Other motion modes may not be used at the same time as the real-time motion control server.
-By calling `stop_traj_mode`, the r/t server will be disposed.
+The service to start those modes will fail when invoked.
+By calling `stop_traj_mode`, the R/T server will be disposed.
 At that time, another motion mode may be used.

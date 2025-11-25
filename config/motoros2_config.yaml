@@ -328,7 +328,8 @@ publisher_qos:
 
 #-----------------------------------------------------------------------------
 # Timeout for real time motion commands. If a command packet is not received
-# within this number of milliseconds, the motion mode will be cancelled.
+# within this number of milliseconds, the motion mode will be cancelled. This
+# applies to all packets within R/T session.
 #
 # Additionally, if the client does not receive a reply packet within this
 # amount of time, then it should be assumed that the session is dead.
