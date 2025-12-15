@@ -337,8 +337,8 @@ publisher_qos:
 # Setting this to '-1' will never timeout. In that case, you must explicitly
 # call '/stop_traj_mode' to stop the motion mode.
 #
-# DEFAULT: 30000 (30.000 seconds)
-#timeout_for_rt_msg: 30000
+# DEFAULT: 5000 (5.000 seconds)
+#timeout_for_rt_msg: 5000
 
 #-----------------------------------------------------------------------------
 # When using the real time motion interface, each command packet must increment
