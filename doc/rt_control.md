@@ -28,7 +28,7 @@ However, that value will increase as additional axes or manipulators are added t
 
 ### Command Flow
 
-Once activated, a UDP server will listen on port `8889` (default).
+Once activated, a UDP server will listen on port `22000` (default).
 The user then sends the first increment with a the `sequenceId` field set to `0`.
 After that, the user must wait until the robot replies before sending the next increment.
 Each subsequent command must increment the `sequenceId`. Additionally, each subsequent command must not be sent until the robot replies to the previous command.
