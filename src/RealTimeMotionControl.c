@@ -367,6 +367,21 @@ bool Ros_RtMotionControl_OpenSocket()
     return true;
 }
 
+//Essentially a clone of the /robot_status topic. But decoupled from the industrial_msgs/RobotStatus type.
+void Ros_RtMotionControl_ConvertRobotStatusToRobotState(RobotState* state)
+{
+    state->drives_powered = g_messages_RobotStatus.msgRobotStatus->drives_powered.val;
+    state->e_stopped = g_messages_RobotStatus.msgRobotStatus->e_stopped.val;
+    state->in_motion = g_messages_RobotStatus.msgRobotStatus->in_motion.val;
+    state->play_mode = (g_messages_RobotStatus.msgRobotStatus->mode.val == industrial_msgs__msg__RobotMode__AUTO);
+    state->motion_possible = g_messages_RobotStatus.msgRobotStatus->motion_possible.val;
+    state->error = g_messages_RobotStatus.msgRobotStatus->in_error.val;
+    if (g_messages_RobotStatus.msgRobotStatus->error_codes.size > 0)
+        state->error_code = g_messages_RobotStatus.msgRobotStatus->error_codes.data[0];
+    else
+        state->error_code = 0;
+}
+
 void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply)
 {
     long pulsePos_moto[MAX_PULSE_AXES];
@@ -437,6 +452,8 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
         reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
     }
+
+    Ros_RtMotionControl_ConvertRobotStatusToRobotState(&reply->state);
 }
 
 bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools)

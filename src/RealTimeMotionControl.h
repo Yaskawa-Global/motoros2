@@ -66,6 +66,16 @@ typedef enum
     MAX_AXES //maxies
 } CartesianIndices;
 
+typedef struct
+{
+    BOOL drives_powered;
+    BOOL e_stopped;
+    BOOL in_motion;
+    BOOL play_mode;
+    BOOL motion_possible;
+    BOOL error;
+    int error_code;
+} RobotState;
 
 //##########################################################################
 //                  !All data is little-endian!
@@ -117,6 +127,10 @@ typedef struct RtPacket_ RtPacket;
 struct RtReply_
 {
     UINT32 sequenceEcho;
+
+    //Essentially a clone of the /robot_status topic. But decoupled
+    //from the industrial_msgs/RobotStatus type.
+    RobotState state;
 
     //This is indicative of where the robot is physically located.
     //Please note that this will trail behind the commanded position.
