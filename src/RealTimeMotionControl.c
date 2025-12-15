@@ -45,6 +45,8 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 
     bool fsuLimitingDetected;
 
+    bool packetTypeOK;
+
     //=========================================================================================
 
     bzero(prevRtCmdPosition, MAX_GROUPS * MAX_AXES * sizeof(LONG));
@@ -102,6 +104,28 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                     Ros_Debug_BroadcastMsg("ERROR: The command packet must be version [%d]", VERSION_REAL_TIME_INTERFACE);
                     break; //drop the connection
                 }
+
+                //Verify the packet type
+                packetTypeOK = TRUE;
+                switch (mode)
+                {
+                case MOTION_MODE_RT_JOINT:
+                    if (incomingCommand.packetType != PacketType_Joint_Increments)
+                    {
+                        packetTypeOK = false;
+                        Ros_Debug_BroadcastMsg("ERROR: The packet type does not match the control_mode specified in start_rt_mode (Joint Increments)");
+                    }
+                    break;
+                case MOTION_MODE_RT_CARTESIAN:
+                    if (incomingCommand.packetType != PacketType_Cart_Increments)
+                    {
+                        packetTypeOK = false;
+                        Ros_Debug_BroadcastMsg("ERROR: The packet type does not match the control_mode specified in start_rt_mode (Cartesian Increments)");
+                    }
+                    break;
+                }
+                if (!packetTypeOK)
+                    break; //drop the connection
 
                 //Check for old or same sequence ID (wraparound safe)
                 if (((int32_t)(incomingCommand.sequenceId - previousSequenceId) <= 0) && !bFirstRecv)

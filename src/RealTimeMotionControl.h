@@ -18,6 +18,12 @@ extern void Ros_RtMotionControl_Cleanup();
 
 typedef enum
 {
+    PacketType_Joint_Increments = 0,
+    PacketType_Cart_Increments
+} PacketType;
+
+typedef enum
+{
     Group_1 = 0,
     Group_2,
     Group_3,
@@ -70,6 +76,10 @@ struct RtPacket_
     //The version of the command packet must match the value expected
     //by MotoROS2.
     int version;
+
+    //The packet type must match the control_mode which was specified
+    //in when invoking the start_rt_mode service.
+    PacketType packetType;
 
     //Must increment sequentially with each new command packet.
     UINT32 sequenceId;
