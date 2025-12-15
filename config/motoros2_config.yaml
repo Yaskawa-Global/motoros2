@@ -318,3 +318,36 @@ publisher_qos:
 # OPTIONS: USER_LAN1, USER_LAN2
 # DEFAULT: (all available network ports)
 #debug_broadcast_port: USER_LAN1
+
+#-----------------------------------------------------------------------------
+# For the real time motion interface, which port should the UDP messages
+# be transmitted on?
+#
+# DEFAULT: 22000
+#rt_udp_port_number: 22000
+
+#-----------------------------------------------------------------------------
+# Timeout for real time motion commands. If a command packet is not received
+# within this number of milliseconds, the motion mode will be cancelled. This
+# applies to all packets within R/T session.
+#
+# Additionally, if the client does not receive a reply packet within this
+# amount of time, then it should be assumed that the session is dead.
+#
+# Setting this to '-1' will never timeout. In that case, you must explicitly
+# call '/stop_traj_mode' to stop the motion mode.
+#
+# DEFAULT: 5000 (5.000 seconds)
+#timeout_for_rt_msg: 5000
+
+#-----------------------------------------------------------------------------
+# When using the real time motion interface, each command packet must increment
+# the sequence ID. If too many packets are lost during communication, then it
+# will be assumed that the PC is not in sync with the robot.
+#
+# If the sequence ID of an incoming packet is different from the previous
+# command by a value greater than this, then the connection will be dropped.
+# The motion mode must be reactivated to be used again.
+#
+# DEFAULT: 3
+#max_sequence_diff_for_rt_msg: 3

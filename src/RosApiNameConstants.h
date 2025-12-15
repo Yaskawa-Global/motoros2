@@ -25,6 +25,7 @@
 #define SERVICE_NAME_RESET_ERROR "reset_error"
 #define SERVICE_NAME_START_TRAJ_MODE "start_traj_mode"
 #define SERVICE_NAME_START_POINT_QUEUE_MODE "start_point_queue_mode"
+#define SERVICE_NAME_START_RT_MODE "start_rt_mode"
 #define SERVICE_NAME_STOP_TRAJ_MODE "stop_traj_mode"
 #define SERVICE_NAME_QUEUE_TRAJ_POINT "queue_traj_point"
 #define SERVICE_NAME_SELECT_MOTION_TOOL "select_motion_tool"
