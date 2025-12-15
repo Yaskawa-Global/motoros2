@@ -8,6 +8,8 @@
 #ifndef MOTOROS2_REALTIME_MOTION_CONTROL_H
 #define MOTOROS2_REALTIME_MOTION_CONTROL_H
 
+#define VERSION_REAL_TIME_INTERFACE 1
+
 #define PACKED __attribute__ ((__packed__))
 
 extern void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode);
@@ -65,6 +67,10 @@ typedef enum
 
 struct RtPacket_
 {
+    //The version of the command packet must match the value expected
+    //by MotoROS2.
+    int version;
+
     //Must increment sequentially with each new command packet.
     UINT32 sequenceId;
     
@@ -86,6 +92,9 @@ struct RtPacket_
     //      haven't yet been added to the increment queue. See also the ROS 2
     //      'select_tool' service definition file in motoros2_interfaces.
     int toolIndex[MAX_GROUPS]; //TOOL 0 - 63
+
+    //Reserved for future expansion
+    char reserved[64];
 
 } PACKED;
 typedef struct RtPacket_ RtPacket;

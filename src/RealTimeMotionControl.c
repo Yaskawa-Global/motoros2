@@ -96,6 +96,13 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 
             if (bytes_received > 0)
             {
+                //Verify version of the command packet
+                if (incomingCommand.version != VERSION_REAL_TIME_INTERFACE)
+                {
+                    Ros_Debug_BroadcastMsg("ERROR: The command packet must be version [%d]", VERSION_REAL_TIME_INTERFACE);
+                    break; //drop the connection
+                }
+
                 //Check for old or same sequence ID (wraparound safe)
                 if (((int32_t)(incomingCommand.sequenceId - previousSequenceId) <= 0) && !bFirstRecv)
                 {

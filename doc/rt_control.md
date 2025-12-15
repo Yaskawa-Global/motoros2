@@ -45,7 +45,6 @@ Additionally, if the client does not receive a reply packet within this amount o
 ### Data format (command)
 
 The command packet is a *packed* `RtPacket` structure.
-This contains a sequence ID, the increments for each control group, and the tool number to use for each control group.
 
 ```c
 //##########################################################################
@@ -53,11 +52,19 @@ This contains a sequence ID, the increments for each control group, and the tool
 //##########################################################################
 struct RtPacket
 {
+    int version;
+
     UINT32 sequenceId;
     double delta[MAX_GROUPS][MAX_AXES]; //[8][8]
     int toolIndex[MAX_GROUPS]; //[8]
 }
 ```
+
+The `version` must match the version number expected by the server.
+If it does not match the expected value, the packet will be rejected and the connection will be dropped.
+The current version is `1`.
+
+This contains a sequence ID, the increments for each control group, and the tool number to use for each control group.
 
 #### Joints
 
