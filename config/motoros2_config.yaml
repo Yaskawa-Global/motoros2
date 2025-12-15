@@ -349,5 +349,5 @@ publisher_qos:
 # command by a value greater than this, then the connection will be dropped.
 # The motion mode must be reactivated to be used again.
 #
-# DEFAULT: 10
-#max_sequence_diff_for_rt_msg: 10
+# DEFAULT: 3
+#max_sequence_diff_for_rt_msg: 3
