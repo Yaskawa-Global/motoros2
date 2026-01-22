@@ -132,7 +132,7 @@ def main():
         )
         if doc_range:
             if doc_range.is_catch_all and args.warn_catch_alls:
-                print(f"{sdef.loc_str}: warning: documented by catch-all '{doc_range}'")
+                print(f"{sdef.loc_str}: warning: '{sdef}' documented by catch-all '{doc_range}'")
         else:
             ret = 1
             print(f"{sdef.loc_str}: error: no documentation for '{sdef}' in '{args.md_file}'")
