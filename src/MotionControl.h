@@ -42,4 +42,6 @@ extern BOOL Ros_MotionControl_IsMotionMode_RawStreaming();
 
 extern void Ros_MotionControl_ValidateMotionModeIsOk();
 
+extern int64_t Ros_MotionControl_TrajectoryExecutionStartTime;
+
 #endif  // MOTOROS2_MOTION_CONTROL_H
