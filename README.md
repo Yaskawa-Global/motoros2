@@ -113,12 +113,12 @@ The following general requirements must be met in order to be able to use MotoRO
 
 To check the version of the system software:
 
-*Standard Pendant*
+#### Standard Pendant
 
  1. touch `{MAIN MENU}` on the pendant keypad
  1. touch `[System Info]`→`[Version]`
 
-*Smart Pendant*
+#### Smart Pendant
 
  1. touch `[MENU]`→`[System Settings]`→`Controller`
 
@@ -149,9 +149,9 @@ The Smart Pendant is compatible with MotoROS2.
 However, the setup procedure must be performed using the *Classic Interface*.
 This is a virtual recreation of the legacy pendant interface.
 
- - touch `[MENU]`→`[System Settings]`→`[Classic Interface]`
- - move the key-switch to `REMOTE` mode
- - touch `[Start Classic Interface]`
+- touch `[MENU]`→`[System Settings]`→`[Classic Interface]`
+- move the key-switch to `REMOTE` mode
+- touch `[Start Classic Interface]`
 
 ### To access *Normal Operation* mode
 
@@ -161,13 +161,13 @@ When you want to return to the Smart Pendant interface, touch the "power" icon i
 
 ### To access *Maintenance* mode
 
- - touch `[Special Mode]`
- - touch `[Maintenance Mode]`
+- touch `[Special Mode]`
+- touch `[Maintenance Mode]`
 
 The controller will automatically reboot.
 When it comes back up, it will automatically launch the *Classic Interface* dialog.
 
- - touch `[Connect]`
+- touch `[Connect]`
 
 When you want to return to the Smart Pendant interface, you must reboot the controller.
 
@@ -286,6 +286,7 @@ In *Normal Operation* mode:
  1. cursor to your job file and press `[SELECT]` then `[ENTER]`
 
 #### YRC1000 and YRC1000 micro
+
 (see [Using the Smart Pendant](#using-the-smart-pendant))
 
  1. touch `[EX MEMORY]`→`[Load]`

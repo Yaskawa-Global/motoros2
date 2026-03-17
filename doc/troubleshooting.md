@@ -1198,7 +1198,7 @@ ALARM 8016
 The job cycle is currently set to `STEP` and MotoROS2 was unable to automatically change it to `AUTO`.
 This will prevent the `INIT_ROS` from operating continuously and will prevent the software from accepting any incoming trajectories.
 
-*Standard Pendant*
+#### Standard Pendant
 
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
  1. touch `[Job]`→`[Cycle]`
@@ -1206,7 +1206,7 @@ This will prevent the `INIT_ROS` from operating continuously and will prevent th
  1. touch `[Setup]`→`[Operate Cond.]`
  1. change `CYCLE SWITCH IN REMOTE MODE` to `AUTO`
 
-*Smart Pendant*
+#### Smart Pendant
 
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
  1. touch `[MENU]`→`[System Settings]`→`[Controller]`
