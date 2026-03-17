@@ -155,7 +155,7 @@ This is a virtual recreation of the legacy pendant interface.
 
 ### To access *Normal Operation* mode
 
- - touch `[Connect]`
+- touch `[Connect]`
 
 When you want to return to the Smart Pendant interface, touch the "power" icon in the top right.
 
