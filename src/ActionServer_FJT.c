@@ -761,6 +761,9 @@ goal_complete_skip_tolerance_comparison: ;
 
     fjt_result_message_ready = TRUE;
 
+    //temporary for testing
+    Ros_MotionControl_AllGroupsInitComplete = FALSE;
+
     //----------------------------------------------------
     Ros_Debug_BroadcastMsg("FJT action complete");
 }
