@@ -96,7 +96,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                 }
             }
 
-            if (bytes_received > 0)
+            if (bytes_received == sizeof(RtPacket))
             {
                 //Verify version of the command packet
                 if (incomingCommand.version != VERSION_REAL_TIME_INTERFACE)
@@ -123,6 +123,9 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                         Ros_Debug_BroadcastMsg("ERROR: The packet type does not match the control_mode specified in start_rt_mode (Cartesian Increments)");
                     }
                     break;
+                default:
+                    packetTypeOK = false;
+                    Ros_Debug_BroadcastMsg("ERROR: Unexpected motion mode is active");
                 }
                 if (!packetTypeOK)
                     break; //drop the connection
