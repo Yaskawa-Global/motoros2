@@ -28,8 +28,6 @@ static struct sockaddr_in client_addr_status_messages;
 static LONG prevRtCmdPosition[MAX_GROUPS][MAX_AXES];
 static LONG howMuchShouldIHaveMoved[MAX_GROUPS][MAX_AXES];
 
-static BOOL rtMotionControlConnected = FALSE;
-
 void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 {
     MP_EXPOS_DATA moveData;
@@ -104,8 +102,6 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                     sockRtStatusSender = -1;
                     break;
                 }
-
-                rtMotionControlConnected = TRUE;
             }
             else
             {
@@ -229,7 +225,6 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
         }
     }
 
-    rtMotionControlConnected = FALSE;
     Ros_Debug_BroadcastMsg("Ending Rt Session");
 }
 
@@ -596,26 +591,21 @@ void Ros_RtMotionControl_SendRobotStatus()
 
     while (TRUE)
     {
-        Ros_Sleep(10);
+        Ros_Sleep(g_nodeConfigSettings.rt_status_sleep_period);
 
-        while (rtMotionControlConnected)
-        {
-            Ros_Sleep(g_nodeConfigSettings.rt_status_sleep_period);
+        //-------------------------------------------------------------------------------
+        stateMsg.drives_powered = g_messages_RobotStatus.msgRobotStatus->drives_powered.val;
+        stateMsg.e_stopped = g_messages_RobotStatus.msgRobotStatus->e_stopped.val;
+        stateMsg.in_motion = g_messages_RobotStatus.msgRobotStatus->in_motion.val;
+        stateMsg.play_mode = (g_messages_RobotStatus.msgRobotStatus->mode.val == industrial_msgs__msg__RobotMode__AUTO);
+        stateMsg.motion_possible = g_messages_RobotStatus.msgRobotStatus->motion_possible.val;
+        stateMsg.error = g_messages_RobotStatus.msgRobotStatus->in_error.val;
+        if (g_messages_RobotStatus.msgRobotStatus->error_codes.size > 0)
+            stateMsg.error_code = g_messages_RobotStatus.msgRobotStatus->error_codes.data[0];
+        else
+            stateMsg.error_code = 0;
 
-            //-------------------------------------------------------------------------------
-            stateMsg.drives_powered = g_messages_RobotStatus.msgRobotStatus->drives_powered.val;
-            stateMsg.e_stopped = g_messages_RobotStatus.msgRobotStatus->e_stopped.val;
-            stateMsg.in_motion = g_messages_RobotStatus.msgRobotStatus->in_motion.val;
-            stateMsg.play_mode = (g_messages_RobotStatus.msgRobotStatus->mode.val == industrial_msgs__msg__RobotMode__AUTO);
-            stateMsg.motion_possible = g_messages_RobotStatus.msgRobotStatus->motion_possible.val;
-            stateMsg.error = g_messages_RobotStatus.msgRobotStatus->in_error.val;
-            if (g_messages_RobotStatus.msgRobotStatus->error_codes.size > 0)
-                stateMsg.error_code = g_messages_RobotStatus.msgRobotStatus->error_codes.data[0];
-            else
-                stateMsg.error_code = 0;
-
-            //-------------------------------------------------------------------------------
-            mpSendTo(sockRtStatusSender, (char*)&stateMsg, sizeof(RobotState), 0, (struct sockaddr*)&client_addr_status_messages, client_addr_len);
-        }
+        //-------------------------------------------------------------------------------
+        mpSendTo(sockRtStatusSender, (char*)&stateMsg, sizeof(RobotState), 0, (struct sockaddr*)&client_addr_status_messages, client_addr_len);
     }
 }
