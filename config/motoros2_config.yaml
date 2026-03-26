@@ -324,7 +324,21 @@ publisher_qos:
 # be transmitted on?
 #
 # DEFAULT: 22000
-#rt_udp_port_number: 22000
+#rt_listener_udp_port_number: 22000
+
+#-----------------------------------------------------------------------------
+# For the real time robot status interface, which port should the UDP messages
+# be transmitted on?
+#
+# DEFAULT: 22001
+#rt_status_udp_port_number: 22001
+
+#-----------------------------------------------------------------------------
+# For the real time robot status interface, how much delay should there be
+# between messages?
+#
+# DEFAULT: 10
+#rt_status_sleep_period: 10
 
 #-----------------------------------------------------------------------------
 # Timeout for real time motion commands. If a command packet is not received

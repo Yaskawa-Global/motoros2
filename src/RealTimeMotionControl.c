@@ -18,8 +18,12 @@ void Ros_RtMotionControl_Cleanup();
 void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply);
 bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools);
 void Ros_RtMotionControl_PurgeBufferedPackets();
+void Ros_RtMotionControl_SendRobotStatus();
 
 static int sockRtCommandListener = -1;
+static int sockStatusSender = -1;
+
+static struct sockaddr_in client_addr_status_messages;
 
 static LONG prevRtCmdPosition[MAX_GROUPS][MAX_AXES];
 static LONG howMuchShouldIHaveMoved[MAX_GROUPS][MAX_AXES];
@@ -357,7 +361,7 @@ bool Ros_RtMotionControl_OpenSocket()
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = mpHtons(atoi(g_nodeConfigSettings.rt_udp_port_number));
+    server_addr.sin_port = mpHtons(atoi(g_nodeConfigSettings.rt_listener_udp_port_number));
 
     if (mpBind(sockRtCommandListener, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0)
     {
@@ -367,22 +371,34 @@ bool Ros_RtMotionControl_OpenSocket()
         return false;
     }
 
-    return true;
-}
+    //=========================================================================================
+    sockStatusSender = mpSocket(AF_INET, SOCK_DGRAM, 0);
+    if (sockStatusSender < 0)
+    {
+        Ros_Debug_BroadcastMsg("ERROR: Could not allocate Status socket for RT interface");
+        return false;
+    }
 
-//Essentially a clone of the /robot_status topic. But decoupled from the industrial_msgs/RobotStatus type.
-void Ros_RtMotionControl_ConvertRobotStatusToRobotState(RobotState* state)
-{
-    state->drives_powered = g_messages_RobotStatus.msgRobotStatus->drives_powered.val;
-    state->e_stopped = g_messages_RobotStatus.msgRobotStatus->e_stopped.val;
-    state->in_motion = g_messages_RobotStatus.msgRobotStatus->in_motion.val;
-    state->play_mode = (g_messages_RobotStatus.msgRobotStatus->mode.val == industrial_msgs__msg__RobotMode__AUTO);
-    state->motion_possible = g_messages_RobotStatus.msgRobotStatus->motion_possible.val;
-    state->error = g_messages_RobotStatus.msgRobotStatus->in_error.val;
-    if (g_messages_RobotStatus.msgRobotStatus->error_codes.size > 0)
-        state->error_code = g_messages_RobotStatus.msgRobotStatus->error_codes.data[0];
-    else
-        state->error_code = 0;
+    // Bind socket to port
+    memset(&client_addr_status_messages, 0, sizeof(client_addr_status_messages));
+    client_addr_status_messages.sin_family = AF_INET;
+    client_addr_status_messages.sin_addr.s_addr = INADDR_ANY;
+    client_addr_status_messages.sin_port = mpHtons(atoi(g_nodeConfigSettings.rt_status_udp_port_number));
+
+    if (mpBind(sockStatusSender, (struct sockaddr*)&client_addr_status_messages, sizeof(client_addr_status_messages)) < 0)
+    {
+        Ros_Debug_BroadcastMsg("ERROR: Failed to bind UDP socket for real-time motion control");
+        mpClose(sockStatusSender);
+        sockStatusSender = -1;
+        return false;
+    }
+
+    //Spin up a separate normal-priorty thread to send out the robot status info
+    mpCreateTask(MP_PRI_TIME_NORMAL, MP_STACK_SIZE,
+        (FUNCPTR)Ros_RtMotionControl_SendRobotStatus,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    return true;
 }
 
 void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply)
@@ -455,8 +471,6 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
         reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
     }
-
-    Ros_RtMotionControl_ConvertRobotStatusToRobotState(&reply->state);
 }
 
 bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools)
@@ -565,5 +579,33 @@ void Ros_RtMotionControl_PurgeBufferedPackets()
         }
         else
             break;
+    }
+}
+
+//Essentially a clone of the /robot_status topic. But decoupled from the industrial_msgs/RobotStatus type.
+void Ros_RtMotionControl_SendRobotStatus()
+{
+    RobotState stateMsg;
+
+    int client_addr_len = sizeof(client_addr_status_messages);
+
+    while (TRUE)
+    {
+        Ros_Sleep(g_nodeConfigSettings.rt_status_sleep_period);
+
+        //-------------------------------------------------------------------------------
+        stateMsg.drives_powered = g_messages_RobotStatus.msgRobotStatus->drives_powered.val;
+        stateMsg.e_stopped = g_messages_RobotStatus.msgRobotStatus->e_stopped.val;
+        stateMsg.in_motion = g_messages_RobotStatus.msgRobotStatus->in_motion.val;
+        stateMsg.play_mode = (g_messages_RobotStatus.msgRobotStatus->mode.val == industrial_msgs__msg__RobotMode__AUTO);
+        stateMsg.motion_possible = g_messages_RobotStatus.msgRobotStatus->motion_possible.val;
+        stateMsg.error = g_messages_RobotStatus.msgRobotStatus->in_error.val;
+        if (g_messages_RobotStatus.msgRobotStatus->error_codes.size > 0)
+            stateMsg.error_code = g_messages_RobotStatus.msgRobotStatus->error_codes.data[0];
+        else
+            stateMsg.error_code = 0;
+
+        //-------------------------------------------------------------------------------
+        mpSendTo(sockStatusSender, (char*)&stateMsg, sizeof(RobotState), 0, (struct sockaddr*)&client_addr_status_messages, client_addr_len);
     }
 }
