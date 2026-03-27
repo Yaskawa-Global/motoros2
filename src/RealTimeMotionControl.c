@@ -95,13 +95,13 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
                 client_addr_status_messages.sin_addr.s_addr = client_addr.sin_addr.s_addr;
                 client_addr_status_messages.sin_port = mpHtons(atoi(g_nodeConfigSettings.rt_status_udp_port_number));
 
-                if (mpConnect(sockRtStatusSender, (struct sockaddr*)&client_addr_status_messages, sizeof(client_addr_status_messages)) == ERROR)
-                {
-                    Ros_Debug_BroadcastMsg("ERROR: Failed to set destination address for RT status");
-                    mpClose(sockRtStatusSender);
-                    sockRtStatusSender = -1;
-                    break;
-                }
+                //if (mpConnect(sockRtStatusSender, (struct sockaddr*)&client_addr_status_messages, sizeof(client_addr_status_messages)) == ERROR)
+                //{
+                //    Ros_Debug_BroadcastMsg("ERROR: Failed to set destination address for RT status");
+                //    mpClose(sockRtStatusSender);
+                //    sockRtStatusSender = -1;
+                //    break;
+                //}
             }
             else
             {
