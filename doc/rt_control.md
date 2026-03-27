@@ -198,13 +198,13 @@ The service to start those modes will fail when invoked.
 By calling `stop_traj_mode`, the R/T server will be disposed.
 At that time, another motion mode may be used.
 
-# R/T Status Monitoring
+## R/T Status Monitoring
 
 When the R/T Motion Control is activated, MotoROS2 will begin to send the `RobotState` structure on port UDP `22001` (default).
 This is essentially a clone of the `/robot_status topic`.
 But decoupled from the `industrial_msgs/RobotStatus` type.
 
-```
+```c
 struct RobotState
 {
     BOOL drives_powered;
