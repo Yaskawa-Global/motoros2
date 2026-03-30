@@ -38,7 +38,7 @@ The following sections document how to download, install, configure, use and tro
   - YRC1000micro: `mr2_yrc1m_*.out`
 - *Online* mode:
   - DX200: insert USB stick with `motoros2_config.yaml` into `CN106` in the controller cabinet
-  - YC1000[micro]: load `motoros2_config.yaml` via `USER DEFINED FILES`
+  - YC1000[micro]: load `motoros2_config.yaml` via `USER DEFINED FILES` (Smart Pendant must use the *Classic Interface*)
 - start an instance of the [micro-ROS Agent](#running-the-micro-ros-agent) on a PC
 - reboot controller
 - verify [MotoROS2 is running](#verifying-successful-installation)
@@ -51,6 +51,7 @@ The following sections document how to download, install, configure, use and tro
 - [General Requirements](#general-requirements)
   - [Checking the system software version](#checking-the-system-software-version)
 - [Option Function compatibility](#option-function-compatibility)
+- [Using the Smart Pendant](#using-the-smart-pendant)
 - [Download](#download)
   - [Downloading the files](#downloading-the-files)
   - [Extracting the files](#extracting-the-files)
@@ -113,8 +114,14 @@ The following general requirements must be met in order to be able to use MotoRO
 
 To check the version of the system software:
 
+#### Standard Pendant
+
  1. touch `{MAIN MENU}` on the pendant keypad
  1. touch `[System Info]`→`[Version]`
+
+#### Smart Pendant
+
+ 1. touch `[MENU]`→`[System Settings]`→`Controller`
 
 Look for the version number starting with `DN`, `YAS` or `YBS`.
 
@@ -136,6 +143,34 @@ The current version of MotoROS2 (`0.2.1`) is ***not*** compatible with the follo
 
 Please post questions about compatibility of MotoROS2 with specific controller features, Option Functions and/or MotoPlus applications in the [Discussion](https://github.com/Yaskawa-Global/motoros2/discussions/categories/q-a) forum.
 Include information on the specific controller and robot model, as well as system software version and information on the MotoPlus application and/or controller feature in question.
+
+## Using the Smart Pendant
+
+The Smart Pendant is compatible with MotoROS2.
+However, the setup procedure must be performed using the *Classic Interface*.
+This is a virtual recreation of the legacy pendant interface.
+
+- touch `[MENU]`→`[System Settings]`→`[Classic Interface]`
+- move the key-switch to `REMOTE` mode
+- touch `[Start Classic Interface]`
+
+### To access *Normal Operation* mode
+
+- touch `[Connect]`
+
+When you want to return to the Smart Pendant interface, touch the "power" icon in the top right.
+
+### To access *Maintenance* mode
+
+- touch `[Special Mode]`
+- touch `[Maintenance Mode]`
+
+The controller will automatically reboot.
+When it comes back up, it will automatically launch the *Classic Interface* dialog.
+
+- touch `[Connect]`
+
+When you want to return to the Smart Pendant interface, you must reboot the controller.
 
 ## Download
 
@@ -193,7 +228,7 @@ Be sure to describe which version of MotoROS2 was downloaded, from where, how it
 
 Use the following steps to verify MotoPlus has been correctly configured for MotoROS2, and the necessary settings are active:
 
- 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode
+ 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode (see [Using the Smart Pendant](#using-the-smart-pendant))
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
  1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
  1. move to `MotoPlus FUNC.`, make sure it is set to `USED`. If it isn't, set it to `USED`
@@ -207,6 +242,7 @@ Insert the storage device into the robot's programming pendant.
 If the controller is configured with the Functional Safety Unit (FSU), then `SAVE DATA CRC CHECK FUNC (FSU)` must be temporarily disabled during the installation procedure.
 
 Turn on the robot controller to enter *Normal Operation* mode.
+(see [Using the Smart Pendant](#using-the-smart-pendant))
 
 In *Normal Operation* mode:
 
@@ -252,6 +288,8 @@ In *Normal Operation* mode:
 
 #### YRC1000 and YRC1000 micro
 
+(see [Using the Smart Pendant](#using-the-smart-pendant))
+
  1. touch `[EX MEMORY]`→`[Load]`
  1. cursor to `USER DEFINED FILES` and press `[SELECT]`
  1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
@@ -275,6 +313,7 @@ Reboot again and there should be no alarms.
 If you receive any errors or alarms after rebooting, please refer to the [Troubleshooting](#troubleshooting) section for information on how to remedy the issue.
 
 If `SAVE DATA CRC CHECK FUNC (FSU)` was disabled at the start of this procedure, then it can now be reenabled.
+(see [Using the Smart Pendant](#using-the-smart-pendant))
 
  1. upgrade to *SAFETY* security level by touching `[System Info]`→`[Security]` (default password is all `5`'s)
  1. touch `[Setup]`→`[Function Enable]`
@@ -371,6 +410,7 @@ It may be necessary to update MotoROS2 configuration during or after initial dep
 ##### Controller software YAS4.70 or YBS3.02 or later
 
 In *Normal Operation* mode:
+(see [Using the Smart Pendant](#using-the-smart-pendant))
 
  1. touch `[EX MEMORY]`→`[Device]`
  1. cursor to `JOB & U.D. FILE LOAD OVERWRITE` and verify it is set to `VALID`.
