@@ -761,6 +761,13 @@ goal_complete_skip_tolerance_comparison: ;
 
     fjt_result_message_ready = TRUE;
 
+    //If this flag remains TRUE, it can cause a race condition at the start of
+    //the next action goal. This can cause the trajectory for one or more groups
+    //to become invalid, which will lead to that group(s) to remain stationary
+    //while the others are moving.
+    //So... we'll clear the flag upon completion of the goal.
+    Ros_MotionControl_AllGroupsInitComplete = FALSE;
+
     //----------------------------------------------------
     Ros_Debug_BroadcastMsg("FJT action complete");
 }
