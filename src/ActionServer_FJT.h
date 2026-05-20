@@ -29,5 +29,6 @@ extern bool Ros_ActionServer_FJT_Goal_Cancel(rclc_action_goal_handle_t* goal_han
 
 extern void Ros_ActionServer_FJT_UpdateProgressTracker(MP_EXPOS_DATA* incrementData);
 
+extern BOOL Ros_MotionControl_AllGroupsInitComplete;
 
 #endif  // MOTOROS2_ACTION_SERVER_FJT_H
