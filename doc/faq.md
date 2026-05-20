@@ -60,6 +60,12 @@ Nor is it compatible with UWI or Weldcom2.
 
 To control the power source, the ROS 2 application must interface to the welder directly.
 
+## Can MotoROS2 be used with the Smart Pendant
+
+Yes.
+But some configuration steps must be performed using the *Classic Interface*.
+Please see [Using the Smart Pendant](../README.md#using-the-smart-pendant).
+
 ## Can multiple MotoROS2 instances run on the same network?
 
 MotoROS2 can be deployed to as many Yaskawa Motoman robot controllers as required.
