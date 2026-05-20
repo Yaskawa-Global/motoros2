@@ -50,7 +50,7 @@ This can occur if another application, such as Simple Connect, is using the stor
 The files for the other application must be removed to make room for MotoROS2.
 
 *How to initialize SRAM drive:*
-(see [Using the Smart Pendant](../README.md#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
  1. turn on the robot controller while holding the `{Main Menu}` key on the keypad to enter *Maintenance* mode.
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
@@ -161,7 +161,7 @@ The MotoROS2 driver attempts to enable the *Speed Feedback* parameters, but is u
 You must temporarily disable the CRC check for the *Speed Feedback* update to complete.
 
 First, remove MotoROS2 from the controller:
-(see [Using the Smart Pendant](../README.md#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
 - Boot the controller into *Maintenance* mode by powering on the controller while holding `{Main Menu}` on the keypad.
 - Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
@@ -232,7 +232,7 @@ For YRC1000 and YRC1000micro: ensure the controller is updated to at least `YAS2
 If the system software version is below this, please contact Yaskawa Motoman for assistance with upgrading the controller.
 
 Then boot the controller into *Maintenance* mode by holding `{Main Menu}` on the keypad.
-(see [Using the Smart Pendant](../README.md#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
 Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
 Touch `[System Info]`→`[Setup]` then select `OPTION FUNCTION`.
@@ -375,7 +375,7 @@ ALARM 8003
 Old versions of the MotoROS2 driver are not compatible with the human-collaborative (HC) robots.
 You must update to v1.9.0 or newer.
 Reboot the robot controller while holding `{Main Menu}` on the keypad to enter *Maintenance* mode.
-(see [Using the Smart Pendant](../README.md#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
 Then touch `[MotoPlus Apl]`→`[Delete]`.
 Select the `MotoROS2.out` file and press `{Enter}` to confirm removal of the MotoROS2 driver.
@@ -400,7 +400,7 @@ ALARM 8003
 Old versions of the MotoROS2 driver are not compatible with the human-collaborative (HC) robots.
 You must update to v1.9.0 or newer.
 Reboot the robot controller while holding `{Main Menu}` on the keypad to enter *Maintenance* mode.
-(see [Using the Smart Pendant](../README.md#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 Touch `[System Info]`→`[Security]` and upgrade to *MANAGEMENT* security level.
 Then touch `[MotoPlus Apl]`→`[Delete]`.
 Select the `MotoROS2.out` file and press `{Enter}` to confirm removal of the MotoROS2 driver.
@@ -552,7 +552,7 @@ ALARM 8011
 Multiple instances of the MotoROS2 MotoPlus application have been detected.
 Only one instance may run on a single robot controller.
 
-(see [Using the Smart Pendant](../README.md#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
 1. turn on the robot controller while holding the `{Main Menu}` key on the keypad to enter *Maintenance* mode.
 1. touch `[MotoPlus APL]`→`[Delete]` and remove any extra `.out` files that have been installed.

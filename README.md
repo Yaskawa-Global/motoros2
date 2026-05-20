@@ -227,7 +227,7 @@ Be sure to describe which version of MotoROS2 was downloaded, from where, how it
 
 Use the following steps to verify MotoPlus has been correctly configured for MotoROS2, and the necessary settings are active:
 
- 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode (see [Using the Smart Pendant](#using-the-smart-pendant))
+ 1. boot the controller while holding `{MAIN MENU}` on the pendant keypad to enter *Maintenance* mode (if using the Smart Pendant, see [Using the Smart Pendant](#using-the-smart-pendant) for information about the 'Classic Interface')
  1. upgrade to *MANAGEMENT* security level by touching `[System Info]`→`[Security]` (default password is all `9`'s)
  1. touch `[System Info]`→`[Setup]` and select `OPTION FUNCTION`
  1. move to `MotoPlus FUNC.`, make sure it is set to `USED`. If it isn't, set it to `USED`
@@ -241,7 +241,7 @@ Insert the storage device into the robot's programming pendant.
 If the controller is configured with the Functional Safety Unit (FSU), then `SAVE DATA CRC CHECK FUNC (FSU)` must be temporarily disabled during the installation procedure.
 
 Turn on the robot controller to enter *Normal Operation* mode.
-(see [Using the Smart Pendant](#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
 In *Normal Operation* mode:
 
@@ -287,7 +287,7 @@ In *Normal Operation* mode:
 
 #### YRC1000 and YRC1000 micro
 
-(see [Using the Smart Pendant](#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
  1. touch `[EX MEMORY]`→`[Load]`
  1. cursor to `USER DEFINED FILES` and press `[SELECT]`
@@ -312,7 +312,7 @@ Reboot again and there should be no alarms.
 If you receive any errors or alarms after rebooting, please refer to the [Troubleshooting](#troubleshooting) section for information on how to remedy the issue.
 
 If `SAVE DATA CRC CHECK FUNC (FSU)` was disabled at the start of this procedure, then it can now be reenabled.
-(see [Using the Smart Pendant](#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
  1. upgrade to *SAFETY* security level by touching `[System Info]`→`[Security]` (default password is all `5`'s)
  1. touch `[Setup]`→`[Function Enable]`
@@ -409,7 +409,7 @@ It may be necessary to update MotoROS2 configuration during or after initial dep
 ##### Controller software YAS4.70 or YBS3.02 or later
 
 In *Normal Operation* mode:
-(see [Using the Smart Pendant](#using-the-smart-pendant))
+(If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
 
  1. touch `[EX MEMORY]`→`[Device]`
  1. cursor to `JOB & U.D. FILE LOAD OVERWRITE` and verify it is set to `VALID`.
