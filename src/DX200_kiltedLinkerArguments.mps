@@ -1,0 +1,1 @@
+-std=gnu99 -nostdlib -r -Wl,--discard-locals -Wl,--entry=mpUsrRoot ~FileList~ -o "~OutputPath~"
