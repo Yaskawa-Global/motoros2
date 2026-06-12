@@ -454,6 +454,7 @@ To start the Agent (on a machine with Docker already installed and setup to allo
 docker run \
   -it \
   --rm \
+  --ipc=host \
   --net=host \
   --user=$(id -u):$(id -g) \
   microros/micro-ros-agent:jazzy \
