@@ -122,11 +122,11 @@ jobs:
           -d /c/build/motoros2/libmicroros_${{ matrix.controller }}_${{ matrix.uros.codename }}
 
     - name: Download and setup M+ SDK (mpBuilder)
-      shell: cmd
+      shell: bash
       run: |
-        C:\msys64\usr\bin\wget.exe -q -O C:/build/mpsdk_ci.7z "${{ secrets.MPSDK_DOWNLOAD_URL }}"
-        "C:\Program Files\7-Zip\7z.exe" x C:/build/mpsdk_ci.7z -oC:/build/
-        del /q C:\build\mpsdk_ci.7z
+        curl -Ls --output-dir=/c/build -o mpsdk_ci.7z '${{ secrets.MPSDK_DOWNLOAD_URL }}'
+        7z x /c/build/mpsdk_ci.7z -o"/c/build/"
+        rm -f /c/build/mpsdk_ci.7z
     - name: Add M+ SDK to PATH
       shell: bash
       run: echo "C:/build/mpsdk" >> $GITHUB_PATH
