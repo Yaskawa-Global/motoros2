@@ -404,6 +404,14 @@ If `yamllint` prints warnings or errors, correct the offending line(s) and rerun
 
 It may be necessary to update MotoROS2 configuration during or after initial deployment.
 
+To extract a copy of your current configuration from the teach pendant:
+
+1. if necessary: restart the controller in *Normal* mode
+1. (If using Smart Pendant, please see [Using the Smart Pendant](../README.md#using-the-smart-pendant) for instructions on using the `Classic Interface`)
+1. touch `[EX MEMORY]`→`[SAVE]`
+1. cursor to `USER DEFINED FILES` and press `[SELECT]`
+1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
+
 #### YRC1000 and YRC1000micro
 
 ##### Controller software YAS4.70 or YBS3.02 or later
@@ -448,13 +456,6 @@ CF and SD cards are not supported when updating the configuration.
 
 NOTE: When submitting support requests, please always get a 'current' copy of the configuration file from the teach pendant.
 You should not rely on the historical configuration files and assume that is currently loaded into the controller.
-
-To extract a copy of your current configuration from the teach pendant:
-
-1. if necessary: restart the controller in *Normal* mode
-1. touch `[EX MEMORY]`→`[SAVE]`
-1. cursor to `USER DEFINED FILES` and press `[SELECT]`
-1. cursor to `motoros2_config.yaml` and press `[SELECT]` then `[ENTER]`
 
 #### DX200 only
 
