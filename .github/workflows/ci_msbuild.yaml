@@ -112,10 +112,26 @@ jobs:
         unzip -q /c/build/micro_ros_motoplus.zip \
           -d /c/build/motoros2/libmicroros_${{ matrix.controller }}_${{ matrix.uros.codename }}
 
-    - name: Download and setup M+ SDK (mpBuilder)
+    - name: Get token for Yaskawa-Global private repos
+      id: yask_glob_token
+      uses: actions/create-github-app-token@v3
+      with:
+        app-id: ${{ secrets.MPLMB_APP_ID }}
+        private-key: ${{ secrets.MPLMB_APP_PRIVATE_KEY }}
+        owner: "yaskawa-global"
+        repositories: ${{ secrets.MPSDK_RELEASE_REPO_NAME }}
+
+    - name: Setup M+ SDK
       shell: bash
+      env:
+        GH_TOKEN: ${{ steps.yask_glob_token.outputs.token }}
+        MPSDK_RELEASE_REPO: yaskawa-global/${{ secrets.MPSDK_RELEASE_REPO_NAME }}
+        MPSDK_RELEASE_TAG: ${{ secrets.MPSDK_RELEASE_TAG }}
+        MPSDK_ASSET_NAME: ${{ secrets.MPSDK_ASSET_NAME }}
       run: |
-        curl -Ls --output-dir=/c/build -o mpsdk_ci.7z '${{ secrets.MPSDK_DOWNLOAD_URL }}'
+        gh release download "${MPSDK_RELEASE_TAG}" \
+          -R "${MPSDK_RELEASE_REPO}" \
+          -p "${MPSDK_ASSET_NAME}" -O /c/build/mpsdk_ci.7z
         7z x /c/build/mpsdk_ci.7z -o"/c/build/"
         rm -f /c/build/mpsdk_ci.7z
     - name: Add M+ SDK to PATH
