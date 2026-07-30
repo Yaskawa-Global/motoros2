@@ -1552,7 +1552,8 @@ MotionNotReadyCode Ros_MotionControl_StartMotionMode(MOTION_MODE mode, rosidl_ru
         }
     }
 
-    StartInterpolationTask(mode);
+    if (!StartInterpolationTask(mode))
+        return MOTION_NOT_READY_ERROR;
 
     // have to initialize the prevPulsePos that will be used when interpolating the traj
     for(grpNo = 0; grpNo < g_Ros_Controller.numGroup; ++grpNo)
