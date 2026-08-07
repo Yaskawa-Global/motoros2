@@ -26,7 +26,8 @@
 // total number of handles =
 //      timers +                                            1
 //      service read & write I/O +                          6
-#define QUANTITY_OF_HANDLES_FOR_IO_EXECUTOR                 (7)
+//      service inform_job/list                             1
+#define QUANTITY_OF_HANDLES_FOR_IO_EXECUTOR                 (8)
 
 typedef struct
 {
