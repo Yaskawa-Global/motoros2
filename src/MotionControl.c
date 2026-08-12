@@ -1641,8 +1641,11 @@ void Ros_MotionControl_StopTrajMode()
     ioWriteData.ulValue = 0;
     mpWriteIO(&ioWriteData, 1);
 
-    mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
-    g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+    if (g_Ros_Controller.tidIncMoveThread != INVALID_TASK)
+    {
+        mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
+        g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+    }
 }
 
 BOOL Ros_MotionControl_IsMotionMode_Trajectory()
