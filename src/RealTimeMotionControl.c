@@ -303,7 +303,7 @@ bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DAT
             
             if (abs(pulse_increments[i]) > ctrlGroup->maxInc.maxIncrement[i])
             {
-                Ros_Debug_BroadcastMsg("ERROR: The increment for axis [%d] exceeds the maximum limit of [%d] pulse counts", pulse_increments[i], ctrlGroup->maxInc.maxIncrement[i]);
+                Ros_Debug_BroadcastMsg("ERROR: Group [%d] Axis [%d] has been commanded to move [%d] pulse counts this increment, exceeding the maximum limit of [%d] pulse counts", groupNo, i, pulse_increments[i], ctrlGroup->maxInc.maxIncrement[i]);
                 return false;
             }
         }
