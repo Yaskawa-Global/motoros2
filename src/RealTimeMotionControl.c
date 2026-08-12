@@ -360,7 +360,7 @@ void Ros_RtMotionControl_Cleanup()
     //Do not delete interpolation task. This is handled in Ros_MotionControl_StopTrajMode.
 }
 
-bool Ros_RtMotionControl_OpenSocket()
+void Ros_RtMotionControl_OpenSocket()
 {
     struct sockaddr_in server_addr;
 
@@ -368,7 +368,7 @@ bool Ros_RtMotionControl_OpenSocket()
     if (sockRtCommandListener < 0)
     {
         Ros_Debug_BroadcastMsg("ERROR: Could not allocate socket for RT interface");
-        return false;
+        motoRosAssert_withMsg(false, SUBCODE_FAIL_ALLOCATE_RT_CMD_SOCKET, "Failed to allocate RT socket");
     }
 
     // Bind socket to port
@@ -381,8 +381,8 @@ bool Ros_RtMotionControl_OpenSocket()
     {
         Ros_Debug_BroadcastMsg("ERROR: Failed to bind UDP socket for real-time motion control");
         mpClose(sockRtCommandListener);
-        sockRtCommandListener = -1;
-        return false;
+        sockRtCommandListener = -1; 
+        motoRosAssert_withMsg(false, SUBCODE_FAIL_BIND_RT_SOCKET, "Failed to bind RT socket");
     }
 
     //=========================================================================================
@@ -390,15 +390,13 @@ bool Ros_RtMotionControl_OpenSocket()
     if (sockRtStatusSender < 0)
     {
         Ros_Debug_BroadcastMsg("ERROR: Could not allocate Status socket for RT interface");
-        return false;
+        motoRosAssert_withMsg(false, SUBCODE_FAIL_ALLOCATE_RT_FB_SOCKET, "Failed to allocate RT socket");
     }
 
     //Spin up a separate normal-priorty thread to send out the robot status info
     mpCreateTask(MP_PRI_TIME_NORMAL, MP_STACK_SIZE,
         (FUNCPTR)Ros_RtMotionControl_SendRobotStatus,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
-    return true;
 }
 
 void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply)
