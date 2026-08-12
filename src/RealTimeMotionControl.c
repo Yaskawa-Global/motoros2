@@ -335,14 +335,14 @@ bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA
 
         moveData->grp_pos_info[groupNo].pos[TCP_8] = incomingCommand->delta[groupNo][TCP_8]; //pulse or micron (no known manipulators use this axis)
 
-        double vector = sqrt(pow(incomingCommand->delta[groupNo][TCP_X], 2) + //x^2
+        double magnitude = sqrt(pow(incomingCommand->delta[groupNo][TCP_X], 2) + //x^2
                              pow(incomingCommand->delta[groupNo][TCP_Y], 2) + //y^2
                              pow(incomingCommand->delta[groupNo][TCP_Z], 2)); //z^2
 
         // Assuming 'elapsed_ms' is your variable for time in milliseconds.
         const double max_speed_mm_per_ms = 1.5; // 1500 mm/sec is 1.5 mm/ms
 
-        if (vector > (max_speed_mm_per_ms * g_Ros_Controller.interpolPeriod))
+        if (magnitude > (max_speed_mm_per_ms * g_Ros_Controller.interpolPeriod))
         {
             Ros_Debug_BroadcastMsg("ERROR: The increment for the TCP exceeds the maximum limit of 1500 mm/sec");
             return false;
