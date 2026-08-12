@@ -587,6 +587,12 @@ void Ros_RtMotionControl_SendRobotStatus()
 
     int client_addr_len = sizeof(client_addr_status_messages);
 
+    if (g_messages_RobotStatus.msgRobotStatus == NULL) //may already be allocated in ControllerStatusIO.c
+    {
+        g_messages_RobotStatus.msgRobotStatus = industrial_msgs__msg__RobotStatus__create();
+        rosidl_runtime_c__int32__Sequence__init(&g_messages_RobotStatus.msgRobotStatus->error_codes, MAX_ALARM_COUNT + 1);
+    }
+
     while (TRUE)
     {
         Ros_Sleep(g_nodeConfigSettings.rt_status_sleep_period);

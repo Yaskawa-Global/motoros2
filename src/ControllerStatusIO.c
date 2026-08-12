@@ -168,8 +168,11 @@ BOOL Ros_Controller_Initialize()
     //==================================
     //create message for robot status
     //TODO(gavanderhoorn): use micro_ros_utilities_create_message_memory(..) instead
-    g_messages_RobotStatus.msgRobotStatus = industrial_msgs__msg__RobotStatus__create();
-    rosidl_runtime_c__int32__Sequence__init(&g_messages_RobotStatus.msgRobotStatus->error_codes, MAX_ALARM_COUNT + 1);
+    if (g_messages_RobotStatus.msgRobotStatus == NULL) //may already be allocated in RealTimeMotionControl.c
+    {
+        g_messages_RobotStatus.msgRobotStatus = industrial_msgs__msg__RobotStatus__create();
+        rosidl_runtime_c__int32__Sequence__init(&g_messages_RobotStatus.msgRobotStatus->error_codes, MAX_ALARM_COUNT + 1);
+    }
 
     //==================================
     // Check and report eco-mode settings
