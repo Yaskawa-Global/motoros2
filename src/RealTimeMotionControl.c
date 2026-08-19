@@ -11,7 +11,7 @@
 #include "MotoROS.h"
 
 void Ros_RtMotionControl_InitJointSpace(MP_EXPOS_DATA* moveData);
-void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData);
+bool Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData);
 bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData);
 void Ros_RtMotionControl_Cleanup();
@@ -59,7 +59,10 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
     if (mode == MOTION_MODE_RT_JOINT)
         Ros_RtMotionControl_InitJointSpace(&moveData);
     else
-        Ros_RtMotionControl_InitCartesian(&moveData);
+    {
+        if (!Ros_RtMotionControl_InitCartesian(&moveData))
+            return; //abort rt session
+    }
 
     Ros_Debug_BroadcastMsg("Starting RT session");
 
@@ -251,7 +254,7 @@ void Ros_RtMotionControl_InitJointSpace(MP_EXPOS_DATA* moveData)
     }
 }
 
-void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
+bool Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
 {
     int i;
     MP_CARTPOS_EX_SEND_DATA cartSendData;
@@ -276,11 +279,24 @@ void Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
         mpGetToolNo(MP_R1_GID + i, &getToolResp);
 
         cartSendData.sRobotNo = i;
-        cartSendData.sFrame = 1; //1 = RF
+
+        CtrlGroup* group = g_Ros_Controller.ctrlGroups[i];
+        if (group->groupId <= MP_R8_GID) //is a robot and not an external axis
+            cartSendData.sFrame = 1; //1 = RF
+        else if (group->groupId <= MP_B8_GID) //is a base track
+            cartSendData.sFrame = 0; //0 = BF
+        else
+        {
+            Ros_Debug_BroadcastMsg("ERROR: Group [%d] is an external positioner. Cartesian control mode is not supported for this group.");
+            return false;
+        }
+
         cartSendData.sToolNo = getToolResp.sToolNo;
         mpGetCartPosEx(&cartSendData, &cartRespData);
         memcpy(prevRtCmdPosition[i], cartRespData.lPos, sizeof(LONG) * MAX_AXES);
     }
+
+    return true;
 }
 
 bool Ros_RtMotionControl_ParseJointSpace(RtPacket* incomingCommand, MP_EXPOS_DATA* moveData)
