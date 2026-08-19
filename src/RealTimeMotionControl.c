@@ -54,6 +54,7 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
     //=========================================================================================
 
     bzero(prevRtCmdPosition, MAX_GROUPS * MAX_AXES * sizeof(LONG));
+    bzero(howMuchShouldIHaveMoved, MAX_GROUPS * MAX_AXES * sizeof(LONG));
 
     if (mode == MOTION_MODE_RT_JOINT)
         Ros_RtMotionControl_InitJointSpace(&moveData);
@@ -426,7 +427,10 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, pulsePos_moto, reply->feedbackPositionJoints[groupIndex]);
         
         for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
-            degrees[axis] = RAD_TO_DEG_0001(reply->feedbackPositionJoints[groupIndex][axis]);
+        {
+            //if (group->axisType.type[axis] == AXIS_ROTATION)
+                degrees[axis] = RAD_TO_DEG_0001(reply->feedbackPositionJoints[groupIndex][axis]);
+        }
 
         //Cart
         mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
