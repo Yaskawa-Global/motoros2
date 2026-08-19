@@ -622,6 +622,8 @@ void Ros_RtMotionControl_SendRobotStatus()
         rosidl_runtime_c__int32__Sequence__init(&g_messages_RobotStatus.msgRobotStatus->error_codes, MAX_ALARM_COUNT + 1);
     }
 
+    stateMsg.version = VERSION_OF_ROBOT_STATE_PACKET;
+
     while (TRUE)
     {
         Ros_Sleep(g_nodeConfigSettings.rt_status_sleep_period);

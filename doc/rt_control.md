@@ -207,6 +207,8 @@ But decoupled from the `industrial_msgs/RobotStatus` type.
 ```c
 struct RobotState
 {
+    int version;
+
     BOOL drives_powered;
     BOOL e_stopped;
     BOOL in_motion;

@@ -149,8 +149,11 @@ typedef struct RtReply_ RtReply;
 
 //Essentially a clone of the /robot_status topic. But decoupled
 //from the industrial_msgs/RobotStatus type.
-typedef struct
+#define VERSION_OF_ROBOT_STATE_PACKET   1
+struct RobotState_
 {
+    int version;
+
     BOOL drives_powered;
     BOOL e_stopped;
     BOOL in_motion;
@@ -158,7 +161,8 @@ typedef struct
     BOOL motion_possible;
     BOOL error;
     int error_code;
-} RobotState;
+} PACKED;
+typedef struct RobotState_ RobotState;
 
 //When checking for interference from the FSU speed limit, there will
 //likely be some small rounding errors. So, the deviation must exceed
