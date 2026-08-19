@@ -248,7 +248,7 @@ void Ros_RtMotionControl_InitJointSpace(MP_EXPOS_DATA* moveData)
         moveData->grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
 
 
-        ctrlGroup.sCtrlGrp = i;
+        ctrlGroup.sCtrlGrp = g_Ros_Controller.ctrlGroups[i]->groupId;;
         mpGetPulsePos(&ctrlGroup, &cmdPulse);
         memcpy(prevRtCmdPosition[i], cmdPulse.lPos, sizeof(cmdPulse.lPos));
     }
@@ -470,7 +470,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         //Answer: No, it should not. That should only be used when converting incoming
         //        positional commands that contain an absolute position.
         //        See https://github.com/Yaskawa-Global/motoros2/discussions/455
-        ctrlGroup.sCtrlGrp = groupIndex;
+        ctrlGroup.sCtrlGrp = g_Ros_Controller.ctrlGroups[groupIndex]->groupId;
         mpGetPulsePos(&ctrlGroup, &cmdPulse);
 
         //rad (or meter for linear track)
@@ -523,7 +523,7 @@ bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools)
             //Answer: No, it should not. That should only be used when converting incoming
             //        positional commands that contain an absolute position.
             //        See https://github.com/Yaskawa-Global/motoros2/discussions/455
-            ctrlGroup.sCtrlGrp = groupIndex;
+            ctrlGroup.sCtrlGrp = g_Ros_Controller.ctrlGroups[groupIndex]->groupId;
             mpGetPulsePos(&ctrlGroup, &cmdPulse);
         }
         else if (mode == MOTION_MODE_RT_CARTESIAN)
