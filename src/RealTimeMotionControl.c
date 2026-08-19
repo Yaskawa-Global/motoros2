@@ -423,26 +423,29 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         //================================================================================
         Ros_CtrlGroup_GetFBPulsePos(group, pulsePos_moto);
 
-        //Angles
+        //Angles (or meters for a linear track)
         Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, pulsePos_moto, reply->feedbackPositionJoints[groupIndex]);
-        
-        for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
+
+        if (group->groupId <= MP_R8_GID) //is a robot and not an external axis
         {
-            //if (group->axisType.type[axis] == AXIS_ROTATION)
-                degrees[axis] = RAD_TO_DEG_0001(reply->feedbackPositionJoints[groupIndex][axis]);
+            for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
+            {
+                //if (group->axisType.type[axis] == AXIS_ROTATION)
+                    degrees[axis] = RAD_TO_DEG_0001(reply->feedbackPositionJoints[groupIndex][axis]);
+            }
+
+            //Cart
+            mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
+
+            reply->feedbackPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
+            reply->feedbackPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
+            reply->feedbackPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
+
+            reply->feedbackPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
+            reply->feedbackPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
+            reply->feedbackPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
+            reply->feedbackPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
         }
-
-        //Cart
-        mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
-
-        reply->feedbackPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
-        reply->feedbackPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
-        reply->feedbackPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
-
-        reply->feedbackPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
-        reply->feedbackPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
-        reply->feedbackPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
-        reply->feedbackPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
 
         //================================================================================
         //CMD pos
@@ -454,24 +457,30 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         ctrlGroup.sCtrlGrp = groupIndex;
         mpGetPulsePos(&ctrlGroup, &cmdPulse);
 
-        //rad
+        //rad (or meter for linear track)
         Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, cmdPulse.lPos, reply->previousCommandPositionJoints[groupIndex]);
-        
-        //deg
-        for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
-            degrees[axis] = RAD_TO_DEG_0001(reply->previousCommandPositionJoints[groupIndex][axis]);
 
-        //Cart
-        mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
+        if (group->groupId <= MP_R8_GID) //is a robot and not an external axis
+        {
+            //deg
+            for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
+                degrees[axis] = RAD_TO_DEG_0001(reply->previousCommandPositionJoints[groupIndex][axis]);
 
-        reply->previousCommandPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
-        reply->previousCommandPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
-        reply->previousCommandPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
+            if (group->groupId <= MP_R8_GID) //is a robot and not an external axis
+            {
+                //Cart
+                mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
 
-        reply->previousCommandPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
-        reply->previousCommandPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
-        reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
-        reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
+                reply->previousCommandPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
+                reply->previousCommandPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
+                reply->previousCommandPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
+
+                reply->previousCommandPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
+                reply->previousCommandPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
+                reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
+                reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
+            }
+        }
     }
 }
 
