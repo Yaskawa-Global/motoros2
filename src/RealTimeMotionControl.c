@@ -288,7 +288,7 @@ bool Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
         //      on the pendant, but I was commanding increments on tool #0. Because of this,
         //      the first motion on each axis would trigger the FSU detection mechanism. But
         //      it immediately recovers after one cycle.
-        mpGetToolNo(MP_R1_GID + i, &getToolResp);
+        mpGetToolNo(group->groupId, &getToolResp);
 
         cartSendData.sRobotNo = i;
 
