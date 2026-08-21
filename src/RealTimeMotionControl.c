@@ -272,8 +272,10 @@ bool Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
 
         if (Ros_CtrlGroup_IsRobot(group)) //is a robot and not an external axis
             cartSendData.sFrame = 1; //1 = RF
-        else if (Ros_CtrlGroup_IsBase(group)) //is a base track
-            cartSendData.sFrame = 0; //0 = BF
+        //TODO: Test on an actual track. I don't think you can get the cartesian of the track alone.
+        //      I think that you can only get robot position, but in Base Frame.
+//        else if (Ros_CtrlGroup_IsBase(group)) //is a base track
+//            cartSendData.sFrame = 0; //0 = BF
         else
         {
             Ros_Debug_BroadcastMsg("ERROR: Group [%d] is an external positioner. Cartesian control mode is not supported for this group.", i);
