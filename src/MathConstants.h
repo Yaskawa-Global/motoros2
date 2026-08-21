@@ -16,7 +16,7 @@
 #define DEGREES_PER_RAD (57.295779513082)
 
 // macro
-#define METERS_TO_MILLIMETERS(x)    (x * 0.001)
+#define METERS_TO_MILLIMETERS(x)    (x * 1000)
 #define MICROMETERS_TO_METERS(x)    (x * 0.000001)
 #define METERS_TO_MICROMETERS(x)    (x * 1000000)
 #define RAD_TO_DEG_0001(x)          (x * DEGREES_PER_RAD * 10000)
