@@ -442,7 +442,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         //Angles (or meters for a linear track)
         Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, pulsePos_moto, reply->feedbackPositionJoints[groupIndex]);
 
-        if (group->groupId <= MP_R8_GID) //is a robot and not an external axis
+        if (Ros_CtrlGroup_IsRobot(group)) //is a robot and not an external axis
         {
             for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
             {
@@ -476,7 +476,7 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
         //rad (or meter for linear track)
         Ros_CtrlGroup_ConvertMotoUnitsToRosUnits(group, cmdPulse.lPos, reply->previousCommandPositionJoints[groupIndex]);
 
-        if (group->groupId <= MP_R8_GID) //is a robot and not an external axis
+        if (Ros_CtrlGroup_IsRobot(group)) //is a robot and not an external axis
         {
             //deg
             for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
