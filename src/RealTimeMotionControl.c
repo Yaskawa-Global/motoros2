@@ -482,20 +482,17 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
             for (int axis = 0; axis < MP_GRP_AXES_NUM; axis += 1)
                 degrees[axis] = RAD_TO_DEG_0001(reply->previousCommandPositionJoints[groupIndex][axis]);
 
-            if (group->groupId <= MP_R8_GID) //is a robot and not an external axis
-            {
-                //Cart
-                mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
+            //Cart
+            mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
 
-                reply->previousCommandPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
-                reply->previousCommandPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
-                reply->previousCommandPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
+            reply->previousCommandPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
 
-                reply->previousCommandPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
-                reply->previousCommandPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
-                reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
-                reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
-            }
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
         }
     }
 }
