@@ -242,6 +242,7 @@ void Ros_Controller_Cleanup()
         Ros_Debug_BroadcastMsg("Failed cleaning up robot status publisher: %d", ret);
 
     industrial_msgs__msg__RobotStatus__destroy(g_messages_RobotStatus.msgRobotStatus);
+    g_messages_RobotStatus.msgRobotStatus = NULL;
 
     MOTOROS2_MEM_TRACE_REPORT(ctrlr_fini);
 }
