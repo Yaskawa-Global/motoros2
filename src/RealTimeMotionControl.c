@@ -287,7 +287,7 @@ bool Ros_RtMotionControl_InitCartesian(MP_EXPOS_DATA* moveData)
             cartSendData.sFrame = 0; //0 = BF
         else
         {
-            Ros_Debug_BroadcastMsg("ERROR: Group [%d] is an external positioner. Cartesian control mode is not supported for this group.");
+            Ros_Debug_BroadcastMsg("ERROR: Group [%d] is an external positioner. Cartesian control mode is not supported for this group.", i);
             return false;
         }
 
