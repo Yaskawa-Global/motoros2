@@ -14,7 +14,7 @@ This control mode minimizes overhead as much as possible by routing the user com
 ## Activation
 
 This control mode is activated using the [start_rt_mode](ros_api.md#start_rt_mode) service.
-The user must specify the `control_mode` to indicate whether the increments will be joint offsets (radians) or cartesian TCP offsets (meters / radians).
+The user must specify the `control_mode` to indicate whether the increments will be joint offsets (radians) or cartesian TCP offsets (meters / quaternion).
 
 If this service is successful, it will return a `result_code` of `Ready (1)`.
 Otherwise, please examine the `result_code` and `message` files in the response for more information.
@@ -73,10 +73,9 @@ struct RtPacket
     //
     //For joint-space, this will be radians of each joint.
     //
-    //For cartesian, this will be meters and radians of the TCP.
-    //The order of the joints must be in the order of [X Y Z Rx Ry Rz Re 8].
+    //For cartesian, this will be meters and quaternion of the TCP.
+    //The order of the joints must be in the order of [X Y Z Qx Qy Qz Qw Re].
     //See CartesianIndices enum.
-    //Rotations are applied in the order of ZYX.
 
     double delta[MAX_GROUPS][MP_GRP_AXES_NUM];
     
@@ -123,7 +122,7 @@ enum JointIndices
 
 #### Cartesian
 
-When the `control_mode` is `CARTESIAN (2)`, the order of the joints in the `delta` array must be in order of `X Y Z Rx Ry Rz Re 8`.
+When the `control_mode` is `CARTESIAN (2)`, the order of the joints in the `delta` array must be in order of `X Y Z Qx Qy Qz Qw Re`.
 
 See `CartesianIndices` enum.
 
@@ -134,18 +133,16 @@ enum CartesianIndices
     TCP_Y,
     TCP_Z,
 
-    TCP_Rx,         //radians
-    TCP_Ry,
-    TCP_Rz,
-    TCP_Re,
+    TCP_Qx,         //quaternion
+    TCP_Qy,
+    TCP_Qz,
+    TCP_Qw,
 
-    TCP_8,          //pulse
+    TCP_Re,         //radians
 
     MAX_AXES
 }
 ```
-
-Please note that rotations are applied in the order of `Z Y X`.
 
 ### Data format (reply)
 

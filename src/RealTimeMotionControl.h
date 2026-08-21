@@ -56,10 +56,10 @@ typedef enum
     TCP_Y,
     TCP_Z,
 
-    TCP_Rx,         //radians
-    TCP_Ry,
-    TCP_Rz,
-    TCP_Re,
+    TCP_Qx,         //quaternion
+    TCP_Qy,
+    TCP_Qz,
+    TCP_Qw,
 
     TCP_8,          //pulse
 
@@ -90,10 +90,9 @@ struct RtPacket_
     //
     //For joint-space, this will be radians of each joint.
     //
-    //For cartesian, this will be meters and radians of the TCP.
-    //The order of the joints must be in the order of [X Y Z Rx Ry Rz Re 8].
+    //For cartesian, this will be meters and quaternion of the TCP.
+    //The order of the joints must be in the order of [X Y Z Qx Qy Qz Qw 8].
     //See CartesianIndices enum.
-    //Rotations are applied in the order of ZYX.
     double delta[MAX_GROUPS][MP_GRP_AXES_NUM];
     
     //Set tool that will be used by motion API (ie: passed by us to mpExRcsIncrementMove(..))

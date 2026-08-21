@@ -338,7 +338,7 @@ bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA
 {
     int groupNo;
 
-    // For each control group, convert radians to pulses and prepare moveData
+    // For each control group, convert incoming command and prepare moveData
     for (groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo += 1)
     {
         moveData->grp_pos_info[groupNo].pos_tag.data[2] = incomingCommand->toolIndex[groupNo];
@@ -347,13 +347,22 @@ bool Ros_RtMotionControl_ParseCartesian(RtPacket* incomingCommand, MP_EXPOS_DATA
         moveData->grp_pos_info[groupNo].pos[TCP_Y] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][TCP_Y]);
         moveData->grp_pos_info[groupNo].pos[TCP_Z] = METERS_TO_MICROMETERS(incomingCommand->delta[groupNo][TCP_Z]);
 
-        moveData->grp_pos_info[groupNo].pos[TCP_Rx] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Rx]);
-        moveData->grp_pos_info[groupNo].pos[TCP_Ry] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Ry]);
-        moveData->grp_pos_info[groupNo].pos[TCP_Rz] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Rz]);
+        Quaternion q;
+        q.x = incomingCommand->delta[groupNo][TCP_Qx];
+        q.y = incomingCommand->delta[groupNo][TCP_Qy];
+        q.z = incomingCommand->delta[groupNo][TCP_Qz];
+        q.w = incomingCommand->delta[groupNo][TCP_Qw];
 
-        moveData->grp_pos_info[groupNo].pos[TCP_Re] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Re]);
+        LONG rx_deg = 0, ry_deg = 0, rz_deg = 0;
+        QuatConversion_GeomMsgsQuaternion_To_MpCoordOrient(&q, &rx_deg, &ry_deg, &rz_deg);
 
-        moveData->grp_pos_info[groupNo].pos[TCP_8] = incomingCommand->delta[groupNo][TCP_8]; //pulse or micron (no known manipulators use this axis)
+        moveData->grp_pos_info[groupNo].pos[3] = rx_deg;
+        moveData->grp_pos_info[groupNo].pos[4] = ry_deg;
+        moveData->grp_pos_info[groupNo].pos[5] = rz_deg;
+
+        moveData->grp_pos_info[groupNo].pos[6] = RAD_TO_DEG_0001(incomingCommand->delta[groupNo][TCP_Re]);
+
+        moveData->grp_pos_info[groupNo].pos[7] = 0;
 
         double magnitude = METERS_TO_MILLIMETERS(sqrt(pow(incomingCommand->delta[groupNo][TCP_X], 2) + //x^2
                              pow(incomingCommand->delta[groupNo][TCP_Y], 2) + //y^2
@@ -456,13 +465,17 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
             //Cart
             mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
 
+            Quaternion qFb;
+            QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coord.rx, coord.ry, coord.rz, &qFb);
+
             reply->feedbackPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
             reply->feedbackPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
             reply->feedbackPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
 
-            reply->feedbackPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
-            reply->feedbackPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
-            reply->feedbackPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
+            reply->feedbackPositionCartesian[groupIndex][TCP_Qx] = qFb.x;
+            reply->feedbackPositionCartesian[groupIndex][TCP_Qy] = qFb.y;
+            reply->feedbackPositionCartesian[groupIndex][TCP_Qz] = qFb.z;
+            reply->feedbackPositionCartesian[groupIndex][TCP_Qw] = qFb.w;
             reply->feedbackPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
         }
 
@@ -488,13 +501,17 @@ void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* comman
             //Cart
             mpConvAxesToCartPos(groupIndex, degrees, command->toolIndex[groupIndex], &figure, &coord);
 
+            Quaternion qCmd;
+            QuatConversion_MpCoordOrient_To_GeomMsgsQuaternion(coord.rx, coord.ry, coord.rz, &qCmd);
+
             reply->previousCommandPositionCartesian[groupIndex][TCP_X] = MICROMETERS_TO_METERS(coord.x);
             reply->previousCommandPositionCartesian[groupIndex][TCP_Y] = MICROMETERS_TO_METERS(coord.y);
             reply->previousCommandPositionCartesian[groupIndex][TCP_Z] = MICROMETERS_TO_METERS(coord.z);
 
-            reply->previousCommandPositionCartesian[groupIndex][TCP_Rx] = DEG_0001_TO_RAD(coord.rx);
-            reply->previousCommandPositionCartesian[groupIndex][TCP_Ry] = DEG_0001_TO_RAD(coord.ry);
-            reply->previousCommandPositionCartesian[groupIndex][TCP_Rz] = DEG_0001_TO_RAD(coord.rz);
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Qx] = qCmd.x;
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Qy] = qCmd.y;
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Qz] = qCmd.z;
+            reply->previousCommandPositionCartesian[groupIndex][TCP_Qw] = qCmd.w;
             reply->previousCommandPositionCartesian[groupIndex][TCP_Re] = DEG_0001_TO_RAD(coord.ex1);
         }
     }
@@ -560,7 +577,7 @@ bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools)
             //   axes. Even if I put all of my commanded increment into a single axis, all 
             //   three of them are going to react. So, the cmd-value of my intended axis may
             //   not be the value I expect.
-            if (mode == MOTION_MODE_RT_CARTESIAN && axis >= TCP_Rx)
+            if (mode == MOTION_MODE_RT_CARTESIAN && axis > TCP_Z)
             {
                 break;
             }
