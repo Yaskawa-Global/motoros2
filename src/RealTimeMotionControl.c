@@ -506,6 +506,7 @@ bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools)
     MP_PULSE_POS_RSP_DATA cmdPulse;
     MP_CARTPOS_EX_SEND_DATA cartSendData;
     MP_CART_POS_RSP_DATA_EX cartRespData;
+    bool returnValue = FALSE;
 
     for (int groupIndex = 0; groupIndex < g_Ros_Controller.numGroup; groupIndex += 1)
     {
@@ -572,11 +573,11 @@ bool Ros_RtMotionControl_CheckForFsuInterference(MOTION_MODE mode, int* tools)
                 //Ros_Debug_BroadcastMsg("difference = %d", difference);
                 //Ros_Debug_BroadcastMsg("---------");
 
-                return TRUE;
+                returnValue = TRUE;
             }
         }
     }
-    return FALSE;
+    return returnValue;
 }
 
 void Ros_RtMotionControl_PurgeBufferedPackets()
