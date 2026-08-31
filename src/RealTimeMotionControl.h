@@ -155,7 +155,6 @@ struct RobotState_
 
     BOOL drives_powered;
     BOOL e_stopped;
-    BOOL in_motion;
     BOOL play_mode;
     BOOL motion_possible;
     BOOL error;

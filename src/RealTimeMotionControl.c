@@ -637,11 +637,37 @@ void Ros_RtMotionControl_SendRobotStatus()
 
     int client_addr_len = sizeof(client_addr_status_messages);
 
-    if (g_messages_RobotStatus.msgRobotStatus == NULL) //may already be allocated in ControllerStatusIO.c
-    {
-        g_messages_RobotStatus.msgRobotStatus = industrial_msgs__msg__RobotStatus__create();
-        rosidl_runtime_c__int32__Sequence__init(&g_messages_RobotStatus.msgRobotStatus->error_codes, MAX_ALARM_COUNT + 1);
-    }
+    //Duplicate logic of ControllerStatusIo
+    MP_IO_INFO ioStatusAddr[IO_ROBOTSTATUS_MAX];            // Array of Specific Input Address representing the I/O status
+    USHORT ioStatus[IO_ROBOTSTATUS_MAX];                    // Array storing the current status of the controller
+
+    ioStatusAddr[IO_ROBOTSTATUS_ALARM_MINOR].ulAddr = 50011;       // Alarm
+    ioStatusAddr[IO_ROBOTSTATUS_ALARM_SYSTEM].ulAddr = 50012;      // Alarm
+    ioStatusAddr[IO_ROBOTSTATUS_ALARM_USER].ulAddr = 50013;        // Alarm
+    ioStatusAddr[IO_ROBOTSTATUS_ERROR].ulAddr = 50014;             // Error
+    ioStatusAddr[IO_ROBOTSTATUS_PLAY].ulAddr = 50054;              // Play
+    ioStatusAddr[IO_ROBOTSTATUS_TEACH].ulAddr = 50053;             // Teach
+    ioStatusAddr[IO_ROBOTSTATUS_REMOTE].ulAddr = 80011; //50056;   // Remote  // Modified E.M. 7/9/2013
+    ioStatusAddr[IO_ROBOTSTATUS_OPERATING].ulAddr = 50070;         // Operating
+    ioStatusAddr[IO_ROBOTSTATUS_HOLD].ulAddr = 50071;              // Hold
+    ioStatusAddr[IO_ROBOTSTATUS_SERVO].ulAddr = 50073;             // Servo ON
+    ioStatusAddr[IO_ROBOTSTATUS_ESTOP_EX].ulAddr = 80025;          // External E-Stop
+    ioStatusAddr[IO_ROBOTSTATUS_ESTOP_PP].ulAddr = 80026;          // Pendant E-Stop
+    ioStatusAddr[IO_ROBOTSTATUS_ESTOP_CTRL].ulAddr = 80027;        // Controller E-Stop
+    ioStatusAddr[IO_ROBOTSTATUS_WAITING_ROS].ulAddr = IO_FEEDBACK_WAITING_MP_INCMOVE; // Job input signaling ready for external motion
+    ioStatusAddr[IO_ROBOTSTATUS_INECOMODE].ulAddr = 50727;         // Energy Saving Mode
+    ioStatusAddr[IO_ROBOTSTATUS_CONT_CYC_MODE].ulAddr = 50052;     // Continuous Cycle Mode
+    ioStatusAddr[IO_ROBOTSTATUS_ALARM_MAJOR].ulAddr = 50010;       // Alarm
+#if (YRC1000||YRC1000u)
+    ioStatusAddr[IO_ROBOTSTATUS_PFL_STOP].ulAddr = 81702;          // PFL function stopped the motion
+    ioStatusAddr[IO_ROBOTSTATUS_PFL_ESCAPE].ulAddr = 81703;        // PFL function escape from clamping motion
+    ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOIDING].ulAddr = 15120;      // PFL function avoidance operating
+    ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOID_JOINT].ulAddr = 15124;   // PFL function avoidance joint enabled
+    ioStatusAddr[IO_ROBOTSTATUS_PFL_AVOID_TRANS].ulAddr = 15125;   // PFL function avoidance translation enabled
+#endif
+
+    //-------------------------------------------------------------------------------
+
 
     stateMsg.version = VERSION_OF_ROBOT_STATE_PACKET;
 
@@ -650,16 +676,17 @@ void Ros_RtMotionControl_SendRobotStatus()
         Ros_Sleep(g_nodeConfigSettings.rt_status_sleep_period);
 
         //-------------------------------------------------------------------------------
-        stateMsg.drives_powered = g_messages_RobotStatus.msgRobotStatus->drives_powered.val;
-        stateMsg.e_stopped = g_messages_RobotStatus.msgRobotStatus->e_stopped.val;
-        stateMsg.in_motion = g_messages_RobotStatus.msgRobotStatus->in_motion.val;
-        stateMsg.play_mode = (g_messages_RobotStatus.msgRobotStatus->mode.val == industrial_msgs__msg__RobotMode__AUTO);
-        stateMsg.motion_possible = g_messages_RobotStatus.msgRobotStatus->motion_possible.val;
-        stateMsg.error = g_messages_RobotStatus.msgRobotStatus->in_error.val;
-        if (g_messages_RobotStatus.msgRobotStatus->error_codes.size > 0)
-            stateMsg.error_code = g_messages_RobotStatus.msgRobotStatus->error_codes.data[0];
-        else
-            stateMsg.error_code = 0;
+        mpReadIO(ioStatusAddr, ioStatus, IO_ROBOTSTATUS_MAX);
+
+        //-------------------------------------------------------------------------------
+        stateMsg.drives_powered = (ioStatus[IO_ROBOTSTATUS_SERVO] != 0 && ioStatus[IO_ROBOTSTATUS_INECOMODE] != 0);
+        stateMsg.e_stopped = (g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_ESTOP_EX] == 0)
+                                || (g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_ESTOP_PP] == 0)
+                                || (g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_ESTOP_CTRL] == 0);
+        stateMsg.play_mode = (g_Ros_Controller.ioStatus[IO_ROBOTSTATUS_PLAY] != 0);
+        stateMsg.motion_possible = TRUE; //This task gets killed if the robot is in a state where motion isn't possible
+        stateMsg.error = 0; //This task gets killed if the robot is in an error state
+        stateMsg.error_code = 0;
 
         //-------------------------------------------------------------------------------
         mpSendTo(sockRtStatusSender, (char*)&stateMsg, sizeof(RobotState), 0, (struct sockaddr*)&client_addr_status_messages, client_addr_len);
