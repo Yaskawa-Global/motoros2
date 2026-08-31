@@ -582,7 +582,7 @@ The name must not be blank.
 
 After correcting the configuration, the [changes will need to be propagated to the Yaskawa controller](../README.md#updating-the-configuration).
 
-### Alarm: 8011[23 - 54]
+### Alarm: 8011[23 - 54] or [56 - 58] or [66 - 67]
 
 *Example:*
 
@@ -611,7 +611,7 @@ ALARM 8011
 [xx]
 ```
 
-Where `[xx]` is a subcode in the ranges `[23 - 54]` or `[56 - 58]`.
+Where `[xx]` is a subcode in the ranges `[23 - 54]` or `[56 - 58]` or `[66 - 67]`.
 
 *Solution:*
 These alarms are often caused by version incompatibilities between ROS 2 (on the client PC), micro-ROS (as part of MotoROS2) and/or the micro-ROS Agent.
@@ -662,7 +662,7 @@ After correcting the configuration, the [changes will need to be propagated to t
 
 ### Alarm: 8011[56 - 58]
 
-Please refer to [Alarm: 8011[23 - 54]](#alarm-801123---54).
+Please refer to [Alarm: 8011[23 - 54]](#alarm-801123---54-or-56---58-or-66---67).
 
 ### Alarm: 8011[59]
 
@@ -756,6 +756,81 @@ Describe the problem and include the following items:
 - version of MotoROS2.
 - copy of `motoros2_config.yaml` copied from the robot controller.
 - verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8011[66]
+
+*Example:*
+
+```text
+ALARM 8011
+ Failed to init service (x)
+[66]
+```
+
+*Solution:*
+Save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8011[67]
+
+*Example:*
+
+```text
+ALARM 8011
+ Failed adding service (x)
+[67]
+```
+
+*Solution:*
+Save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8011[68]
+
+*Example:*
+
+```text
+ALARM 8011
+ Failed to allocate RT socket
+[68]
+```
+
+*Solution:*
+Save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8011[69]
+
+*Example:*
+
+```text
+ALARM 8011
+ Failed to bind RT socket
+[69]
+```
+
+*Solution:*
+Save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
+
+### Alarm: 8011[70]
+
+*Example:*
+
+```text
+ALARM 8011
+ Failed to allocate RT socket
+[70]
+```
+
+*Solution:*
+Save a copy of the output of the [debug-listener script](#debug-log-client) and the `PANELBOX.LOG` from the robot's teach pendant.
+Open a new issue on the [Issue tracker](https://github.com/yaskawa-global/motoros2/issues), describe the problem and attach `PANELBOX.LOG` and the debug log to the issue.
+Include a verbatim copy of the alarm text as seen on the teach pendant (alarm number and `[subcode]`).
 
 ### Alarm: 8012[xx]
 

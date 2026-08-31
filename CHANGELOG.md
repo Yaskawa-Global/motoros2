@@ -1,11 +1,19 @@
 <!--
-SPDX-FileCopyrightText: 2022-2023, Yaskawa America, Inc.
-SPDX-FileCopyrightText: 2022-2023, Delft University of Technology
+SPDX-FileCopyrightText: 2022-2025, Yaskawa America, Inc.
+SPDX-FileCopyrightText: 2022-2025, Delft University of Technology
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 -->
 
 # Changelog
+
+## Forthcoming
+
+MotoROS2 is now built against `micro_ros_motoplus` version TODO
+
+New functionality:
+
+- Add new motion mode for real-time control of the robot. This pipes the user commands directly to the motion API with minimal overhead. ([#449](https://github.com/Yaskawa-Global/motoros2/pull/449))
 
 ## 0.2.1 (2025-06-26)
 

@@ -346,7 +346,7 @@ void Ros_ActionServer_FJT_ResetProgressTracker()
     //TODO: do multidof too
 }
 
-//Called from TrajectoryMotionControl::Ros_MotionControl_IncMoveLoopStart
+//Called from TrajectoryMotionControl::Ros_MotionControl_NonRtIncMoveLoopStart
 void Ros_ActionServer_FJT_UpdateProgressTracker(MP_EXPOS_DATA* incrementData)
 {
     if (fjt_active_goal_handle == NULL)

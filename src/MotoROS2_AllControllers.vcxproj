@@ -368,6 +368,7 @@
     <None Include="..\doc\network_configuration.md" />
     <None Include="..\doc\ros_api.md" />
     <None Include="..\doc\troubleshooting.md" />
+    <None Include="..\doc\rt_control.md" />
     <None Include="..\libmicroros_dx200_foxy\libmicroros.dnLib_foxy" />
     <None Include="..\libmicroros_dx200_galactic\libmicroros.dnLib_galactic" />
     <None Include="..\libmicroros_dx200_humble\libmicroros.dnLib_humble" />
@@ -434,9 +435,11 @@
     <ClCompile Include="FileUtilityFunctions.c" />
     <ClCompile Include="InformCheckerAndGenerator.c" />
     <ClCompile Include="MemoryAllocation.c" />
+    <ClCompile Include="RealTimeMotionControl.c" />
     <ClCompile Include="ServiceQueueTrajPoint.c" />
     <ClCompile Include="ServiceReadWriteIO.c" />
     <ClCompile Include="ServiceStartPointQueueMode.c" />
+    <ClCompile Include="ServiceStartRtMode.c" />
     <ClCompile Include="ServiceStopTrajMode.c" />
     <ClCompile Include="ServiceStartTrajMode.c" />
     <ClCompile Include="ServiceSelectMotionTool.c" />
@@ -467,11 +470,13 @@
     <ClInclude Include="InformCheckerAndGenerator.h" />
     <ClInclude Include="MemoryAllocation.h" />
     <ClInclude Include="MemoryTracing.h" />
+    <ClInclude Include="RealTimeMotionControl.h" />
     <ClInclude Include="RosApiNameConstants.h" />
     <ClInclude Include="..\lib\MotoPlusExterns.h" />
     <ClInclude Include="ServiceQueueTrajPoint.h" />
     <ClInclude Include="ServiceReadWriteIO.h" />
     <ClInclude Include="ServiceStartPointQueueMode.h" />
+    <ClInclude Include="ServiceStartRtMode.h" />
     <ClInclude Include="ServiceStopTrajMode.h" />
     <ClInclude Include="ServiceStartTrajMode.h" />
     <ClInclude Include="ServiceSelectMotionTool.h" />

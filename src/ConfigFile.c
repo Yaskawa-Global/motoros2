@@ -123,6 +123,11 @@ Configuration_Item Ros_ConfigFile_Items[] =
     { "ignore_missing_calib_data", &g_nodeConfigSettings.ignore_missing_calib_data, Value_Bool },
     { "debug_broadcast_enabled", &g_nodeConfigSettings.debug_broadcast_enabled, Value_Bool },
     { "debug_broadcast_port", &g_nodeConfigSettings.debug_broadcast_port, Value_UserLanPort },
+    { "rt_listener_udp_port_number", g_nodeConfigSettings.rt_listener_udp_port_number, Value_String },
+    { "rt_status_udp_port_number", g_nodeConfigSettings.rt_status_udp_port_number, Value_String },
+    { "rt_status_sleep_period", &g_nodeConfigSettings.rt_status_sleep_period, Value_Int },
+    { "timeout_for_rt_msg", &g_nodeConfigSettings.timeout_for_rt_msg, Value_Int },
+    { "max_sequence_diff_for_rt_msg", &g_nodeConfigSettings.max_sequence_diff_for_rt_msg, Value_Int },
 };
 
 void Ros_ConfigFile_SetAllDefaultValues()
@@ -214,15 +219,38 @@ void Ros_ConfigFile_SetAllDefaultValues()
     //inform_job_name
     snprintf(g_nodeConfigSettings.inform_job_name, MAX_JOB_NAME_LEN, "%s", DEFAULT_INFORM_JOB_NAME);
 
+    //=========
     //allow_custom_inform
     g_nodeConfigSettings.allow_custom_inform_job = DEFAULT_ALLOW_CUSTOM_INFORM;
 
+    //=========
     //userlan monitoring
     g_nodeConfigSettings.userlan_monitor_enabled = DEFAULT_ULAN_MON_ENABLED;
     g_nodeConfigSettings.userlan_monitor_port = DEFAULT_ULAN_MON_LINK;
 
+    //=========
     //ignore_missing_calib_data
     g_nodeConfigSettings.ignore_missing_calib_data = DEFAULT_IGNORE_MISSING_CALIB;
+
+    //=========
+    //rt_listener_udp_port_number
+    sprintf(g_nodeConfigSettings.rt_listener_udp_port_number, "%s", DEFAULT_RT_LISTENER_UDP_PORT_NUMBER);
+
+    //=========
+    //rt_status_udp_port_number
+    sprintf(g_nodeConfigSettings.rt_status_udp_port_number, "%s", DEFAULT_RT_STATUS_UDP_PORT_NUMBER);
+
+    //=========
+    //rt_status_sleep_period
+    g_nodeConfigSettings.rt_status_sleep_period = DEFAULT_RT_STATUS_SLEEP_PERIOD;
+
+    //=========
+    //timeout_for_rt_msg
+    g_nodeConfigSettings.timeout_for_rt_msg = DEFAULT_TIMEOUT_FOR_RT_MSG;
+
+    //=========
+    //max_sequence_diff_for_rt_msg
+    g_nodeConfigSettings.max_sequence_diff_for_rt_msg = DEFAULT_MAX_SEQUENCE_DIFFERENCE;
 }
 
 void Ros_ConfigFile_CheckYamlEvent(yaml_event_t* event)
@@ -743,6 +771,11 @@ void Ros_ConfigFile_PrintActiveConfiguration(Ros_Configuration_Settings const* c
     Ros_Debug_BroadcastMsg("Config: ignore_missing_calib_data = %d", config->ignore_missing_calib_data);
     Ros_Debug_BroadcastMsg("Config: debug_broadcast_enabled = %d", config->debug_broadcast_enabled);
     Ros_Debug_BroadcastMsg("Config: debug_broadcast_port = %d", config->debug_broadcast_port);
+    Ros_Debug_BroadcastMsg("Config: rt_listener_udp_port_number = %s", config->rt_listener_udp_port_number);
+    Ros_Debug_BroadcastMsg("Config: rt_status_udp_port_number = %s", config->rt_status_udp_port_number);
+    Ros_Debug_BroadcastMsg("Config: rt_status_sleep_period = %d", config->rt_status_sleep_period);
+    Ros_Debug_BroadcastMsg("Config: timeout_for_rt_msg = %d", config->timeout_for_rt_msg);
+    Ros_Debug_BroadcastMsg("Config: max_sequence_diff_for_rt_msg = %d", config->max_sequence_diff_for_rt_msg);
 }
 
 void Ros_ConfigFile_Parse()

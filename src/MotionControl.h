@@ -19,11 +19,13 @@ typedef enum
 {
     MOTION_MODE_INACTIVE,
     MOTION_MODE_TRAJECTORY,
-    MOTION_MODE_POINTQUEUE
+    MOTION_MODE_POINTQUEUE,
+    MOTION_MODE_RT_JOINT,
+    MOTION_MODE_RT_CARTESIAN,
 } MOTION_MODE;
 
 extern Init_Trajectory_Status Ros_MotionControl_InitTrajectory(control_msgs__action__FollowJointTrajectory_SendGoal_Request* pending_ros_goal_request);
-extern void Ros_MotionControl_IncMoveLoopStart();
+extern void Ros_MotionControl_NonRtIncMoveLoopStart();
 extern void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup);
 extern UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request);
 extern BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_data const* dataToEnQ);
@@ -38,7 +40,7 @@ extern void Ros_MotionControl_StopTrajMode();
 
 extern BOOL Ros_MotionControl_IsMotionMode_Trajectory();
 extern BOOL Ros_MotionControl_IsMotionMode_PointQueue();
-extern BOOL Ros_MotionControl_IsMotionMode_RawStreaming();
+extern BOOL Ros_MotionControl_IsMotionMode_RealTime();
 
 extern void Ros_MotionControl_ValidateMotionModeIsOk();
 
