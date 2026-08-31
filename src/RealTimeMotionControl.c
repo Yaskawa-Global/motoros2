@@ -22,6 +22,7 @@ void Ros_RtMotionControl_SendRobotStatus();
 
 static int sockRtCommandListener = -1;
 static int sockRtStatusSender = -1;
+static int tidRobotStatus = -1;
 
 static struct sockaddr_in client_addr_status_messages;
 
@@ -68,6 +69,11 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
 
     Ros_Debug_BroadcastMsg("Flushing stale packets from socket buffer...");
     Ros_RtMotionControl_PurgeBufferedPackets();
+
+    //Spin up a separate normal-priorty thread to send out the robot status info
+    tidRobotStatus = mpCreateTask(MP_PRI_TIME_NORMAL, MP_STACK_SIZE,
+        (FUNCPTR)Ros_RtMotionControl_SendRobotStatus,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     //=========================================================================================
     while (TRUE)
@@ -228,6 +234,8 @@ void Ros_RtMotionControl_HyperRobotCommanderX5(MOTION_MODE mode)
             break;
         }
     }
+
+    mpDeleteTask(tidRobotStatus);
 
     Ros_Debug_BroadcastMsg("Ending Rt Session");
 }
@@ -421,11 +429,6 @@ void Ros_RtMotionControl_OpenSocket()
         Ros_Debug_BroadcastMsg("ERROR: Could not allocate Status socket for RT interface");
         motoRosAssert_withMsg(false, SUBCODE_FAIL_ALLOCATE_RT_FB_SOCKET, "Failed to allocate RT socket");
     }
-
-    //Spin up a separate normal-priorty thread to send out the robot status info
-    mpCreateTask(MP_PRI_TIME_NORMAL, MP_STACK_SIZE,
-        (FUNCPTR)Ros_RtMotionControl_SendRobotStatus,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
 void Ros_RtMotionControl_PopulateReplyMessage(MOTION_MODE mode, RtPacket* command, RtReply* reply)
