@@ -596,8 +596,8 @@ BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_dat
 
 // Fail-safe pre/post buffer-sentinel check. Returns TRUE iff both bracket
 // guard words still hold POINT_QUEUE_GUARD_MAGIC (i.e. the data[] array has not
-// been overrun on either side). Cheap: two integer compares. Callers MUST hold
-// point_q.q_lock; on mismatch they release the lock, raise a fatal alarm and
+// been overrun on either side). Cheap: two integer compares. There is no lock
+// to release now (lock-free SPSC); on mismatch callers raise a fatal alarm and
 // fail safe rather than feed a corrupted point into motion.
 static BOOL Ros_MotionControl_PointQueueGuardsOk(CtrlGroup* ctrlGroup)
 {
@@ -605,72 +605,92 @@ static BOOL Ros_MotionControl_PointQueueGuardsOk(CtrlGroup* ctrlGroup)
         && (ctrlGroup->point_q.guard_post == POINT_QUEUE_GUARD_MAGIC);
 }
 
+// Derived depth from a head/tail snapshot: (tail - head) mod POINT_QUEUE_SLOTS.
+// Single producer means the producer's own view of tail is exact; head only
+// grows, so the value is exact from the producer side and a safe lower/consistent
+// bound from any observer. Correct for the ONE_DEEP (==0) and FIFO (>=DEPTH)
+// admission decisions. Static helper: callers below have already validated guards.
+static LONG Ros_MotionControl_PointQueueDepth(CtrlGroup* ctrlGroup)
+{
+    LONG head = ctrlGroup->point_q.head;
+    LONG tail = ctrlGroup->point_q.tail;
+    LONG depth = tail - head;
+    if (depth < 0)
+        depth += POINT_QUEUE_SLOTS;
+    return depth;
+}
+
 LONG Ros_MotionControl_PointQueueCount(CtrlGroup* ctrlGroup)
 {
-    LONG cnt = 0;
-    if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
+    if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
     {
-        if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
-        {
-            mpSemGive(ctrlGroup->point_q.q_lock);
-            mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
-                SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
-            return ERROR;
-        }
-        cnt = ctrlGroup->point_q.cnt;
-        mpSemGive(ctrlGroup->point_q.q_lock);
+        mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
+            SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
+        return ERROR;
     }
-    else
-        cnt = ERROR;
-    return cnt;
+    return Ros_MotionControl_PointQueueDepth(ctrlGroup);
 }
 
+// PRODUCER side (single enqueue-caller task; see SPSC invariant at PointQueue_q).
+// Validate guards; if full return FALSE; write the slot payload; issue a RELEASE
+// barrier so the payload write is globally visible BEFORE the new tail is
+// published; then publish tail. The consumer, seeing the advanced tail, is
+// guaranteed to observe the completed payload.
 BOOL Ros_MotionControl_PointQueueEnqueue(CtrlGroup* ctrlGroup, JointMotionData* pt)
 {
-    BOOL ok = FALSE;
-    if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
+    LONG tail, head, nextTail;
+
+    if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
     {
-        if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
-        {
-            mpSemGive(ctrlGroup->point_q.q_lock);
-            mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
-                SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
-            return FALSE;
-        }
-        if (ctrlGroup->point_q.cnt < POINT_QUEUE_DEPTH)
-        {
-            int writeIdx = Q_OFFSET_IDX(ctrlGroup->point_q.idx, ctrlGroup->point_q.cnt, POINT_QUEUE_DEPTH);
-            ctrlGroup->point_q.data[writeIdx] = *pt;
-            ctrlGroup->point_q.cnt += 1;
-            ok = TRUE;
-        }
-        mpSemGive(ctrlGroup->point_q.q_lock);
+        mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
+            SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
+        return FALSE;
     }
-    return ok;
+
+    tail = ctrlGroup->point_q.tail;         // producer owns tail (exact)
+    head = ctrlGroup->point_q.head;         // snapshot consumer's head
+    nextTail = tail + 1;
+    if (nextTail >= POINT_QUEUE_SLOTS)
+        nextTail = 0;
+
+    if (nextTail == head)                   // full (one slot kept empty)
+        return FALSE;
+
+    ctrlGroup->point_q.data[tail] = *pt;    // write payload into the free slot
+    __sync_synchronize();                   // RELEASE: payload before tail publish
+    ctrlGroup->point_q.tail = nextTail;     // publish the new tail
+    return TRUE;
 }
 
+// CONSUMER side (single dequeue-caller task; see SPSC invariant at PointQueue_q).
+// Validate guards; if empty (head == tail) return FALSE; read tail, then issue an
+// ACQUIRE barrier BEFORE reading the slot so the payload the producer wrote is
+// observed; copy the slot out; then advance head (consumer owns head).
 BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* out)
 {
-    BOOL ok = FALSE;
-    if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
+    LONG head, tail, nextHead;
+
+    if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
     {
-        if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
-        {
-            mpSemGive(ctrlGroup->point_q.q_lock);
-            mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
-                SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
-            return FALSE;
-        }
-        if (ctrlGroup->point_q.cnt > 0)
-        {
-            *out = ctrlGroup->point_q.data[ctrlGroup->point_q.idx];
-            ctrlGroup->point_q.idx = Q_OFFSET_IDX(ctrlGroup->point_q.idx, 1, POINT_QUEUE_DEPTH);
-            ctrlGroup->point_q.cnt -= 1;
-            ok = TRUE;
-        }
-        mpSemGive(ctrlGroup->point_q.q_lock);
+        mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
+            SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
+        return FALSE;
     }
-    return ok;
+
+    head = ctrlGroup->point_q.head;         // consumer owns head (exact)
+    tail = ctrlGroup->point_q.tail;         // observe producer's published tail
+    if (head == tail)                       // empty
+        return FALSE;
+
+    __sync_synchronize();                   // ACQUIRE: observe payload before read
+    *out = ctrlGroup->point_q.data[head];   // copy the oldest point out
+
+    nextHead = head + 1;
+    if (nextHead >= POINT_QUEUE_SLOTS)
+        nextHead = 0;
+    __sync_synchronize();                   // ensure slot read completes before head advances
+    ctrlGroup->point_q.head = nextHead;     // free the slot (publish new head)
+    return TRUE;
 }
 
 //-------------------------------------------------------------------
@@ -1709,9 +1729,10 @@ BOOL Ros_MotionControl_IsMotionMode_PointQueue()
 
 BOOL Ros_MotionControl_ReadAndClearPointQueueUnderran(void)
 {
-    BOOL v = Ros_MotionControl_PointQueueUnderran;
-    Ros_MotionControl_PointQueueUnderran = FALSE;
-    return v;
+    // Atomic read-and-clear: __sync_lock_test_and_set atomically stores FALSE
+    // and returns the prior value, so a concurrent SET (single store on the
+    // consumer path) cannot be lost between a separate read and clear.
+    return __sync_lock_test_and_set(&Ros_MotionControl_PointQueueUnderran, FALSE);
 }
 
 BOOL Ros_MotionControl_IsMotionMode_RawStreaming()

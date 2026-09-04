@@ -18,8 +18,11 @@
 //       INVALID_JOINT_LIST=5, UNABLE_TO_PROCESS_POINT=6, QUEUE_FULL=7)
 //   STUBBED (host no-ops / minimal fakes, NOT real behavior):
 //     - MotoPlus base typedefs (BOOL/LONG/UINT16/UINT64/UCHAR/SEM_ID)
-//     - mpSemBCreate/mpSemTake/mpSemGive — always succeed, no locking
 //     - a minimal CtrlGroup that carries only point_q
+//   NOTE: the ring is now LOCK-FREE SPSC and no longer takes any semaphore. The
+//   mpSem* stubs remain only for legacy compatibility and are unused by the ring.
+//   The __sync_synchronize() / __sync_lock_test_and_set() barriers used by the
+//   real ring are GCC compiler builtins available natively on host gcc — no stub.
 //
 // The tested ring primitive *bodies* live in point_queue_ring.c and are
 // byte-identical to those committed in motoros2/src/MotionControl.c (see the
@@ -66,6 +69,7 @@ static inline int    mpSemGive(SEM_ID s)        { (void)s; return OK; }
 #define Q_OFFSET_IDX( a, b, c ) (((a)+(b)) >= (c) ) ? ((a)+(b)-(c)) \
                 : ( (((a)+(b)) < 0 ) ? ((a)+(b)+(c)) : ((a)+(b)) )
 #define POINT_QUEUE_DEPTH 32
+#define POINT_QUEUE_SLOTS (POINT_QUEUE_DEPTH + 1)
 #define POINT_QUEUE_GUARD_MAGIC 0x51504751u
 
 #define MP_GRP_AXES_NUM 8
@@ -79,14 +83,14 @@ typedef struct
     double vel[MP_GRP_AXES_NUM];    // velocity in radians/s
 } JointMotionData;
 
-// PointQueue_q — verbatim layout from CtrlGroup.h
+// PointQueue_q — verbatim layout from CtrlGroup.h (lock-free SPSC ring:
+// consumer-owned head, producer-owned tail, +1 backing slot for full/empty).
 typedef struct
 {
-    SEM_ID q_lock;
-    LONG cnt;                       // number of points currently queued
-    LONG idx;                       // index of the oldest queued point
+    volatile LONG head;             // CONSUMER-owned: index of oldest queued point
+    volatile LONG tail;             // PRODUCER-owned: index of next free slot
     UINT32 guard_pre;               // == POINT_QUEUE_GUARD_MAGIC
-    JointMotionData data[POINT_QUEUE_DEPTH];
+    JointMotionData data[POINT_QUEUE_SLOTS];
     UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC
 } PointQueue_q;
 

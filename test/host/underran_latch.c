@@ -27,11 +27,10 @@ void Mirror_MarkPointQueueUnderran(void)
     s_point_queue_underran = TRUE;
 }
 
-// Mirror of Ros_MotionControl_ReadAndClearPointQueueUnderran(): return current
-// value, then clear to FALSE. The ONLY clear site.
+// Mirror of Ros_MotionControl_ReadAndClearPointQueueUnderran(): atomic
+// read-and-clear via __sync_lock_test_and_set (returns prior value, stores
+// FALSE) — byte-for-byte the real accessor. The ONLY clear site.
 BOOL Mirror_ReadAndClearPointQueueUnderran(void)
 {
-    BOOL v = s_point_queue_underran;
-    s_point_queue_underran = FALSE;
-    return v;
+    return __sync_lock_test_and_set(&s_point_queue_underran, FALSE);
 }

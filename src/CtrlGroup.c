@@ -165,10 +165,11 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
         bzero(&ctrlGroup->inc_q, sizeof(Incremental_q));
         ctrlGroup->inc_q.q_lock = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
 
+        // Lock-free SPSC point-queue ring: no semaphore. bzero clears head/tail
+        // to 0 (empty). Only the pre/post buffer sentinels need setting.
         bzero(&ctrlGroup->point_q, sizeof(PointQueue_q));
         ctrlGroup->point_q.guard_pre = POINT_QUEUE_GUARD_MAGIC;
         ctrlGroup->point_q.guard_post = POINT_QUEUE_GUARD_MAGIC;
-        ctrlGroup->point_q.q_lock = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
 
         // Calculate maximum speed in radian per second
         bzero(maxSpeedPulse, sizeof(maxSpeedPulse));
@@ -256,7 +257,7 @@ void Ros_CtrlGrp_Cleanup(CtrlGroup* ctrlGroup)
     ctrlGroup->tidAddToIncQueue = INVALID_TASK;
 
     mpSemDelete(ctrlGroup->inc_q.q_lock);
-    mpSemDelete(ctrlGroup->point_q.q_lock);
+    // point_q is lock-free (no semaphore to delete).
 }
 
 

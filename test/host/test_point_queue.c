@@ -30,7 +30,7 @@ static int failures = 0;
 static void new_group(CtrlGroup* g)
 {
     memset(g, 0, sizeof(*g));
-    g->point_q.q_lock = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
+    // lock-free SPSC ring: bzero clears head/tail to 0 (empty), no semaphore.
     // mirror CtrlGroup.c init: bracket guards set to MAGIC after bzero
     g->point_q.guard_pre = POINT_QUEUE_GUARD_MAGIC;
     g->point_q.guard_post = POINT_QUEUE_GUARD_MAGIC;

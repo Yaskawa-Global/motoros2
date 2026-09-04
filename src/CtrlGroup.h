@@ -52,14 +52,32 @@ typedef struct
 #define POINT_QUEUE_DEPTH 32   // depth of the point-queue FIFO (see streaming-point-fifo spec); tunable, single source of truth
 #define POINT_QUEUE_GUARD_MAGIC 0x51504751u   // bracket-word sentinel value guarding the point-queue data[] array
 
+// Usable slots must equal POINT_QUEUE_DEPTH. This ring is LOCK-FREE SPSC using
+// the "keep one slot empty" full/empty discriminator, so the backing array is
+// sized POINT_QUEUE_DEPTH+1: one slot is always left unused to tell full
+// (head == (tail+1) % SLOTS) from empty (head == tail). Usable capacity is
+// therefore POINT_QUEUE_DEPTH, exactly as the macro means. This scheme is
+// depth-agnostic (no power-of-two requirement).
+#define POINT_QUEUE_SLOTS (POINT_QUEUE_DEPTH + 1)
+
 // Ring FIFO of trajectory points awaiting interpolation (point-queue mode).
+//
+// LOCK-FREE single-producer / single-consumer (SPSC). LOAD-BEARING INVARIANT:
+// single enqueue-caller task + single dequeue-caller task; NOT lock-free-safe
+// if a second producer or consumer, or a multi-threaded executor, is introduced.
+//   - Producer OWNS `tail` (advanced only by enqueue). Consumer OWNS `head`
+//     (advanced only by dequeue). Neither side writes the other's index.
+//   - Depth is DERIVED from (tail - head) mod SLOTS; there is no shared count.
+//   - Memory ordering via GCC __sync_synchronize() barriers (see enqueue/
+//     dequeue in MotionControl.c): producer publishes payload-then-tail with a
+//     release barrier; consumer observes tail-then-payload with an acquire
+//     barrier. head/tail are single word-aligned (naturally atomic on x86).
 typedef struct
 {
-    SEM_ID q_lock;
-    LONG cnt;                       // number of points currently queued
-    LONG idx;                       // index of the oldest queued point
+    volatile LONG head;             // CONSUMER-owned: index of oldest queued point (dequeue advances)
+    volatile LONG tail;             // PRODUCER-owned: index of next free slot (enqueue advances)
     UINT32 guard_pre;               // == POINT_QUEUE_GUARD_MAGIC (pre-buffer sentinel)
-    JointMotionData data[POINT_QUEUE_DEPTH];
+    JointMotionData data[POINT_QUEUE_SLOTS];
     UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC (post-buffer sentinel)
 } PointQueue_q;
 
