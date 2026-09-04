@@ -6,12 +6,13 @@
 //   - count correctness
 //   - full rejects enqueue; empty rejects dequeue
 //
-// TIER 2 (admission policy + underran latch, REAL runtime for the ring +
-//         policy branches; the underran latch is a MODEL of Task 5 semantics):
+// TIER 2 (admission policy + underran flag, REAL runtime for the ring +
+//         policy branches; the underran flag is a host MIRROR of the REAL
+//         Task-5 accessor since the host can't run the IP_CLK IncMove loop):
 //   - ONE_DEEP: first enqueue SUCCESS (depth 1), second returns BUSY
 //   - FIFO: fills to POINT_QUEUE_DEPTH (SUCCESS, increasing depth), next QUEUE_FULL
-//   - underran latch: starts TRUE; ReadAndClear TRUE then FALSE; consumer-empty
-//     re-latches TRUE; read-and-clear semantics hold
+//   - underran flag: starts TRUE; ReadAndClear TRUE then FALSE; a simulated
+//     consumer-empty set re-latches TRUE; read-and-clear semantics hold
 //   - legacy-equivalence: ONE_DEEP yields SUCCESS then BUSY, never QUEUE_FULL
 //
 // Build+run via test/host/Makefile or test/host/run_tests.sh. Exits non-zero on
@@ -178,17 +179,17 @@ static void test_admit_fifo_fill_then_full(void)
     ASSERT(Ros_MotionControl_PointQueueCount(&g) == POINT_QUEUE_DEPTH); // FULL did not enqueue
 }
 
-// underran latch: starts TRUE; ReadAndClear TRUE then FALSE; consumer-empty
-// re-latches TRUE; read-and-clear semantics hold.
-static void test_underran_latch(void)
+// underran flag: exercises the REAL read-and-clear accessor CONTRACT via the
+// host mirror. Starts TRUE (baseline); ReadAndClear returns TRUE then FALSE; a
+// simulated consumer-empty set re-latches TRUE; read-and-clear holds.
+static void test_underran_read_and_clear(void)
 {
-    printf("== TIER2 test_underran_latch ==\n");
-    UnderranLatch_Init();
-    ASSERT(UnderranLatch_ReadAndClear() == TRUE);   // starts TRUE
-    ASSERT(UnderranLatch_ReadAndClear() == FALSE);  // cleared by previous read
-    UnderranLatch_SetConsumerEmpty();               // simulated consumer-empty
-    ASSERT(UnderranLatch_ReadAndClear() == TRUE);   // latched again
-    ASSERT(UnderranLatch_ReadAndClear() == FALSE);  // and cleared again
+    printf("== TIER2 test_underran_read_and_clear ==\n");
+    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == TRUE);   // starts TRUE
+    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == FALSE);  // cleared by previous read
+    Mirror_MarkPointQueueUnderran();                           // simulated consumer-empty
+    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == TRUE);   // latched again
+    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == FALSE);  // and cleared again
 }
 
 // legacy-equivalence: ONE_DEEP path yields SUCCESS then BUSY, and NEVER
@@ -218,7 +219,7 @@ int main(void)
     // Tier 2
     test_admit_one_deep();
     test_admit_fifo_fill_then_full();
-    test_underran_latch();
+    test_underran_read_and_clear();
     test_legacy_equivalence();
 
     if (failures == 0) { printf("\nALL PASS\n"); return 0; }

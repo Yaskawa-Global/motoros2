@@ -45,6 +45,12 @@ MOTION_MODE Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
 
 BOOL Ros_MotionControl_MustInitializePointQueue = TRUE; //first point of streaming trajectory must match current-position
 
+// Sticky point-queue underran flag. Starts TRUE so the first read after any
+// non-poweroff startup reports the baseline. SET (exactly one site) on the
+// consumer path when the ring is observed empty in point-queue mode; cleared
+// ONLY by Ros_MotionControl_ReadAndClearPointQueueUnderran().
+static volatile BOOL Ros_MotionControl_PointQueueUnderran = TRUE;
+
 Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence* sequenceGoalJointNames, trajectory_msgs__msg__JointTrajectoryPoint__Sequence* sequenceOfPoints)
 {
     long requestPulsePos[MAX_PULSE_AXES];
@@ -904,6 +910,9 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                         }
                         else
                         {
+                            // Queue is empty: point-queue mode underrun (streaming fell behind)
+                            if (Ros_MotionControl_IsMotionMode_PointQueue())
+                                Ros_MotionControl_PointQueueUnderran = TRUE;
                             // Queue is empty, initialize to 0 pulse increment
                             moveData.grp_pos_info[i].pos_tag.data[2] = 0;
                             moveData.grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
@@ -1696,6 +1705,13 @@ BOOL Ros_MotionControl_IsMotionMode_PointQueue()
 {
     return (Ros_MotionControl_ActiveMotionMode == 
         MOTION_MODE_POINTQUEUE);
+}
+
+BOOL Ros_MotionControl_ReadAndClearPointQueueUnderran(void)
+{
+    BOOL v = Ros_MotionControl_PointQueueUnderran;
+    Ros_MotionControl_PointQueueUnderran = FALSE;
+    return v;
 }
 
 BOOL Ros_MotionControl_IsMotionMode_RawStreaming()

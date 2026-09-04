@@ -12,17 +12,21 @@
 UINT16 PointQueue_AdmitOne(CtrlGroup* g, PointQueueAdmitPolicy policy,
                            JointMotionData* pt, UINT16* out_depth);
 
-// --- Underran latch MODEL ---------------------------------------------------
-// NOTE: this is a MODEL, not real source. The real underran latch + accessor is
-// Task 5 (not yet implemented in the committed tree). The semantics modeled
-// here are exactly those specified for Task 5:
-//   - the latch starts TRUE (no consumer has run yet)
+// --- Underran flag MIRROR ---------------------------------------------------
+// The REAL sticky flag + accessor now exist in src/MotionControl.c (Task 5):
+//   static volatile BOOL Ros_MotionControl_PointQueueUnderran = TRUE;
+//   BOOL Ros_MotionControl_ReadAndClearPointQueueUnderran(void);
+// with a single SET site in the consumer-empty (q->cnt==0) point-queue branch
+// of Ros_MotionControl_IncMoveLoopStart.
+//
+// The host can't run the real IP_CLK IncMove loop, so these are a faithful
+// MIRROR of the real flag + accessor. Mirror_MarkPointQueueUnderran() stands in
+// for the real consumer-empty SET line. The read-and-clear CONTRACT exercised
+// here is identical to the one the real accessor upholds:
+//   - starts TRUE (baseline on startup)
 //   - ReadAndClear returns the current value, then clears it to FALSE
-//   - the consumer setting "queue empty" latches it back to TRUE
-// When Task 5 lands its accessor, this model should be replaced by tests
-// against the real function.
-void UnderranLatch_Init(void);                 // sets latch TRUE
-void UnderranLatch_SetConsumerEmpty(void);     // consumer observed empty -> latch TRUE
-BOOL UnderranLatch_ReadAndClear(void);         // return current, then clear to FALSE
+//   - a consumer-empty set latches it back to TRUE
+void Mirror_MarkPointQueueUnderran(void);           // simulate real consumer-empty SET
+BOOL Mirror_ReadAndClearPointQueueUnderran(void);   // mirror of the real accessor
 
 #endif // MOTOROS2_TEST_ADMISSION_MODEL_H

@@ -59,6 +59,10 @@ extern BOOL Ros_MotionControl_IsMotionMode_Trajectory();
 extern BOOL Ros_MotionControl_IsMotionMode_PointQueue();
 extern BOOL Ros_MotionControl_IsMotionMode_RawStreaming();
 
+// Returns the sticky point-queue underran flag and clears it to FALSE.
+// This is the ONLY site that clears the flag.
+extern BOOL Ros_MotionControl_ReadAndClearPointQueueUnderran(void);
+
 extern void Ros_MotionControl_ValidateMotionModeIsOk();
 
 #endif  // MOTOROS2_MOTION_CONTROL_H
