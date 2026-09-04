@@ -354,6 +354,9 @@
     <ClCompile Include="ServiceQueueTrajPoint.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceQueueTrajPointStream.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
     <ClCompile Include="ServiceStartPointQueueMode.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
@@ -468,6 +471,9 @@
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="ServiceQueueTrajPoint.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceQueueTrajPointStream.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="ServiceStartPointQueueMode.h">
