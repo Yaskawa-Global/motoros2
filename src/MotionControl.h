@@ -43,6 +43,12 @@ extern LONG Ros_MotionControl_PointQueueCount(CtrlGroup* ctrlGroup);          //
 extern BOOL Ros_MotionControl_PointQueueEnqueue(CtrlGroup* ctrlGroup, JointMotionData* pt); // producer append; FALSE if full/corrupt.
 extern BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* out); // consumer pop oldest; FALSE if empty/corrupt.
 
+// Reset the ring to empty (head == tail == 0), discarding queued points. Called
+// from the stop/mode-exit teardown (Ros_MotionControl_ClearQ_All). Safe because
+// the stop path quiesces the consumer first (see body). Does NOT touch the
+// sticky underran flag (per spec 5.5 it survives flush).
+extern void Ros_MotionControl_PointQueueFlush(CtrlGroup* ctrlGroup);
+
 // Shared admission+convert path feeding the point-queue ring for all groups.
 // Returns a motoros2_interfaces__msg__QueueResultEnum value; sets *out_depth (if non-NULL)
 // to the post-call depth of group 0 (all groups move in lockstep by construction).

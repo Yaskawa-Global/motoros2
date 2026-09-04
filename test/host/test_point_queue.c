@@ -146,6 +146,56 @@ static void test_point_queue_wraparound(void)
     ASSERT(!Ros_MotionControl_PointQueueDequeue(&g, &out));
 }
 
+// flush (teardown parity): enqueue N points, flush, assert the ring reports
+// depth 0, and that enqueue/dequeue work correctly afterward — i.e. head/tail
+// reset cleanly with no stale wraparound. Mirrors the stop/mode-exit teardown
+// performed by Ros_MotionControl_ClearQ_All in MotionControl.c.
+static void test_flush_clears_point_ring(void)
+{
+    printf("== TIER1 test_flush_clears_point_ring ==\n");
+    CtrlGroup g; new_group(&g);
+
+    // Advance head/tail into a non-trivial (wrapped) position first: fill,
+    // drain most, refill — so a naive "cnt=0" that forgot the indices would
+    // leave stale head/tail and be caught below.
+    for (int i = 0; i < POINT_QUEUE_DEPTH; i++) {
+        JointMotionData p; memset(&p, 0, sizeof(p)); p.time = (UINT64)(1000 + i);
+        ASSERT(Ros_MotionControl_PointQueueEnqueue(&g, &p));
+    }
+    for (int i = 0; i < POINT_QUEUE_DEPTH - 1; i++) {
+        JointMotionData out;
+        ASSERT(Ros_MotionControl_PointQueueDequeue(&g, &out));
+    }
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 1);
+
+    // Flush: ring must report empty.
+    Ros_MotionControl_PointQueueFlush(&g);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+    JointMotionData out;
+    ASSERT(!Ros_MotionControl_PointQueueDequeue(&g, &out));
+
+    // Guards must survive flush (flush only resets indices, not sentinels).
+    ASSERT(g.point_q.guard_pre == POINT_QUEUE_GUARD_MAGIC);
+    ASSERT(g.point_q.guard_post == POINT_QUEUE_GUARD_MAGIC);
+
+    // After flush, enqueue/dequeue must work cleanly from index 0 (no stale
+    // wraparound): fill fully, drain in FIFO order, end empty.
+    for (int i = 0; i < POINT_QUEUE_DEPTH; i++) {
+        JointMotionData p; memset(&p, 0, sizeof(p)); p.time = (UINT64)(5000 + i);
+        ASSERT(Ros_MotionControl_PointQueueEnqueue(&g, &p));
+        ASSERT(Ros_MotionControl_PointQueueCount(&g) == i + 1);
+    }
+    for (int i = 0; i < POINT_QUEUE_DEPTH; i++) {
+        JointMotionData d;
+        ASSERT(Ros_MotionControl_PointQueueDequeue(&g, &d) && d.time == (UINT64)(5000 + i));
+    }
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+
+    // Flush on an already-empty ring is a no-op that stays empty.
+    Ros_MotionControl_PointQueueFlush(&g);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+}
+
 //================ TIER 2 : admission policy + underran latch ===============
 
 // ONE_DEEP: first SUCCESS (depth 1), second BUSY.
@@ -216,6 +266,7 @@ int main(void)
     test_point_queue_full_rejects_enqueue();
     test_point_queue_wraparound();
     test_point_queue_guard_corruption_fails_safe();
+    test_flush_clears_point_ring();
     // Tier 2
     test_admit_one_deep();
     test_admit_fifo_fill_then_full();

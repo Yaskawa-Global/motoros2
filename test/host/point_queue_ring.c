@@ -98,3 +98,14 @@ BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* 
     ctrlGroup->point_q.head = nextHead;     // free the slot (publish new head)
     return TRUE;
 }
+
+// Flush the ring back to empty — mirrors Ros_MotionControl_PointQueueFlush in
+// motoros2/src/MotionControl.c (kept in lockstep; see the header banner). Resets
+// BOTH indices to 0 so the backing buffer restarts from slot 0 with no stale
+// wraparound. Deliberately does NOT touch any underran state (spec 5.5).
+void Ros_MotionControl_PointQueueFlush(CtrlGroup* ctrlGroup)
+{
+    ctrlGroup->point_q.head = 0;
+    ctrlGroup->point_q.tail = 0;
+    __sync_synchronize();                   // publish the reset before returning
+}

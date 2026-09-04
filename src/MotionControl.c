@@ -693,6 +693,33 @@ BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* 
     return TRUE;
 }
 
+// Flush the point-queue ring back to empty (head == tail == 0), discarding any
+// queued-but-not-yet-interpolated points. Used by the stop/hold/E-stop/mode-exit
+// teardown path (Ros_MotionControl_ClearQ_All) to bring the ring to parity with
+// the legacy one-deep queue, which was fully torn down on stop.
+//
+// CONCURRENCY / SPSC SAFETY: this ring is LOCK-FREE single-producer (owns tail)
+// / single-consumer (owns head). A blind "head = tail = 0" from an arbitrary
+// context could race the owning tasks. It is safe HERE because flush only runs
+// from the stop path: Ros_MotionControl_StopMotion raises bStopMotion = TRUE and
+// then waits for !Ros_MotionControl_HasDataToProcess() BEFORE calling
+// ClearQ_All, so the consumer (interpolation task, the sole dequeuer) is
+// quiesced and not touching head, and the producer admission path is gated off
+// by bStopMotion. With both owners quiesced, resetting both indices to 0 is
+// race-free. We deliberately zero BOTH indices (not just head = tail) so the
+// backing buffer restarts from slot 0 with no stale wraparound state — matching
+// the fresh state established at CtrlGroup init.
+//
+// CONTAINMENT: flush does NOT read or clear Ros_MotionControl_PointQueueUnderran.
+// Per spec 5.5 the sticky underran flag intentionally SURVIVES a flush; it is
+// cleared only by Ros_MotionControl_ReadAndClearPointQueueUnderran().
+void Ros_MotionControl_PointQueueFlush(CtrlGroup* ctrlGroup)
+{
+    ctrlGroup->point_q.head = 0;
+    ctrlGroup->point_q.tail = 0;
+    __sync_synchronize();                   // publish the reset before returning
+}
+
 //-------------------------------------------------------------------
 // Shared admission+convert path: converts an incoming trajectory point and
 // enqueues one JointMotionData per control group into the point-queue ring.
@@ -1375,6 +1402,15 @@ BOOL Ros_MotionControl_ClearQ_All()
 
         // Set pointer to specified queue
         Incremental_q* q = &g_Ros_Controller.ctrlGroups[groupNo]->inc_q;
+
+        // Flush the point-queue ring to parity with the inc_q teardown below.
+        // This is the ONE site inc_q is reset, so it is also the site the ring
+        // must be emptied (stop/hold/E-stop/mode-exit all funnel through here
+        // and through StartMotionMode's leftover-clear, which also call this).
+        // Lock-free reset is safe: see Ros_MotionControl_PointQueueFlush — the
+        // stop path has already quiesced the consumer. NOTE: intentionally does
+        // NOT touch the sticky underran flag (spec 5.5: it survives flush).
+        Ros_MotionControl_PointQueueFlush(g_Ros_Controller.ctrlGroups[groupNo]);
 
         // Lock the q before manipulating it
         if (mpSemTake(q->q_lock, Q_LOCK_TIMEOUT) == OK)
