@@ -89,6 +89,7 @@ typedef struct
 {
     volatile LONG head;             // CONSUMER-owned: index of oldest queued point
     volatile LONG tail;             // PRODUCER-owned: index of next free slot
+    volatile BOOL flushRequested;   // CONSUMER-cleared async flush request; setter writes neither index
     UINT32 guard_pre;               // == POINT_QUEUE_GUARD_MAGIC
     JointMotionData data[POINT_QUEUE_SLOTS];
     UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC

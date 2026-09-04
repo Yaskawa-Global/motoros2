@@ -196,6 +196,77 @@ static void test_flush_clears_point_ring(void)
     ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
 }
 
+// flush-as-request (async-safe) semantics. The async caller (IO-status monitor)
+// only SETS flushRequested and touches neither index; the consumer actions it
+// (head = tail) at the top of its loop. This test simulates that split as far as
+// the single-threaded host allows: (a) request does not itself change indices;
+// (b) the consumer's flush-action step empties the ring (head = tail); (c) the
+// request flag is cleared by the consumer; (d) enqueue/dequeue work cleanly from
+// a wrapped position afterward, with consistent indices and no stale wraparound.
+static void test_flush_request_consumer_actions(void)
+{
+    printf("== TIER1 test_flush_request_consumer_actions ==\n");
+    CtrlGroup g; new_group(&g);
+
+    // Advance into a wrapped position: fill, drain most, refill some, so head/tail
+    // are both non-zero and unequal (a naive reset would be caught below).
+    for (int i = 0; i < POINT_QUEUE_DEPTH; i++) {
+        JointMotionData p; memset(&p, 0, sizeof(p)); p.time = (UINT64)(1000 + i);
+        ASSERT(Ros_MotionControl_PointQueueEnqueue(&g, &p));
+    }
+    for (int i = 0; i < POINT_QUEUE_DEPTH - 2; i++) {
+        JointMotionData out;
+        ASSERT(Ros_MotionControl_PointQueueDequeue(&g, &out));
+    }
+    for (int i = 0; i < 2; i++) {
+        JointMotionData p; memset(&p, 0, sizeof(p)); p.time = (UINT64)(2000 + i);
+        ASSERT(Ros_MotionControl_PointQueueEnqueue(&g, &p));
+    }
+    LONG depthBefore = Ros_MotionControl_PointQueueCount(&g);
+    ASSERT(depthBefore > 0);
+    LONG headBefore = g.point_q.head;
+    LONG tailBefore = g.point_q.tail;
+
+    // (a) REQUEST a flush (async setter). It must NOT change head or tail, and the
+    //     ring must still report its prior depth (nothing has actioned it yet).
+    Ros_MotionControl_PointQueueRequestFlush(&g);
+    ASSERT(g.point_q.flushRequested == TRUE);
+    ASSERT(g.point_q.head == headBefore);
+    ASSERT(g.point_q.tail == tailBefore);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == depthBefore);
+
+    // (b)/(c) CONSUMER actions the request: head = tail (empty), flag cleared.
+    ASSERT(Ros_MotionControl_PointQueueActionFlushIfRequested(&g) == TRUE);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+    ASSERT(g.point_q.flushRequested == FALSE);
+    ASSERT(g.point_q.head == g.point_q.tail);   // atomically empty via head = tail
+    JointMotionData out;
+    ASSERT(!Ros_MotionControl_PointQueueDequeue(&g, &out));
+
+    // Actioning again with no pending request is a no-op returning FALSE.
+    ASSERT(Ros_MotionControl_PointQueueActionFlushIfRequested(&g) == FALSE);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+
+    // (d) Enqueue/dequeue must work cleanly afterward from the (wrapped) index the
+    //     flush left head==tail at — fill fully, drain FIFO, end empty, indices
+    //     consistent (no stale wraparound).
+    for (int i = 0; i < POINT_QUEUE_DEPTH; i++) {
+        JointMotionData p; memset(&p, 0, sizeof(p)); p.time = (UINT64)(7000 + i);
+        ASSERT(Ros_MotionControl_PointQueueEnqueue(&g, &p));
+        ASSERT(Ros_MotionControl_PointQueueCount(&g) == i + 1);
+    }
+    ASSERT(!Ros_MotionControl_PointQueueEnqueue(&g, &out));  // full rejects
+    for (int i = 0; i < POINT_QUEUE_DEPTH; i++) {
+        JointMotionData d;
+        ASSERT(Ros_MotionControl_PointQueueDequeue(&g, &d) && d.time == (UINT64)(7000 + i));
+    }
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+
+    // Guards survive the request/action cycle (only indices + flag touched).
+    ASSERT(g.point_q.guard_pre == POINT_QUEUE_GUARD_MAGIC);
+    ASSERT(g.point_q.guard_post == POINT_QUEUE_GUARD_MAGIC);
+}
+
 //================ TIER 2 : admission policy + underran latch ===============
 
 // ONE_DEEP: first SUCCESS (depth 1), second BUSY.
@@ -267,6 +338,7 @@ int main(void)
     test_point_queue_wraparound();
     test_point_queue_guard_corruption_fails_safe();
     test_flush_clears_point_ring();
+    test_flush_request_consumer_actions();
     // Tier 2
     test_admit_one_deep();
     test_admit_fifo_fill_then_full();

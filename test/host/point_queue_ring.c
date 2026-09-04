@@ -99,13 +99,40 @@ BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* 
     return TRUE;
 }
 
-// Flush the ring back to empty — mirrors Ros_MotionControl_PointQueueFlush in
-// motoros2/src/MotionControl.c (kept in lockstep; see the header banner). Resets
-// BOTH indices to 0 so the backing buffer restarts from slot 0 with no stale
-// wraparound. Deliberately does NOT touch any underran state (spec 5.5).
+// DIRECT flush (quiesced-caller-only) — mirrors Ros_MotionControl_PointQueueFlush
+// in motoros2/src/MotionControl.c (kept in lockstep; see the header banner).
+// Resets BOTH indices to 0 so the backing buffer restarts from slot 0 with no
+// stale wraparound. Deliberately does NOT touch any underran state (spec 5.5).
 void Ros_MotionControl_PointQueueFlush(CtrlGroup* ctrlGroup)
 {
     ctrlGroup->point_q.head = 0;
     ctrlGroup->point_q.tail = 0;
     __sync_synchronize();                   // publish the reset before returning
+}
+
+// ASYNC-SAFE flush REQUEST — mirrors Ros_MotionControl_PointQueueRequestFlush in
+// motoros2/src/MotionControl.c. Sets the per-group flag only; touches NEITHER
+// head NOR tail (preserving the single-writer-each SPSC invariant when called
+// from a context that has not quiesced the consumer).
+void Ros_MotionControl_PointQueueRequestFlush(CtrlGroup* ctrlGroup)
+{
+    ctrlGroup->point_q.flushRequested = TRUE;
+    __sync_synchronize();                   // publish the request before returning
+}
+
+// CONSUMER flush-action step — mirrors the top-of-loop block in
+// Ros_MotionControl_AddToIncQueueProcess (motoros2/src/MotionControl.c). This is
+// the ONLY place the async flush reset happens: a single read of producer-owned
+// tail, a single write of consumer-owned head (head = tail => empty), then clear
+// the request. Returns TRUE if a flush was actioned this call. (The host stub
+// CtrlGroup carries no trajectoryIterator, so iterator invalidation — which the
+// real consumer also performs — is exercised in the integration code, not here.)
+BOOL Ros_MotionControl_PointQueueActionFlushIfRequested(CtrlGroup* ctrlGroup)
+{
+    if (!ctrlGroup->point_q.flushRequested)
+        return FALSE;
+    ctrlGroup->point_q.head = ctrlGroup->point_q.tail;  // read producer tail once, write consumer head once => empty
+    __sync_synchronize();                               // publish head reset
+    ctrlGroup->point_q.flushRequested = FALSE;          // consumer clears the request last
+    return TRUE;
 }

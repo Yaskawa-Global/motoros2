@@ -327,6 +327,30 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
     {
         if (Ros_MotionControl_AllGroupsInitComplete)
         {
+            // ASYNC-SAFE FLUSH ACTION (consumer side): an async caller (IO-status
+            // monitor on alarm / WAITING_ROS-off / PFL) may have requested a flush
+            // via Ros_MotionControl_PointQueueRequestFlush, which only set the flag
+            // and touched neither index. THIS is the sole place the async flush
+            // reset happens, and the consumer is the sole writer of head, so the
+            // SPSC single-writer-each invariant holds. Empty the ring with a single
+            // read of the producer-owned tail and a single write of the
+            // consumer-owned head (head = tail => derived depth 0), atomically
+            // empty with no torn index. We ALSO abandon the point currently being
+            // fed: after head = tail the in-flight point already copied into the
+            // working iterator is stale (it belongs to the flushed stream), so for
+            // a SAFETY flush (alarm/PFL/stop) we invalidate the iterator so the
+            // interpolation gate below stops feeding that segment too — otherwise
+            // the robot would keep interpolating one abandoned point past the
+            // flush. Underran is intentionally NOT touched (spec 5.5: survives).
+            if (ctrlGroup->point_q.flushRequested)
+            {
+                ctrlGroup->point_q.head = ctrlGroup->point_q.tail;  // read producer tail once, write consumer head once => empty
+                if (ctrlGroup->trajectoryIterator != NULL)
+                    ctrlGroup->trajectoryIterator->valid = FALSE;   // abandon the in-flight (now stale) point
+                __sync_synchronize();                               // publish head reset + iterator invalidation
+                ctrlGroup->point_q.flushRequested = FALSE;          // consumer clears the request last
+            }
+
             // Point-queue mode: feed the working iterator from the ring. If the
             // iterator slot is free (not valid), pull the next point off this
             // group's ring and mark it valid so the interpolation gate below can
@@ -693,22 +717,26 @@ BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* 
     return TRUE;
 }
 
-// Flush the point-queue ring back to empty (head == tail == 0), discarding any
-// queued-but-not-yet-interpolated points. Used by the stop/hold/E-stop/mode-exit
-// teardown path (Ros_MotionControl_ClearQ_All) to bring the ring to parity with
-// the legacy one-deep queue, which was fully torn down on stop.
+// DIRECT flush: reset the point-queue ring to empty (head == tail == 0),
+// discarding any queued-but-not-yet-interpolated points.
 //
-// CONCURRENCY / SPSC SAFETY: this ring is LOCK-FREE single-producer (owns tail)
-// / single-consumer (owns head). A blind "head = tail = 0" from an arbitrary
-// context could race the owning tasks. It is safe HERE because flush only runs
-// from the stop path: Ros_MotionControl_StopMotion raises bStopMotion = TRUE and
-// then waits for !Ros_MotionControl_HasDataToProcess() BEFORE calling
-// ClearQ_All, so the consumer (interpolation task, the sole dequeuer) is
-// quiesced and not touching head, and the producer admission path is gated off
-// by bStopMotion. With both owners quiesced, resetting both indices to 0 is
-// race-free. We deliberately zero BOTH indices (not just head = tail) so the
-// backing buffer restarts from slot 0 with no stale wraparound state — matching
-// the fresh state established at CtrlGroup init.
+// >>> QUIESCED-CALLER-ONLY <<<
+// This ring is LOCK-FREE single-producer (owns tail) / single-consumer (owns
+// head). Writing BOTH indices from here is race-free ONLY when the consumer
+// (the interpolation task, sole owner of head) is provably not running. The one
+// caller that guarantees this is Ros_MotionControl_StopMotion: it raises
+// bStopMotion = TRUE and then WAITS for !Ros_MotionControl_HasDataToProcess()
+// before flushing, so the consumer is quiesced and not touching head, and the
+// producer admission path is gated off by bStopMotion. With both owners
+// quiesced, resetting both indices to 0 is race-free, and StopMotion is
+// guaranteed an empty ring ON RETURN (it cannot rely on the consumer actioning
+// a request, because the consumer is stopped). We deliberately zero BOTH indices
+// so the backing buffer restarts from slot 0 with no stale wraparound state.
+//
+// ASYNC callers (IO-status monitor: alarm / WAITING_ROS-off / PFL) MUST NOT call
+// this — they do not quiesce the consumer and a torn head write would corrupt
+// the ring. They use Ros_MotionControl_PointQueueRequestFlush instead, which the
+// consumer actions safely.
 //
 // CONTAINMENT: flush does NOT read or clear Ros_MotionControl_PointQueueUnderran.
 // Per spec 5.5 the sticky underran flag intentionally SURVIVES a flush; it is
@@ -718,6 +746,22 @@ void Ros_MotionControl_PointQueueFlush(CtrlGroup* ctrlGroup)
     ctrlGroup->point_q.head = 0;
     ctrlGroup->point_q.tail = 0;
     __sync_synchronize();                   // publish the reset before returning
+}
+
+// ASYNC-SAFE flush: REQUEST that the consumer empty the ring. Sets the per-group
+// flushRequested flag and returns immediately. Touches NEITHER head NOR tail, so
+// it preserves the single-writer-each SPSC invariant and is safe to call from an
+// arbitrary context that has NOT quiesced the consumer — specifically the
+// IO-status monitor task (Ros_Controller_IoStatusUpdate) on alarm / WAITING_ROS
+// turning off / PFL stop-escape-avoid. The consumer (sole owner of head) sees the
+// flag at the top of its per-cycle loop and performs the actual reset there via
+// head = tail (see Ros_MotionControl_AddToIncQueueProcess).
+//
+// CONTAINMENT: does NOT touch the sticky underran flag (spec 5.5: survives flush).
+void Ros_MotionControl_PointQueueRequestFlush(CtrlGroup* ctrlGroup)
+{
+    ctrlGroup->point_q.flushRequested = TRUE;
+    __sync_synchronize();                   // publish the request before returning
 }
 
 //-------------------------------------------------------------------
@@ -1366,6 +1410,19 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
     // Clear queues
     bRet = Ros_MotionControl_ClearQ_All();
 
+    // DIRECT point-queue flush: ClearQ_All only REQUESTED a flush (async-safe),
+    // which relies on the consumer actioning head = tail at the top of its loop.
+    // But StopMotion has QUIESCED the consumer above (bStopMotion = TRUE, mpHold,
+    // then waited for !HasDataToProcess()), so the consumer will NOT run to action
+    // that request — and StopMotion must return with a definitely-empty ring.
+    // Because the consumer is provably stopped, it is race-free for StopMotion to
+    // reset both indices directly here. The obsolete request the ClearQ_All call
+    // left in flushRequested is harmless (the ring is already empty after this
+    // direct reset); we leave the flag alone — the direct reset is what makes the
+    // ring empty on return.
+    for (int groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo++)
+        Ros_MotionControl_PointQueueFlush(g_Ros_Controller.ctrlGroups[groupNo]);
+
     // All motion should be stopped at this point, so turn of the flag
     g_Ros_Controller.bStopMotion = FALSE;
 
@@ -1403,14 +1460,17 @@ BOOL Ros_MotionControl_ClearQ_All()
         // Set pointer to specified queue
         Incremental_q* q = &g_Ros_Controller.ctrlGroups[groupNo]->inc_q;
 
-        // Flush the point-queue ring to parity with the inc_q teardown below.
-        // This is the ONE site inc_q is reset, so it is also the site the ring
-        // must be emptied (stop/hold/E-stop/mode-exit all funnel through here
-        // and through StartMotionMode's leftover-clear, which also call this).
-        // Lock-free reset is safe: see Ros_MotionControl_PointQueueFlush — the
-        // stop path has already quiesced the consumer. NOTE: intentionally does
-        // NOT touch the sticky underran flag (spec 5.5: it survives flush).
-        Ros_MotionControl_PointQueueFlush(g_Ros_Controller.ctrlGroups[groupNo]);
+        // ASYNC-SAFE flush of the point-queue ring, to parity with the inc_q
+        // teardown below. ClearQ_All has ASYNC callers that do NOT quiesce the
+        // consumer (Ros_Controller_IoStatusUpdate: alarm / WAITING_ROS-off / PFL),
+        // so we MUST NOT touch head/tail here. Instead REQUEST a flush: the
+        // consumer (sole owner of head) actions it (head = tail) at the top of its
+        // loop. This is always safe regardless of caller context. The one caller
+        // that needs the ring definitely-empty ON RETURN — StopMotion — has
+        // already quiesced the consumer, so it performs its OWN direct flush after
+        // this call (a stopped consumer would never action the request). NOTE:
+        // intentionally does NOT touch the sticky underran flag (spec 5.5).
+        Ros_MotionControl_PointQueueRequestFlush(g_Ros_Controller.ctrlGroups[groupNo]);
 
         // Lock the q before manipulating it
         if (mpSemTake(q->q_lock, Q_LOCK_TIMEOUT) == OK)

@@ -76,6 +76,13 @@ typedef struct
 {
     volatile LONG head;             // CONSUMER-owned: index of oldest queued point (dequeue advances)
     volatile LONG tail;             // PRODUCER-owned: index of next free slot (enqueue advances)
+    // ASYNC-SAFE FLUSH REQUEST: set TRUE by any (possibly async, non-quiescing)
+    // caller that wants the ring emptied; ACTIONED (and cleared) exclusively by
+    // the consumer at the top of Ros_MotionControl_AddToIncQueueProcess. The
+    // async setter touches NEITHER head NOR tail, so the single-writer-each SPSC
+    // invariant is preserved even from the IO-status monitor task. Init FALSE at
+    // CtrlGroup construction (bzero of point_q).
+    volatile BOOL flushRequested;   // CONSUMER-cleared flush request; setter writes neither index
     UINT32 guard_pre;               // == POINT_QUEUE_GUARD_MAGIC (pre-buffer sentinel)
     JointMotionData data[POINT_QUEUE_SLOTS];
     UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC (post-buffer sentinel)
