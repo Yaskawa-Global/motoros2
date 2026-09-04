@@ -22,10 +22,29 @@ typedef enum
     MOTION_MODE_POINTQUEUE
 } MOTION_MODE;
 
+// Admission policy governing how a new point is accepted into the point-queue ring.
+//   POINT_QUEUE_ADMIT_ONE_DEEP : legacy behavior — admit iff the ring is empty (BUSY otherwise).
+//   POINT_QUEUE_ADMIT_FIFO     : streaming behavior — admit iff the ring is not full (QUEUE_FULL otherwise).
+typedef enum
+{
+    POINT_QUEUE_ADMIT_ONE_DEEP,
+    POINT_QUEUE_ADMIT_FIFO
+} PointQueueAdmitPolicy;
+
 extern Init_Trajectory_Status Ros_MotionControl_InitTrajectory(control_msgs__action__FollowJointTrajectory_SendGoal_Request* pending_ros_goal_request);
 extern void Ros_MotionControl_IncMoveLoopStart();
 extern void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup);
 extern UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request);
+
+// Point-queue ring primitives (point-queue mode). Each operates under point_q.q_lock.
+extern LONG Ros_MotionControl_PointQueueCount(CtrlGroup* ctrlGroup);          // count under lock; ERROR on lock failure.
+extern BOOL Ros_MotionControl_PointQueueEnqueue(CtrlGroup* ctrlGroup, JointMotionData* pt); // append under lock; FALSE if full/lock fail.
+extern BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* out); // pop oldest under lock; FALSE if empty/lock fail.
+
+// Shared admission+convert path feeding the point-queue ring for all groups.
+// Returns a motoros2_interfaces__msg__QueueResultEnum value; sets *out_depth (if non-NULL)
+// to the post-call depth of group 0 (all groups move in lockstep by construction).
+extern UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request, PointQueueAdmitPolicy policy, UINT16* out_depth);
 extern BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_data const* dataToEnQ);
 extern BOOL Ros_MotionControl_HasDataInQueue();
 extern BOOL Ros_MotionControl_HasDataToProcess();

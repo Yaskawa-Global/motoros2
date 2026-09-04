@@ -570,6 +570,131 @@ BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_dat
     return TRUE;
 }
 
+//-------------------------------------------------------------------
+// Point-queue ring primitives (point-queue mode).
+// Locking discipline mirrors inc_q: mpSemTake/mpSemGive with Q_LOCK_TIMEOUT.
+//-------------------------------------------------------------------
+LONG Ros_MotionControl_PointQueueCount(CtrlGroup* ctrlGroup)
+{
+    LONG cnt = 0;
+    if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
+    {
+        cnt = ctrlGroup->point_q.cnt;
+        mpSemGive(ctrlGroup->point_q.q_lock);
+    }
+    else
+        cnt = ERROR;
+    return cnt;
+}
+
+BOOL Ros_MotionControl_PointQueueEnqueue(CtrlGroup* ctrlGroup, JointMotionData* pt)
+{
+    BOOL ok = FALSE;
+    if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
+    {
+        if (ctrlGroup->point_q.cnt < POINT_QUEUE_DEPTH)
+        {
+            int writeIdx = Q_OFFSET_IDX(ctrlGroup->point_q.idx, ctrlGroup->point_q.cnt, POINT_QUEUE_DEPTH);
+            ctrlGroup->point_q.data[writeIdx] = *pt;
+            ctrlGroup->point_q.cnt += 1;
+            ok = TRUE;
+        }
+        mpSemGive(ctrlGroup->point_q.q_lock);
+    }
+    return ok;
+}
+
+BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* out)
+{
+    BOOL ok = FALSE;
+    if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
+    {
+        if (ctrlGroup->point_q.cnt > 0)
+        {
+            *out = ctrlGroup->point_q.data[ctrlGroup->point_q.idx];
+            ctrlGroup->point_q.idx = Q_OFFSET_IDX(ctrlGroup->point_q.idx, 1, POINT_QUEUE_DEPTH);
+            ctrlGroup->point_q.cnt -= 1;
+            ok = TRUE;
+        }
+        mpSemGive(ctrlGroup->point_q.q_lock);
+    }
+    return ok;
+}
+
+//-------------------------------------------------------------------
+// Shared admission+convert path: converts an incoming trajectory point and
+// enqueues one JointMotionData per control group into the point-queue ring.
+// The admission policy governs whether a point is accepted (one-deep legacy vs
+// FIFO streaming). *out_depth (if non-NULL) is set to group 0's post-call depth.
+//-------------------------------------------------------------------
+UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
+    motoros2_interfaces__srv__QueueTrajPoint_Request* request,
+    PointQueueAdmitPolicy policy, UINT16* out_depth)
+{
+    int grpIndex, jointIndexInTraj;
+
+    if (Ros_MotionControl_MustInitializePointQueue)
+    {
+        Init_Trajectory_Status status = Ros_MotionControl_InitPointQueue(request);
+        if (out_depth) *out_depth = 0;
+        return (status == INIT_TRAJ_OK)
+            ? motoros2_interfaces__msg__QueueResultEnum__SUCCESS
+            : (UINT16)status;
+    }
+
+    if (g_Ros_Controller.totalAxesCount != request->joint_names.size)
+        return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
+
+    // Admission check against the ring (all groups move in lockstep).
+    for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
+    {
+        LONG cnt = Ros_MotionControl_PointQueueCount(g_Ros_Controller.ctrlGroups[grpIndex]);
+        if (cnt == ERROR)
+            return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
+        if (policy == POINT_QUEUE_ADMIT_ONE_DEEP && cnt >= 1)
+            return motoros2_interfaces__msg__QueueResultEnum__BUSY;
+        if (policy == POINT_QUEUE_ADMIT_FIFO && cnt >= POINT_QUEUE_DEPTH)
+            return motoros2_interfaces__msg__QueueResultEnum__QUEUE_FULL;
+    }
+
+    if (Ros_MotionControl_HasDuplicateNames(&request->joint_names))
+        return INIT_TRAJ_DUPLICATE_JOINT_NAME;
+
+    // Convert into a per-group staging point, then enqueue.
+    JointMotionData staged[MAX_CONTROLLABLE_GROUPS];
+    bzero(staged, sizeof(staged));
+
+    trajectory_msgs__msg__JointTrajectoryPoint__Sequence pointSequence;
+    pointSequence.capacity = 1;
+    pointSequence.size = 1;
+    pointSequence.data = &request->point; //no additional memory is allocated this way
+
+    for (jointIndexInTraj = 0; jointIndexInTraj < request->joint_names.size; jointIndexInTraj += 1)
+    {
+        int jointIndexInCtrlGroup;
+        if (!Ros_MotionControl_FindCtrlGroupAndIndex(&request->joint_names.data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
+            return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
+
+        Init_Trajectory_Status status = Ros_MotionControl_ConvertTrajectoryToJointMotionData(
+            &pointSequence, jointIndexInTraj, g_Ros_Controller.ctrlGroups[grpIndex],
+            jointIndexInCtrlGroup, &staged[grpIndex]);
+        if (status != INIT_TRAJ_OK)
+            return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
+    }
+
+    for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
+    {
+        staged[grpIndex].valid = TRUE;
+        if (!Ros_MotionControl_PointQueueEnqueue(g_Ros_Controller.ctrlGroups[grpIndex], &staged[grpIndex]))
+            return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
+    }
+
+    if (out_depth)
+        *out_depth = (UINT16)Ros_MotionControl_PointQueueCount(g_Ros_Controller.ctrlGroups[0]);
+
+    return motoros2_interfaces__msg__QueueResultEnum__SUCCESS;
+}
+
 UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request)
 {
     if (Ros_MotionControl_MustInitializePointQueue)
