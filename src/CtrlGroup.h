@@ -49,6 +49,17 @@ typedef struct
     double vel[MP_GRP_AXES_NUM];    // velocity in radians/s
 } JointMotionData;
 
+#define POINT_QUEUE_DEPTH 32   // depth of the point-queue FIFO (see streaming-point-fifo spec); tunable, single source of truth
+
+// Ring FIFO of trajectory points awaiting interpolation (point-queue mode).
+typedef struct
+{
+    SEM_ID q_lock;
+    LONG cnt;                       // number of points currently queued
+    LONG idx;                       // index of the oldest queued point
+    JointMotionData data[POINT_QUEUE_DEPTH];
+} PointQueue_q;
+
 //---------------------------------------------------------------
 // CtrlGroup:
 // Structure containing all the data related to a control group
@@ -66,6 +77,7 @@ typedef struct
     int tool;                                   // selected tool for the motion
 
     Incremental_q inc_q;                        // incremental queue
+    PointQueue_q point_q;                       // point-queue FIFO (point-queue mode)
     UINT64 q_time;                              // time to which the queue has been processed
 
     JointMotionData* trajectoryIterator;        // joint motion command data in radian
