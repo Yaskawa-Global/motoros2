@@ -321,6 +321,19 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
     {
         if (Ros_MotionControl_AllGroupsInitComplete)
         {
+            // Point-queue mode: feed the working iterator from the ring. If the
+            // iterator slot is free (not valid), pull the next point off this
+            // group's ring and mark it valid so the interpolation gate below can
+            // process it. FJT/trajectory mode is untouched — it still walks the
+            // pinned trajectoryToProcess buffer via the branch at the end.
+            if (Ros_MotionControl_IsMotionMode_PointQueue()
+                && ctrlGroup->trajectoryIterator != NULL
+                && !ctrlGroup->trajectoryIterator->valid)
+            {
+                if (Ros_MotionControl_PointQueueDequeue(ctrlGroup, ctrlGroup->trajectoryIterator))
+                    ctrlGroup->trajectoryIterator->valid = TRUE;
+            }
+
             // if there is no message to process, delay and try again
             if (!g_Ros_Controller.bStopMotion && ctrlGroup->hasDataToProcess && ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
             {
@@ -697,98 +710,10 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
 
 UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request)
 {
-    if (Ros_MotionControl_MustInitializePointQueue)
-    {
-        Ros_Debug_BroadcastMsg("Initial point in trajectory queue");
-
-        Init_Trajectory_Status status;
-        status = Ros_MotionControl_InitPointQueue(request);
-
-        if (status == INIT_TRAJ_OK)
-        {
-            return motoros2_interfaces__msg__QueueResultEnum__SUCCESS;
-        }
-        else
-        {
-            return status;
-        }
-    }
-
-    //------------------------------------------------------------
-    //The trajectory contains information for all groups. Determine which groups are used by looking at the 'joint names'.
-    int grpIndex, jointIndexInTraj;
-
-    if (g_Ros_Controller.totalAxesCount != request->joint_names.size)
-    {
-        Ros_Debug_BroadcastMsg("Queued point must contain data for all %d joints.", g_Ros_Controller.totalAxesCount);
-        return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
-    }
-
-    //===================================
-    //Incoming points are processed one joint at a time.
-    //For each of those joints, this iterates over all of the CtrlGroup objects and compares the joint names.
-    //This allows it to find the correct CtrlGroup object and the joint index (in moto order) in the JointMotionData array.
-    //===================================
-
-    //precheck to ensure all groups are ready to accept a new point
-    for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
-    {
-        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-
-        if (ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
-        {
-            //A point is already being processed for this control group.
-            //Wait for it to be processed before adding a new point.
-            return motoros2_interfaces__msg__QueueResultEnum__BUSY;
-        }
-    }
-
-    if (Ros_MotionControl_HasDuplicateNames(&request->joint_names))
-    {
-        return INIT_TRAJ_DUPLICATE_JOINT_NAME;
-    }
-
-    //for each joint/axis in a single trajectory point
-    for (jointIndexInTraj = 0; jointIndexInTraj < request->joint_names.size; jointIndexInTraj += 1)
-    {
-        int  jointIndexInCtrlGroup;
-        CtrlGroup* ctrlGroup;
-
-        if (!Ros_MotionControl_FindCtrlGroupAndIndex(&request->joint_names.data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
-        {
-            return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
-        }
-        ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-
-        // for point queuing, we create a single-point trajectory, store the incoming
-        // point in it and send it off for processing by the trajectory processing
-        // pipeline.
-        trajectory_msgs__msg__JointTrajectoryPoint__Sequence pointSequence;
-
-        pointSequence.capacity = 1;
-        pointSequence.size = 1;
-        pointSequence.data = &request->point; //no additional memory is allocated this way
-
-        //NOTE: I'm using the SECOND point in the 200 point buffer to hold the converted data. The `Ros_MotionControl_Init` function
-        //      populated the first buffer position with the initial point in the queue. Followup points are placed in the second 
-        //      buffer position. As the destination in position 2 is processed, it is moved into position 1 to become the starting
-        //      point for the next destination.
-        Init_Trajectory_Status status = Ros_MotionControl_ConvertTrajectoryToJointMotionData(&pointSequence, jointIndexInTraj, ctrlGroup, jointIndexInCtrlGroup, ctrlGroup->trajectoryIterator);
-        if (status != INIT_TRAJ_OK)
-        {
-            Ros_Debug_BroadcastMsg("Failed to parse incoming trajectory point.");
-            return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
-        }
-    }
-
-    for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
-    {
-        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-
-        ctrlGroup->trajectoryIterator->valid = TRUE;
-    }
-
-    return motoros2_interfaces__msg__QueueResultEnum__SUCCESS;
+    //Legacy one-deep handler: thin wrapper over the shared admission core.
+    //ONE_DEEP policy admits iff the ring is empty (count == 0), preserving the
+    //legacy SUCCESS-then-BUSY (never QUEUE_FULL) semantics for legacy clients.
+    return Ros_MotionControl_EnqueueTrajectoryPoint(request, POINT_QUEUE_ADMIT_ONE_DEEP, NULL);
 }
 
 //-------------------------------------------------------------------
