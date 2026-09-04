@@ -166,6 +166,8 @@ CtrlGroup* Ros_CtrlGroup_Create(int groupIndex, BOOL bIsLastGrpToInit, float int
         ctrlGroup->inc_q.q_lock = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
 
         bzero(&ctrlGroup->point_q, sizeof(PointQueue_q));
+        ctrlGroup->point_q.guard_pre = POINT_QUEUE_GUARD_MAGIC;
+        ctrlGroup->point_q.guard_post = POINT_QUEUE_GUARD_MAGIC;
         ctrlGroup->point_q.q_lock = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
 
         // Calculate maximum speed in radian per second

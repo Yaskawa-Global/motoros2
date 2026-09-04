@@ -587,11 +587,30 @@ BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_dat
 // Point-queue ring primitives (point-queue mode).
 // Locking discipline mirrors inc_q: mpSemTake/mpSemGive with Q_LOCK_TIMEOUT.
 //-------------------------------------------------------------------
+
+// Fail-safe pre/post buffer-sentinel check. Returns TRUE iff both bracket
+// guard words still hold POINT_QUEUE_GUARD_MAGIC (i.e. the data[] array has not
+// been overrun on either side). Cheap: two integer compares. Callers MUST hold
+// point_q.q_lock; on mismatch they release the lock, raise a fatal alarm and
+// fail safe rather than feed a corrupted point into motion.
+static BOOL Ros_MotionControl_PointQueueGuardsOk(CtrlGroup* ctrlGroup)
+{
+    return (ctrlGroup->point_q.guard_pre == POINT_QUEUE_GUARD_MAGIC)
+        && (ctrlGroup->point_q.guard_post == POINT_QUEUE_GUARD_MAGIC);
+}
+
 LONG Ros_MotionControl_PointQueueCount(CtrlGroup* ctrlGroup)
 {
     LONG cnt = 0;
     if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
     {
+        if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
+        {
+            mpSemGive(ctrlGroup->point_q.q_lock);
+            mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
+                SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
+            return ERROR;
+        }
         cnt = ctrlGroup->point_q.cnt;
         mpSemGive(ctrlGroup->point_q.q_lock);
     }
@@ -605,6 +624,13 @@ BOOL Ros_MotionControl_PointQueueEnqueue(CtrlGroup* ctrlGroup, JointMotionData* 
     BOOL ok = FALSE;
     if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
     {
+        if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
+        {
+            mpSemGive(ctrlGroup->point_q.q_lock);
+            mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
+                SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
+            return FALSE;
+        }
         if (ctrlGroup->point_q.cnt < POINT_QUEUE_DEPTH)
         {
             int writeIdx = Q_OFFSET_IDX(ctrlGroup->point_q.idx, ctrlGroup->point_q.cnt, POINT_QUEUE_DEPTH);
@@ -622,6 +648,13 @@ BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* 
     BOOL ok = FALSE;
     if (mpSemTake(ctrlGroup->point_q.q_lock, Q_LOCK_TIMEOUT) == OK)
     {
+        if (!Ros_MotionControl_PointQueueGuardsOk(ctrlGroup))
+        {
+            mpSemGive(ctrlGroup->point_q.q_lock);
+            mpSetAlarm(ALARM_ASSERTION_FAIL, "Point-queue buffer corrupted",
+                SUBCODE_POINT_QUEUE_GUARD_CORRUPTION);
+            return FALSE;
+        }
         if (ctrlGroup->point_q.cnt > 0)
         {
             *out = ctrlGroup->point_q.data[ctrlGroup->point_q.idx];
@@ -648,6 +681,7 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
 
     if (Ros_MotionControl_MustInitializePointQueue)
     {
+        Ros_Debug_BroadcastMsg("Initial point in trajectory queue");
         Init_Trajectory_Status status = Ros_MotionControl_InitPointQueue(request);
         if (out_depth) *out_depth = 0;
         return (status == INIT_TRAJ_OK)
@@ -656,7 +690,10 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
     }
 
     if (g_Ros_Controller.totalAxesCount != request->joint_names.size)
+    {
+        Ros_Debug_BroadcastMsg("Queued point must contain data for all %d joints.", g_Ros_Controller.totalAxesCount);
         return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
+    }
 
     // Admission check against the ring (all groups move in lockstep).
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
@@ -692,7 +729,10 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
             &pointSequence, jointIndexInTraj, g_Ros_Controller.ctrlGroups[grpIndex],
             jointIndexInCtrlGroup, &staged[grpIndex]);
         if (status != INIT_TRAJ_OK)
+        {
+            Ros_Debug_BroadcastMsg("Failed to parse incoming trajectory point.");
             return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
+        }
     }
 
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)

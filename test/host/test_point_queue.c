@@ -30,6 +30,9 @@ static void new_group(CtrlGroup* g)
 {
     memset(g, 0, sizeof(*g));
     g->point_q.q_lock = mpSemBCreate(SEM_Q_FIFO, SEM_FULL);
+    // mirror CtrlGroup.c init: bracket guards set to MAGIC after bzero
+    g->point_q.guard_pre = POINT_QUEUE_GUARD_MAGIC;
+    g->point_q.guard_post = POINT_QUEUE_GUARD_MAGIC;
 }
 
 //======================= TIER 1 : ring logic ==============================
@@ -74,6 +77,32 @@ static void test_point_queue_full_rejects_enqueue(void)
     JointMotionData overflow; memset(&overflow, 0, sizeof(overflow)); overflow.time = 9999;
     ASSERT(!Ros_MotionControl_PointQueueEnqueue(&g, &overflow));
     ASSERT(Ros_MotionControl_PointQueueCount(&g) == POINT_QUEUE_DEPTH);
+}
+
+// guard sentinels: corrupting either bracket word makes Enqueue/Dequeue fail
+// safe (return FALSE) and Count report ERROR. Mirrors the fail-safe guard
+// validation in MotionControl.c's ring primitives.
+static void test_point_queue_guard_corruption_fails_safe(void)
+{
+    printf("== TIER1 test_point_queue_guard_corruption_fails_safe ==\n");
+
+    // pre-guard corruption
+    CtrlGroup g1; new_group(&g1);
+    JointMotionData p; memset(&p, 0, sizeof(p)); p.time = 7;
+    ASSERT(Ros_MotionControl_PointQueueEnqueue(&g1, &p)); // healthy
+    g1.point_q.guard_pre = 0xDEADBEEFu;                   // corrupt
+    JointMotionData out;
+    ASSERT(!Ros_MotionControl_PointQueueEnqueue(&g1, &p));
+    ASSERT(!Ros_MotionControl_PointQueueDequeue(&g1, &out));
+    ASSERT(Ros_MotionControl_PointQueueCount(&g1) == ERROR);
+
+    // post-guard corruption
+    CtrlGroup g2; new_group(&g2);
+    ASSERT(Ros_MotionControl_PointQueueEnqueue(&g2, &p)); // healthy
+    g2.point_q.guard_post = 0xDEADBEEFu;                  // corrupt
+    ASSERT(!Ros_MotionControl_PointQueueEnqueue(&g2, &p));
+    ASSERT(!Ros_MotionControl_PointQueueDequeue(&g2, &out));
+    ASSERT(Ros_MotionControl_PointQueueCount(&g2) == ERROR);
 }
 
 // wraparound past POINT_QUEUE_DEPTH: drain half, refill, forcing idx to wrap.
@@ -185,6 +214,7 @@ int main(void)
     test_point_queue_empty_rejects_dequeue();
     test_point_queue_full_rejects_enqueue();
     test_point_queue_wraparound();
+    test_point_queue_guard_corruption_fails_safe();
     // Tier 2
     test_admit_one_deep();
     test_admit_fifo_fill_then_full();

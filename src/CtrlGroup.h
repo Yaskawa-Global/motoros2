@@ -50,6 +50,7 @@ typedef struct
 } JointMotionData;
 
 #define POINT_QUEUE_DEPTH 32   // depth of the point-queue FIFO (see streaming-point-fifo spec); tunable, single source of truth
+#define POINT_QUEUE_GUARD_MAGIC 0x51504751u   // bracket-word sentinel value guarding the point-queue data[] array
 
 // Ring FIFO of trajectory points awaiting interpolation (point-queue mode).
 typedef struct
@@ -57,7 +58,9 @@ typedef struct
     SEM_ID q_lock;
     LONG cnt;                       // number of points currently queued
     LONG idx;                       // index of the oldest queued point
+    UINT32 guard_pre;               // == POINT_QUEUE_GUARD_MAGIC (pre-buffer sentinel)
     JointMotionData data[POINT_QUEUE_DEPTH];
+    UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC (post-buffer sentinel)
 } PointQueue_q;
 
 //---------------------------------------------------------------

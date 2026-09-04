@@ -36,6 +36,7 @@
 typedef int                 BOOL;
 typedef long                LONG;
 typedef unsigned short      UINT16;
+typedef unsigned int        UINT32;
 typedef unsigned long long  UINT64;
 typedef unsigned char       UCHAR;
 typedef void*               SEM_ID;
@@ -65,6 +66,7 @@ static inline int    mpSemGive(SEM_ID s)        { (void)s; return OK; }
 #define Q_OFFSET_IDX( a, b, c ) (((a)+(b)) >= (c) ) ? ((a)+(b)-(c)) \
                 : ( (((a)+(b)) < 0 ) ? ((a)+(b)+(c)) : ((a)+(b)) )
 #define POINT_QUEUE_DEPTH 32
+#define POINT_QUEUE_GUARD_MAGIC 0x51504751u
 
 #define MP_GRP_AXES_NUM 8
 
@@ -83,7 +85,9 @@ typedef struct
     SEM_ID q_lock;
     LONG cnt;                       // number of points currently queued
     LONG idx;                       // index of the oldest queued point
+    UINT32 guard_pre;               // == POINT_QUEUE_GUARD_MAGIC
     JointMotionData data[POINT_QUEUE_DEPTH];
+    UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC
 } PointQueue_q;
 
 // Minimal CtrlGroup: only the member the tested code touches (point_q).
