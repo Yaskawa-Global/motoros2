@@ -315,6 +315,9 @@
     <ClCompile Include="MotionControl.c">
       <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
+    <ClCompile Include="PointQueue.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
     <ClCompile Include="ServiceStopTrajMode.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
@@ -339,6 +342,9 @@
     <ClCompile Include="Tests_CtrlGroup.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_PointQueue.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
     <ClCompile Include="Tests_TestUtils.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
@@ -352,6 +358,9 @@
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="ServiceQueueTrajPoint.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceQueueTrajPointStream.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
     <ClCompile Include="ServiceStartPointQueueMode.c">
@@ -389,6 +398,9 @@
     <ClInclude Include="Tests_CtrlGroup.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
+    <ClInclude Include="Tests_PointQueue.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
     <ClInclude Include="Tests_TestUtils.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
@@ -408,6 +420,9 @@
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
     <ClInclude Include="MotionControl.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="PointQueue.h">
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
     <ClInclude Include="ServiceReadWriteIO.h">
@@ -468,6 +483,9 @@
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="ServiceQueueTrajPoint.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceQueueTrajPointStream.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="ServiceStartPointQueueMode.h">

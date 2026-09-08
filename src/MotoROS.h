@@ -75,6 +75,7 @@
 #include <motoros2_interfaces/srv/start_traj_mode.h>
 #include <motoros2_interfaces/srv/start_point_queue_mode.h>
 #include <motoros2_interfaces/srv/queue_traj_point.h>
+#include <motoros2_interfaces/srv/queue_traj_point_stream.h>
 #include <motoros2_interfaces/srv/select_motion_tool.h>
 #include <builtin_interfaces/msg/duration.h>
 #include <builtin_interfaces/msg/time.h>
@@ -93,9 +94,11 @@
 #include "CmosParameterExtraction.h"
 #include "ActionServer_FJT.h"
 #include "CtrlGroup.h"
+#include "PointQueue.h"
 #include "ControllerStatusIO.h"
 #include "PositionMonitor.h"
 #include "ServiceQueueTrajPoint.h"
+#include "ServiceQueueTrajPointStream.h"
 #include "ServiceReadWriteIO.h"
 #include "ServiceResetError.h"
 #include "ServiceStartTrajMode.h"
@@ -112,6 +115,7 @@
 #include "Tests_ControllerStatusIO.h"
 #include "Tests_ActionServer_FJT.h"
 #include "Tests_TimeConversionUtils.h"
+#include "Tests_PointQueue.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"

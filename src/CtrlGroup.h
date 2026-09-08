@@ -49,11 +49,19 @@ typedef struct
     double vel[MP_GRP_AXES_NUM];    // velocity in radians/s
 } JointMotionData;
 
+// The point-queue ring type (PointQueue_q) and its POINT_QUEUE_* macros live
+// with their code in PointQueue.h. Included here (after JointMotionData, which
+// the ring's data[] slots are typed on) so CtrlGroup can embed a PointQueue_q.
+#include "PointQueue.h"
+
 //---------------------------------------------------------------
 // CtrlGroup:
 // Structure containing all the data related to a control group
+// (tag _CtrlGroup + the CtrlGroup typedef are forward-declared in PointQueue.h
+// so the ring primitives can take CtrlGroup* before this full definition; we
+// define the struct body here without re-typedef'ing to avoid a duplicate.)
 //---------------------------------------------------------------
-typedef struct
+struct _CtrlGroup
 {
     int groupNo;                                // sequence group number
     int numAxes;                                // number of axis in the control group
@@ -66,6 +74,7 @@ typedef struct
     int tool;                                   // selected tool for the motion
 
     Incremental_q inc_q;                        // incremental queue
+    PointQueue_q point_q;                       // point-queue FIFO (point-queue mode)
     UINT64 q_time;                              // time to which the queue has been processed
 
     JointMotionData* trajectoryIterator;        // joint motion command data in radian
@@ -96,7 +105,7 @@ typedef struct
     rcl_publisher_t publisherJointState;
     sensor_msgs__msg__JointState* msgJointState;
 
-} CtrlGroup;
+}; // struct _CtrlGroup (typedef'd to CtrlGroup in PointQueue.h)
 
 
 //---------------------------------

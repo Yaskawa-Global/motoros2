@@ -78,6 +78,7 @@ void RosInitTask()
     bTestResult &= Ros_Testing_ControllerStatusIO();
     bTestResult &= Ros_Testing_ActionServer_FJT();
     bTestResult &= Ros_Testing_TimeConversionUtils();
+    bTestResult &= Ros_Testing_PointQueue();
     bTestResult ? Ros_Debug_BroadcastMsg("Testing SUCCESSFUL") : Ros_Debug_BroadcastMsg("!!! Testing FAILED !!!");
     MOTOROS2_MEM_TRACE_REPORT(testing)
     Ros_Debug_BroadcastMsg("===");
@@ -130,6 +131,7 @@ void RosInitTask()
         Ros_ActionServer_FJT_Initialize(); //initialize action server - FollowJointTrajectory
 
         Ros_ServiceQueueTrajPoint_Initialize();
+        Ros_ServiceQueueTrajPointStream_Initialize();
         Ros_ServiceReadWriteIO_Initialize();
         Ros_ServiceResetError_Initialize();
         Ros_ServiceStartTrajMode_Initialize();
@@ -213,6 +215,7 @@ void RosInitTask()
         Ros_ServiceStartPointQueueMode_Cleanup();
         Ros_ServiceResetError_Cleanup();
         Ros_ServiceReadWriteIO_Cleanup();
+        Ros_ServiceQueueTrajPointStream_Cleanup();
         Ros_ServiceQueueTrajPoint_Cleanup();
 
         Ros_ActionServer_FJT_Cleanup();

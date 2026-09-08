@@ -45,6 +45,12 @@ MOTION_MODE Ros_MotionControl_ActiveMotionMode = MOTION_MODE_INACTIVE;
 
 BOOL Ros_MotionControl_MustInitializePointQueue = TRUE; //first point of streaming trajectory must match current-position
 
+// Sticky point-queue underran flag. Starts TRUE so the first read after any
+// non-poweroff startup reports the baseline. SET (exactly one site) on the
+// consumer path when the ring is observed empty in point-queue mode; cleared
+// ONLY by Ros_MotionControl_ReadAndClearPointQueueUnderran().
+static volatile BOOL Ros_MotionControl_PointQueueUnderran = TRUE;
+
 Init_Trajectory_Status Ros_MotionControl_Init(rosidl_runtime_c__String__Sequence* sequenceGoalJointNames, trajectory_msgs__msg__JointTrajectoryPoint__Sequence* sequenceOfPoints)
 {
     long requestPulsePos[MAX_PULSE_AXES];
@@ -321,6 +327,43 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
     {
         if (Ros_MotionControl_AllGroupsInitComplete)
         {
+            // ASYNC-SAFE FLUSH ACTION (consumer side): an async caller (IO-status
+            // monitor on alarm / WAITING_ROS-off / PFL) may have requested a flush
+            // via Ros_MotionControl_PointQueueRequestFlush, which only set the flag
+            // and touched neither index. THIS is the sole place the async flush
+            // reset happens, and the consumer is the sole writer of head, so the
+            // SPSC single-writer-each invariant holds. Empty the ring with a single
+            // read of the producer-owned tail and a single write of the
+            // consumer-owned head (head = tail => derived depth 0), atomically
+            // empty with no torn index. We ALSO abandon the point currently being
+            // fed: after head = tail the in-flight point already copied into the
+            // working iterator is stale (it belongs to the flushed stream), so for
+            // a SAFETY flush (alarm/PFL/stop) we invalidate the iterator so the
+            // interpolation gate below stops feeding that segment too — otherwise
+            // the robot would keep interpolating one abandoned point past the
+            // flush. Underran is intentionally NOT touched (spec 5.5: survives).
+            if (ctrlGroup->point_q.flushRequested)
+            {
+                ctrlGroup->point_q.head = ctrlGroup->point_q.tail;  // read producer tail once, write consumer head once => empty
+                if (ctrlGroup->trajectoryIterator != NULL)
+                    ctrlGroup->trajectoryIterator->valid = FALSE;   // abandon the in-flight (now stale) point
+                __sync_synchronize();                               // publish head reset + iterator invalidation
+                ctrlGroup->point_q.flushRequested = FALSE;          // consumer clears the request last
+            }
+
+            // Point-queue mode: feed the working iterator from the ring. If the
+            // iterator slot is free (not valid), pull the next point off this
+            // group's ring and mark it valid so the interpolation gate below can
+            // process it. FJT/trajectory mode is untouched — it still walks the
+            // pinned trajectoryToProcess buffer via the branch at the end.
+            if (Ros_MotionControl_IsMotionMode_PointQueue()
+                && ctrlGroup->trajectoryIterator != NULL
+                && !ctrlGroup->trajectoryIterator->valid)
+            {
+                if (Ros_MotionControl_PointQueueDequeue(ctrlGroup, ctrlGroup->trajectoryIterator))
+                    ctrlGroup->trajectoryIterator->valid = TRUE;
+            }
+
             // if there is no message to process, delay and try again
             if (!g_Ros_Controller.bStopMotion && ctrlGroup->hasDataToProcess && ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
             {
@@ -570,14 +613,23 @@ BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_dat
     return TRUE;
 }
 
-UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request)
+//-------------------------------------------------------------------
+// Shared admission+convert path: converts an incoming trajectory point and
+// enqueues one JointMotionData per control group into the point-queue ring.
+// The admission policy governs whether a point is accepted (one-deep legacy vs
+// FIFO streaming). *out_depth (if non-NULL) is set to group 0's post-call depth.
+//-------------------------------------------------------------------
+UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
+    motoros2_interfaces__srv__QueueTrajPoint_Request* request,
+    PointQueueAdmitPolicy policy, UINT16* out_depth)
 {
+    int grpIndex, jointIndexInTraj;
+
     if (Ros_MotionControl_MustInitializePointQueue)
     {
         Ros_Debug_BroadcastMsg("Initial point in trajectory queue");
-
-        Init_Trajectory_Status status;
-        status = Ros_MotionControl_InitPointQueue(request);
+        Init_Trajectory_Status status = Ros_MotionControl_InitPointQueue(request);
+        if (out_depth) *out_depth = 0;
 
         if (status == INIT_TRAJ_OK)
         {
@@ -585,13 +637,9 @@ UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__
         }
         else
         {
-            return status;
+            return (UINT16)status;
         }
     }
-
-    //------------------------------------------------------------
-    //The trajectory contains information for all groups. Determine which groups are used by looking at the 'joint names'.
-    int grpIndex, jointIndexInTraj;
 
     if (g_Ros_Controller.totalAxesCount != request->joint_names.size)
     {
@@ -599,56 +647,59 @@ UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__
         return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
     }
 
-    //===================================
-    //Incoming points are processed one joint at a time.
-    //For each of those joints, this iterates over all of the CtrlGroup objects and compares the joint names.
-    //This allows it to find the correct CtrlGroup object and the joint index (in moto order) in the JointMotionData array.
-    //===================================
-
-    //precheck to ensure all groups are ready to accept a new point
+    // Admission check against the ring (all groups move in lockstep).
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
         CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-
-        if (ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)
-        {
-            //A point is already being processed for this control group.
-            //Wait for it to be processed before adding a new point.
+        LONG cnt = Ros_MotionControl_PointQueueCount(ctrlGroup);
+        if (cnt == ERROR)
+            return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
+        // Legacy ONE_DEEP is busy until the point BOTH leaves the ring AND
+        // finishes interpolating. The consumer dequeues the point (cnt 1->0)
+        // into its working iterator at the top of its loop, one interpolation
+        // segment BEFORE the point is done. Counting only the ring would clear
+        // BUSY a segment too early and transiently allow 2 points in flight
+        // (1 in the iterator being interpolated + 1 freshly admitted into the
+        // ring). Also treat the in-flight iterator point as occupancy so BUSY
+        // holds until interpolation completes (iterator->valid cleared) —
+        // bit-exact legacy timing.
+        //
+        // Concurrency: trajectoryIterator->valid is a consumer-owned field read
+        // here from the producer (admission) context. This is a benign
+        // single-word BOOL read (like the existing head/tail cross-owner reads);
+        // no consumer state is written and no lock is taken. A momentarily stale
+        // read can only make BUSY linger one extra check (safe — "busy until
+        // done"). FJT/trajectory mode is unaffected: this term lives inside the
+        // ONE_DEEP branch, only reached on the legacy point-queue admission path.
+        if (policy == POINT_QUEUE_ADMIT_ONE_DEEP
+            && (cnt >= 1
+                || (ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)))
             return motoros2_interfaces__msg__QueueResultEnum__BUSY;
-        }
+        if (policy == POINT_QUEUE_ADMIT_FIFO && cnt >= POINT_QUEUE_DEPTH)
+            return motoros2_interfaces__msg__QueueResultEnum__QUEUE_FULL;
     }
 
     if (Ros_MotionControl_HasDuplicateNames(&request->joint_names))
-    {
         return INIT_TRAJ_DUPLICATE_JOINT_NAME;
-    }
 
-    //for each joint/axis in a single trajectory point
+    // Convert into a per-group staging point, then enqueue.
+    JointMotionData staged[MAX_CONTROLLABLE_GROUPS];
+    bzero(staged, sizeof(staged));
+
+    trajectory_msgs__msg__JointTrajectoryPoint__Sequence pointSequence;
+    pointSequence.capacity = 1;
+    pointSequence.size = 1;
+    pointSequence.data = &request->point; //no additional memory is allocated this way
+
     for (jointIndexInTraj = 0; jointIndexInTraj < request->joint_names.size; jointIndexInTraj += 1)
     {
-        int  jointIndexInCtrlGroup;
-        CtrlGroup* ctrlGroup;
-
+        int jointIndexInCtrlGroup;
         if (!Ros_MotionControl_FindCtrlGroupAndIndex(&request->joint_names.data[jointIndexInTraj], &grpIndex, &jointIndexInCtrlGroup))
-        {
             return motoros2_interfaces__msg__QueueResultEnum__INVALID_JOINT_LIST;
-        }
-        ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
 
-        // for point queuing, we create a single-point trajectory, store the incoming
-        // point in it and send it off for processing by the trajectory processing
-        // pipeline.
-        trajectory_msgs__msg__JointTrajectoryPoint__Sequence pointSequence;
-
-        pointSequence.capacity = 1;
-        pointSequence.size = 1;
-        pointSequence.data = &request->point; //no additional memory is allocated this way
-
-        //NOTE: I'm using the SECOND point in the 200 point buffer to hold the converted data. The `Ros_MotionControl_Init` function
-        //      populated the first buffer position with the initial point in the queue. Followup points are placed in the second 
-        //      buffer position. As the destination in position 2 is processed, it is moved into position 1 to become the starting
-        //      point for the next destination.
-        Init_Trajectory_Status status = Ros_MotionControl_ConvertTrajectoryToJointMotionData(&pointSequence, jointIndexInTraj, ctrlGroup, jointIndexInCtrlGroup, ctrlGroup->trajectoryIterator);
+        Init_Trajectory_Status status = Ros_MotionControl_ConvertTrajectoryToJointMotionData(
+            &pointSequence, jointIndexInTraj, g_Ros_Controller.ctrlGroups[grpIndex],
+            jointIndexInCtrlGroup, &staged[grpIndex]);
         if (status != INIT_TRAJ_OK)
         {
             Ros_Debug_BroadcastMsg("Failed to parse incoming trajectory point.");
@@ -658,12 +709,23 @@ UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__
 
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
-        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
-
-        ctrlGroup->trajectoryIterator->valid = TRUE;
+        staged[grpIndex].valid = TRUE;
+        if (!Ros_MotionControl_PointQueueEnqueue(g_Ros_Controller.ctrlGroups[grpIndex], &staged[grpIndex]))
+            return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
     }
 
+    if (out_depth)
+        *out_depth = (UINT16)Ros_MotionControl_PointQueueCount(g_Ros_Controller.ctrlGroups[0]);
+
     return motoros2_interfaces__msg__QueueResultEnum__SUCCESS;
+}
+
+UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request)
+{
+    //Legacy one-deep handler: thin wrapper over the shared admission core.
+    //ONE_DEEP policy admits iff the ring is empty (count == 0), preserving the
+    //legacy SUCCESS-then-BUSY (never QUEUE_FULL) semantics for legacy clients.
+    return Ros_MotionControl_EnqueueTrajectoryPoint(request, POINT_QUEUE_ADMIT_ONE_DEEP, NULL);
 }
 
 //-------------------------------------------------------------------
@@ -814,6 +876,9 @@ void Ros_MotionControl_IncMoveLoopStart() //<-- IP_CLK priority task
                         }
                         else
                         {
+                            // Queue is empty: point-queue mode underrun (streaming fell behind)
+                            if (Ros_MotionControl_IsMotionMode_PointQueue())
+                                Ros_MotionControl_PointQueueUnderran = TRUE;
                             // Queue is empty, initialize to 0 pulse increment
                             moveData.grp_pos_info[i].pos_tag.data[2] = 0;
                             moveData.grp_pos_info[i].pos_tag.data[3] = MP_INC_PULSE_DTYPE;
@@ -1220,6 +1285,19 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
     // Clear queues
     bRet = Ros_MotionControl_ClearQ_All();
 
+    // DIRECT point-queue flush: ClearQ_All only REQUESTED a flush (async-safe),
+    // which relies on the consumer actioning head = tail at the top of its loop.
+    // But StopMotion has QUIESCED the consumer above (bStopMotion = TRUE, mpHold,
+    // then waited for !HasDataToProcess()), so the consumer will NOT run to action
+    // that request — and StopMotion must return with a definitely-empty ring.
+    // Because the consumer is provably stopped, it is race-free for StopMotion to
+    // reset both indices directly here. The obsolete request the ClearQ_All call
+    // left in flushRequested is harmless (the ring is already empty after this
+    // direct reset); we leave the flag alone — the direct reset is what makes the
+    // ring empty on return.
+    for (int groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo++)
+        Ros_MotionControl_PointQueueFlush(g_Ros_Controller.ctrlGroups[groupNo]);
+
     // All motion should be stopped at this point, so turn of the flag
     g_Ros_Controller.bStopMotion = FALSE;
 
@@ -1256,6 +1334,18 @@ BOOL Ros_MotionControl_ClearQ_All()
 
         // Set pointer to specified queue
         Incremental_q* q = &g_Ros_Controller.ctrlGroups[groupNo]->inc_q;
+
+        // ASYNC-SAFE flush of the point-queue ring, to parity with the inc_q
+        // teardown below. ClearQ_All has ASYNC callers that do NOT quiesce the
+        // consumer (Ros_Controller_IoStatusUpdate: alarm / WAITING_ROS-off / PFL),
+        // so we MUST NOT touch head/tail here. Instead REQUEST a flush: the
+        // consumer (sole owner of head) actions it (head = tail) at the top of its
+        // loop. This is always safe regardless of caller context. The one caller
+        // that needs the ring definitely-empty ON RETURN — StopMotion — has
+        // already quiesced the consumer, so it performs its OWN direct flush after
+        // this call (a stopped consumer would never action the request). NOTE:
+        // intentionally does NOT touch the sticky underran flag (spec 5.5).
+        Ros_MotionControl_PointQueueRequestFlush(g_Ros_Controller.ctrlGroups[groupNo]);
 
         // Lock the q before manipulating it
         if (mpSemTake(q->q_lock, Q_LOCK_TIMEOUT) == OK)
@@ -1606,6 +1696,14 @@ BOOL Ros_MotionControl_IsMotionMode_PointQueue()
 {
     return (Ros_MotionControl_ActiveMotionMode == 
         MOTION_MODE_POINTQUEUE);
+}
+
+BOOL Ros_MotionControl_ReadAndClearPointQueueUnderran(void)
+{
+    // Atomic read-and-clear: __sync_lock_test_and_set atomically stores FALSE
+    // and returns the prior value, so a concurrent SET (single store on the
+    // consumer path) cannot be lost between a separate read and clear.
+    return __sync_lock_test_and_set(&Ros_MotionControl_PointQueueUnderran, FALSE);
 }
 
 BOOL Ros_MotionControl_IsMotionMode_RawStreaming()
