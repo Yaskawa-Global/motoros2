@@ -26,6 +26,23 @@
 // one group the behavior is identical). Conversion/joint-name/duplicate checks
 // are out of scope for the host tier and are covered compile-only under the
 // real cross-toolchain (see task-3-report.md).
+//
+// ONE_DEEP IN-FLIGHT ITERATOR TERM (final-fix wave)
+// -------------------------------------------------
+// The shipped ONE_DEEP busy condition is NOT just (cnt >= 1). The consumer
+// dequeues the point from the ring (cnt 1->0) into its working iterator at the
+// top of its loop, one interpolation segment BEFORE the point finishes. If
+// admission looked only at the ring count, BUSY would clear a segment too early
+// and transiently allow 2 points in flight. The shipped condition (verbatim):
+//
+//     if (policy == ONE_DEEP
+//         && (cnt >= 1
+//             || (ctrlGroup->trajectoryIterator != NULL
+//                 && ctrlGroup->trajectoryIterator->valid)))     -> BUSY
+//
+// The host CtrlGroup carries no trajectoryIterator, so we mirror the in-flight
+// iterator as g->iterator_valid — a plain READ (never written by this admission
+// predicate), exactly as the producer only READS the consumer-owned valid bit.
 
 #include "admission_model.h"
 
@@ -36,7 +53,7 @@ UINT16 PointQueue_AdmitOne(CtrlGroup* g, PointQueueAdmitPolicy policy,
 
     if (cnt == ERROR)
         return QRE_UNABLE_TO_PROCESS_POINT;
-    if (policy == POINT_QUEUE_ADMIT_ONE_DEEP && cnt >= 1)
+    if (policy == POINT_QUEUE_ADMIT_ONE_DEEP && (cnt >= 1 || g->iterator_valid))
         return QRE_BUSY;
     if (policy == POINT_QUEUE_ADMIT_FIFO && cnt >= POINT_QUEUE_DEPTH)
         return QRE_QUEUE_FULL;

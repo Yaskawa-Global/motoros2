@@ -795,10 +795,30 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
     // Admission check against the ring (all groups move in lockstep).
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
-        LONG cnt = Ros_MotionControl_PointQueueCount(g_Ros_Controller.ctrlGroups[grpIndex]);
+        CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[grpIndex];
+        LONG cnt = Ros_MotionControl_PointQueueCount(ctrlGroup);
         if (cnt == ERROR)
             return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
-        if (policy == POINT_QUEUE_ADMIT_ONE_DEEP && cnt >= 1)
+        // Legacy ONE_DEEP is busy until the point BOTH leaves the ring AND
+        // finishes interpolating. The consumer dequeues the point (cnt 1->0)
+        // into its working iterator at the top of its loop, one interpolation
+        // segment BEFORE the point is done. Counting only the ring would clear
+        // BUSY a segment too early and transiently allow 2 points in flight
+        // (1 in the iterator being interpolated + 1 freshly admitted into the
+        // ring). Also treat the in-flight iterator point as occupancy so BUSY
+        // holds until interpolation completes (iterator->valid cleared) —
+        // bit-exact legacy timing.
+        //
+        // Concurrency: trajectoryIterator->valid is a consumer-owned field read
+        // here from the producer (admission) context. This is a benign
+        // single-word BOOL read (like the existing head/tail cross-owner reads);
+        // no consumer state is written and no lock is taken. A momentarily stale
+        // read can only make BUSY linger one extra check (safe — "busy until
+        // done"). FJT/trajectory mode is unaffected: this term lives inside the
+        // ONE_DEEP branch, only reached on the legacy point-queue admission path.
+        if (policy == POINT_QUEUE_ADMIT_ONE_DEEP
+            && (cnt >= 1
+                || (ctrlGroup->trajectoryIterator != NULL && ctrlGroup->trajectoryIterator->valid)))
             return motoros2_interfaces__msg__QueueResultEnum__BUSY;
         if (policy == POINT_QUEUE_ADMIT_FIFO && cnt >= POINT_QUEUE_DEPTH)
             return motoros2_interfaces__msg__QueueResultEnum__QUEUE_FULL;

@@ -95,10 +95,16 @@ typedef struct
     UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC
 } PointQueue_q;
 
-// Minimal CtrlGroup: only the member the tested code touches (point_q).
+// Minimal CtrlGroup: the members the tested code touches. point_q is the SPSC
+// ring. iterator_valid models the consumer's in-flight working iterator: in
+// production this is ctrlGroup->trajectoryIterator->valid — a point that has
+// been dequeued from the ring (cnt 1->0) but is still interpolating. The host
+// CtrlGroup has no trajectoryIterator, so we mirror only the one BOOL the new
+// ONE_DEEP busy condition reads (see admission_model.c).
 typedef struct
 {
     PointQueue_q point_q;
+    BOOL iterator_valid;            // models trajectoryIterator->valid (consumer-owned, READ in admission)
 } CtrlGroup;
 
 // --- Admission policy enum (verbatim from motoros2/src/MotionControl.h) ---

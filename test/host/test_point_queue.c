@@ -16,6 +16,15 @@
 //     consumer-empty SET line re-latches TRUE; read-and-clear semantics hold
 //   - legacy-equivalence: ONE_DEEP yields SUCCESS then BUSY, never QUEUE_FULL,
 //     admits again after consume; FIFO on the same ring fills then QUEUE_FULL
+//   - legacy in-flight seam (final-fix wave): the ONE_DEEP busy condition is
+//     (cnt >= 1 || iterator_valid), not just (cnt >= 1). A synchronous
+//     dequeue-as-consume does NOT cover the state where the consumer has pulled
+//     the point OFF the ring (cnt 1->0) but is STILL interpolating it (the
+//     in-flight working iterator holds a valid point). test_legacy_inflight_busy
+//     models that seam: enqueue SUCCESS; simulate consumer DEQUEUE-into-iterator
+//     (cnt==0, iterator_valid=TRUE) and assert a legacy enqueue still returns
+//     BUSY (the iterator term holds BUSY); then simulate interpolation finishing
+//     (iterator_valid=FALSE) and assert SUCCESS again — bit-exact legacy timing.
 //
 // Build+run via test/host/Makefile or test/host/run_tests.sh. Exits non-zero on
 // any failure. Uses plain asserts (custom ASSERT that keeps counting).
@@ -386,6 +395,53 @@ static void test_legacy_vs_fifo_same_ring(void)
     ASSERT(Ros_MotionControl_PointQueueCount(&g) == POINT_QUEUE_DEPTH);
 }
 
+// legacy in-flight seam (final-fix wave): the concurrent state a synchronous
+// dequeue-as-consume can't reach — point pulled OFF the ring (cnt 1->0) but
+// still interpolating in the consumer's working iterator. Models the shipped
+// ONE_DEEP busy condition (cnt >= 1 || iterator_valid): BUSY must hold on the
+// iterator term ALONE, then release only when interpolation finishes.
+static void test_legacy_inflight_busy(void)
+{
+    printf("== TIER2 test_legacy_inflight_busy ==\n");
+    CtrlGroup g; new_group(&g);
+    UINT16 depth = 0xFFFF;
+
+    // 1) Legacy enqueue: SUCCESS, ring depth 1, nothing in-flight yet.
+    JointMotionData p; memset(&p, 0, sizeof(p)); p.time = 7;
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &p, &depth) == QRE_SUCCESS);
+    ASSERT(depth == 1);
+    ASSERT(g.iterator_valid == FALSE);
+
+    // 2) Consumer dequeues the point INTO its in-flight iterator: ring count
+    //    drops to 0, but the point is still interpolating (iterator_valid=TRUE).
+    JointMotionData iter;
+    ASSERT(Ros_MotionControl_PointQueueDequeue(&g, &iter) && iter.time == 7);
+    g.iterator_valid = TRUE;                              // consumer marks it valid
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);  // ring is empty...
+
+    // 3) ...yet a legacy enqueue in THIS state must still be BUSY — the
+    //    iterator-valid term (NOT the ring count) is what holds BUSY. A
+    //    ring-only condition would wrongly SUCCEED here (2 points in flight).
+    JointMotionData q; memset(&q, 0, sizeof(q)); q.time = 8;
+    depth = 0xFFFF;
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &q, &depth) == QRE_BUSY);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);  // BUSY did not enqueue
+
+    // 4) Interpolation finishes: consumer clears iterator_valid. Now legacy
+    //    admits again — SUCCESS, depth 1. Matches old "busy until done" timing.
+    g.iterator_valid = FALSE;
+    depth = 0xFFFF;
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &q, &depth) == QRE_SUCCESS);
+    ASSERT(depth == 1);
+
+    // 5) FIFO policy is unaffected by the iterator term: with an in-flight point
+    //    marked valid but ring below depth, FIFO still admits (never BUSY).
+    CtrlGroup gf; new_group(&gf);
+    gf.iterator_valid = TRUE;                             // in-flight, ring empty
+    JointMotionData f; memset(&f, 0, sizeof(f)); f.time = 9;
+    ASSERT(PointQueue_AdmitOne(&gf, POINT_QUEUE_ADMIT_FIFO, &f, NULL) == QRE_SUCCESS);
+}
+
 int main(void)
 {
     // Tier 1
@@ -402,6 +458,7 @@ int main(void)
     test_underran_read_and_clear();
     test_legacy_equivalence();
     test_legacy_vs_fifo_same_ring();
+    test_legacy_inflight_busy();
 
     if (failures == 0) { printf("\nALL PASS\n"); return 0; }
     printf("\n%d FAILURE(S)\n", failures);
