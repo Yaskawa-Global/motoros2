@@ -1,5 +1,21 @@
 // test_point_queue.c — host-gcc unit tests for the point-queue feature.
 //
+// TAXONOMY NOTE: the TIER 1 ring sub-tests below share their test taxonomy with
+// the on-target boot self-test in src/Tests_PointQueue.c (Ros_Testing_PointQueue).
+// The names line up 1:1 so a reader sees the same ring behaviors covered in both
+// places (host-gcc here, on-controller there):
+//   test_point_queue_empty_rejects_dequeue      <-> Ros_Testing_PointQueue_EmptyRejectsDequeue
+//   test_point_queue_fifo_order                 <-> Ros_Testing_PointQueue_FifoOrder
+//   test_point_queue_full_rejects_enqueue       <-> Ros_Testing_PointQueue_FullRejectsEnqueue
+//   test_point_queue_wraparound                 <-> Ros_Testing_PointQueue_Wraparound
+//   test_point_queue_guard_corruption_fails_safe<-> Ros_Testing_PointQueue_GuardCorruptionFailsSafe
+//   test_flush_clears_point_ring                <-> Ros_Testing_PointQueue_FlushClearsRing
+//   test_flush_request_consumer_actions         <-> Ros_Testing_PointQueue_FlushRequestConsumerActions
+// (This host harness additionally exercises the ring's guard fail-safe RETURN
+// path — Enqueue/Dequeue FALSE, Count ERROR — because mpSetAlarm is stubbed here;
+// the on-target self-test verifies the guard predicate alarm-free instead. See
+// the ALARM DECISION note in src/Tests_PointQueue.c.)
+//
 // TIER 1 (ring logic, REAL runtime — bodies verbatim from MotionControl.c):
 //   - enqueue/dequeue FIFO order
 //   - wraparound past POINT_QUEUE_DEPTH

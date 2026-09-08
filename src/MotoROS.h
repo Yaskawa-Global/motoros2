@@ -115,6 +115,7 @@
 #include "Tests_ControllerStatusIO.h"
 #include "Tests_ActionServer_FJT.h"
 #include "Tests_TimeConversionUtils.h"
+#include "Tests_PointQueue.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"

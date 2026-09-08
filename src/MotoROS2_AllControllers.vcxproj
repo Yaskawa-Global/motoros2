@@ -444,6 +444,7 @@
     <ClCompile Include="Tests_ActionServer_FJT.c" />
     <ClCompile Include="Tests_ControllerStatusIO.c" />
     <ClCompile Include="Tests_CtrlGroup.c" />
+    <ClCompile Include="Tests_PointQueue.c" />
     <ClCompile Include="Tests_TestUtils.c" />
     <ClCompile Include="Tests_RosMotoPlusConversionUtils.c" />
     <ClCompile Include="MotionControl.c" />
@@ -481,6 +482,7 @@
     <ClInclude Include="Tests_ActionServer_FJT.h" />
     <ClInclude Include="Tests_ControllerStatusIO.h" />
     <ClInclude Include="Tests_CtrlGroup.h" />
+    <ClInclude Include="Tests_PointQueue.h" />
     <ClInclude Include="Tests_TestUtils.h" />
     <ClInclude Include="Tests_RosMotoPlusConversionUtils.h" />
     <ClInclude Include="Tests_TimeConversionUtils.h" />

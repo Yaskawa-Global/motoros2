@@ -342,6 +342,9 @@
     <ClCompile Include="Tests_CtrlGroup.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_PointQueue.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
     <ClCompile Include="Tests_TestUtils.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
@@ -393,6 +396,9 @@
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
     <ClInclude Include="Tests_CtrlGroup.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_PointQueue.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
     <ClInclude Include="Tests_TestUtils.h">
