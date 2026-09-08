@@ -447,6 +447,7 @@
     <ClCompile Include="Tests_TestUtils.c" />
     <ClCompile Include="Tests_RosMotoPlusConversionUtils.c" />
     <ClCompile Include="MotionControl.c" />
+    <ClCompile Include="PointQueue.c" />
     <ClCompile Include="ActionServer_FJT.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Quaternion_Conversion.c" />
@@ -485,6 +486,7 @@
     <ClInclude Include="Tests_TimeConversionUtils.h" />
     <ClInclude Include="TimeConversionUtils.h" />
     <ClInclude Include="MotionControl.h" />
+    <ClInclude Include="PointQueue.h" />
     <ClInclude Include="ActionServer_FJT.h" />
     <ClInclude Include="MotoROS.h" />
     <ClInclude Include="..\lib\CmosParameterExtraction.h" />

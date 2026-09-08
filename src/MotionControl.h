@@ -36,25 +36,8 @@ extern void Ros_MotionControl_IncMoveLoopStart();
 extern void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup);
 extern UINT16 Ros_MotionControl_ProcessQueuedTrajectoryPoint(motoros2_interfaces__srv__QueueTrajPoint_Request* request);
 
-// Point-queue ring primitives (point-queue mode). LOCK-FREE SPSC: enqueue is
-// producer-only (single enqueue-caller task), dequeue is consumer-only (single
-// dequeue-caller task). See the load-bearing SPSC invariant at PointQueue_q.
-extern LONG Ros_MotionControl_PointQueueCount(CtrlGroup* ctrlGroup);          // derived depth; ERROR on guard corruption.
-extern BOOL Ros_MotionControl_PointQueueEnqueue(CtrlGroup* ctrlGroup, JointMotionData* pt); // producer append; FALSE if full/corrupt.
-extern BOOL Ros_MotionControl_PointQueueDequeue(CtrlGroup* ctrlGroup, JointMotionData* out); // consumer pop oldest; FALSE if empty/corrupt.
-
-// DIRECT flush: reset the ring to empty (head == tail == 0), discarding queued
-// points. QUIESCED-CALLER-ONLY: writes both indices, so it is race-free only when
-// the consumer is provably stopped (Ros_MotionControl_StopMotion, which waits for
-// !HasDataToProcess() first). Does NOT touch the sticky underran flag (spec 5.5).
-extern void Ros_MotionControl_PointQueueFlush(CtrlGroup* ctrlGroup);
-
-// ASYNC-SAFE flush: request that the consumer empty the ring. Sets the per-group
-// flushRequested flag and returns; touches NEITHER head NOR tail. Safe from any
-// context, including async callers that do not quiesce the consumer (IO-status
-// monitor). The consumer actions it (head = tail) at the top of its loop. Used by
-// Ros_MotionControl_ClearQ_All. Does NOT touch the sticky underran flag (spec 5.5).
-extern void Ros_MotionControl_PointQueueRequestFlush(CtrlGroup* ctrlGroup);
+// Point-queue ring primitives (point-queue mode) are declared in PointQueue.h:
+//   Ros_MotionControl_PointQueueCount / Enqueue / Dequeue / Flush / RequestFlush.
 
 // Shared admission+convert path feeding the point-queue ring for all groups.
 // Returns a motoros2_interfaces__msg__QueueResultEnum value; sets *out_depth (if non-NULL)

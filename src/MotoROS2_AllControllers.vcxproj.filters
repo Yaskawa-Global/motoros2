@@ -315,6 +315,9 @@
     <ClCompile Include="MotionControl.c">
       <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
+    <ClCompile Include="PointQueue.c">
+      <Filter>Source Files\Robot Controller</Filter>
+    </ClCompile>
     <ClCompile Include="ServiceStopTrajMode.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
@@ -411,6 +414,9 @@
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
     <ClInclude Include="MotionControl.h">
+      <Filter>Header Files\Robot Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="PointQueue.h">
       <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
     <ClInclude Include="ServiceReadWriteIO.h">

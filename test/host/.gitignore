@@ -1,0 +1,3 @@
+# Built host-test artifacts (compiled locally with plain gcc)
+test_point_queue
+*.o

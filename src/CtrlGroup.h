@@ -49,50 +49,19 @@ typedef struct
     double vel[MP_GRP_AXES_NUM];    // velocity in radians/s
 } JointMotionData;
 
-#define POINT_QUEUE_DEPTH 32   // depth of the point-queue FIFO (see streaming-point-fifo spec); tunable, single source of truth
-#define POINT_QUEUE_GUARD_MAGIC 0x51504751u   // bracket-word sentinel value guarding the point-queue data[] array
-
-// Usable slots must equal POINT_QUEUE_DEPTH. This ring is LOCK-FREE SPSC using
-// the "keep one slot empty" full/empty discriminator, so the backing array is
-// sized POINT_QUEUE_DEPTH+1: one slot is always left unused to tell full
-// (head == (tail+1) % SLOTS) from empty (head == tail). Usable capacity is
-// therefore POINT_QUEUE_DEPTH, exactly as the macro means. This scheme is
-// depth-agnostic (no power-of-two requirement).
-#define POINT_QUEUE_SLOTS (POINT_QUEUE_DEPTH + 1)
-
-// Ring FIFO of trajectory points awaiting interpolation (point-queue mode).
-//
-// LOCK-FREE single-producer / single-consumer (SPSC). LOAD-BEARING INVARIANT:
-// single enqueue-caller task + single dequeue-caller task; NOT lock-free-safe
-// if a second producer or consumer, or a multi-threaded executor, is introduced.
-//   - Producer OWNS `tail` (advanced only by enqueue). Consumer OWNS `head`
-//     (advanced only by dequeue). Neither side writes the other's index.
-//   - Depth is DERIVED from (tail - head) mod SLOTS; there is no shared count.
-//   - Memory ordering via GCC __sync_synchronize() barriers (see enqueue/
-//     dequeue in MotionControl.c): producer publishes payload-then-tail with a
-//     release barrier; consumer observes tail-then-payload with an acquire
-//     barrier. head/tail are single word-aligned (naturally atomic on x86).
-typedef struct
-{
-    volatile LONG head;             // CONSUMER-owned: index of oldest queued point (dequeue advances)
-    volatile LONG tail;             // PRODUCER-owned: index of next free slot (enqueue advances)
-    // ASYNC-SAFE FLUSH REQUEST: set TRUE by any (possibly async, non-quiescing)
-    // caller that wants the ring emptied; ACTIONED (and cleared) exclusively by
-    // the consumer at the top of Ros_MotionControl_AddToIncQueueProcess. The
-    // async setter touches NEITHER head NOR tail, so the single-writer-each SPSC
-    // invariant is preserved even from the IO-status monitor task. Init FALSE at
-    // CtrlGroup construction (bzero of point_q).
-    volatile BOOL flushRequested;   // CONSUMER-cleared flush request; setter writes neither index
-    UINT32 guard_pre;               // == POINT_QUEUE_GUARD_MAGIC (pre-buffer sentinel)
-    JointMotionData data[POINT_QUEUE_SLOTS];
-    UINT32 guard_post;              // == POINT_QUEUE_GUARD_MAGIC (post-buffer sentinel)
-} PointQueue_q;
+// The point-queue ring type (PointQueue_q) and its POINT_QUEUE_* macros live
+// with their code in PointQueue.h. Included here (after JointMotionData, which
+// the ring's data[] slots are typed on) so CtrlGroup can embed a PointQueue_q.
+#include "PointQueue.h"
 
 //---------------------------------------------------------------
 // CtrlGroup:
 // Structure containing all the data related to a control group
+// (tag _CtrlGroup + the CtrlGroup typedef are forward-declared in PointQueue.h
+// so the ring primitives can take CtrlGroup* before this full definition; we
+// define the struct body here without re-typedef'ing to avoid a duplicate.)
 //---------------------------------------------------------------
-typedef struct
+struct _CtrlGroup
 {
     int groupNo;                                // sequence group number
     int numAxes;                                // number of axis in the control group
@@ -136,7 +105,7 @@ typedef struct
     rcl_publisher_t publisherJointState;
     sensor_msgs__msg__JointState* msgJointState;
 
-} CtrlGroup;
+}; // struct _CtrlGroup (typedef'd to CtrlGroup in PointQueue.h)
 
 
 //---------------------------------

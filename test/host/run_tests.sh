@@ -8,10 +8,13 @@ cd "$HERE"
 
 CC="${CC:-gcc}"
 BIN="test_point_queue"
-SRCS=(test_point_queue.c point_queue_ring.c admission_model.c underran_latch.c)
+# Host-tree TUs + the REAL production ring TU (../../src/PointQueue.c). The ring
+# bodies are no longer duplicated; PointQueue.c is compiled with `-iquote . -I-`
+# so the test-only MotoROS.h shim in this dir resolves instead of src/MotoROS.h.
+SRCS=(test_point_queue.c point_queue_ring.c admission_model.c underran_latch.c ../../src/PointQueue.c)
 
-echo "building with: $CC -std=c99 -Wall"
-"$CC" -std=c99 -Wall "${SRCS[@]}" -o "$BIN"
+echo "building with: $CC -std=c99 -Wall -iquote . -I-"
+"$CC" -std=c99 -Wall -iquote . -I- "${SRCS[@]}" -o "$BIN"
 
 echo "running $BIN"
 if ./"$BIN"; then

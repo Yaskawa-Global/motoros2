@@ -94,6 +94,7 @@
 #include "CmosParameterExtraction.h"
 #include "ActionServer_FJT.h"
 #include "CtrlGroup.h"
+#include "PointQueue.h"
 #include "ControllerStatusIO.h"
 #include "PositionMonitor.h"
 #include "ServiceQueueTrajPoint.h"
