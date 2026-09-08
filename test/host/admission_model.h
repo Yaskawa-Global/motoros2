@@ -12,21 +12,22 @@
 UINT16 PointQueue_AdmitOne(CtrlGroup* g, PointQueueAdmitPolicy policy,
                            JointMotionData* pt, UINT16* out_depth);
 
-// --- Underran flag MIRROR ---------------------------------------------------
-// The REAL sticky flag + accessor now exist in src/MotionControl.c (Task 5):
+// --- Underran flag + accessor (REAL) ---------------------------------------
+// The REAL sticky flag + accessor are defined in underran_latch.c using the
+// verbatim name + body shipped in src/MotionControl.c (Task 5):
 //   static volatile BOOL Ros_MotionControl_PointQueueUnderran = TRUE;
 //   BOOL Ros_MotionControl_ReadAndClearPointQueueUnderran(void);
 // with a single SET site in the consumer-empty (q->cnt==0) point-queue branch
 // of Ros_MotionControl_IncMoveLoopStart.
 //
-// The host can't run the real IP_CLK IncMove loop, so these are a faithful
-// MIRROR of the real flag + accessor. Mirror_MarkPointQueueUnderran() stands in
-// for the real consumer-empty SET line. The read-and-clear CONTRACT exercised
-// here is identical to the one the real accessor upholds:
+// underran_latch.c duplicates the accessor (the same lockstep-mirroring pattern
+// as point_queue_ring.c) so the host tests drive the REAL accessor contract:
 //   - starts TRUE (baseline on startup)
 //   - ReadAndClear returns the current value, then clears it to FALSE
 //   - a consumer-empty set latches it back to TRUE
-void Mirror_MarkPointQueueUnderran(void);           // simulate real consumer-empty SET
-BOOL Mirror_ReadAndClearPointQueueUnderran(void);   // mirror of the real accessor
+// The host can't run the real IP_CLK IncMove loop, so SimulateConsumerEmptyUnderran()
+// reproduces the ONE production SET line directly.
+void SimulateConsumerEmptyUnderran(void);                 // reproduce the real consumer-empty SET line
+BOOL Ros_MotionControl_ReadAndClearPointQueueUnderran(void);   // the REAL accessor
 
 #endif // MOTOROS2_TEST_ADMISSION_MODEL_H

@@ -7,13 +7,15 @@
 //   - full rejects enqueue; empty rejects dequeue
 //
 // TIER 2 (admission policy + underran flag, REAL runtime for the ring +
-//         policy branches; the underran flag is a host MIRROR of the REAL
-//         Task-5 accessor since the host can't run the IP_CLK IncMove loop):
+//         policy branches; the underran accessor is the REAL
+//         Ros_MotionControl_ReadAndClearPointQueueUnderran (verbatim body from
+//         src/MotionControl.c, kept in lockstep — see underran_latch.c)):
 //   - ONE_DEEP: first enqueue SUCCESS (depth 1), second returns BUSY
 //   - FIFO: fills to POINT_QUEUE_DEPTH (SUCCESS, increasing depth), next QUEUE_FULL
-//   - underran flag: starts TRUE; ReadAndClear TRUE then FALSE; a simulated
-//     consumer-empty set re-latches TRUE; read-and-clear semantics hold
-//   - legacy-equivalence: ONE_DEEP yields SUCCESS then BUSY, never QUEUE_FULL
+//   - underran flag: starts TRUE; ReadAndClear TRUE then FALSE; the real
+//     consumer-empty SET line re-latches TRUE; read-and-clear semantics hold
+//   - legacy-equivalence: ONE_DEEP yields SUCCESS then BUSY, never QUEUE_FULL,
+//     admits again after consume; FIFO on the same ring fills then QUEUE_FULL
 //
 // Build+run via test/host/Makefile or test/host/run_tests.sh. Exits non-zero on
 // any failure. Uses plain asserts (custom ASSERT that keeps counting).
@@ -300,17 +302,19 @@ static void test_admit_fifo_fill_then_full(void)
     ASSERT(Ros_MotionControl_PointQueueCount(&g) == POINT_QUEUE_DEPTH); // FULL did not enqueue
 }
 
-// underran flag: exercises the REAL read-and-clear accessor CONTRACT via the
-// host mirror. Starts TRUE (baseline); ReadAndClear returns TRUE then FALSE; a
-// simulated consumer-empty set re-latches TRUE; read-and-clear holds.
+// underran flag: exercises the REAL read-and-clear accessor
+// (Ros_MotionControl_ReadAndClearPointQueueUnderran, verbatim from
+// src/MotionControl.c — see underran_latch.c). Starts TRUE (baseline);
+// ReadAndClear returns TRUE then FALSE; the real consumer-empty SET line
+// (reproduced by SimulateConsumerEmptyUnderran) re-latches TRUE; read-and-clear holds.
 static void test_underran_read_and_clear(void)
 {
     printf("== TIER2 test_underran_read_and_clear ==\n");
-    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == TRUE);   // starts TRUE
-    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == FALSE);  // cleared by previous read
-    Mirror_MarkPointQueueUnderran();                           // simulated consumer-empty
-    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == TRUE);   // latched again
-    ASSERT(Mirror_ReadAndClearPointQueueUnderran() == FALSE);  // and cleared again
+    ASSERT(Ros_MotionControl_ReadAndClearPointQueueUnderran() == TRUE);   // starts TRUE
+    ASSERT(Ros_MotionControl_ReadAndClearPointQueueUnderran() == FALSE);  // cleared by previous read
+    SimulateConsumerEmptyUnderran();                                      // real consumer-empty SET line
+    ASSERT(Ros_MotionControl_ReadAndClearPointQueueUnderran() == TRUE);   // latched again
+    ASSERT(Ros_MotionControl_ReadAndClearPointQueueUnderran() == FALSE);  // and cleared again
 }
 
 // legacy-equivalence: ONE_DEEP path yields SUCCESS then BUSY, and NEVER
@@ -319,14 +323,67 @@ static void test_legacy_equivalence(void)
 {
     printf("== TIER2 test_legacy_equivalence ==\n");
     CtrlGroup g; new_group(&g);
+    UINT16 depth = 0xFFFF;
     JointMotionData p; memset(&p, 0, sizeof(p)); p.time = 42;
-    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &p, NULL) == QRE_SUCCESS);
+
+    // First legacy call: SUCCESS, depth reported == 1 (pre-change one-deep).
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &p, &depth) == QRE_SUCCESS);
+    ASSERT(depth == 1);
+
+    // Second (and every subsequent) call before consume: BUSY, never QUEUE_FULL,
+    // regardless of how many times invoked while occupied. Ring stays at depth 1.
     for (int i = 0; i < 100; i++) {
         JointMotionData q; memset(&q, 0, sizeof(q)); q.time = (UINT64)i;
         UINT16 r = PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &q, NULL);
         ASSERT(r == QRE_BUSY);
         ASSERT(r != QRE_QUEUE_FULL);
     }
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 1); // no BUSY call enqueued
+
+    // After a simulated consume (dequeue drains the one point), ONE_DEEP admits
+    // again: SUCCESS with depth 1 — identical to pre-change legacy semantics.
+    JointMotionData out;
+    ASSERT(Ros_MotionControl_PointQueueDequeue(&g, &out) && out.time == 42);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+    depth = 0xFFFF;
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &p, &depth) == QRE_SUCCESS);
+    ASSERT(depth == 1);
+}
+
+// legacy-vs-FIFO contrast over ONE ring: the two admission policies differ ONLY
+// in the admission decision. Legacy ONE_DEEP tops out at depth 1 and returns
+// BUSY (never QUEUE_FULL); FIFO on the very same (freshly-flushed) ring fills to
+// POINT_QUEUE_DEPTH then returns QUEUE_FULL. Proves legacy clients NEVER observe
+// QUEUE_FULL, while stream clients do once the ring is genuinely full.
+static void test_legacy_vs_fifo_same_ring(void)
+{
+    printf("== TIER2 test_legacy_vs_fifo_same_ring ==\n");
+    CtrlGroup g; new_group(&g);
+
+    // Legacy ONE_DEEP over the ring: SUCCESS once (depth 1), then BUSY; the ring
+    // never grows past 1 and QUEUE_FULL never appears.
+    JointMotionData p; memset(&p, 0, sizeof(p)); p.time = 1;
+    UINT16 depth = 0xFFFF;
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &p, &depth) == QRE_SUCCESS);
+    ASSERT(depth == 1);
+    JointMotionData p2; memset(&p2, 0, sizeof(p2)); p2.time = 2;
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_ONE_DEEP, &p2, NULL) == QRE_BUSY);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 1);
+
+    // Reset the SAME ring (flush restores head==tail==0) and drive FIFO instead:
+    // it fills all the way to POINT_QUEUE_DEPTH (SUCCESS, increasing depth) and
+    // only then returns QUEUE_FULL — the code legacy never sees.
+    Ros_MotionControl_PointQueueFlush(&g);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+    for (int i = 0; i < POINT_QUEUE_DEPTH; i++) {
+        JointMotionData f; memset(&f, 0, sizeof(f)); f.time = (UINT64)(100 + i);
+        depth = 0xFFFF;
+        ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_FIFO, &f, &depth) == QRE_SUCCESS);
+        ASSERT(depth == (UINT16)(i + 1));
+    }
+    JointMotionData over; memset(&over, 0, sizeof(over)); over.time = 999;
+    ASSERT(PointQueue_AdmitOne(&g, POINT_QUEUE_ADMIT_FIFO, &over, NULL) == QRE_QUEUE_FULL);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == POINT_QUEUE_DEPTH);
 }
 
 int main(void)
@@ -344,6 +401,7 @@ int main(void)
     test_admit_fifo_fill_then_full();
     test_underran_read_and_clear();
     test_legacy_equivalence();
+    test_legacy_vs_fifo_same_ring();
 
     if (failures == 0) { printf("\nALL PASS\n"); return 0; }
     printf("\n%d FAILURE(S)\n", failures);

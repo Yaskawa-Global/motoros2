@@ -156,6 +156,33 @@ If this service fails, inspect the `QueueResultEnum` field in the reply to deter
 The most common type of failure is `BUSY`.
 This is caused when the system is still processing a previously queued point.
 
+### queue_traj_point_stream
+
+Type: [motoros2_interfaces/srv/QueueTrajPointStream](https://github.com/yaskawa-global/motoros2_interfaces/blob/d6805d32714df4430f7db3d8ddc736c340ddeba8/srv/QueueTrajPointStream.srv)
+
+Submit a `JointTrajectoryPoint` to be pushed onto the point queue for continuous streaming motion.
+
+The request contains the same fields as `queue_traj_point`: a `joint_names` list and a single `point` (`trajectory_msgs/JointTrajectoryPoint`).
+
+The `start_point_queue_mode` service must have been called prior to attempting to use this service.
+
+Unlike `queue_traj_point` (which is one-deep: it accepts a single point and returns `BUSY` until that point has been consumed), this service pushes points onto a multi-point FIFO ring.
+Points are accepted until the ring is full, at which point the service returns `QUEUE_FULL`.
+This lets a client stream several points ahead of the consumer to keep the queue supplied and avoid underruns.
+
+The response reports:
+
+- `result_code`: a `QueueResultEnum` indicating the outcome (e.g. `SUCCESS`, `QUEUE_FULL`, `BUSY`, `WRONG_MODE`, `INVALID_JOINT_LIST`).
+- `message`: a human-readable description of `result_code`.
+- `queue_size`: the number of points in the queue after this call.
+- `underran_since_last_call`: `true` if the point queue ran empty (underran) at any time since the previous call to this service.
+
+The `underran_since_last_call` flag is read-and-cleared on every call: reading it returns whether an underrun occurred since the last call and simultaneously resets it.
+The FIRST call after startup returns `true` for this flag as a baseline (the queue is considered to have started empty); subsequent calls report actual underruns.
+
+If this service fails, inspect the `result_code` field in the reply to determine the cause.
+`QUEUE_FULL` indicates the ring is full and the client should retry after the consumer has made room.
+
 ### write_group_io
 
 Type: [motoros2_interfaces/srv/WriteGroupIO](https://github.com/yaskawa-global/motoros2_interfaces/blob/d6805d32714df4430f7db3d8ddc736c340ddeba8/srv/WriteGroupIO.srv)
