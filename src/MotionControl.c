@@ -630,9 +630,15 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
         Ros_Debug_BroadcastMsg("Initial point in trajectory queue");
         Init_Trajectory_Status status = Ros_MotionControl_InitPointQueue(request);
         if (out_depth) *out_depth = 0;
-        return (status == INIT_TRAJ_OK)
-            ? motoros2_interfaces__msg__QueueResultEnum__SUCCESS
-            : (UINT16)status;
+
+        if (status == INIT_TRAJ_OK)
+        {
+            return motoros2_interfaces__msg__QueueResultEnum__SUCCESS;
+        }
+        else
+        {
+            return (UINT16)status;
+        }
     }
 
     if (g_Ros_Controller.totalAxesCount != request->joint_names.size)
