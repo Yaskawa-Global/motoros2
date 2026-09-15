@@ -19,6 +19,7 @@ extern ServiceQueueTrajPointStream_Messages g_messages_QueueTrajPointStream;
 
 extern void Ros_ServiceQueueTrajPointStream_Initialize();
 extern void Ros_ServiceQueueTrajPointStream_Cleanup();
+extern void Ros_ServiceQueueTrajPointStream_ResetSequence();
 
 extern void Ros_ServiceQueueTrajPointStream_Trigger(const void* request_msg, void* response_msg);
 

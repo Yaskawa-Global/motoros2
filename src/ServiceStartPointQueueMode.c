@@ -49,7 +49,8 @@ void Ros_ServiceStartPointQueueMode_Trigger(const void* request_msg, void* respo
     RCL_UNUSED(request_msg);
     StartPointQueueMode_Response* response = (StartPointQueueMode_Response*) response_msg;
 
-    // trust ..
+    BOOL wasPointQueueActive = Ros_MotionControl_IsMotionMode_PointQueue();
+
     response->result_code.value = MOTION_READY;
     rosidl_runtime_c__String__assign(&response->message, "");
     
@@ -69,8 +70,13 @@ void Ros_ServiceStartPointQueueMode_Trigger(const void* request_msg, void* respo
         Ros_Debug_BroadcastMsg("%s: %s (%d)", __func__,
             response->message.data, response->result_code.value);
     }
+    else if (!wasPointQueueActive)
+    {
+        Ros_ServiceQueueTrajPointStream_ResetSequence();
+        Ros_Debug_BroadcastMsg("%s: activated; stream sequence reset to baseline", __func__);
+    }
     else
     {
-        Ros_Debug_BroadcastMsg("%s: activated", __func__);
+        Ros_Debug_BroadcastMsg("%s: already active; stream sequence preserved", __func__);
     }
 }

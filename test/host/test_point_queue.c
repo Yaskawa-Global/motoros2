@@ -52,6 +52,7 @@
 #include <stdio.h>
 #include "admission_model.h"
 #include "stop_abort_model.h"
+#include "sequence_model.h"
 
 static int failures = 0;
 #define ASSERT(cond) do { \
@@ -548,6 +549,32 @@ static void test_abort_mode_and_done_semantics(void)
     ASSERT(success.incmove_done);
 }
 
+static void test_stream_sequence_semantics(void)
+{
+    printf("== TIER4 test_stream_sequence_semantics ==\n");
+    SequenceModel model;
+    SequenceModel_Reset(&model);
+    ASSERT(SequenceModel_Check(&model, 1234, 10) == SEQUENCE_ACCEPT_NEW);
+    SequenceModel_Commit(&model, 1234, 10);
+    ASSERT(SequenceModel_Check(&model, 1234, 10) == SEQUENCE_ACCEPT_DUPLICATE);
+    ASSERT(SequenceModel_Check(&model, 1234, 11) == SEQUENCE_REJECT_MISMATCH);
+    ASSERT(SequenceModel_Check(&model, 1236, 12) == SEQUENCE_REJECT_MISMATCH);
+    ASSERT(SequenceModel_Check(&model, 1235, 12) == SEQUENCE_ACCEPT_NEW);
+    SequenceModel_Commit(&model, 1235, 12);
+
+    SequenceModel_Reset(&model);
+    ASSERT(SequenceModel_Check(&model, 65534, 20) == SEQUENCE_ACCEPT_NEW);
+    SequenceModel_Commit(&model, 65534, 20);
+    ASSERT(SequenceModel_Check(&model, 65535, 21) == SEQUENCE_ACCEPT_NEW);
+    SequenceModel_Commit(&model, 65535, 21);
+    ASSERT(SequenceModel_Check(&model, 0, 22) == SEQUENCE_ACCEPT_NEW);
+    SequenceModel_Commit(&model, 0, 22);
+    ASSERT(SequenceModel_Check(&model, 1, 23) == SEQUENCE_ACCEPT_NEW);
+
+    SequenceModel_Reset(&model);
+    ASSERT(SequenceModel_Check(&model, 50000, 30) == SEQUENCE_ACCEPT_NEW);
+}
+
 int main(void)
 {
     // Tier 1
@@ -570,6 +597,8 @@ int main(void)
     test_stop_flushes_only_after_quiescence();
     test_stop_failure_and_hold_semantics();
     test_abort_mode_and_done_semantics();
+    // Tier 4
+    test_stream_sequence_semantics();
 
     if (failures == 0) { printf("\nALL PASS\n"); return 0; }
     printf("\n%d FAILURE(S)\n", failures);

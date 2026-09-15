@@ -103,6 +103,7 @@ void Ros_ServiceAbortPointQueue_Trigger(const void* request_msg, void* response_
     // Having disabled admission, report failure honestly rather than claiming a
     // stop we did not achieve; the caller must escalate to the physical E-stop.
     Ros_MotionControl_StopTrajMode();
+    Ros_ServiceQueueTrajPointStream_ResetSequence();
 
     if (!bMotionStopped)
     {
