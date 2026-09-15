@@ -28,6 +28,7 @@
 #define SERVICE_NAME_STOP_TRAJ_MODE "stop_traj_mode"
 #define SERVICE_NAME_QUEUE_TRAJ_POINT "queue_traj_point"
 #define SERVICE_NAME_QUEUE_TRAJ_POINT_STREAM "queue_traj_point_stream"
+#define SERVICE_NAME_ABORT_POINT_QUEUE "abort_point_queue"
 #define SERVICE_NAME_SELECT_MOTION_TOOL "select_motion_tool"
 
 #define ACTION_NAME_FOLLOW_JOINT_TRAJECTORY "follow_joint_trajectory"

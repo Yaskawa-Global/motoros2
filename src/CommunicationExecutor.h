@@ -21,8 +21,9 @@
 //      service stop_traj_mode                              1
 //      service queue_traj_point                            1
 //      service queue_traj_point_stream                     1
+//      service abort_point_queue                           1
 //      service select_tool                                 1
-#define QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR             (10)
+#define QUANTITY_OF_HANDLES_FOR_MOTION_EXECUTOR             (11)
 
 // total number of handles =
 //      timers +                                            1

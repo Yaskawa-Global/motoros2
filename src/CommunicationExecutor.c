@@ -387,6 +387,11 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_QUEUE_POINT_STREAM, "Failed adding service (%d)", (int)rc);
 
     rc = rclc_executor_add_service(
+        &executor_motion_control, &g_serviceAbortPointQueue, &g_messages_AbortPointQueue.request,
+        &g_messages_AbortPointQueue.response, Ros_ServiceAbortPointQueue_Trigger);
+    motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_ABORT_POINT_QUEUE, "Failed adding service (%d)", (int)rc);
+
+    rc = rclc_executor_add_service(
         &executor_motion_control, &g_serviceSelectMotionTool, &g_messages_SelectMotionTool.request,
         &g_messages_SelectMotionTool.response, Ros_ServiceSelectMotionTool_Trigger);
     motoRos_RCLAssertOK_withMsg(rc, SUBCODE_FAIL_ADD_SERVICE_SELECT_MOTION_TOOL, "Failed adding service (%d)", (int)rc);

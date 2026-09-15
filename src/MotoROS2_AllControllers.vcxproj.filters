@@ -366,6 +366,9 @@
     <ClCompile Include="ServiceStartPointQueueMode.c">
       <Filter>Source Files\Services</Filter>
     </ClCompile>
+    <ClCompile Include="ServiceAbortPointQueue.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
     <ClCompile Include="Ros_mpGetRobotCalibrationData.c">
       <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
@@ -489,6 +492,9 @@
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="ServiceStartPointQueueMode.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceAbortPointQueue.h">
       <Filter>Header Files\Services</Filter>
     </ClInclude>
     <ClInclude Include="Ros_mpGetRobotCalibrationData.h">

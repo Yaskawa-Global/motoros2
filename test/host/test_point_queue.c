@@ -294,6 +294,29 @@ static void test_flush_request_consumer_actions(void)
     ASSERT(g.point_q.guard_post == POINT_QUEUE_GUARD_MAGIC);
 }
 
+// abort regression (service /abort_point_queue): the abort service must leave
+// NOTHING behind — every point the controller already accepted is discarded.
+// The service itself never touches the ring; it calls
+// Ros_MotionControl_StopMotion(FALSE), which quiesces the consumer and then
+// flushes each group's ring directly (see ServiceAbortPointQueue.c and the
+// QUIESCED-CALLER-ONLY note on Ros_MotionControl_PointQueueFlush). This test
+// pins the ring-side half of that contract for the abort path: with accepted
+// points queued, the flush StopMotion performs empties the ring, so the ring is
+// provably empty ON RETURN from the service rather than after some later
+// consumer pass. (test_flush_clears_point_ring above covers flush's index/guard
+// hygiene in depth; this one deliberately stays the small abort-facing case.)
+static void test_abort_flushes_all_accepted_points(void)
+{
+    printf("== TIER1 test_abort_flushes_all_accepted_points ==\n");
+    CtrlGroup g; new_group(&g);
+    JointMotionData p; memset(&p, 0, sizeof(p)); p.time = 1;
+    ASSERT(Ros_MotionControl_PointQueueEnqueue(&g, &p));
+    ASSERT(Ros_MotionControl_PointQueueEnqueue(&g, &p));
+    Ros_MotionControl_PointQueueFlush(&g);
+    ASSERT(Ros_MotionControl_PointQueueCount(&g) == 0);
+    ASSERT(!Ros_MotionControl_PointQueueDequeue(&g, &p));
+}
+
 //================ TIER 2 : admission policy + underran latch ===============
 
 // ONE_DEEP: first SUCCESS (depth 1), second BUSY.
@@ -468,6 +491,7 @@ int main(void)
     test_point_queue_guard_corruption_fails_safe();
     test_flush_clears_point_ring();
     test_flush_request_consumer_actions();
+    test_abort_flushes_all_accepted_points();
     // Tier 2
     test_admit_one_deep();
     test_admit_fifo_fill_then_full();
