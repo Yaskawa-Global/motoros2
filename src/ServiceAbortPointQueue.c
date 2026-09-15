@@ -50,11 +50,16 @@ void Ros_ServiceAbortPointQueue_Cleanup()
 // See the safety note in ServiceAbortPointQueue.h: only the physical safety
 // circuit provides emergency-stop assurance.
 //
-// The whole point of this service is what it does NOT do: unlike
-// Ros_ServiceStopTrajMode_Trigger, it does not refuse when the increment queue
-// is non-empty (ServiceStopTrajMode.c) - that is exactly the state an abort
-// exists to resolve. Everything else is the same, deliberately reusing the
-// existing stop machinery rather than adding a second stop path:
+// This service diverges from Ros_ServiceStopTrajMode_Trigger in exactly TWO
+// places, both of them the point of the service, and both called out where they
+// happen below:
+//   1. it does not refuse when the increment queue is non-empty
+//      (ServiceStopTrajMode.c) - that is exactly the state an abort exists to
+//      resolve;
+//   2. it exits the motion mode on the failure path too, instead of returning
+//      early - see the ORDERING note in the body.
+// Everything else deliberately reuses the existing stop machinery rather than
+// adding a second stop path:
 //
 //   Ros_MotionControl_StopMotion(FALSE) raises bStopMotion, holds INIT_ROS so
 //   the arm decelerates smoothly, WAITS for message processing to quiesce, then
@@ -64,10 +69,6 @@ void Ros_ServiceAbortPointQueue_Cleanup()
 //   doing so from a service context would race the interpolation task. See the
 //   QUIESCED-CALLER-ONLY note on the ring's direct flush primitive in
 //   PointQueue.{c,h}: StopMotion is the one caller allowed to use it.
-//
-// StopMotion returning FALSE means message processing did not quiesce within
-// MOTION_STOP_TIMEOUT or a queue could not be cleared: motion state is then
-// unknown, so we report failure instead of claiming a stop we did not achieve.
 void Ros_ServiceAbortPointQueue_Trigger(const void* request_msg, void* response_msg)
 {
     RCL_UNUSED(request_msg);
@@ -75,19 +76,43 @@ void Ros_ServiceAbortPointQueue_Trigger(const void* request_msg, void* response_
 
     Ros_Debug_BroadcastMsg("%s: aborting point queue (software stop, NOT an E-stop)", __func__);
 
-    if (!Ros_MotionControl_StopMotion(FALSE))
-    {
-        response->success = FALSE;
-        rosidl_runtime_c__String__assign(&response->message, "failed to stop motion and clear point queue");
+    BOOL bMotionStopped = Ros_MotionControl_StopMotion(FALSE);
 
-        Ros_Debug_BroadcastMsg("%s: %s", __func__, response->message.data);
-        return;
-    }
-
+    // ORDERING - DELIBERATE DIVERGENCE FROM ServiceStopTrajMode.c:
+    // exit the motion mode and raise INCMOVE_DONE on BOTH paths, BEFORE looking
+    // at the result. stop_traj_mode returns early when StopMotion fails, which is
+    // defensible for a graceful request; for an escalation stop it produces the
+    // worst possible end state, so this service does NOT copy it.
+    //
+    // StopMotion returns FALSE when the ~20 ms quiesce wait expires
+    // (MOTION_STOP_TIMEOUT) or when Ros_MotionControl_ClearQ_All could not take a
+    // group's q_lock - and in that second case that group's increment queue was
+    // NOT cleared. By the time StopMotion returns it has already lowered
+    // bStopMotion and released its HOLD, so returning early here would leave the
+    // controller ARMED in the point-queue/trajectory mode, with residual
+    // increments able to keep the arm moving and queue_traj_point still willing to
+    // accept more work. Exiting the mode unconditionally is strictly safer: it is
+    // a pure state change (StopTrajMode only clears the mode flags and drops
+    // WAITING_ROS) that cannot fail and cannot make matters worse.
+    //
+    // Having disarmed, we then report the failure honestly rather than claiming a
+    // stop we did not achieve - the caller must escalate to the physical E-stop.
     Ros_MotionControl_StopTrajMode();
 
     // Set I/O signal
     Ros_Controller_SetIOState(IO_FEEDBACK_MP_INCMOVE_DONE, TRUE);
+
+    if (!bMotionStopped)
+    {
+        response->success = FALSE;
+        rosidl_runtime_c__String__assign(&response->message,
+            "abort INCOMPLETE: motion may not have stopped (message processing did not quiesce, "
+            "or an increment queue was locked and could not be cleared). Motion mode was exited "
+            "anyway. Treat the controller as unsafe and use the E-stop");
+
+        Ros_Debug_BroadcastMsg("%s: %s", __func__, response->message.data);
+        return;
+    }
 
     response->success = TRUE;
     rosidl_runtime_c__String__assign(&response->message, "point queue aborted and trajectory mode exited");

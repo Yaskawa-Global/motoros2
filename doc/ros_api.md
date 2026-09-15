@@ -144,6 +144,8 @@ This service will fail if called while motion is being executed.
 
 To stop a currently executing FollowJointTrajectory motion, cancel the active goal (either using the action client which submitted it, or after inspecting the list of active goals of the action server and submitting a cancel request for a specific goal id).
 
+To stop when this service refuses — ie: when the queue is *not* empty and the motion must be given up rather than completed — use `abort_point_queue` (see below).
+
 ### queue_traj_point
 
 Type: [motoros2_interfaces/srv/QueueTrajPoint](https://github.com/yaskawa-global/motoros2_interfaces/blob/d6805d32714df4430f7db3d8ddc736c340ddeba8/srv/QueueTrajPoint.srv)
@@ -182,6 +184,34 @@ The FIRST call after startup returns `true` for this flag as a baseline (the que
 
 If this service fails, inspect the `result_code` field in the reply to determine the cause.
 `QUEUE_FULL` indicates the ring is full and the client should retry after the consumer has made room.
+
+### abort_point_queue
+
+Type: `motoros2_interfaces/srv/AbortPointQueue` (added by this fork; see `srv/AbortPointQueue.srv` in the pinned `motoros2_interfaces`)
+
+Stop message processing, discard every trajectory point the controller has already accepted, and exit the active motion mode.
+The request is empty: the abort is unconditional and takes no arguments.
+
+Unlike `stop_traj_mode`, this service does **not** refuse when the increment queue is non-empty — that is exactly the situation it exists to resolve.
+It always exits the motion mode, whatever the queue holds.
+Discarding accepted motion is the intended behaviour, not a side effect: this is the escalation path for when a graceful stop cannot be honoured (for example when `stop_traj_mode` has just refused).
+
+The response reports:
+
+- `success`: `true` when the abort completed — message processing stopped, all accepted points discarded, motion mode exited.
+- `message`: human-readable detail, always populated.
+
+`success` is `false` when the stop could not be **confirmed**: message processing did not quiesce within the internal timeout, or an increment queue was locked and could not be cleared.
+The motion mode is exited either way, so a `false` reply means "disarmed, but motion may not have stopped".
+Treat the controller as unsafe and use the physical E-stop.
+
+> **This is a software stop, not a safety-rated emergency stop.**
+> It stops the arm as fast as software can, and no faster: it is subject to controller scheduling, message-processing latency and the servo deceleration ramp, and it does nothing at all if MotoROS2 or the Agent connection is unhealthy.
+> Only the physical safety circuit (E-stop button, safety fence, PFL) provides emergency-stop assurance.
+> Do not present this service to an operator as an emergency stop, and do not use it as a substitute for one.
+
+Note: as with `stop_traj_mode`, the underlying stop sequence toggles the controller's HOLD state ON and then OFF.
+If an operator had set HOLD at the pendant, that HOLD is **released** by this service.
 
 ### write_group_io
 

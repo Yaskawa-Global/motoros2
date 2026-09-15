@@ -20,10 +20,27 @@
 // fence, PFL) provides emergency-stop assurance. Integrators must keep the
 // hardware E-stop as the sole protective stop.
 //
-// Request: empty.
-// Response: 'success' (BOOL) and 'message' (human-readable detail). Note that
-// AbortPointQueue.srv deliberately carries no comments (its request has no
-// fields), so THIS header is the normative documentation of the service.
+// >>> SIDE EFFECT: THIS RELEASES AN OPERATOR'S HOLD <<<
+// Ros_MotionControl_StopMotion toggles the controller's HOLD state ON and then
+// OFF again (MotionControl.c). If an operator had set HOLD at the pendant, that
+// HOLD is RELEASED when this service completes. The behaviour is pre-existing and
+// shared with stop_traj_mode, but it matters more here: this service is
+// documented as always safe to call, whatever the queue holds, so it will be
+// called far more freely - including automatically, from a supervisor reacting to
+// an error. Anything relying on pendant HOLD to keep the arm still must not
+// depend on it surviving an abort.
+//
+// Request: empty - the abort is unconditional and takes no arguments.
+// Response: 'success' (BOOL) and 'message' (human-readable detail, always
+// populated). 'success' is FALSE when the stop could not be CONFIRMED (message
+// processing did not quiesce, or an increment queue was locked); the motion mode
+// is exited either way, so a FALSE reply means "disarmed, but motion may not have
+// stopped - escalate to the E-stop". See the ORDERING note in
+// ServiceAbortPointQueue.c.
+//
+// The integrator-facing copy of all of the above lives in AbortPointQueue.srv
+// (rendered by 'ros2 interface show') and in doc/ros_api.md; keep the three in
+// step when changing behaviour.
 //
 // Relationship to 'stop_traj_mode': stop_traj_mode is the graceful exit and
 // REFUSES while the increment queue still holds work (see ServiceStopTrajMode.c)
