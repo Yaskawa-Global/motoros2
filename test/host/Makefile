@@ -18,11 +18,11 @@ CFLAGS  ?= -std=c99 -Wall
 IQUOTE   = -iquote . -I-
 SRCDIR   = ../../src
 BIN      = test_point_queue
-# Host-tree TUs (test driver + consumer flush-action model + admission/underran models)
-HOST_SRCS = test_point_queue.c point_queue_ring.c admission_model.c underran_latch.c
+# Host-tree TUs (test driver + focused ring/admission/stop orchestration models)
+HOST_SRCS = test_point_queue.c point_queue_ring.c admission_model.c underran_latch.c stop_abort_model.c
 # Real production ring TU, compiled against the host MotoROS.h shim
 REAL_SRCS = $(SRCDIR)/PointQueue.c
-HDRS     = motoplus_stubs.h point_queue_ring.h admission_model.h MotoROS.h
+HDRS     = motoplus_stubs.h point_queue_ring.h admission_model.h stop_abort_model.h MotoROS.h
 
 .PHONY: all build run clean
 all: run

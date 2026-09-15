@@ -16,21 +16,9 @@
 // the on-target self-test verifies the guard predicate alarm-free instead. See
 // the ALARM DECISION note in src/Tests_PointQueue.c.)
 //
-// NOT COVERED HERE — the /abort_point_queue service
-// (src/ServiceAbortPointQueue.c) has NO host coverage, deliberately. Its logic is
-// the ORDER of MotoPlus/micro-ROS calls it makes — Ros_MotionControl_StopMotion
-// (mpHold, the quiesce wait, ClearQ_All), Ros_MotionControl_StopTrajMode and
-// Ros_Controller_SetIOState — and reproducing those here would mean stubbing the
-// MotoPlus job/IO layer, i.e. testing the stubs rather than the firmware. The ring
-// half of its contract is already covered by test_flush_clears_point_ring above
-// (the service never touches the ring itself; StopMotion does), so a separate
-// abort ring test would add no coverage. The service's real gates are the
-// MotoPlus firmware build, the on-controller BOOT (its init and executor
-// registration assert on failure, raising 8011 with
-// SUBCODE_FAIL_{INIT,ADD}_SERVICE_ABORT_POINT_QUEUE — note this is boot-time
-// wiring, NOT the Ros_Testing_PointQueue ring self-test named above), and the
-// bring-up stop exercises in the playback plan. Do not add a host test that
-// flushes a ring and calls itself an abort test: it would only re-prove the flush.
+// TIER 3 uses a focused orchestration model for stop/abort branch ordering. It
+// does not pretend to test MotoPlus itself; it checks the safety invariants at the
+// seams around mpHold, quiescence, all-group queue clearing, mode exit and IO.
 //
 // TIER 1 (ring logic, REAL runtime — bodies verbatim from MotionControl.c):
 //   - enqueue/dequeue FIFO order
@@ -63,6 +51,7 @@
 
 #include <stdio.h>
 #include "admission_model.h"
+#include "stop_abort_model.h"
 
 static int failures = 0;
 #define ASSERT(cond) do { \
@@ -474,6 +463,91 @@ static void test_legacy_inflight_busy(void)
     ASSERT(PointQueue_AdmitOne(&gf, POINT_QUEUE_ADMIT_FIFO, &f, NULL) == QRE_SUCCESS);
 }
 
+//================ TIER 3 : stop/abort orchestration ========================
+
+static StopAbortModel new_stop_model(void)
+{
+    StopAbortModel model;
+    memset(&model, 0, sizeof(model));
+    model.num_groups = 3;
+    model.point_queue_mode = TRUE;
+    for (int i = 0; i < model.num_groups; ++i)
+        model.inc_queue_clear_ok[i] = TRUE;
+    return model;
+}
+
+static void test_stop_interrupts_segment_and_full_wait(void)
+{
+    printf("== TIER3 test_stop_interrupts_segment_and_full_wait ==\n");
+    ASSERT(StopModel_InterpolationMayContinue(FALSE));
+    ASSERT(!StopModel_InterpolationMayContinue(TRUE));
+    ASSERT(StopModel_FullQueueWaitMayContinue(FALSE, TRUE));
+    ASSERT(!StopModel_FullQueueWaitMayContinue(TRUE, TRUE));
+    ASSERT(!StopModel_FullQueueWaitMayContinue(FALSE, FALSE));
+}
+
+static void test_stop_flushes_only_after_quiescence(void)
+{
+    printf("== TIER3 test_stop_flushes_only_after_quiescence ==\n");
+    StopAbortModel failed = new_stop_model();
+    ASSERT(!StopModel_StopMotion(&failed, FALSE, TRUE, TRUE));
+    ASSERT(failed.stop_motion && failed.hold_active);
+    ASSERT(failed.clear_attempts == failed.num_groups);
+    for (int i = 0; i < failed.num_groups; ++i) {
+        ASSERT(failed.flush_requested[i]);
+        ASSERT(!failed.direct_flushed[i]);
+    }
+
+    StopAbortModel stopped = new_stop_model();
+    ASSERT(StopModel_StopMotion(&stopped, TRUE, TRUE, TRUE));
+    ASSERT(!stopped.stop_motion && !stopped.hold_active);
+    for (int i = 0; i < stopped.num_groups; ++i)
+        ASSERT(stopped.direct_flushed[i]);
+}
+
+static void test_stop_failure_and_hold_semantics(void)
+{
+    printf("== TIER3 test_stop_failure_and_hold_semantics ==\n");
+    StopAbortModel clear_failure = new_stop_model();
+    clear_failure.inc_queue_clear_ok[0] = FALSE;
+    ASSERT(!StopModel_StopMotion(&clear_failure, TRUE, TRUE, TRUE));
+    ASSERT(clear_failure.clear_attempts == clear_failure.num_groups);
+    ASSERT(clear_failure.stop_motion && clear_failure.hold_active);
+
+    StopAbortModel apply_failure = new_stop_model();
+    ASSERT(!StopModel_StopMotion(&apply_failure, TRUE, FALSE, TRUE));
+    ASSERT(apply_failure.stop_motion);
+
+    StopAbortModel command_hold = new_stop_model();
+    command_hold.hold_active = TRUE;
+    ASSERT(StopModel_StopMotion(&command_hold, TRUE, TRUE, TRUE));
+    ASSERT(!command_hold.hold_active);
+
+    StopAbortModel release_failure = new_stop_model();
+    ASSERT(!StopModel_StopMotion(&release_failure, TRUE, TRUE, FALSE));
+    ASSERT(release_failure.stop_motion && release_failure.hold_active);
+}
+
+static void test_abort_mode_and_done_semantics(void)
+{
+    printf("== TIER3 test_abort_mode_and_done_semantics ==\n");
+    StopAbortModel wrong_mode = new_stop_model();
+    wrong_mode.point_queue_mode = FALSE;
+    ASSERT(!StopModel_AbortPointQueue(&wrong_mode, TRUE, TRUE, TRUE));
+    ASSERT(wrong_mode.clear_attempts == 0 && !wrong_mode.incmove_done);
+
+    StopAbortModel failed = new_stop_model();
+    ASSERT(!StopModel_AbortPointQueue(&failed, FALSE, TRUE, TRUE));
+    ASSERT(!failed.point_queue_mode);
+    ASSERT(!failed.incmove_done);
+    ASSERT(failed.stop_motion && failed.hold_active);
+
+    StopAbortModel success = new_stop_model();
+    ASSERT(StopModel_AbortPointQueue(&success, TRUE, TRUE, TRUE));
+    ASSERT(!success.point_queue_mode);
+    ASSERT(success.incmove_done);
+}
+
 int main(void)
 {
     // Tier 1
@@ -491,6 +565,11 @@ int main(void)
     test_legacy_equivalence();
     test_legacy_vs_fifo_same_ring();
     test_legacy_inflight_busy();
+    // Tier 3
+    test_stop_interrupts_segment_and_full_wait();
+    test_stop_flushes_only_after_quiescence();
+    test_stop_failure_and_hold_semantics();
+    test_abort_mode_and_done_semantics();
 
     if (failures == 0) { printf("\nALL PASS\n"); return 0; }
     printf("\n%d FAILURE(S)\n", failures);

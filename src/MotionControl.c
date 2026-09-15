@@ -455,7 +455,9 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
 
                 int iterationCounter = 0;
                 // While interpolation time is smaller than new ROS point time
-                while ((curTrajData->time < endTrajData->time) && Ros_Controller_IsMotionReady())
+                while ((curTrajData->time < endTrajData->time)
+                    && Ros_Controller_IsMotionReady()
+                    && !g_Ros_Controller.bStopMotion)
                 {
                     iterationCounter += 1;
                     //Relinquish CPU control after some number of iterations. Prevent starvation of other tasks.
@@ -536,6 +538,13 @@ void Ros_MotionControl_AddToIncQueueProcess(CtrlGroup* ctrlGroup)
 
                 curTrajData->valid = FALSE;
 
+                if (g_Ros_Controller.bStopMotion)
+                {
+                    bzero(ctrlGroup->trajectoryToProcess, sizeof(ctrlGroup->trajectoryToProcess));
+                    ctrlGroup->hasDataToProcess = FALSE;
+                    continue;
+                }
+
                 if (Ros_MotionControl_IsMotionMode_Trajectory())
                 {
                     if (ctrlGroup->trajectoryIterator == &ctrlGroup->trajectoryToProcess[MAX_NUMBER_OF_POINTS_PER_TRAJECTORY]) //pointing to last possible entry in the array; don't increment iterator
@@ -585,7 +594,7 @@ BOOL Ros_MotionControl_AddPulseIncPointToQ(CtrlGroup* ctrlGroup, Incremental_dat
         Ros_Sleep(g_Ros_Controller.interpolPeriod);
 
         //make sure we don't get stuck in infinite loop
-        if (!Ros_Controller_IsMotionReady()) //<- they probably pressed HOLD or ESTOP
+        if (g_Ros_Controller.bStopMotion || !Ros_Controller_IsMotionReady()) //<- they probably pressed HOLD or ESTOP
         {
             return FALSE;
         }
@@ -624,6 +633,9 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
     PointQueueAdmitPolicy policy, UINT16* out_depth)
 {
     int grpIndex, jointIndexInTraj;
+
+    if (g_Ros_Controller.bStopMotion)
+        return motoros2_interfaces__msg__QueueResultEnum__BUSY;
 
     if (Ros_MotionControl_MustInitializePointQueue)
     {
@@ -706,6 +718,9 @@ UINT16 Ros_MotionControl_EnqueueTrajectoryPoint(
             return motoros2_interfaces__msg__QueueResultEnum__UNABLE_TO_PROCESS_POINT;
         }
     }
+
+    if (g_Ros_Controller.bStopMotion)
+        return motoros2_interfaces__msg__QueueResultEnum__BUSY;
 
     for (grpIndex = 0; grpIndex < g_Ros_Controller.numGroup; grpIndex += 1)
     {
@@ -1249,6 +1264,8 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
     // NOTE: for the time being, stop motion will stop all motion for all control group
     BOOL bRet;
     BOOL bStopped;
+    BOOL bHoldApplied;
+    BOOL bHoldReleased;
     int checkCnt;
 
     MP_HOLD_SEND_DATA holdSendData;
@@ -1266,8 +1283,11 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
     // while INIT_ROS has already been suspended.
     g_Ros_Controller.bStopMotion = TRUE;
 
+    bzero(&stdRspData, sizeof(stdRspData));
     holdSendData.sHold = ON;
-    mpHold(&holdSendData, &stdRspData);
+    bHoldApplied = (mpHold(&holdSendData, &stdRspData) == OK && stdRspData.err_no == 0);
+    if (!bHoldApplied)
+        Ros_Debug_BroadcastMsg("ERROR: Failed to apply HOLD while stopping motion (err_no: %d)", stdRspData.err_no);
 
     bStopped = FALSE;
     // Check that background processing of message has been stopped
@@ -1285,41 +1305,54 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
     // Clear queues
     bRet = Ros_MotionControl_ClearQ_All();
 
-    // DIRECT point-queue flush: ClearQ_All only REQUESTED a flush (async-safe),
-    // which relies on the consumer actioning head = tail at the top of its loop.
-    // But StopMotion has QUIESCED the consumer above (bStopMotion = TRUE, mpHold,
-    // then waited for !HasDataToProcess()), so the consumer will NOT run to action
-    // that request — and StopMotion must return with a definitely-empty ring.
-    // Because the consumer is provably stopped, it is race-free for StopMotion to
-    // reset both indices directly here. The obsolete request the ClearQ_All call
-    // left in flushRequested is harmless (the ring is already empty after this
-    // direct reset); we leave the flag alone — the direct reset is what makes the
-    // ring empty on return.
-    for (int groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo++)
-        Ros_MotionControl_PointQueueFlush(g_Ros_Controller.ctrlGroups[groupNo]);
+    // A direct ring reset writes both SPSC indices and is safe only after the
+    // interpolation consumer has acknowledged quiescence. On timeout, leave the
+    // async flush request set for the consumer to action without violating index
+    // ownership.
+    if (bStopped)
+    {
+        for (int groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo++)
+            Ros_MotionControl_PointQueueFlush(g_Ros_Controller.ctrlGroups[groupNo]);
+    }
 
-    // All motion should be stopped at this point, so turn of the flag
-    g_Ros_Controller.bStopMotion = FALSE;
+    if (!bHoldApplied || !bStopped || !bRet)
+    {
+        Ros_Debug_BroadcastMsg("ERROR: Stop incomplete; retaining software stop and HOLD");
+        return FALSE;
+    }
 
+    bzero(&stdRspData, sizeof(stdRspData));
     holdSendData.sHold = OFF;
-    mpHold(&holdSendData, &stdRspData);
+    bHoldReleased = (mpHold(&holdSendData, &stdRspData) == OK && stdRspData.err_no == 0);
+    if (!bHoldReleased)
+    {
+        Ros_Debug_BroadcastMsg("ERROR: Failed to release command HOLD after stopping motion (err_no: %d)", stdRspData.err_no);
+        return FALSE;
+    }
+
+    g_Ros_Controller.bStopMotion = FALSE;
 
     if (bKeepJobRunning)
     {
         //zero struct, so cJobName is empty, which results in a 'resume from HOLD'
         //NOTE: mpStartJob(..) docs are a bit ambiguous about this
         bzero(&startJobData, sizeof(startJobData));
-        mpStartJob(&startJobData, &stdRspData);
-        if (stdRspData.err_no != 0)
+        bzero(&stdRspData, sizeof(stdRspData));
+        if (mpStartJob(&startJobData, &stdRspData) != OK || stdRspData.err_no != 0)
         {
             Ros_Debug_BroadcastMsg("WARNING: mpStartJob error: %d", stdRspData.err_no);
+            g_Ros_Controller.bStopMotion = TRUE;
+            bzero(&stdRspData, sizeof(stdRspData));
+            holdSendData.sHold = ON;
+            mpHold(&holdSendData, &stdRspData);
+            return FALSE;
         }
     }
 
     if (checkCnt >= MOTION_STOP_TIMEOUT)
         Ros_Debug_BroadcastMsg("WARNING: Message processing not stopped before clearing queue");
 
-    return(bStopped && bRet);
+    return TRUE;
 }
 
 //-------------------------------------------------------------------
@@ -1327,6 +1360,8 @@ BOOL Ros_MotionControl_StopMotion(BOOL bKeepJobRunning)
 //-------------------------------------------------------------------
 BOOL Ros_MotionControl_ClearQ_All()
 {
+    BOOL allQueuesCleared = TRUE;
+
     for (int groupNo = 0; groupNo < g_Ros_Controller.numGroup; groupNo++)
     {
         // Stop addtional items from being added to the queue
@@ -1359,11 +1394,11 @@ BOOL Ros_MotionControl_ClearQ_All()
         else
         {
             Ros_Debug_BroadcastMsg("ERROR: Unable to clear queue.  Queue is locked up! (Group #%d)", groupNo);
-            return FALSE;
+            allQueuesCleared = FALSE;
         }
     }
 
-    return TRUE;
+    return allQueuesCleared;
 }
 
 // only for this compilation unit for now

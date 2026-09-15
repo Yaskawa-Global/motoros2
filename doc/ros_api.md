@@ -189,11 +189,11 @@ If this service fails, inspect the `result_code` field in the reply to determine
 
 Type: `motoros2_interfaces/srv/AbortPointQueue` (added by this fork; see `srv/AbortPointQueue.srv` in the pinned `motoros2_interfaces`)
 
-Stop message processing, discard every trajectory point the controller has already accepted, and exit the active motion mode.
-The request is empty: the abort is unconditional and takes no arguments.
+Stop point-queue message processing, discard every trajectory point the controller has already accepted, and exit point-queue motion mode.
+The request is empty. Calls made when point-queue mode is not active are rejected without affecting FollowJointTrajectory.
 
 Unlike `stop_traj_mode`, this service does **not** refuse when the increment queue is non-empty — that is exactly the situation it exists to resolve.
-It always exits the motion mode, whatever the queue holds.
+Once an abort is attempted in point-queue mode, it exits that mode whatever the queue holds.
 Discarding accepted motion is the intended behaviour, not a side effect: this is the escalation path for when a graceful stop cannot be honoured (for example when `stop_traj_mode` has just refused).
 
 The response reports:
@@ -210,8 +210,8 @@ Treat the controller as unsafe and use the physical E-stop.
 > Only the physical safety circuit (E-stop button, safety fence, PFL) provides emergency-stop assurance.
 > Do not present this service to an operator as an emergency stop, and do not use it as a substitute for one.
 
-Note: as with `stop_traj_mode`, the underlying stop sequence toggles the controller's HOLD state ON and then OFF.
-If an operator had set HOLD at the pendant, that HOLD is **released** by this service.
+On success, the underlying stop sequence applies and releases command HOLD. Pendant and external HOLD are separate controller HOLD sources.
+On failure, command HOLD and the software stop remain asserted; resolve the fault before attempting to resume motion.
 
 ### write_group_io
 

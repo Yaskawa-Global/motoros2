@@ -20,15 +20,11 @@
 // fence, PFL) provides emergency-stop assurance. Integrators must keep the
 // hardware E-stop as the sole protective stop.
 //
-// >>> SIDE EFFECT: THIS RELEASES AN OPERATOR'S HOLD <<<
-// Ros_MotionControl_StopMotion toggles the controller's HOLD state ON and then
-// OFF again (MotionControl.c). If an operator had set HOLD at the pendant, that
-// HOLD is RELEASED when this service completes. The behaviour is pre-existing and
-// shared with stop_traj_mode, but it matters more here: this service is
-// documented as always safe to call, whatever the queue holds, so it will be
-// called far more freely - including automatically, from a supervisor reacting to
-// an error. Anything relying on pendant HOLD to keep the arm still must not
-// depend on it surviving an abort.
+// Ros_MotionControl_StopMotion applies and then releases command HOLD on a
+// successful stop. Pendant and external HOLD are separate controller HOLD
+// sources. If stopping or queue cleanup fails, command HOLD and the software
+// stop remain asserted; recovery requires resolving the fault before motion can
+// resume.
 //
 // Request: empty - the abort is unconditional and takes no arguments.
 // Response: 'success' (BOOL) and 'message' (human-readable detail, always
@@ -45,9 +41,9 @@
 // Relationship to 'stop_traj_mode': stop_traj_mode is the graceful exit and
 // REFUSES while the increment queue still holds work (see ServiceStopTrajMode.c)
 // - precisely the state an abort has to deal with. This service performs the
-// same stop sequence WITHOUT that refusal, so it always exits point-queue /
-// trajectory mode. It is therefore the escalation path when a graceful stop
-// cannot be honoured, and it is expected to discard queued motion.
+// same stop sequence WITHOUT that refusal, so it exits point-queue mode. Calls
+// outside point-queue mode are rejected without affecting FollowJointTrajectory.
+// It is the escalation path when a graceful point-queue stop cannot be honoured.
 
 
 extern rcl_service_t g_serviceAbortPointQueue;
