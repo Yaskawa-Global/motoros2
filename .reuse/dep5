@@ -46,3 +46,7 @@ License: CC0-1.0
 Files: doc/img/logo.png
 Copyright: 2023 Yaskawa America, Inc.
 License: CC-BY-NC-ND-4.0
+
+Files: doc/img/RtFlow.png doc/img/RtFlow.vsdx
+Copyright: 2023 Yaskawa America, Inc.
+License: CC-BY-NC-ND-4.0

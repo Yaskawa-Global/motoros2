@@ -9,7 +9,7 @@
 #define MOTOROS2_MOTOROS_H
 
 #define APPLICATION_NAME            "MotoROS2"
-#define APPLICATION_VERSION         "0.2.1"
+#define APPLICATION_VERSION         "0.2.2-pre"
 
 #include "motoPlus.h"
 
@@ -71,9 +71,11 @@
 #include <motoros2_interfaces/srv/write_m_register.h>
 #include <motoros2_interfaces/msg/io_result_codes.h>
 #include <motoros2_interfaces/msg/init_traj_enum.h>
+#include <motoros2_interfaces/msg/control_mode_enum.h>
 #include <motoros2_interfaces/srv/reset_error.h>
 #include <motoros2_interfaces/srv/start_traj_mode.h>
 #include <motoros2_interfaces/srv/start_point_queue_mode.h>
+#include <motoros2_interfaces/srv/start_rt_mode.h>
 #include <motoros2_interfaces/srv/queue_traj_point.h>
 #include <motoros2_interfaces/srv/select_motion_tool.h>
 #include <builtin_interfaces/msg/duration.h>
@@ -100,9 +102,11 @@
 #include "ServiceResetError.h"
 #include "ServiceStartTrajMode.h"
 #include "ServiceStartPointQueueMode.h"
+#include "ServiceStartRtMode.h"
 #include "ServiceStopTrajMode.h"
 #include "ServiceSelectMotionTool.h"
 #include "MotionControl.h"
+#include "RealTimeMotionControl.h"
 #include "ConfigFile.h"
 #include "RosApiNameConstants.h"
 #include "TimeConversionUtils.h"
