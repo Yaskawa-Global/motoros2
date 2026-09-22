@@ -349,6 +349,9 @@ healthchecksdb
 .vscode/
 
 # M+ libmicroros distribution directories
+libmicroros_yrc1000_kilted/
+libmicroros_yrc1000u_kilted/
+libmicroros_dx200_kilted/
 libmicroros_yrc1000_jazzy/
 libmicroros_yrc1000u_jazzy/
 libmicroros_dx200_jazzy/

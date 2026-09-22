@@ -104,7 +104,7 @@ The following general requirements must be met in order to be able to use MotoRO
 - the controller must have a correctly configured network connection:
   - DX200 and YRC1000micro: `LAN`
   - YRC1000: either `LAN2` or `LAN3`
-- ROS 2 version: Foxy, Galactic, Humble, or Jazzy.
+- ROS 2 version: Foxy, Galactic, Humble, Jazzy, or Kilted.
   MotoROS2 does not support ROS 2 Iron Irwini nor Rolling Ridley.
 - Docker or a from-source build of the micro-ROS Agent
 - FastDDS as RMW (even when using ROS 2 Galactic)
@@ -174,10 +174,13 @@ The values must match *exactly*.
 |:--------------|:-----------------|:------------------|:-----------|:-----------------------------------|
 | DX200         | Humble           | `mr2_dx2_h.out`   | `0.2.1`    | `6672e218b60c42f00ce335dc4a977ee9` |
 | DX200         | Jazzy            | `mr2_dx2_j.out`   | `0.2.1`    | `f31673a8559e331719f8b25f174419a3` |
+| DX200         | Kilted           | `mr2_dx2_k.out`   | `0.2.1`    | ` `                                |
 | YRC1000       | Humble           | `mr2_yrc1_h.out`  | `0.2.1`    | `fec0137dc4b3dd4b9c5e169d78211eda` |
 | YRC1000       | Jazzy            | `mr2_yrc1_j.out`  | `0.2.1`    | `6b7c0cae3e13f266509615412e46e57b` |
+| YRC1000       | Kilted           | `mr2_yrc1_k.out`  | `0.2.1`    | ` `                                |
 | YRC1000micro  | Humble           | `mr2_yrc1m_h.out` | `0.2.1`    | `6666de4b1bb41859a543f5ca8a413a98` |
 | YRC1000micro  | Jazzy            | `mr2_yrc1m_j.out` | `0.2.1`    | `c421fa95d647ab77a5f2a1babed06fa2` |
+| YRC1000micro  | Kilted           | `mr2_yrc1m_k.out` | `0.2.1`    | ` `                                |
 
 If the hash matches, proceed with the next section, [Installation](#installation).
 
@@ -443,6 +446,7 @@ However, always make sure to use a version of the Agent image which corresponds 
 With ROS 2 Foxy, use `microros/micro-ros-agent:foxy`.
 With ROS 2 Humble, use `microros/micro-ros-agent:humble`.
 With ROS 2 Jazzy, use `microros/micro-ros-agent:jazzy`.
+With ROS 2 Kilted, use `microros/micro-ros-agent:kilted`.
 
 To start the Agent (on a machine with Docker already installed and setup to allow non-root access):
 
@@ -450,6 +454,7 @@ To start the Agent (on a machine with Docker already installed and setup to allo
 docker run \
   -it \
   --rm \
+  --ipc=host \
   --net=host \
   --user=$(id -u):$(id -g) \
   microros/micro-ros-agent:jazzy \
@@ -470,6 +475,7 @@ Note: always make sure to use a version of the Agent which corresponds to the ve
 For ROS 2 Foxy, checkout the `foxy` branch.
 For ROS 2 Humble, checkout the `humble` branch.
 For ROS 2 Jazzy, checkout the `jazzy` branch.
+For ROS 2 Kilted, checkout the `kilted` branch.
 
 #### Linux (Debian/Ubuntu)
 
@@ -559,7 +565,7 @@ After the final reboot of the controller, and after [starting the micro-ROS Agen
 
 Note: if you are using ROS 2 Galactic, please first read [Only FastDDS is supported](#only-fastdds-is-supported).
 
-On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS), Humble, or Jazzy):
+On a PC with a supported ROS 2 installation (ie: Foxy, Galactic (with FastDDS), Humble, Jazzy, or Kilted):
 
 1. open a new terminal
 1. `source` the ROS 2 installation
@@ -749,7 +755,7 @@ None of the other RMWs are supported, including Cyclone DDS, which is the defaul
 
 Symptoms of this incompatibility are seemingly functional ROS 2 network connections, where topics are succesfully published and subscribed to, but service invocations and action goal submissions appear to *hang*.
 
-**Note**: ROS 2 Foxy, ROS 2 Humble, ROS 2 Jazzy, and ROS 2 Rolling all use FastDDS by default.
+**Note**: ROS 2 Foxy, ROS 2 Humble, ROS 2 Jazzy, ROS 2 Kilted, and ROS 2 Rolling all use FastDDS by default.
 If you haven't changed your default RMW, you should not need to change anything for MotoROS2.
 
 **Work-around**: unfortunately, this limitation is caused by a middleware-layer incompatibility with respect to how service requests are (de)serialised by the respective RMWs ([ros2/rmw_cyclonedds#184](https://github.com/ros2/rmw_cyclonedds/issues/184)), and without significant changes to the way MotoROS2 operates, has no known work-around.
