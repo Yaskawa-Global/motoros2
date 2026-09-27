@@ -28,8 +28,6 @@
 
 #define INVALID_TASK                        -1
 
-#define MAX_CONTROLLABLE_GROUPS             8
-
 #define MASK_ISALARM_ACTIVEALARM            0x02
 #define MASK_ISALARM_ACTIVEERROR            0x01
 

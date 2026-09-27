@@ -331,10 +331,7 @@ void Ros_ActionServer_FJT_ResetProgressTracker()
     bzero(feedback->desired.velocities.data,
         sizeof(double) * g_messages_PositionMonitor.jointStateAllGroups->velocity.size);
 
-    //--------------------
-    //desired effort
-    bzero(feedback->desired.effort.data,
-        sizeof(double) * g_messages_PositionMonitor.jointStateAllGroups->effort.size);
+    feedback->desired.velocities.size = g_messages_PositionMonitor.jointStateAllGroups->velocity.size;
 
     //===========================================
     //error in position (zero)
@@ -343,24 +340,44 @@ void Ros_ActionServer_FJT_ResetProgressTracker()
 
     feedback->error.positions.size = g_messages_PositionMonitor.jointStateAllGroups->position.size;
 
+    //===========================================
+    //error in velocity (zero)
+    bzero(feedback->error.velocities.data,
+        sizeof(double) * g_messages_PositionMonitor.jointStateAllGroups->velocity.size);
+
+    feedback->error.velocities.size = g_messages_PositionMonitor.jointStateAllGroups->velocity.size;
+
     //TODO: do multidof too
 }
 
 //Called from TrajectoryMotionControl::Ros_MotionControl_IncMoveLoopStart
-void Ros_ActionServer_FJT_UpdateProgressTracker(MP_EXPOS_DATA* incrementData)
+void Ros_ActionServer_FJT_UpdateProgressTracker(MP_PULSE_POS_RSP_DATA pulsePosData[MAX_CONTROLLABLE_GROUPS], MP_EXPOS_DATA* moveData, UINT64 time_executing_trajectory)
 {
     if (fjt_active_goal_handle == NULL)
         return;
-
+    
     int iteratorAllAxes = 0;
+    Ros_Millis_To_Duration_Msg(time_executing_trajectory, &feedback_FollowJointTrajectory.feedback.desired.time_from_start);
     for (int groupIndex = 0; groupIndex < g_Ros_Controller.numGroup; groupIndex += 1)
     {
-        double radRosOrder[MP_GRP_AXES_NUM];
+        double positionRadRosOrder[MP_GRP_AXES_NUM];
+        double velocityRadRosOrder[MP_GRP_AXES_NUM];
+        long desiredPos[MP_GRP_AXES_NUM];
         CtrlGroup* ctrlGroup = g_Ros_Controller.ctrlGroups[groupIndex];
-        Ros_CtrlGroup_ConvertToRosPos(ctrlGroup, incrementData->grp_pos_info[groupIndex].pos, radRosOrder);
+
+        for (int i = 0; i < ctrlGroup->numAxes; i += 1) 
+        {
+            desiredPos[i] = pulsePosData[groupIndex].lPos[i] + moveData->grp_pos_info[groupIndex].pos[i];
+        }
+
+        Ros_CtrlGroup_ConvertToRosPos(ctrlGroup, desiredPos, positionRadRosOrder);
+        Ros_CtrlGroup_ConvertToRosPos(ctrlGroup, moveData->grp_pos_info[groupIndex].pos, velocityRadRosOrder);
 
         for (int i = 0; i < ctrlGroup->numAxes; i += 1, iteratorAllAxes += 1)
-            feedback_FollowJointTrajectory.feedback.desired.positions.data[iteratorAllAxes] = feedback_FollowJointTrajectory.feedback.actual.positions.data[iteratorAllAxes] + radRosOrder[i];
+        {
+            feedback_FollowJointTrajectory.feedback.desired.positions.data[iteratorAllAxes] = positionRadRosOrder[i];
+            feedback_FollowJointTrajectory.feedback.desired.velocities.data[iteratorAllAxes] = velocityRadRosOrder[i] * (1000.0 / g_Ros_Controller.interpolPeriod);
+        }
     }
 }
 
@@ -392,12 +409,20 @@ void Ros_ActionServer_FJT_ProcessFeedback()
             g_messages_PositionMonitor.jointStateAllGroups->effort.data,
             sizeof(double) * g_messages_PositionMonitor.jointStateAllGroups->effort.size);
 
+        Ros_Millis_To_Duration_Msg(Ros_Time_Msg_To_Millis(&g_messages_PositionMonitor.jointStateAllGroups->header.stamp) - Ros_MotionControl_TrajectoryExecutionStartTime, &feedback_FollowJointTrajectory.feedback.actual.time_from_start);
+
         for (int i = 0; i < (MAX_CONTROLLABLE_GROUPS * MP_GRP_AXES_NUM); i += 1)
         {
             //.desired was set in ActionServer_FJT_UpdateProgressTracker (called from increment-move loop)
             feedback_FollowJointTrajectory.feedback.error.positions.data[i] =
                 feedback_FollowJointTrajectory.feedback.desired.positions.data[i] -
                 feedback_FollowJointTrajectory.feedback.actual.positions.data[i];
+
+            feedback_FollowJointTrajectory.feedback.error.velocities.data[i] =
+                feedback_FollowJointTrajectory.feedback.desired.velocities.data[i] -
+                feedback_FollowJointTrajectory.feedback.actual.velocities.data[i];
+
+            feedback_FollowJointTrajectory.feedback.error.time_from_start = feedback_FollowJointTrajectory.feedback.actual.time_from_start;
         }
 
         //-----------------------------------------------------------------------------
