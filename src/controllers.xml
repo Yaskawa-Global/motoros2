@@ -5,6 +5,9 @@ SPDX-License-Identifier: Apache-2.0
 -->
 <root>
 	<libExtension>
+		<YRC1000_lyrical>yrcLib_lyrical;yrcLib</YRC1000_lyrical>
+		<YRC1000u_lyrical>yrcmLib_lyrical;yrcmLib</YRC1000u_lyrical>
+		<DX200_lyrical>dnLib_lyrical;dnLib</DX200_lyrical>
 		<YRC1000_jazzy>yrcLib_jazzy;yrcLib</YRC1000_jazzy>
 		<YRC1000u_jazzy>yrcmLib_jazzy;yrcmLib</YRC1000u_jazzy>
 		<DX200_jazzy>dnLib_jazzy;dnLib</DX200_jazzy>
@@ -20,6 +23,9 @@ SPDX-License-Identifier: Apache-2.0
 	</libExtension>
 	
 	<appName>
+		<YRC1000_lyrical>MOTOPLUS-YRC1000</YRC1000_lyrical>
+		<YRC1000u_lyrical>MOTOPLUS-YRC1000micro</YRC1000u_lyrical>
+		<DX200_lyrical>MOTOPLUS-DX200</DX200_lyrical>
 		<YRC1000_jazzy>MOTOPLUS-YRC1000</YRC1000_jazzy>
 		<YRC1000u_jazzy>MOTOPLUS-YRC1000micro</YRC1000u_jazzy>
 		<DX200_jazzy>MOTOPLUS-DX200</DX200_jazzy>
@@ -35,6 +41,9 @@ SPDX-License-Identifier: Apache-2.0
 	</appName>
 	
 	<compilers>
+		<YRC1000_lyrical>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_lyrical>
+		<YRC1000u_lyrical>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_lyrical>
+		<DX200_lyrical>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_lyrical>
 		<YRC1000_jazzy>YRC1000\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000_jazzy>
 		<YRC1000u_jazzy>YRC1000u\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</YRC1000u_jazzy>
 		<DX200_jazzy>DX200\gnu\4.3.3-vxworks-6.9\x86-win32\bin\ccpentium.exe</DX200_jazzy>

@@ -187,7 +187,12 @@ void Ros_Communication_Cleanup()
     MOTOROS2_MEM_TRACE_REPORT(comm_exec_fini);
 }
 
+// rcl_timer_callback_t gained a 'callback data' parameter in Lyrical
+#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_LYRICAL
+void Ros_Communication_PingAgentConnection(rcl_timer_t* timer, int64_t last_call_time, uintptr_t callback_data)
+#else
 void Ros_Communication_PingAgentConnection(rcl_timer_t* timer, int64_t last_call_time)
+#endif
 {
     //Ensure the Agent is still connected.
     const int timeout_ms = 1000;
@@ -199,13 +204,21 @@ void Ros_Communication_PingAgentConnection(rcl_timer_t* timer, int64_t last_call
         rmw_uros_sync_session(100);
 }
 
+#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_LYRICAL
+void Ros_Communication_PublishActionFeedback(rcl_timer_t* timer, int64_t last_call_time, uintptr_t callback_data)
+#else
 void Ros_Communication_PublishActionFeedback(rcl_timer_t* timer, int64_t last_call_time)
+#endif
 {
     Ros_ActionServer_FJT_ProcessFeedback();
     Ros_ActionServer_FJT_ProcessResult();
 }
 
+#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_LYRICAL
+static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t last_call_time, uintptr_t callback_data)
+#else
 static void Ros_Communication_MonitorUserLanState(rcl_timer_t* timer, int64_t last_call_time)
+#endif
 {
     //assume link is currently up (and pretend it was up before this timer even
     //started).
@@ -290,7 +303,7 @@ void Ros_Communication_StartExecutors(SEM_ID semCommunicationExecutorStatus)
     // rclc_timer_init_default(..) was replaced with rclc_timer_init_default2(..)
     // in Jazzy, which has a different set of parameters. Call the correct version
     // based on what this is being compiled for
-#ifdef MOTOPLUS_LIBMICROROS_ROS2_IS_JAZZY
+#if defined(MOTOPLUS_LIBMICROROS_ROS2_IS_JAZZY) || defined(MOTOPLUS_LIBMICROROS_ROS2_IS_LYRICAL)
     rc = rclc_timer_init_default2(&timerPingAgent, &g_microRosNodeInfo.support, RCL_MS_TO_NS(PERIOD_COMMUNICATION_PING_AGENT_MS), Ros_Communication_PingAgentConnection, true);
     motoRosAssert_withMsg(rc == RCL_RET_OK, SUBCODE_FAIL_TIMER_INIT_PING, "Failed creating rclc timer (%d)", (int)rc);
 

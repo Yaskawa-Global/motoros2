@@ -277,6 +277,33 @@
     <None Include="..\libmicroros_yrc1000u_jazzy\libmicroros.yrcmLib_jazzy">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
+    <None Include="DX200_lyricalCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="DX200_lyricalLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_lyricalLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000_lyricalCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_lyricalCompilerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="YRC1000u_lyricalLinkerArguments.mps">
+      <Filter>Compile Settings</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000_lyrical\libmicroros.yrcLib_lyrical">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_dx200_lyrical\libmicroros.dnLib_lyrical">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
+    <None Include="..\libmicroros_yrc1000u_lyrical\libmicroros.yrcmLib_lyrical">
+      <Filter>MotoPlus Libraries\micro-ROS</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
