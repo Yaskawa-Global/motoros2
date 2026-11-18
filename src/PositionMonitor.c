@@ -390,6 +390,29 @@ void Ros_PositionMonitor_CalculateTransforms(int groupIndex, long* pulsePos_moto
 
     transform = &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTcp].transform;
     Ros_MpCoord_To_GeomMsgsTransform(&coordToolData, transform);
+
+    //the active tool may have changed since the TCP frame was named (fi: through
+    //the 'select_motion_tool' service), so make sure the name matches the tool
+    //file used for the transform above
+    Ros_PositionMonitor_UpdateTcpFrameName(
+        &g_messages_PositionMonitor.transform->transforms.data[(groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTcp].child_frame_id,
+        group->tool);
+}
+
+void Ros_PositionMonitor_UpdateTcpFrameName(rosidl_runtime_c__String* tcpFrameName, int tool)
+{
+    //TCP frames are named '<prefix>rN/tcp_<tool>' (see Ros_PositionMonitor_Initialize_TfPublisher(..))
+    char* toolNumber = strrchr(tcpFrameName->data, '_');
+    if (toolNumber == NULL)
+        return;
+    toolNumber += 1;
+
+    if (atoi(toolNumber) == tool)
+        return;
+
+    char formatBuffer[MAX_TF_FRAME_NAME_LENGTH];
+    snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%.*s%d", (int)(toolNumber - tcpFrameName->data), tcpFrameName->data, tool);
+    rosidl_runtime_c__String__assign(tcpFrameName, formatBuffer);
 }
 
 void Ros_PositionMonitor_UpdateLocation()

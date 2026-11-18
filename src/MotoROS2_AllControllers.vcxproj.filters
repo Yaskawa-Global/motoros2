@@ -369,6 +369,9 @@
     <ClCompile Include="Tests_TimeConversionUtils.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests_PositionMonitor.c">
+      <Filter>Source Files\Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MotoROS.h">
@@ -483,6 +486,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tests_TimeConversionUtils.h">
+      <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests_PositionMonitor.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
   </ItemGroup>
