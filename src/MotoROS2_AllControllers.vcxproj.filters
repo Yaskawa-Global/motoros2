@@ -277,6 +277,9 @@
     <None Include="..\libmicroros_yrc1000u_jazzy\libmicroros.yrcmLib_jazzy">
       <Filter>MotoPlus Libraries\micro-ROS</Filter>
     </None>
+    <None Include="..\doc\rt_control.md">
+      <Filter>Docs\doc</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -368,6 +371,12 @@
     </ClCompile>
     <ClCompile Include="Tests_TimeConversionUtils.c">
       <Filter>Source Files\Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceStartRtMode.c">
+      <Filter>Source Files\Services</Filter>
+    </ClCompile>
+    <ClCompile Include="RealTimeMotionControl.c">
+      <Filter>Source Files\Robot Controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -484,6 +493,12 @@
     </ClInclude>
     <ClInclude Include="Tests_TimeConversionUtils.h">
       <Filter>Header Files\Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceStartRtMode.h">
+      <Filter>Header Files\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="RealTimeMotionControl.h">
+      <Filter>Header Files\Robot Controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

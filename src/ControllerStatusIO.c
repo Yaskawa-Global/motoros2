@@ -168,27 +168,10 @@ BOOL Ros_Controller_Initialize()
     //==================================
     //create message for robot status
     //TODO(gavanderhoorn): use micro_ros_utilities_create_message_memory(..) instead
-    g_messages_RobotStatus.msgRobotStatus = industrial_msgs__msg__RobotStatus__create();
-    rosidl_runtime_c__int32__Sequence__init(&g_messages_RobotStatus.msgRobotStatus->error_codes, MAX_ALARM_COUNT + 1);
-
-    //==================================
-    // If not started, start the IncMoveTask (there should be only one instance of this thread)
-    if (g_Ros_Controller.tidIncMoveThread == INVALID_TASK)
+    if (g_messages_RobotStatus.msgRobotStatus == NULL)
     {
-        Ros_Debug_BroadcastMsg("Creating new task: IncMoveTask");
-
-        g_Ros_Controller.tidIncMoveThread = mpCreateTask(MP_PRI_IP_CLK_TAKE, MP_STACK_SIZE,
-            (FUNCPTR)Ros_MotionControl_IncMoveLoopStart,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        if (g_Ros_Controller.tidIncMoveThread == ERROR)
-        {
-            Ros_Debug_BroadcastMsg("Failed to create task for incremental-motion.  Check robot parameters.");
-            g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
-            Ros_Controller_SetIOState(IO_FEEDBACK_FAILURE, TRUE);
-            mpSetAlarm(ALARM_TASK_CREATE_FAIL, APPLICATION_NAME " FAILED TO CREATE TASK", SUBCODE_INCREMENTAL_MOTION);
-
-            return FALSE;
-        }
+        g_messages_RobotStatus.msgRobotStatus = industrial_msgs__msg__RobotStatus__create();
+        rosidl_runtime_c__int32__Sequence__init(&g_messages_RobotStatus.msgRobotStatus->error_codes, MAX_ALARM_COUNT + 1);
     }
 
     //==================================
@@ -247,8 +230,11 @@ void Ros_Controller_Cleanup()
         }
     }
 
-    mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
-    g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+    if (g_Ros_Controller.tidIncMoveThread != INVALID_TASK)
+    {
+        mpDeleteTask(g_Ros_Controller.tidIncMoveThread);
+        g_Ros_Controller.tidIncMoveThread = INVALID_TASK;
+    }
 
     Ros_Debug_BroadcastMsg("Cleanup publisher robot status");
     ret = rcl_publisher_fini(&g_publishers_RobotStatus.robotStatus, &g_microRosNodeInfo.node);
@@ -256,6 +242,7 @@ void Ros_Controller_Cleanup()
         Ros_Debug_BroadcastMsg("Failed cleaning up robot status publisher: %d", ret);
 
     industrial_msgs__msg__RobotStatus__destroy(g_messages_RobotStatus.msgRobotStatus);
+    g_messages_RobotStatus.msgRobotStatus = NULL;
 
     MOTOROS2_MEM_TRACE_REPORT(ctrlr_fini);
 }
