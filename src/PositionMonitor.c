@@ -209,7 +209,8 @@ static void Ros_PositionMonitor_Initialize_TfPublisher(rmw_qos_profile_t const* 
         rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_FlangeToTool0].child_frame_id, formatBuffer);
 
         snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%sr%d/tcp_%d", frame_prefix, robotIterator + 1, g_Ros_Controller.ctrlGroups[robotIterator]->tool);
-        rosidl_runtime_c__String__assign(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_FlangeToTcp].child_frame_id, formatBuffer);
+        //the 'select_motion_tool' service renames this frame when the active tool changes
+        Ros_ServiceSelectMotionTool_InitTcpFrameName(&g_messages_PositionMonitor.transform->transforms.data[i + tfLink_FlangeToTcp].child_frame_id, formatBuffer);
 
         robotIterator += 1;
     }

@@ -112,6 +112,7 @@
 #include "Tests_ControllerStatusIO.h"
 #include "Tests_ActionServer_FJT.h"
 #include "Tests_TimeConversionUtils.h"
+#include "Tests_ServiceSelectMotionTool.h"
 #include "FauxCommandLineArgs.h"
 #include "InformCheckerAndGenerator.h"
 #include "MathConstants.h"
