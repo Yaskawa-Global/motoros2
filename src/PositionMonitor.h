@@ -37,6 +37,4 @@ extern void Ros_PositionMonitor_Cleanup();
 
 extern void Ros_PositionMonitor_UpdateLocation();
 
-extern void Ros_PositionMonitor_UpdateTcpFrameName(rosidl_runtime_c__String* tcpFrameName, int tool);
-
 #endif  // MOTOROS2_POSITION_MONITOR_H

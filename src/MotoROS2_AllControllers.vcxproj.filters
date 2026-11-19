@@ -369,7 +369,7 @@
     <ClCompile Include="Tests_TimeConversionUtils.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
-    <ClCompile Include="Tests_PositionMonitor.c">
+    <ClCompile Include="Tests_ServiceSelectMotionTool.c">
       <Filter>Source Files\Tests</Filter>
     </ClCompile>
   </ItemGroup>
@@ -488,7 +488,7 @@
     <ClInclude Include="Tests_TimeConversionUtils.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
-    <ClInclude Include="Tests_PositionMonitor.h">
+    <ClInclude Include="Tests_ServiceSelectMotionTool.h">
       <Filter>Header Files\Tests</Filter>
     </ClInclude>
   </ItemGroup>

@@ -22,4 +22,7 @@ extern void Ros_ServiceSelectMotionTool_Cleanup();
 
 extern void Ros_ServiceSelectMotionTool_Trigger(const void* request_msg, void* response_msg);
 
+extern void Ros_ServiceSelectMotionTool_InitTcpFrameName(rosidl_runtime_c__String* tcpFrameName, const char* name);
+extern void Ros_ServiceSelectMotionTool_UpdateTcpFrameName(rosidl_runtime_c__String* tcpFrameName, int tool);
+
 #endif  // MOTOROS2_SERVICE_SELECT_TOOL_H

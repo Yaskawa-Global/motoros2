@@ -43,6 +43,53 @@ void Ros_ServiceSelectMotionTool_Cleanup()
     MOTOROS2_MEM_TRACE_REPORT(svc_select_tool_fini);
 }
 
+void Ros_ServiceSelectMotionTool_InitTcpFrameName(rosidl_runtime_c__String* tcpFrameName, const char* name)
+{
+    //allocate the full MAX_TF_FRAME_NAME_LENGTH, so Ros_ServiceSelectMotionTool_UpdateTcpFrameName(..)
+    //can rename the frame in place. The TF publisher runs in another task, so the
+    //buffer it may be reading must not be freed.
+    char formatBuffer[MAX_TF_FRAME_NAME_LENGTH] = { 0 };
+    snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%s", name);
+    if (rosidl_runtime_c__String__assignn(tcpFrameName, formatBuffer, MAX_TF_FRAME_NAME_LENGTH - 1))
+        tcpFrameName->size = strlen(tcpFrameName->data);
+}
+
+void Ros_ServiceSelectMotionTool_UpdateTcpFrameName(rosidl_runtime_c__String* tcpFrameName, int tool)
+{
+    //TCP frames are named '<prefix>rN/tcp_<tool>' (see Ros_PositionMonitor_Initialize_TfPublisher(..))
+    char* toolNumber = strrchr(tcpFrameName->data, '_');
+    if (toolNumber == NULL)
+        return;
+    toolNumber += 1;
+
+    char formatBuffer[MAX_TF_FRAME_NAME_LENGTH];
+    int length = snprintf(formatBuffer, MAX_TF_FRAME_NAME_LENGTH, "%.*s%d", (int)(toolNumber - tcpFrameName->data), tcpFrameName->data, tool);
+    if (length < 0 || length >= MAX_TF_FRAME_NAME_LENGTH)
+        return;
+
+    if ((size_t)length < tcpFrameName->capacity)
+    {
+        //rename in place (see Ros_ServiceSelectMotionTool_InitTcpFrameName(..))
+        memcpy(tcpFrameName->data, formatBuffer, length + 1);
+        tcpFrameName->size = length;
+    }
+    else
+        rosidl_runtime_c__String__assign(tcpFrameName, formatBuffer);
+}
+
+static void Ros_ServiceSelectMotionTool_RenameTcpFrame(int groupIndex, int tool)
+{
+    //only robots have a TCP frame (see Ros_PositionMonitor_CalculateTransforms(..))
+    if (!Ros_CtrlGroup_IsRobot(g_Ros_Controller.ctrlGroups[groupIndex]))
+        return;
+
+    size_t tfIndex = (groupIndex * NUMBER_TRANSFORM_LINKS_PER_ROBOT) + tfLink_FlangeToTcp;
+    if (g_messages_PositionMonitor.transform == NULL || tfIndex >= g_messages_PositionMonitor.transform->transforms.size)
+        return;
+
+    Ros_ServiceSelectMotionTool_UpdateTcpFrameName(&g_messages_PositionMonitor.transform->transforms.data[tfIndex].child_frame_id, tool);
+}
+
 void Ros_ServiceSelectMotionTool_Trigger(const void* request_msg, void* response_msg)
 {
     Ros_Debug_BroadcastMsg("%s: entry", __func__);
@@ -95,6 +142,10 @@ void Ros_ServiceSelectMotionTool_Trigger(const void* request_msg, void* response
     //      haven't yet been added to the increment queue. See also the ROS 2
     //      'select_tool' service definition file in motoros2_interfaces.
     g_Ros_Controller.ctrlGroups[request->group_number]->tool = request->tool_number;
+
+    //the TF publisher computes the TCP transform from the tool selected above,
+    //so publish it under that tool's name too
+    Ros_ServiceSelectMotionTool_RenameTcpFrame(request->group_number, request->tool_number);
 
     //report to caller
     rosidl_runtime_c__String__assign(&response->message, motoros2_interfaces__msg__SelectionResultCodes__OK_STR);

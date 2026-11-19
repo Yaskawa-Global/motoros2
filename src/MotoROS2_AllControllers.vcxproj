@@ -455,7 +455,7 @@
     <ClCompile Include="Ros_mpGetRobotCalibrationData.c" />
     <ClCompile Include="RosMotoPlusConversionUtils.c" />
     <ClCompile Include="Tests_TimeConversionUtils.c" />
-    <ClCompile Include="Tests_PositionMonitor.c" />
+    <ClCompile Include="Tests_ServiceSelectMotionTool.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigFile.h" />
@@ -482,7 +482,7 @@
     <ClInclude Include="Tests_TestUtils.h" />
     <ClInclude Include="Tests_RosMotoPlusConversionUtils.h" />
     <ClInclude Include="Tests_TimeConversionUtils.h" />
-    <ClInclude Include="Tests_PositionMonitor.h" />
+    <ClInclude Include="Tests_ServiceSelectMotionTool.h" />
     <ClInclude Include="TimeConversionUtils.h" />
     <ClInclude Include="MotionControl.h" />
     <ClInclude Include="ActionServer_FJT.h" />
