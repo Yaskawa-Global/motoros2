@@ -83,19 +83,10 @@ jobs:
     - name: Find MSBuild and add to PATH
       uses: microsoft/setup-msbuild@v3
 
-    - name: Generate token (micro_ros_motoplus)
-      id: gen_token
-      uses: actions/create-github-app-token@v1
-      with:
-        app-id: ${{ secrets.MPLMB_APP_ID }}
-        private-key: ${{ secrets.MPLMB_APP_PRIVATE_KEY }}
-        owner: "yaskawa-global"
-        repositories: "micro_ros_motoplus"
-
     - name: "Download M+ libmicroros (${{ matrix.uros.codename }}-${{ matrix.uros.release }} for ${{ steps.uppercaser.outputs.ctrlr }})"
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ steps.gen_token.outputs.token }}
+        GH_TOKEN: ${{ github.token }}
         RELEASE_TYPE: ${{ (matrix.uros.prerelease && 'prerelease') || 'release' }}
       run: |
         gh \
@@ -122,11 +113,11 @@ jobs:
           -d /c/build/motoros2/libmicroros_${{ matrix.controller }}_${{ matrix.uros.codename }}
 
     - name: Download and setup M+ SDK (mpBuilder)
-      shell: cmd
+      shell: bash
       run: |
-        C:\msys64\usr\bin\wget.exe -q -O C:/build/mpsdk_ci.7z "${{ secrets.MPSDK_DOWNLOAD_URL }}"
-        "C:\Program Files\7-Zip\7z.exe" x C:/build/mpsdk_ci.7z -oC:/build/
-        del /q C:\build\mpsdk_ci.7z
+        curl -Ls --output-dir=/c/build -o mpsdk_ci.7z '${{ secrets.MPSDK_DOWNLOAD_URL }}'
+        7z x /c/build/mpsdk_ci.7z -o"/c/build/"
+        rm -f /c/build/mpsdk_ci.7z
     - name: Add M+ SDK to PATH
       shell: bash
       run: echo "C:/build/mpsdk" >> $GITHUB_PATH

@@ -11,7 +11,7 @@ jobs:
   md_lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-    - uses: DavidAnson/markdownlint-cli2-action@v24
+    - uses: actions/checkout@v7
+    - uses: DavidAnson/markdownlint-cli2-action@v24.2.0
       with:
         globs: "**/*.md"
